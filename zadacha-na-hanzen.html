@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="bg">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Задача на Ханзен – GeoCalc</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="img/favicon.png">
+    <style>
+        .task-layout {
+            display: flex;
+            gap: 2em;
+            margin: 2em auto;
+            max-width: 1200px;
+            padding: 0 2em;
+        }
+
+        .task-left, .task-right {
+            background: #fff;
+            padding: 2em;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            flex: 1;
+        }
+
+        .task-left h2, .task-right h2 {
+            color: #00b0ea;
+            font-size: 1.2em;
+            margin-bottom: 1em;
+        }
+
+        .form-group {
+            margin-bottom: 1.2em;
+        }
+
+        label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.4em;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 0.6em;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 1em;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 1em;
+            margin-top: 1.5em;
+        }
+
+        .btn-row button {
+            flex: 1;
+            padding: 0.6em 1em;
+            border: none;
+            background-color: #00b0ea;
+            color: white;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-row button:hover {
+            background-color: #0096cc;
+        }
+
+        .output {
+            font-family: monospace;
+            white-space: pre-wrap;
+            font-size: 0.9em;
+            color: #333;
+            background: #f8fdff;
+            padding: 1em;
+            border-radius: 8px;
+            border: 1px solid #d0edf9;
+        }
+
+        h1 {
+            font-size: 1.8em;
+            font-weight: 800;
+            margin: 1em 0 0.8em;
+            color: #002244;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+
+        h1 i {
+            color: #00c3ff;
+            margin-right: 0.4em;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="main-header">
+        <div class="header-left">
+            <img src="geocalc.png" alt="GeoCalc Logo" class="logo" />
+        </div>
+        <nav class="header-nav">
+            <a href="index.html">Начало</a>
+            <a href="#">За нас</a>
+            <a href="#">Цени</a>
+            <a href="#">Контакти</a>
+            <a href="#">Акаунт</a>
+            <a href="#"><i class="fas fa-user"></i> Вход / Регистрация</a>
+            <div class="theme-switch">
+                <input type="checkbox" id="toggle-dark" />
+                <label for="toggle-dark" class="switch-label">
+                    <i class="fas fa-sun"></i>
+                </label>
+            </div>
+        </nav>
+    </header>
+
+    <h1><i class="fas fa-crosshairs"></i> Задача на Ханзен</h1>
+
+    <div class="task-layout">
+        <div class="task-left">
+            <h2><i class="fas fa-pencil-alt"></i> Входни данни</h2>
+
+            <div class="form-group">
+                <label for="xa">Xₐ (точка A)</label>
+                <input type="number" id="xa" step="any">
+            </div>
+            <div class="form-group">
+                <label for="ya">Yₐ (точка A)</label>
+                <input type="number" id="ya" step="any">
+            </div>
+            <div class="form-group">
+                <label for="xb">Xᵦ (точка B)</label>
+                <input type="number" id="xb" step="any">
+            </div>
+            <div class="form-group">
+                <label for="yb">Yᵦ (точка B)</label>
+                <input type="number" id="yb" step="any">
+            </div>
+            <div class="form-group">
+                <label for="alpha">Ъгъл α (°)</label>
+                <input type="number" id="alpha" step="any">
+            </div>
+            <div class="form-group">
+                <label for="beta">Ъгъл β (°)</label>
+                <input type="number" id="beta" step="any">
+            </div>
+
+            <div class="btn-row">
+                <button onclick="calculate()">Изчисли</button>
+                <button onclick="resetForm()">Изчисти</button>
+            </div>
+        </div>
+
+        <div class="task-right">
+            <h2><i class="fas fa-chart-line"></i> Резултати</h2>
+            <div class="output" id="results">Въведете координати и ъгли, след което натиснете "Изчисли".</div>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-inner">
+                <div class="footer-column">
+                    <h4><i class="fas fa-link"></i> Бързи връзки</h4>
+                    <a href="#">За нас</a>
+                    <a href="#">Контакт</a>
+                    <a href="#">Цени</a>
+                </div>
+                <div class="footer-column">
+                    <h4><i class="fas fa-info-circle"></i> Информация</h4>
+                    <a href="#">Политика за поверителност</a>
+                    <a href="#">Общи условия</a>
+                    <a href="#">Дисклеймър</a>
+                </div>
+                <div class="footer-column">
+                    <h4><i class="fas fa-share-alt"></i> Последвайте ни</h4>
+                    <a href="#"><i class="fab fa-instagram"></i> Instagram</a>
+                    <a href="#"><i class="fab fa-linkedin"></i> LinkedIn</a>
+                    <a href="#"><i class="fab fa-youtube"></i> YouTube</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© GeoCalc, 2025. Всички права запазени.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function hansenProblem(xA, yA, xB, yB, alphaDeg, betaDeg) {
+            const toRad = deg => deg * Math.PI / 180;
+            const alpha = toRad(alphaDeg);
+            const beta = toRad(betaDeg);
+            const gamma = Math.PI - alpha - beta;
+
+            const d = Math.sqrt((xB - xA) ** 2 + (yB - yA) ** 2);
+            const a = (d * Math.sin(alpha)) / Math.sin(gamma);
+            const b = (d * Math.sin(beta)) / Math.sin(gamma);
+
+            const dx = xB - xA;
+            const dy = yB - yA;
+            const angleAB = Math.atan2(dy, dx);
+            const angleToP = angleAB + beta;
+
+            const xP = xA + b * Math.cos(angleToP);
+            const yP = yA + b * Math.sin(angleToP);
+
+            return {
+                xP: xP.toFixed(3),
+                yP: yP.toFixed(3),
+                deltaX: dx.toFixed(3),
+                deltaY: dy.toFixed(3),
+                d: d.toFixed(3),
+                alphaDeg,
+                betaDeg
+            };
+        }
+
+        function calculate() {
+            const xa = parseFloat(document.getElementById("xa").value);
+            const ya = parseFloat(document.getElementById("ya").value);
+            const xb = parseFloat(document.getElementById("xb").value);
+            const yb = parseFloat(document.getElementById("yb").value);
+            const alpha = parseFloat(document.getElementById("alpha").value);
+            const beta = parseFloat(document.getElementById("beta").value);
+
+            if (isNaN(xa) || isNaN(ya) || isNaN(xb) || isNaN(yb) || isNaN(alpha) || isNaN(beta)) {
+                alert("Моля, попълнете всички полета.");
+                return;
+            }
+
+            const res = hansenProblem(xa, ya, xb, yb, alpha, beta);
+
+            document.getElementById("results").textContent = `
+XA = ${xa}, YA = ${ya}
+XB = ${xb}, YB = ${yb}
+α = ${res.alphaDeg}°, β = ${res.betaDeg}°
+Разстояние AB = ${res.d} m
+-------------------------------------
+Координати на точка P:
+XP = ${res.xP}
+YP = ${res.yP}
+`;
+        }
+
+        function resetForm() {
+            ["xa", "ya", "xb", "yb", "alpha", "beta"].forEach(id => document.getElementById(id).value = '');
+            document.getElementById("results").textContent = "Въведете координати и ъгли, след което натиснете \"Изчисли\".";
+        }
+
+        // Dark mode switch
+        const toggle = document.getElementById('toggle-dark');
+        const icon = document.querySelector('.switch-label i');
+        toggle.addEventListener('change', () => {
+            document.body.classList.toggle('dark-mode');
+            icon.classList.toggle('fa-sun');
+            icon.classList.toggle('fa-moon');
+        });
+    </script>
+
+</body>
+
+</html>
