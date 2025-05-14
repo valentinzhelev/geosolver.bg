@@ -72,3 +72,27 @@ input[type="number"] {
     border-radius: 8px;
     border: 1px solid #d0edf9;
 }
+
+.history-table {
+    margin-top: 2em;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+    overflow-x: auto;
+}
+
+.history-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.history-table th,
+.history-table td {
+    padding: 0.6em;
+    border: 1px solid #ccc;
+    text-align: center;
+}
+
+.history-table th {
+    background-color: #f2f2f2;
+}
