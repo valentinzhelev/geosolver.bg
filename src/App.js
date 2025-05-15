@@ -1,3 +1,9 @@
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import HomePage from './components/HomePage';
+import PurvaZadacha from './components/PurvaZadacha';
+import VtoraZadacha from './components/VtoraZadacha';
+import PravaZasechka from './components/PravaZasechka';
+import AboutPage from './components/AboutPage';
 import { Helmet } from "react-helmet";
 
 function App() {
