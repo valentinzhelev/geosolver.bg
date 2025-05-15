@@ -4,6 +4,7 @@ import Layout from './Layout';
 import Breadcrumbs from './Breadcrumbs';
 import { saveCalculation } from "./historyService";
 import { getRecentCalculations } from "./historyService";
+import { Helmet } from "react-helmet";
 
 const PurvaZadacha = () => {
   const [form, setForm] = useState({ y1: '', x1: '', alpha: '', s: '' });
@@ -94,83 +95,98 @@ X2 = ${x2.toFixed(2)}`;
   };
 
   return (
-    <Layout>
-      <Breadcrumbs />
-      <h1 style={{ textAlign: 'center', fontSize: '1.8em', marginTop: '1em' }}>
-        <i className="fas fa-location-arrow" style={{ color: '#00c3ff', marginRight: '0.4em' }}></i>
-        ПЪРВА ОСНОВНА ЗАДАЧА
-      </h1>
-      <div className="task-layout">
-        <div className="task-left">
-          <h2><i className="fas fa-location-arrow"></i> Входни данни</h2>
+    <>
+      <Helmet>
+        <title>Първа основна задача – Изчисляване по начална точка, ъгъл и дължина | GeoSolver</title>
+        <meta
+          name="description"
+          content="Изчисляване на координати по начална точка, ъгъл и дължина с онлайн геодезически калкулатор. Бързи и точни решения за геодезисти."
+        />
+        <meta
+          name="keywords"
+          content="геодезия, онлайн калкулатор, първа основна задача, координати, ъгъл, дължина, трансформация, геодезически изчисления"
+        />
+        <meta name="robots" content="index, follow" />
+        <meta name="author" content="GeoSolver" />
+      </Helmet>
+      <Layout>
+        <Breadcrumbs />
+        <h1 style={{ textAlign: 'center', fontSize: '1.8em', marginTop: '1em' }}>
+          <i className="fas fa-location-arrow" style={{ color: '#00c3ff', marginRight: '0.4em' }}></i>
+          ПЪРВА ОСНОВНА ЗАДАЧА
+        </h1>
+        <div className="task-layout">
+          <div className="task-left">
+            <h2><i className="fas fa-location-arrow"></i> Входни данни</h2>
 
-          <div className="form-group">
-            <label htmlFor="y1">Y₁ (координата)</label>
-            <input type="number" id="y1" value={form.y1} onChange={handleChange} step="any" />
+            <div className="form-group">
+              <label htmlFor="y1">Y₁ (координата)</label>
+              <input type="number" id="y1" value={form.y1} onChange={handleChange} step="any" />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="x1">X₁ (координата)</label>
+              <input type="number" id="x1" value={form.x1} onChange={handleChange} step="any" />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="alpha">Ъгъл α (в гради)</label>
+              <input type="number" id="alpha" value={form.alpha} onChange={handleChange} step="any" />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="s">Дължина S</label>
+              <input type="number" id="s" value={form.s} onChange={handleChange} step="any" />
+            </div>
+
+            <div className="btn-row">
+              <button onClick={calculate}>Изчисли</button>
+              <button onClick={resetForm}>Изчисти</button>
+              <button onClick={toggleHistory}>
+                {showHistory ? "Скрий историята" : "История на изчисленията"}
+              </button>
+            </div>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="x1">X₁ (координата)</label>
-            <input type="number" id="x1" value={form.x1} onChange={handleChange} step="any" />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="alpha">Ъгъл α (в гради)</label>
-            <input type="number" id="alpha" value={form.alpha} onChange={handleChange} step="any" />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="s">Дължина S</label>
-            <input type="number" id="s" value={form.s} onChange={handleChange} step="any" />
-          </div>
-
-          <div className="btn-row">
-            <button onClick={calculate}>Изчисли</button>
-            <button onClick={resetForm}>Изчисти</button>
-            <button onClick={toggleHistory}>
-              {showHistory ? "Скрий историята" : "История на изчисленията"}
-            </button>
+          <div className="task-right">
+            <h2><i className="fas fa-chart-line"></i> Резултати</h2>
+            <div className="output">{result}</div>
           </div>
         </div>
-
-        <div className="task-right">
-          <h2><i className="fas fa-chart-line"></i> Резултати</h2>
-          <div className="output">{result}</div>
-        </div>
-      </div>
-      {showHistory && (
-        <div className="history-table">
-          <h2>Последни изчисления</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Y₁</th>
-                <th>X₁</th>
-                <th>α</th>
-                <th>S</th>
-                <th>Y₂</th>
-                <th>X₂</th>
-                <th>Дата</th>
-              </tr>
-            </thead>
-            <tbody>
-              {history.map((entry, index) => (
-                <tr key={index}>
-                  <td>{entry.y1}</td>
-                  <td>{entry.x1}</td>
-                  <td>{entry.alpha}</td>
-                  <td>{entry.s}</td>
-                  <td>{entry.y2}</td>
-                  <td>{entry.x2}</td>
-                  <td>{new Date(entry.date).toLocaleString("bg-BG")}</td>
+        {showHistory && (
+          <div className="history-table">
+            <h2>Последни изчисления</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>Y₁</th>
+                  <th>X₁</th>
+                  <th>α</th>
+                  <th>S</th>
+                  <th>Y₂</th>
+                  <th>X₂</th>
+                  <th>Дата</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+              </thead>
+              <tbody>
+                {history.map((entry, index) => (
+                  <tr key={index}>
+                    <td>{entry.y1}</td>
+                    <td>{entry.x1}</td>
+                    <td>{entry.alpha}</td>
+                    <td>{entry.s}</td>
+                    <td>{entry.y2}</td>
+                    <td>{entry.x2}</td>
+                    <td>{new Date(entry.date).toLocaleString("bg-BG")}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
-    </Layout>
+      </Layout>
+    </>
   );
 };
 

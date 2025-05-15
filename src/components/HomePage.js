@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import "./HomePage.css";
 import { Link } from 'react-router-dom';
 import Layout from './Layout';
+import { Helmet } from "react-helmet";
 
 const HomePage = () => {
   useEffect(() => {
@@ -18,6 +19,14 @@ const HomePage = () => {
 
   return (
     <>
+      <Helmet>
+        <title>GeoSolver - Онлайн калкулатор за геодезия и засечки</title>
+        <meta name="description" content="GeoSolver предлага онлайн калкулатори за геодезия, включително права засечка, обратна засечка, полярна засечка, координатни трансформации и други. Бързи и точни изчисления за геодезисти и инженери." />
+        <meta name="keywords" content="геодезия, онлайн калкулатори, права засечка, обратна засечка, полярна засечка, координатни трансформации, геодезически изчисления, GNSS, тахиметрия, координати, азимут, дължина, триангулация, Хелмерт, афинна трансформация, инженерна геодезия" />
+        <meta name="robots" content="index, follow" />
+        <meta name="author" content="GeoSolver" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </Helmet>
       <Layout>
         <div className="banner-warning">
           <span className="warning-icon">

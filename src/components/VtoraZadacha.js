@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Layout from './Layout';
 import './TaskLayout.css';
+import { Helmet } from "react-helmet";
 
 const VtoraZadacha = () => {
     const [form, setForm] = useState({ x1: '', y1: '', x2: '', y2: '' });
@@ -79,48 +80,63 @@ S₁,₂ = ${distance.toFixed(2)} m
     };
 
     return (
-        <Layout>
-            <h1 style={{ textAlign: 'center', fontSize: '1.8em', marginTop: '1em' }}>
-                <i className="fas fa-compass" style={{ color: '#00c3ff', marginRight: '0.4em' }}></i>
-                ВТОРА ОСНОВНА ЗАДАЧА
-            </h1>
+        <>
+            <Helmet>
+                <title>Втора основна задача – Изчисляване на ъгъл и разстояние между две точки | GeoSolver</title>
+                <meta
+                    name="description"
+                    content="Онлайн калкулатор за изчисляване на ъгъл и разстояние между две точки по координати. Бързо и лесно геодезическо изчисление за професионалисти."
+                />
+                <meta
+                    name="keywords"
+                    content="геодезия, ъгъл между две точки, разстояние, геодезически калкулатор, координати, онлайн изчисления, тахиметрия, GNSS, аналитична геодезия"
+                />
+                <meta name="robots" content="index, follow" />
+                <meta name="author" content="GeoSolver" />
+            </Helmet>
+            <Layout>
+                <h1 style={{ textAlign: 'center', fontSize: '1.8em', marginTop: '1em' }}>
+                    <i className="fas fa-compass" style={{ color: '#00c3ff', marginRight: '0.4em' }}></i>
+                    ВТОРА ОСНОВНА ЗАДАЧА
+                </h1>
 
-            <div className="task-layout">
-                <div className="task-left">
-                    <h2><i className="fas fa-edit"></i> Входни данни</h2>
+                <div className="task-layout">
+                    <div className="task-left">
+                        <h2><i className="fas fa-edit"></i> Входни данни</h2>
 
-                    <div className="form-group">
-                        <label htmlFor="x1">X₁</label>
-                        <input type="number" id="x1" value={form.x1} onChange={handleChange} step="any" />
+                        <div className="form-group">
+                            <label htmlFor="x1">X₁</label>
+                            <input type="number" id="x1" value={form.x1} onChange={handleChange} step="any" />
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="y1">Y₁</label>
+                            <input type="number" id="y1" value={form.y1} onChange={handleChange} step="any" />
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="x2">X₂</label>
+                            <input type="number" id="x2" value={form.x2} onChange={handleChange} step="any" />
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="y2">Y₂</label>
+                            <input type="number" id="y2" value={form.y2} onChange={handleChange} step="any" />
+                        </div>
+
+                        <div className="btn-row">
+                            <button onClick={calculate}>Изчисли</button>
+                            <button onClick={resetForm}>Изчисти</button>
+                        </div>
                     </div>
 
-                    <div className="form-group">
-                        <label htmlFor="y1">Y₁</label>
-                        <input type="number" id="y1" value={form.y1} onChange={handleChange} step="any" />
-                    </div>
-
-                    <div className="form-group">
-                        <label htmlFor="x2">X₂</label>
-                        <input type="number" id="x2" value={form.x2} onChange={handleChange} step="any" />
-                    </div>
-
-                    <div className="form-group">
-                        <label htmlFor="y2">Y₂</label>
-                        <input type="number" id="y2" value={form.y2} onChange={handleChange} step="any" />
-                    </div>
-
-                    <div className="btn-row">
-                        <button onClick={calculate}>Изчисли</button>
-                        <button onClick={resetForm}>Изчисти</button>
+                    <div className="task-right">
+                        <h2><i className="fas fa-chart-line"></i> Резултати</h2>
+                        <div className="output">{result}</div>
                     </div>
                 </div>
-
-                <div className="task-right">
-                    <h2><i className="fas fa-chart-line"></i> Резултати</h2>
-                    <div className="output">{result}</div>
-                </div>
-            </div>
-        </Layout>
+            </Layout>
+        </>
     );
 };
 

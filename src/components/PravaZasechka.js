@@ -3,6 +3,7 @@ import './TaskLayout.css';
 import Layout from './Layout';
 import Breadcrumbs from './Breadcrumbs';
 import jsPDF from 'jspdf';
+import { Helmet } from "react-helmet";
 
 const PravaZasechka = () => {
     const initialMessage = ['Въведете данни и натиснете "Изчисли", за да видите резултати тук.'];
@@ -172,50 +173,65 @@ const PravaZasechka = () => {
     };
 
     return (
-        <Layout>
-            <Breadcrumbs />
-            <h1 style={{ textAlign: 'center', fontSize: '1.8em', marginTop: '1em' }}>
-                <i className="fas fa-crosshairs" style={{ color: '#0d99ff', marginRight: '0.4em' }}></i>
-                ПРАВА ЗАСЕЧКА
-            </h1>
-            <div className="task-layout">
-                <div className="task-left">
-                    <h2>Входни данни</h2>
-                    {['yA', 'xA', 'yB', 'xB', 'beta1', 'beta2'].map((id) => (
-                        <div className="form-group" key={id}>
-                            <label htmlFor={id}>{id.toUpperCase()}</label>
-                            <input type="number" id={id} value={form[id]} onChange={handleChange} step="any" />
+        <>
+            <Helmet>
+                <title>Права засечка – Геодезически калкулатор | GeoSolver</title>
+                <meta
+                    name="description"
+                    content="Онлайн калкулатор за права засечка – изчисляване на координати чрез посока и разстояние от известна точка. Точни и бързи геодезически изчисления."
+                />
+                <meta
+                    name="keywords"
+                    content="права засечка, геодезически калкулатор, координати, геодезия, тахиметрия, геодезически изчисления, онлайн геодезия, GNSS, координатни системи"
+                />
+                <meta name="robots" content="index, follow" />
+                <meta name="author" content="GeoSolver" />
+            </Helmet>
+            <Layout>
+                <Breadcrumbs />
+                <h1 style={{ textAlign: 'center', fontSize: '1.8em', marginTop: '1em' }}>
+                    <i className="fas fa-crosshairs" style={{ color: '#0d99ff', marginRight: '0.4em' }}></i>
+                    ПРАВА ЗАСЕЧКА
+                </h1>
+                <div className="task-layout">
+                    <div className="task-left">
+                        <h2>Входни данни</h2>
+                        {['yA', 'xA', 'yB', 'xB', 'beta1', 'beta2'].map((id) => (
+                            <div className="form-group" key={id}>
+                                <label htmlFor={id}>{id.toUpperCase()}</label>
+                                <input type="number" id={id} value={form[id]} onChange={handleChange} step="any" />
+                            </div>
+                        ))}
+                        <div className="btn-row">
+                            <button onClick={calculate}>Изчисли</button>
+                            <button onClick={resetForm}>Изчисти</button>
+                            <button onClick={copyToClipboard}>Копирай резултата</button>
+                            <button onClick={exportToPDF}>Запази като PDF</button>
+                            <button onClick={() => setIsDetailed(!isDetailed)}>
+                                {isDetailed ? 'Покажи само финал' : 'Покажи подробно'}
+                            </button>
                         </div>
-                    ))}
-                    <div className="btn-row">
-                        <button onClick={calculate}>Изчисли</button>
-                        <button onClick={resetForm}>Изчисти</button>
-                        <button onClick={copyToClipboard}>Копирай резултата</button>
-                        <button onClick={exportToPDF}>Запази като PDF</button>
-                        <button onClick={() => setIsDetailed(!isDetailed)}>
-                            {isDetailed ? 'Покажи само финал' : 'Покажи подробно'}
-                        </button>
                     </div>
-                </div>
 
-                <div className="task-right">
-                    <h2><i className="fas fa-chart-line"></i> Изчисления</h2>
-                    <div className="output">
-                        {displayedLines.length > 0
-                            ? displayedLines.map((line, index) => (
-                                <div key={index} style={{ marginBottom: '6px' }}>
-                                    {line}
-                                </div>
-                            ))
-                            : initialMessage.map((line, index) => (
-                                <div key={index} style={{ marginBottom: '6px' }}>
-                                    {line}
-                                </div>
-                            ))}
+                    <div className="task-right">
+                        <h2><i className="fas fa-chart-line"></i> Изчисления</h2>
+                        <div className="output">
+                            {displayedLines.length > 0
+                                ? displayedLines.map((line, index) => (
+                                    <div key={index} style={{ marginBottom: '6px' }}>
+                                        {line}
+                                    </div>
+                                ))
+                                : initialMessage.map((line, index) => (
+                                    <div key={index} style={{ marginBottom: '6px' }}>
+                                        {line}
+                                    </div>
+                                ))}
+                        </div>
                     </div>
                 </div>
-            </div>
-        </Layout>
+            </Layout>
+        </>
     );
 };
 
