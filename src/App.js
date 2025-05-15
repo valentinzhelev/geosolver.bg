@@ -4,6 +4,7 @@ import HomePage from './components/HomePage';
 import PurvaZadacha from './components/PurvaZadacha';
 import VtoraZadacha from './components/VtoraZadacha';
 import AboutPage from './components/AboutPage';
+import PravaZasechka from './components/PravaZasechka';
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Route path="/purva-zadacha" element={<PurvaZadacha />} />
         <Route path="/vtora-zadacha" element={<VtoraZadacha />} />
         <Route path="/za-nas" element={<AboutPage />} />
+        <Route path="/prava-zasechka" element={<PravaZasechka />} />
       </Routes>
     </Router>
   );
