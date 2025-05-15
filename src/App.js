@@ -3,7 +3,9 @@ import HomePage from './components/HomePage';
 import PurvaZadacha from './components/PurvaZadacha';
 import VtoraZadacha from './components/VtoraZadacha';
 import PravaZasechka from './components/PravaZasechka';
+import ObratnaZasechka from './components/ObratnaZasechka';
 import AboutPage from './components/AboutPage';
+import Prices from './components/Prices';
 import { Helmet } from "react-helmet";
 
 function App() {
@@ -29,7 +31,9 @@ function App() {
           <Route path="/purva-zadacha" element={<PurvaZadacha />} />
           <Route path="/vtora-zadacha" element={<VtoraZadacha />} />
           <Route path="/prava-zasechka" element={<PravaZasechka />} />
+          <Route path="/obratna-zasechka" element={<ObratnaZasechka />} />
           <Route path="/za-nas" element={<AboutPage />} />
+          <Route path="/planove" element={<Prices />} />
         </Routes>
       </Router>
     </>

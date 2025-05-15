@@ -192,7 +192,9 @@ const HomePage = () => {
                   </li>
                 </ul>
                 <div className="card-actions">
-                  <button>Изчисли</button>
+                  <Link to="/obratna-zasechka">
+                    <button>Изчисли</button>
+                  </Link>
                   <div className="tooltip">
                     <button>Инфо</button>
                     <div className="tooltip-text">

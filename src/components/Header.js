@@ -20,11 +20,15 @@ const Header = () => {
         <img src="/geocalc.png" alt="GEOSOLVER Logo" className="logo" />
       </div>
       <nav className="header-nav">
-        <Link to="/" className="active">Начало</Link>
+        <Link to="/" className={({ isActive }) => isActive ? 'active' : ''}>
+          Начало
+        </Link>
         <Link to="/za-nas" className={({ isActive }) => isActive ? 'active' : ''}>
           За нас
         </Link>
-        <a href="#">Цени</a>
+        <Link to="/planove" className={({ isActive }) => isActive ? 'active' : ''}>
+          Цени
+        </Link>
         <a href="#">Контакти</a>
         <a href="#">Акаунт</a>
         <a href="#"><i className="fas fa-user"></i> Вход / Регистрация</a>

@@ -1,0 +1,126 @@
+.prices-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #222;
+}
+
+.prices-header {
+    font-size: 2.2rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 0.3rem;
+    color: #007bff;
+}
+
+.prices-subheader {
+    text-align: center;
+    font-size: 1.1rem;
+    margin-bottom: 2.5rem;
+    color: #444;
+}
+
+.prices-row {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: nowrap;
+    margin-bottom: 3rem;
+}
+
+.price-card {
+    background: #f9fbff;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    padding: 2rem 1.5rem;
+    width: 320px;
+    text-align: center;
+    transition: transform 0.3s ease;
+    border-top: 5px solid transparent;
+}
+
+.price-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.15);
+}
+
+.price-icon {
+    font-size: 3.8rem;
+    color: #0099ff;
+    margin-bottom: 1rem;
+}
+
+.price-card.free .price-icon {
+    color: #28a745;
+}
+
+.price-card.pro .price-icon {
+    color: #007bff;
+}
+
+.price-card.corp .price-icon {
+    color: #fd7e14;
+}
+
+.price-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+    color: #007bff;
+}
+
+.price-amount {
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    color: #000;
+}
+
+.price-description {
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    color: #555;
+}
+
+.price-button {
+    background-color: #0099ff;
+    border: none;
+    color: white;
+    padding: 12px 28px;
+    border-radius: 6px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.25s ease;
+    width: 100%;
+}
+
+.price-button:hover {
+    background-color: #007acc;
+}
+
+.faq-section {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.faq-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #007bff;
+}
+
+.faq-question {
+    font-weight: 700;
+    margin-top: 1rem;
+    margin-bottom: 0.3rem;
+    font-size: 1rem;
+}
+
+.faq-answer {
+    margin-left: 1rem;
+    color: #444;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
