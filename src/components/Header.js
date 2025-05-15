@@ -21,7 +21,9 @@ const Header = () => {
       </div>
       <nav className="header-nav">
         <Link to="/" className="active">Начало</Link>
-        <a href="#">За нас</a>
+        <Link to="/za-nas" className={({ isActive }) => isActive ? 'active' : ''}>
+          За нас
+        </Link>
         <a href="#">Цени</a>
         <a href="#">Контакти</a>
         <a href="#">Акаунт</a>
