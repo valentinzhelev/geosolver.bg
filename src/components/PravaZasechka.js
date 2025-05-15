@@ -1,68 +1,87 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './TaskLayout.css';
 import Layout from './Layout';
 import Breadcrumbs from './Breadcrumbs';
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
-
 
 const PravaZasechka = () => {
+    // Начален текст, който се показва преди калкулациите
+    const initialMessage = ['Въведете данни и натиснете "Изчисли", за да видите резултати тук.'];
+
+    // Формата
     const [form, setForm] = useState({ xA: '', yA: '', xB: '', yB: '', beta1: '', beta2: '' });
-    const [result, setResult] = useState([]);
-    const [fullLog, setFullLog] = useState([]);
+
+    // Пълните редове за анимация (през calculate ги задаваме)
+    const [fullLines, setFullLines] = useState(initialMessage);
+
+    // Текущо показани редове (с анимация буква по буква)
+    const [displayedLines, setDisplayedLines] = useState([]);
+
+    // Индекс на текущия ред, който се пише
+    const [currentLine, setCurrentLine] = useState(0);
+
+    // Индекс на текущия символ в текущия ред
+    const [currentCharIndex, setCurrentCharIndex] = useState(0);
+
+    // Показване на детайли (превключвател)
     const [isDetailed, setIsDetailed] = useState(true);
 
-    let delayCounter = 0; // Натрупващо се закъснение за ред по ред
-    const stepDelay = 400; // Време между стъпките в ms
+    // За копиране в клипборда
+    const copyToClipboard = () => {
+        const plainText = displayedLines.join('\n');
+        navigator.clipboard.writeText(plainText).then(() => alert("Резултатът е копиран."));
+    };
 
+    // За запазване в PDF
+    const exportToPDF = () => {
+        const doc = new jsPDF();
+        let y = 10;
+
+        displayedLines.forEach((line) => {
+            doc.text(line, 10, y);
+            y += 7;
+        });
+
+        doc.save('prava_zasechka.pdf');
+    };
+
+    // useEffect за ефекта буква по буква
+    useEffect(() => {
+        if (currentLine < fullLines.length) {
+            if (currentCharIndex <= fullLines[currentLine].length) {
+                const timer = setTimeout(() => {
+                    // Извличаме част от текущия ред
+                    const newText = fullLines[currentLine].slice(0, currentCharIndex);
+
+                    setDisplayedLines((prev) => {
+                        const copy = [...prev];
+                        copy[currentLine] = newText;
+                        return copy;
+                    });
+
+                    setCurrentCharIndex(currentCharIndex + 1);
+                }, 30); // тук можеш да промениш скоростта
+
+                return () => clearTimeout(timer);
+            } else {
+                // След като реда е изписан, преминаваме към следващия ред
+                setCurrentLine(currentLine + 1);
+                setCurrentCharIndex(0);
+            }
+        }
+    }, [currentCharIndex, currentLine, fullLines]);
+
+    // Обработване на промени във формата
     const handleChange = (e) => {
         setForm({ ...form, [e.target.id]: e.target.value });
     };
 
-    const copyToClipboard = () => {
-        const plainText = fullLog.map(line => {
-            const div = document.createElement('div');
-            div.innerHTML = typeof line === 'string' ? line : line.props.children;
-            return div.textContent;
-        }).join('\n');
-        navigator.clipboard.writeText(plainText).then(() => alert("Резултатът е копиран."));
-    };
-
-    const exportToPDF = () => {
-        const input = document.querySelector('.output'); // селектираш елемента с изчисленията
-        if (!input) return alert('Няма съдържание за експортиране!');
-
-        html2canvas(input).then((canvas) => {
-            const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF({
-                orientation: 'portrait',
-                unit: 'pt',
-                format: 'a4',
-            });
-
-            const imgProps = pdf.getImageProperties(imgData);
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-            pdf.save('prava_zasechka.pdf');
-        });
-    };
-
-
-
-    const logStep = (jsx) => {
-        setFullLog((prev) => [...prev, jsx]);
-        setTimeout(() => {
-            setResult((prev) => [...prev, jsx]);
-        }, delayCounter);
-        delayCounter += stepDelay;
-    };
-
+    // Стартиране на изчисленията и подготвяне на пълните редове за анимация
     const calculate = () => {
-        setResult([]);
-        setFullLog([]);
-        delayCounter = 0; // Рестартираме закъснението при ново изчисление
+        // Изчистваме предишните резултати
+        setDisplayedLines([]);
+        setCurrentLine(0);
+        setCurrentCharIndex(0);
 
         const { xA, yA, xB, yB, beta1, beta2 } = form;
         const toNum = (v) => parseFloat(v);
@@ -82,8 +101,11 @@ const PravaZasechka = () => {
         const dY = round(yB_ - yA_, 2);
         const alphaABTablic = round4(Math.abs(Math.atan(dY / dX) * (200 / Math.PI)));
 
-        logStep(<div><strong>1)</strong> tgα<sub>AB</sub> = ΔY / ΔX = {dY} / {dX} → <em>Изчисляваме посоката AB</em></div>);
-        logStep(<div>α<sub>AB</sub> таблично = <strong>{alphaABTablic}</strong> gon</div>);
+        // Тук събираме пълните редове като обикновени низове
+        const lines = [
+            `1) tg\u03B1\u2090\u2091 = \u0394Y / \u0394X = ${dY} / ${dX} → Изчисляваме посоката AB`,
+            `α\u2090\u2091 таблично = ${alphaABTablic} gon`,
+        ];
 
         let alphaAB = 0;
         if (dY > 0 && dX > 0) alphaAB = alphaABTablic;
@@ -91,43 +113,48 @@ const PravaZasechka = () => {
         else if (dY < 0 && dX < 0) alphaAB = 200 + alphaABTablic;
         else if (dY < 0 && dX > 0) alphaAB = 400 - alphaABTablic;
 
-        logStep(<div>α<sub>AB</sub> = {round4(alphaAB)} gon (според квадрант)</div>);
+        lines.push(`α\u2090\u2091 = ${round4(alphaAB)} gon (според квадрант)`);
 
         const sAB = round(Math.sqrt(Math.pow(xB_ - xA_, 2) + Math.pow(yB_ - yA_, 2)));
-        logStep(<div>s<sub>AB</sub> = √(ΔX² + ΔY²) = <strong>{sAB}</strong> → <em>Дължина на страната AB</em></div>);
+        lines.push(`s\u2090\u2091 = √(ΔX² + ΔY²) = ${sAB} → Дължина на страната AB`);
 
         const alphaBA = alphaAB > 200 ? alphaAB - 200 : alphaAB + 200;
         const alphaAP = round4(alphaAB - beta1_);
         const alphaBP = round4(alphaBA + beta2_);
 
-        logStep(<><strong>2)</strong> α<sub>AP</sub> = α<sub>AB</sub> - β₁ = {round4(alphaAB)} - {beta1_} = <strong>{alphaAP}</strong> → <em>Посока към P от A</em></>);
-        logStep(<div>α<sub>BP</sub> = α<sub>BA</sub> + β₂ = {round4(alphaBA)} + {beta2_} = <strong>{alphaBP}</strong> → <em>Посока към P от B</em></div>);
+        lines.push(`2) α\u2090P = α\u2090\u2091 - β₁ = ${round4(alphaAB)} - ${beta1_} = ${alphaAP} → Посока към P от A`);
+        lines.push(`α\u2090P = α\u2090A + β₂ = ${round4(alphaBA)} + ${beta2_} = ${alphaBP} → Посока към P от B`);
 
         const sAP = round((sAB * Math.sin(toRad(beta2_))) / Math.sin(toRad(beta1_ + beta2_)));
         const sBP = round((sAB * Math.sin(toRad(beta1_))) / Math.sin(toRad(beta1_ + beta2_)));
 
-        logStep(<><strong>3)</strong> s<sub>AP</sub> = (s<sub>AB</sub>·sinβ₂) / sin(β₁ + β₂) = <strong>{sAP}</strong> → <em>Изчисляваме дължина от A до P</em></>);
-        logStep(<div>s<sub>BP</sub> = (s<sub>AB</sub>·sinβ₁) / sin(β₁ + β₂) = <strong>{sBP}</strong> → <em>Изчисляваме дължина от B до P</em></div>);
+        lines.push(`3) s\u2090P = (s\u2090\u2091·sinβ₂) / sin(β₁ + β₂) = ${sAP} → Изчисляваме дължина от A до P`);
+        lines.push(`s\u2090P = (s\u2090\u2091·sinβ₁) / sin(β₁ + β₂) = ${sBP} → Изчисляваме дължина от B до P`);
 
         const xPrimP = xA_ + round(sAP * Math.cos(toRad(alphaAP)), 4);
         const yPrimP = yA_ + round(sAP * Math.sin(toRad(alphaAP)), 4);
         const xSecondP = xB_ + round(sBP * Math.cos(toRad(alphaBP)), 4);
         const ySecondP = yB_ + round(sBP * Math.sin(toRad(alphaBP)), 4);
 
-        logStep(<><strong>4)</strong> ΔX<sub>AP</sub> = s<sub>AP</sub>·cos(α<sub>AP</sub>), ΔY<sub>AP</sub> = s<sub>AP</sub>·sin(α<sub>AP</sub>)</>);
-        logStep(<div>ΔX<sub>BP</sub> = s<sub>BP</sub>·cos(α<sub>BP</sub>), ΔY<sub>BP</sub> = s<sub>BP</sub>·sin(α<sub>BP</sub>)</div>);
+        lines.push(`4) ΔX\u2090P = s\u2090P·cos(α\u2090P), ΔY\u2090P = s\u2090P·sin(α\u2090P)`);
+        lines.push(`ΔX\u2090P = s\u2090P·cos(α\u2090P), ΔY\u2090P = s\u2090P·sin(α\u2090P)`);
 
         const xP = round((xPrimP + xSecondP) / 2);
         const yP = round((yPrimP + ySecondP) / 2);
 
-        logStep(<><strong>5)</strong> X' = {round(xPrimP, 2)}, X" = {round(xSecondP, 2)} → X = <strong>{xP}</strong></>);
-        logStep(<div>Y' = {round(yPrimP, 2)}, Y" = {round(ySecondP, 2)} → Y = <strong>{yP}</strong></div>);
+        lines.push(`5) X' = ${round(xPrimP, 2)}, X" = ${round(xSecondP, 2)} → X = ${xP}`);
+        lines.push(`Y' = ${round(yPrimP, 2)}, Y" = ${round(ySecondP, 2)} → Y = ${yP}`);
+
+        setFullLines(lines);
     };
 
+    // Изчистване на формата и връщане на началния текст
     const resetForm = () => {
         setForm({ xA: '', yA: '', xB: '', yB: '', beta1: '', beta2: '' });
-        setResult([]);
-        setFullLog([]);
+        setFullLines(initialMessage);
+        setDisplayedLines([]);
+        setCurrentLine(0);
+        setCurrentCharIndex(0);
     };
 
     return (
@@ -160,9 +187,10 @@ const PravaZasechka = () => {
                 <div className="task-right">
                     <h2><i className="fas fa-chart-line"></i> Изчисления</h2>
                     <div className="output">
-                        {(isDetailed ? result : fullLog.slice(-2)).map((line, index) => (
-                            <div key={index} style={{ marginBottom: '6px' }}>{line}</div>
-                        ))}
+                        {displayedLines.length > 0
+                            ? displayedLines.map((line, index) => <div key={index} style={{ marginBottom: '6px' }}>{line}</div>)
+                            : initialMessage.map((line, index) => <div key={index} style={{ marginBottom: '6px' }}>{line}</div>)
+                        }
                     </div>
                 </div>
             </div>
