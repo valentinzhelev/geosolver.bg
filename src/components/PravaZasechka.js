@@ -1,38 +1,77 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import './TaskLayout.css';
 import Layout from './Layout';
 import Breadcrumbs from './Breadcrumbs';
 import jsPDF from 'jspdf';
 
 const PravaZasechka = () => {
-    // Начален текст, който се показва преди калкулациите
     const initialMessage = ['Въведете данни и натиснете "Изчисли", за да видите резултати тук.'];
 
-    // Формата
     const [form, setForm] = useState({ xA: '', yA: '', xB: '', yB: '', beta1: '', beta2: '' });
-
-    // Пълните редове за анимация (през calculate ги задаваме)
     const [fullLines, setFullLines] = useState(initialMessage);
-
-    // Текущо показани редове (с анимация буква по буква)
+    const [linesToAnimate, setLinesToAnimate] = useState(initialMessage);
     const [displayedLines, setDisplayedLines] = useState([]);
-
-    // Индекс на текущия ред, който се пише
     const [currentLine, setCurrentLine] = useState(0);
-
-    // Индекс на текущия символ в текущия ред
     const [currentCharIndex, setCurrentCharIndex] = useState(0);
-
-    // Показване на детайли (превключвател)
     const [isDetailed, setIsDetailed] = useState(true);
+    const [animationDone, setAnimationDone] = useState(false);
 
-    // За копиране в клипборда
+    const stepDelay = 30;
+
+    useEffect(() => {
+        if (currentLine < linesToAnimate.length) {
+            if (currentCharIndex <= linesToAnimate[currentLine].length) {
+                const timer = setTimeout(() => {
+                    const newText = linesToAnimate[currentLine].slice(0, currentCharIndex);
+                    setDisplayedLines((prev) => {
+                        const copy = [...prev];
+                        copy[currentLine] = newText;
+                        return copy;
+                    });
+                    setCurrentCharIndex(currentCharIndex + 1);
+                }, stepDelay);
+
+                return () => clearTimeout(timer);
+            } else {
+                setCurrentLine(currentLine + 1);
+                setCurrentCharIndex(0);
+            }
+        } else {
+            // Когато анимацията достигне края, маркираме като завършена
+            setAnimationDone(true);
+        }
+    }, [currentCharIndex, currentLine, linesToAnimate]);
+
+    // Управление на показваните редове при смяна на режим (подробен / финал)
+    useEffect(() => {
+        if (!animationDone) {
+            if (isDetailed) {
+                setLinesToAnimate(fullLines);
+            } else {
+                setLinesToAnimate(fullLines.length > 0 ? [fullLines[fullLines.length - 2], fullLines[fullLines.length - 1]] : []);
+            }
+            setDisplayedLines([]);
+            setCurrentLine(0);
+            setCurrentCharIndex(0);
+        } else {
+            // Ако анимацията вече е направена, просто превключваме без анимация
+            if (isDetailed) {
+                setDisplayedLines(fullLines);
+            } else {
+                setDisplayedLines(fullLines.length > 0 ? [fullLines[fullLines.length - 2], fullLines[fullLines.length - 1]] : []);
+            }
+        }
+    }, [isDetailed, fullLines, animationDone]);
+
+    const handleChange = (e) => {
+        setForm({ ...form, [e.target.id]: e.target.value });
+    };
+
     const copyToClipboard = () => {
         const plainText = displayedLines.join('\n');
         navigator.clipboard.writeText(plainText).then(() => alert("Резултатът е копиран."));
     };
 
-    // За запазване в PDF
     const exportToPDF = () => {
         const doc = new jsPDF();
         let y = 10;
@@ -45,40 +84,8 @@ const PravaZasechka = () => {
         doc.save('prava_zasechka.pdf');
     };
 
-    // useEffect за ефекта буква по буква
-    useEffect(() => {
-        if (currentLine < fullLines.length) {
-            if (currentCharIndex <= fullLines[currentLine].length) {
-                const timer = setTimeout(() => {
-                    // Извличаме част от текущия ред
-                    const newText = fullLines[currentLine].slice(0, currentCharIndex);
-
-                    setDisplayedLines((prev) => {
-                        const copy = [...prev];
-                        copy[currentLine] = newText;
-                        return copy;
-                    });
-
-                    setCurrentCharIndex(currentCharIndex + 1);
-                }, 30); // тук можеш да промениш скоростта
-
-                return () => clearTimeout(timer);
-            } else {
-                // След като реда е изписан, преминаваме към следващия ред
-                setCurrentLine(currentLine + 1);
-                setCurrentCharIndex(0);
-            }
-        }
-    }, [currentCharIndex, currentLine, fullLines]);
-
-    // Обработване на промени във формата
-    const handleChange = (e) => {
-        setForm({ ...form, [e.target.id]: e.target.value });
-    };
-
-    // Стартиране на изчисленията и подготвяне на пълните редове за анимация
     const calculate = () => {
-        // Изчистваме предишните резултати
+        setAnimationDone(false);  // ресетваме флага при ново изчисление
         setDisplayedLines([]);
         setCurrentLine(0);
         setCurrentCharIndex(0);
@@ -101,7 +108,6 @@ const PravaZasechka = () => {
         const dY = round(yB_ - yA_, 2);
         const alphaABTablic = round4(Math.abs(Math.atan(dY / dX) * (200 / Math.PI)));
 
-        // Тук събираме пълните редове като обикновени низове
         const lines = [
             `1) tg\u03B1\u2090\u2091 = \u0394Y / \u0394X = ${dY} / ${dX} → Изчисляваме посоката AB`,
             `α\u2090\u2091 таблично = ${alphaABTablic} gon`,
@@ -142,19 +148,26 @@ const PravaZasechka = () => {
         const xP = round((xPrimP + xSecondP) / 2);
         const yP = round((yPrimP + ySecondP) / 2);
 
-        lines.push(`5) X' = ${round(xPrimP, 2)}, X" = ${round(xSecondP, 2)} → X = ${xP}`);
-        lines.push(`Y' = ${round(yPrimP, 2)}, Y" = ${round(ySecondP, 2)} → Y = ${yP}`);
+        lines.push(`5a) X' = ${round(xPrimP, 2)}, X" = ${round(xSecondP, 2)} → X = ${xP}`);
+        lines.push(`5b) Y' = ${round(yPrimP, 2)}, Y" = ${round(ySecondP, 2)} → Y = ${yP}`);
 
         setFullLines(lines);
+
+        if (!isDetailed) {
+            setLinesToAnimate(lines.slice(-2));
+        } else {
+            setLinesToAnimate(lines);
+        }
     };
 
-    // Изчистване на формата и връщане на началния текст
     const resetForm = () => {
         setForm({ xA: '', yA: '', xB: '', yB: '', beta1: '', beta2: '' });
         setFullLines(initialMessage);
+        setLinesToAnimate(initialMessage);
         setDisplayedLines([]);
         setCurrentLine(0);
         setCurrentCharIndex(0);
+        setAnimationDone(false);
     };
 
     return (
@@ -188,9 +201,16 @@ const PravaZasechka = () => {
                     <h2><i className="fas fa-chart-line"></i> Изчисления</h2>
                     <div className="output">
                         {displayedLines.length > 0
-                            ? displayedLines.map((line, index) => <div key={index} style={{ marginBottom: '6px' }}>{line}</div>)
-                            : initialMessage.map((line, index) => <div key={index} style={{ marginBottom: '6px' }}>{line}</div>)
-                        }
+                            ? displayedLines.map((line, index) => (
+                                <div key={index} style={{ marginBottom: '6px' }}>
+                                    {line}
+                                </div>
+                            ))
+                            : initialMessage.map((line, index) => (
+                                <div key={index} style={{ marginBottom: '6px' }}>
+                                    {line}
+                                </div>
+                            ))}
                     </div>
                 </div>
             </div>
