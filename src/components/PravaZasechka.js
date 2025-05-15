@@ -94,6 +94,7 @@ const PravaZasechka = () => {
         const toNum = (v) => parseFloat(v);
         const round = (val, dec = 2) => Math.round(val * 10 ** dec) / 10 ** dec;
         const round4 = (val) => Math.round(val * 10000) / 10000;
+        const round3 = (val) => Math.round(val * 1000) / 1000; // нов метод за 3 знака след запетая
         const toRad = (g) => g * 0.015708;
 
         const xA_ = toNum(xA), yA_ = toNum(yA), xB_ = toNum(xB), yB_ = toNum(yB);
@@ -145,8 +146,8 @@ const PravaZasechka = () => {
         lines.push(`4) ΔX\u2090P = s\u2090P·cos(α\u2090P), ΔY\u2090P = s\u2090P·sin(α\u2090P)`);
         lines.push(`ΔX\u2090P = s\u2090P·cos(α\u2090P), ΔY\u2090P = s\u2090P·sin(α\u2090P)`);
 
-        const xP = round((xPrimP + xSecondP) / 2);
-        const yP = round((yPrimP + ySecondP) / 2);
+        const xP = round3((xPrimP + xSecondP) / 2);
+        const yP = round3((yPrimP + ySecondP) / 2);
 
         lines.push(`5a) X' = ${round(xPrimP, 2)}, X" = ${round(xSecondP, 2)} → X = ${xP}`);
         lines.push(`5b) Y' = ${round(yPrimP, 2)}, Y" = ${round(ySecondP, 2)} → Y = ${yP}`);
