@@ -3,6 +3,8 @@ import './TaskLayout.css';
 import Layout from './Layout';
 import Breadcrumbs from './Breadcrumbs';
 import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+
 
 const PravaZasechka = () => {
     const [form, setForm] = useState({ xA: '', yA: '', xB: '', yB: '', beta1: '', beta2: '' });
@@ -27,16 +29,27 @@ const PravaZasechka = () => {
     };
 
     const exportToPDF = () => {
-        const doc = new jsPDF();
-        let y = 10;
-        fullLog.forEach((line, i) => {
-            const div = document.createElement('div');
-            div.innerHTML = typeof line === 'string' ? line : line.props.children;
-            doc.text(div.textContent || '', 10, y);
-            y += 7;
+        const input = document.querySelector('.output'); // селектираш елемента с изчисленията
+        if (!input) return alert('Няма съдържание за експортиране!');
+
+        html2canvas(input).then((canvas) => {
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF({
+                orientation: 'portrait',
+                unit: 'pt',
+                format: 'a4',
+            });
+
+            const imgProps = pdf.getImageProperties(imgData);
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+            pdf.save('prava_zasechka.pdf');
         });
-        doc.save('prava_zasechka.pdf');
     };
+
+
 
     const logStep = (jsx) => {
         setFullLog((prev) => [...prev, jsx]);
