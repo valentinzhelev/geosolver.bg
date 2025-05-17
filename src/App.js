@@ -1,11 +1,11 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import HomePage from './components/HomePage';
-import PurvaZadacha from './components/PurvaZadacha';
-import VtoraZadacha from './components/VtoraZadacha';
-import PravaZasechka from './components/PravaZasechka';
-import ObratnaZasechka from './components/ObratnaZasechka';
-import AboutPage from './components/AboutPage';
-import Prices from './components/Prices';
+import HomePage from './components/pages/HomePage/HomePage';
+import PurvaZadacha from './components/tasks/PurvaZadacha';
+import VtoraZadacha from './components/tasks/VtoraZadacha';
+import PravaZasechka from './components/tasks/PravaZasechka';
+import ObratnaZasechka from './components/tasks/ObratnaZasechka';
+import AboutPage from './components/pages/AboutPage/AboutPage';
+import Prices from './components/pages/Prices/Prices';
 import { Helmet } from "react-helmet";
 
 function App() {

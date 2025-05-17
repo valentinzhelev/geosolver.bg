@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import "./HomePage.css";
 import { Link } from 'react-router-dom';
-import Layout from './Layout';
+import Layout from '../../layout/Layout';
 import { Helmet } from "react-helmet";
 
 const HomePage = () => {

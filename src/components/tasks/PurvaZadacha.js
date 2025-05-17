@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import './TaskLayout.css';
-import Layout from './Layout';
-import Breadcrumbs from './Breadcrumbs';
-import { saveCalculation } from "./historyService";
-import { getRecentCalculations } from "./historyService";
+import Layout from '../layout/Layout';
+import Breadcrumbs from '../layout/Breadcrumbs';
+import { saveCalculation } from "../shared/historyService";
+import { getRecentCalculations } from "../shared/historyService";
 import { Helmet } from "react-helmet";
 
 const PurvaZadacha = () => {

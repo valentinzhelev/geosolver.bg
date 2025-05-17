@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import './TaskLayout.css';
-import Layout from './Layout';
-import Breadcrumbs from './Breadcrumbs';
+import Layout from '../layout/Layout';
+import Breadcrumbs from '../layout/Breadcrumbs';
 import jsPDF from 'jspdf';
 import { Helmet } from "react-helmet";
 
-const PravaZasechka = () => {
+const ObratnaZasechka = () => {
     const initialMessage = ['Въведете данни и натиснете "Изчисли", за да видите резултати тук.'];
 
-    const [form, setForm] = useState({ xA: '', yA: '', xB: '', yB: '', beta1: '', beta2: '' });
+    const [form, setForm] = useState({
+        xA: '', yA: '',
+        xB: '', yB: '',
+        xC: '', yC: '',
+        beta1: '', beta2: ''
+    });
     const [fullLines, setFullLines] = useState(initialMessage);
     const [linesToAnimate, setLinesToAnimate] = useState(initialMessage);
     const [displayedLines, setDisplayedLines] = useState([]);
@@ -38,12 +43,10 @@ const PravaZasechka = () => {
                 setCurrentCharIndex(0);
             }
         } else {
-            // Когато анимацията достигне края, маркираме като завършена
             setAnimationDone(true);
         }
     }, [currentCharIndex, currentLine, linesToAnimate]);
 
-    // Управление на показваните редове при смяна на режим (подробен / финал)
     useEffect(() => {
         if (!animationDone) {
             if (isDetailed) {
@@ -55,7 +58,6 @@ const PravaZasechka = () => {
             setCurrentLine(0);
             setCurrentCharIndex(0);
         } else {
-            // Ако анимацията вече е направена, просто превключваме без анимация
             if (isDetailed) {
                 setDisplayedLines(fullLines);
             } else {
@@ -76,94 +78,114 @@ const PravaZasechka = () => {
     const exportToPDF = () => {
         const doc = new jsPDF();
         let y = 10;
-
         displayedLines.forEach((line) => {
             doc.text(line, 10, y);
             y += 7;
         });
-
-        doc.save('prava_zasechka.pdf');
+        doc.save('obratna_zasechka.pdf');
     };
 
     const calculate = () => {
-        setAnimationDone(false);  // ресетваме флага при ново изчисление
+        setAnimationDone(false);
         setDisplayedLines([]);
         setCurrentLine(0);
         setCurrentCharIndex(0);
 
-        const { xA, yA, xB, yB, beta1, beta2 } = form;
+        const {
+            xA, yA,
+            xB, yB,
+            xC, yC,
+            beta1, beta2
+        } = form;
+
         const toNum = (v) => parseFloat(v);
-        const round = (val, dec = 2) => Math.round(val * 10 ** dec) / 10 ** dec;
-        const round4 = (val) => Math.round(val * 10000) / 10000;
-        const round3 = (val) => Math.round(val * 1000) / 1000; // нов метод за 3 знака след запетая
-        const toRad = (g) => g * 0.015708;
+        const round3 = (v) => Math.round(v * 1000) / 1000;
+        const toRad = (g) => g * (Math.PI / 200); // градуси в радиани (град)
 
-        const xA_ = toNum(xA), yA_ = toNum(yA), xB_ = toNum(xB), yB_ = toNum(yB);
-        const beta1_ = toNum(beta1), beta2_ = toNum(beta2);
+        const XA = toNum(xA), YA = toNum(yA);
+        const XB = toNum(xB), YB = toNum(yB);
+        const XC = toNum(xC), YC = toNum(yC);
+        const b1 = toNum(beta1), b2 = toNum(beta2);
 
-        if ([xA_, yA_, xB_, yB_, beta1_, beta2_].some(isNaN)) {
+        if ([XA, YA, XB, YB, XC, YC, b1, b2].some(isNaN)) {
             alert("Моля, попълнете всички полета коректно.");
             return;
         }
 
-        const dX = round(xB_ - xA_, 2);
-        const dY = round(yB_ - yA_, 2);
-        const alphaABTablic = round4(Math.abs(Math.atan(dY / dX) * (200 / Math.PI)));
+        // Изчисляваме разстоянията между точки A и C:
+        const SAC = Math.sqrt((XA - XC) ** 2 + (YA - YC) ** 2);
+
+        // Изчисляваме ъглите αАК и αСК (на база координати):
+        const alphaAC = Math.atan2(YC - YA, XC - XA) * (200 / Math.PI);
+        const alphaCA = Math.atan2(YA - YC, XA - XC) * (200 / Math.PI);
+
+        // Корекция ъгли, ако са отрицателни:
+        const fixAngle = (a) => (a < 0 ? a + 400 : a);
+        const alfaAK = fixAngle(alphaAC);
+        const alfaCK = fixAngle(alphaCA);
+
+        // Изчисляване на дължините SAK и SCK по синусова теорема:
+        const SAK = SAC * Math.sin(toRad(b1)) / Math.sin(toRad(b1 + b2));
+        const SCK = SAC * Math.sin(toRad(b2)) / Math.sin(toRad(b1 + b2));
+
+        // Координати на точка K (помощна точка):
+        const XK1 = XA + SAK * Math.cos(alfaAK * Math.PI / 200);
+        const YK1 = YA + SAK * Math.sin(alfaAK * Math.PI / 200);
+        const XK2 = XC + SCK * Math.cos(alfaCK * Math.PI / 200);
+        const YK2 = YC + SCK * Math.sin(alfaCK * Math.PI / 200);
+
+        // Средни координати на K:
+        const XK = (XK1 + XK2) / 2;
+        const YK = (YK1 + YK2) / 2;
+
+        // Ъгли δ1 и δ2 за изчисление на P:
+        const delta1 = alfaAK - b1;
+        const delta2 = alfaCK + b2;
+
+        // Координати на търсената точка P:
+        const XP1 = XK + SAK * Math.cos(delta1 * Math.PI / 200);
+        const YP1 = YK + SAK * Math.sin(delta1 * Math.PI / 200);
+        const XP2 = XK + SCK * Math.cos(delta2 * Math.PI / 200);
+        const YP2 = YK + SCK * Math.sin(delta2 * Math.PI / 200);
+
+        // Средни координати на P:
+        const XP = round3((XP1 + XP2) / 2);
+        const YP = round3((YP1 + YP2) / 2);
 
         const lines = [
-            `1) tg\u03B1\u2090\u2091 = \u0394Y / \u0394X = ${dY} / ${dX} → Изчисляваме посоката AB`,
-            `α\u2090\u2091 таблично = ${alphaABTablic} gon`,
+            `1) Изчисляваме ъгъл αАК: ${round3(alfaAK)} gon`,
+            `2) Изчисляваме ъгъл αСК: ${round3(alfaCK)} gon`,
+            `3) Дължина на отсечката AC: ${round3(SAC)} m`,
+            `4) Изчисляваме дължините SAK и SCK чрез синусовата теорема:`,
+            `   SAK = SAC * sinβ₁ / sin(β₁ + β₂) = ${round3(SAK)} m`,
+            `   SCK = SAC * sinβ₂ / sin(β₁ + β₂) = ${round3(SCK)} m`,
+            `5) Изчисляваме координатите на помощната точка K:`,
+            `   XK = ${round3(XK)} m, YK = ${round3(YK)} m`,
+            `6) Изчисляваме ъглите δ₁ и δ₂:`,
+            `   δ₁ = αАК - β₁ = ${round3(delta1)} gon`,
+            `   δ₂ = αСК + β₂ = ${round3(delta2)} gon`,
+            `7) Изчисляваме координатите на търсената точка P:`,
+            `   X_P1 = ${round3(XP1)} m, Y_P1 = ${round3(YP1)} m`,
+            `   X_P2 = ${round3(XP2)} m, Y_P2 = ${round3(YP2)} m`,
+            `8) Средни координати на P:`,
+            `   X_P = ${XP} m, Y_P = ${YP} m`
         ];
 
-        let alphaAB = 0;
-        if (dY > 0 && dX > 0) alphaAB = alphaABTablic;
-        else if (dY > 0 && dX < 0) alphaAB = 200 - alphaABTablic;
-        else if (dY < 0 && dX < 0) alphaAB = 200 + alphaABTablic;
-        else if (dY < 0 && dX > 0) alphaAB = 400 - alphaABTablic;
-
-        lines.push(`α\u2090\u2091 = ${round4(alphaAB)} gon (според квадрант)`);
-
-        const sAB = round(Math.sqrt(Math.pow(xB_ - xA_, 2) + Math.pow(yB_ - yA_, 2)));
-        lines.push(`s\u2090\u2091 = √(ΔX² + ΔY²) = ${sAB} → Дължина на страната AB`);
-
-        const alphaBA = alphaAB > 200 ? alphaAB - 200 : alphaAB + 200;
-        const alphaAP = round4(alphaAB - beta1_);
-        const alphaBP = round4(alphaBA + beta2_);
-
-        lines.push(`2) α\u2090P = α\u2090\u2091 - β₁ = ${round4(alphaAB)} - ${beta1_} = ${alphaAP} → Посока към P от A`);
-        lines.push(`α\u2090P = α\u2090A + β₂ = ${round4(alphaBA)} + ${beta2_} = ${alphaBP} → Посока към P от B`);
-
-        const sAP = round((sAB * Math.sin(toRad(beta2_))) / Math.sin(toRad(beta1_ + beta2_)));
-        const sBP = round((sAB * Math.sin(toRad(beta1_))) / Math.sin(toRad(beta1_ + beta2_)));
-
-        lines.push(`3) s\u2090P = (s\u2090\u2091·sinβ₂) / sin(β₁ + β₂) = ${sAP} → Изчисляваме дължина от A до P`);
-        lines.push(`s\u2090P = (s\u2090\u2091·sinβ₁) / sin(β₁ + β₂) = ${sBP} → Изчисляваме дължина от B до P`);
-
-        const xPrimP = xA_ + round(sAP * Math.cos(toRad(alphaAP)), 4);
-        const yPrimP = yA_ + round(sAP * Math.sin(toRad(alphaAP)), 4);
-        const xSecondP = xB_ + round(sBP * Math.cos(toRad(alphaBP)), 4);
-        const ySecondP = yB_ + round(sBP * Math.sin(toRad(alphaBP)), 4);
-
-        lines.push(`4) ΔX\u2090P = s\u2090P·cos(α\u2090P), ΔY\u2090P = s\u2090P·sin(α\u2090P)`);
-        lines.push(`ΔX\u2090P = s\u2090P·cos(α\u2090P), ΔY\u2090P = s\u2090P·sin(α\u2090P)`);
-
-        const xP = round3((xPrimP + xSecondP) / 2);
-        const yP = round3((yPrimP + ySecondP) / 2);
-
-        lines.push(`5a) X' = ${round(xPrimP, 2)}, X" = ${round(xSecondP, 2)} → X = ${xP}`);
-        lines.push(`5b) Y' = ${round(yPrimP, 2)}, Y" = ${round(ySecondP, 2)} → Y = ${yP}`);
-
         setFullLines(lines);
-
         if (!isDetailed) {
-            setLinesToAnimate(lines.slice(-2));
+            setLinesToAnimate(lines.slice(-4));
         } else {
             setLinesToAnimate(lines);
         }
     };
 
     const resetForm = () => {
-        setForm({ xA: '', yA: '', xB: '', yB: '', beta1: '', beta2: '' });
+        setForm({
+            xA: '', yA: '',
+            xB: '', yB: '',
+            xC: '', yC: '',
+            beta1: '', beta2: ''
+        });
         setFullLines(initialMessage);
         setLinesToAnimate(initialMessage);
         setDisplayedLines([]);
@@ -175,14 +197,14 @@ const PravaZasechka = () => {
     return (
         <>
             <Helmet>
-                <title>Права засечка – Геодезически калкулатор | GeoSolver</title>
+                <title>Обратна засечка – Геодезически калкулатор | GeoSolver</title>
                 <meta
                     name="description"
-                    content="Онлайн калкулатор за права засечка – изчисляване на координати чрез посока и разстояние от известна точка. Точни и бързи геодезически изчисления."
+                    content="Онлайн калкулатор за обратна засечка – изчисляване на координати чрез ъгли към известни точки. Точни и бързи геодезически изчисления."
                 />
                 <meta
                     name="keywords"
-                    content="права засечка, геодезически калкулатор, координати, геодезия, тахиметрия, геодезически изчисления, онлайн геодезия, GNSS, координатни системи"
+                    content="обратна засечка, геодезически калкулатор, координати, геодезия, триангулация, геодезически изчисления, онлайн геодезия, GNSS, координатни системи"
                 />
                 <meta name="robots" content="index, follow" />
                 <meta name="author" content="GeoSolver" />
@@ -191,12 +213,12 @@ const PravaZasechka = () => {
                 <Breadcrumbs />
                 <h1 style={{ textAlign: 'center', fontSize: '1.8em', marginTop: '1em' }}>
                     <i className="fas fa-crosshairs" style={{ color: '#0d99ff', marginRight: '0.4em' }}></i>
-                    ПРАВА ЗАСЕЧКА
+                    ОБРАТНА ЗАСЕЧКА
                 </h1>
                 <div className="task-layout">
                     <div className="task-left">
                         <h2>Входни данни</h2>
-                        {['yA', 'xA', 'yB', 'xB', 'beta1', 'beta2'].map((id) => (
+                        {['xA', 'yA', 'xB', 'yB', 'xC', 'yC', 'beta1', 'beta2'].map((id) => (
                             <div className="form-group" key={id}>
                                 <label htmlFor={id}>{id.toUpperCase()}</label>
                                 <input type="number" id={id} value={form[id]} onChange={handleChange} step="any" />
@@ -235,4 +257,4 @@ const PravaZasechka = () => {
     );
 };
 
-export default PravaZasechka;
+export default ObratnaZasechka;

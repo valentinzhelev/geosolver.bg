@@ -1,7 +1,7 @@
 import React from 'react';
 import './Prices.css';
-import Layout from './Layout';
-import Breadcrumbs from './Breadcrumbs';
+import Layout from '../../layout/Layout';
+import Breadcrumbs from '../../layout/Breadcrumbs';
 import { Helmet } from "react-helmet";
 
 const Prices = () => {

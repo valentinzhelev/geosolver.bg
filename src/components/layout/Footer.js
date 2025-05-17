@@ -25,7 +25,7 @@ const Footer = () => {
           </div>
         </div>
         <div className="footer-bottom">
-          <p>© GEOSOLVER, 2025. Всички права запазени. | Текуща версия: <strong>v1.1.9-beta.1</strong></p>
+          <p>© GEOSOLVER, 2025. Всички права запазени. | Текуща версия: <strong>v1.0.22-beta.1</strong></p>
         </div>
       </div>
     </footer>
