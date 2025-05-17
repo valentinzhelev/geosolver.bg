@@ -1,9 +1,9 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './components/pages/HomePage/HomePage';
-import PurvaZadacha from './components/tasks/PurvaZadacha';
-import VtoraZadacha from './components/tasks/VtoraZadacha';
-import PravaZasechka from './components/tasks/PravaZasechka';
-import ObratnaZasechka from './components/tasks/ObratnaZasechka';
+import FirstTask from './components/tasks/FirstTask';
+import SecondTask from './components/tasks/SecondTask';
+import ForwardIntersection from './components/tasks/ForwardIntersection';
+import Resection from './components/tasks/Resection';
 import AboutPage from './components/pages/AboutPage/AboutPage';
 import Prices from './components/pages/Prices/Prices';
 import { Helmet } from "react-helmet";
@@ -28,12 +28,12 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/purva-zadacha" element={<PurvaZadacha />} />
-          <Route path="/vtora-zadacha" element={<VtoraZadacha />} />
-          <Route path="/prava-zasechka" element={<PravaZasechka />} />
-          <Route path="/obratna-zasechka" element={<ObratnaZasechka />} />
-          <Route path="/za-nas" element={<AboutPage />} />
-          <Route path="/planove" element={<Prices />} />
+          <Route path="/first-task" element={<FirstTask />} />
+          <Route path="/second-task" element={<SecondTask />} />
+          <Route path="/forward-intersection" element={<ForwardIntersection />} />
+          <Route path="/resection" element={<Resection />} />
+          <Route path="/about-us" element={<AboutPage />} />
+          <Route path="/prices" element={<Prices />} />
         </Routes>
       </Router>
     </>

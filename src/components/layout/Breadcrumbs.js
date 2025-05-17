@@ -4,8 +4,12 @@ import './Breadcrumbs.css';
 
 const pathNames = {
     '/': 'Начало',
-    '/purva-zadacha': 'Първа основна задача',
-    '/vtora-zadacha': 'Втора основна задача',
+    '/about-us': 'За нас',
+    '/prices': 'Цени',
+    '/first-task': 'Първа основна задача',
+    '/second-task': 'Втора основна задача',
+    '/forward-intersection': 'Права Засечка',
+    '/resection': 'Обратна Засечка',
 };
 
 const Breadcrumbs = () => {

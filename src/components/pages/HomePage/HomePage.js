@@ -85,7 +85,7 @@ const HomePage = () => {
                   </li>
                 </ul>
                 <div className="card-actions">
-                  <Link to="/purva-zadacha">
+                  <Link to="/first-task">
                     <button>Изчисли</button>
                   </Link>
                   <div className="tooltip">
@@ -121,7 +121,7 @@ const HomePage = () => {
                   </li>
                 </ul>
                 <div className="card-actions">
-                  <Link to="/vtora-zadacha">
+                  <Link to="/second-task">
                     <button>Изчисли</button>
                   </Link>
                   <div className="tooltip">
@@ -157,7 +157,7 @@ const HomePage = () => {
                   </li>
                 </ul>
                 <div className="card-actions">
-                  <Link to="/prava-zasechka">
+                  <Link to="/forward-intersection">
                     <button>Изчисли</button>
                   </Link>
                   <div className="tooltip">
@@ -192,7 +192,7 @@ const HomePage = () => {
                   </li>
                 </ul>
                 <div className="card-actions">
-                  <Link to="/obratna-zasechka">
+                  <Link to="/resection">
                     <button>Изчисли</button>
                   </Link>
                   <div className="tooltip">

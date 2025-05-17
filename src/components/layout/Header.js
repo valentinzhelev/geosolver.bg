@@ -23,15 +23,15 @@ const Header = () => {
         <Link to="/" className={({ isActive }) => isActive ? 'active' : ''}>
           Начало
         </Link>
-        <Link to="/za-nas" className={({ isActive }) => isActive ? 'active' : ''}>
+        <Link to="/about-us" className={({ isActive }) => isActive ? 'active' : ''}>
           За нас
         </Link>
-        <Link to="/planove" className={({ isActive }) => isActive ? 'active' : ''}>
+        <Link to="/prices" className={({ isActive }) => isActive ? 'active' : ''}>
           Цени
         </Link>
-        <a href="#">Контакти</a>
-        <a href="#">Акаунт</a>
-        <a href="#"><i className="fas fa-user"></i> Вход / Регистрация</a>
+        <a href="https://geosolver.bg">Контакти</a>
+        <a href="https://geosolver.bg">Акаунт</a>
+        <a href="https://geosolver.bg"><i className="fas fa-user"></i> Вход / Регистрация</a>
         <div className="theme-switch">
           <input type="checkbox" id="toggle-dark" />
           <label htmlFor="toggle-dark" className="switch-label">
