@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import Layout from '../../layout/Layout';
-import './AboutPage.css';
 import { Helmet } from "react-helmet";
 
 const events = [

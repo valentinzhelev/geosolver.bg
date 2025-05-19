@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import './TaskLayout.css';
 import Layout from '../layout/Layout';
 import Breadcrumbs from '../layout/Breadcrumbs';
 import jsPDF from 'jspdf';

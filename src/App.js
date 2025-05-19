@@ -6,6 +6,7 @@ import ForwardIntersection from './components/tasks/ForwardIntersection';
 import Resection from './components/tasks/Resection';
 import AboutPage from './components/pages/AboutPage/AboutPage';
 import Prices from './components/pages/Prices/Prices';
+import ToolsPage from './components/pages/ToolsPage';
 import { Helmet } from "react-helmet";
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
           <Route path="/resection" element={<Resection />} />
           <Route path="/about-us" element={<AboutPage />} />
           <Route path="/prices" element={<Prices />} />
+          <Route path="/tools" element={<ToolsPage />} />
         </Routes>
       </Router>
     </>

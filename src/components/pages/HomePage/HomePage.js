@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import "./HomePage.css";
 import { Link } from 'react-router-dom';
 import Layout from '../../layout/Layout';
 import { Helmet } from "react-helmet";
@@ -28,289 +27,63 @@ const HomePage = () => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Helmet>
       <Layout>
-        <div className="banner-warning">
-          <span className="warning-icon">
-            <i className="fa-solid fa-triangle-exclamation warning-icon"></i>
-          </span>
-          <div className="warning-content">
-            <div className="warning-title">
-              <strong>Необходима е регистрация</strong>
-            </div>
-            <div className="warning-text">
-              За да използвате инструментите за изчисление в GeoSolver, трябва да
-              сте регистриран потребител с потвърден имейл адрес. Ако вече сте се
-              регистрирали, проверете входящата си поща и потвърдете своя имейл.
-              Ако не сте получили писмо, можете да заявите ново изпращане от
-              страницата „Акаунт“.
+        <div className="w-full max-w-[1660px] mx-auto px-4 md:px-6 flex flex-col gap-10 pt-8 pb-16">
+          {/* Top Buttons */}
+          <div className="w-full flex flex-col md:flex-row gap-2 md:gap-5">
+            {[
+              "Разгледай инструментите",
+              "Виж цените",
+              "Свържи се с нас"
+            ].map((text, i) => (
+              <div key={i} className="flex-1 p-4 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex justify-between items-center">
+                <span className="text-black text-sm md:text-base font-semibold font-['Manrope']">{text}</span>
+                <img src="/arrow_right.svg" alt="Arrow" className="w-4 h-4 md:w-5 md:h-5" />
+              </div>
+            ))}
+          </div>
+
+          {/* Hero Section */}
+          <div
+            className="w-full h-64 md:h-64 p-6 md:p-14 relative rounded-xl flex flex-col justify-center items-center gap-4 overflow-hidden"
+            style={{
+              backgroundImage: "url('/gradient_wallpaper.jpg')",
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat'
+            }}
+          >
+            {/* Overlay for darkening */}
+            <div className="absolute inset-0 bg-black/30 pointer-events-none rounded-xl" />
+            {/* Logo */}
+            <img src="/Vector_logo.png" alt="GeoSolver Logo" className="w-10 h-10 md:w-12 md:h-12 mb-2 z-10" />
+            {/* Text */}
+            <div className="relative z-10 text-center text-white text-base md:text-lg font-semibold font-['Manrope']">
+              GeoSolver е проект, роден от желанието да се улесни ежедневната работа на геодезисти чрез достъпен онлайн инструмент. Платформата предоставя прецизни изчисления, интуитивен интерфейс и възможност за съхраняване на история на изчисленията.
             </div>
           </div>
-        </div>
 
-        <div className="main-content">
-          <div className="content-container">
-            <div className="top-bar">
-              <div className="search-wrapper">
-                <i className="fas fa-search"></i>
-                <input
-                  type="text"
-                  placeholder="Търси задачи..."
-                  className="search-input"
-                />
+          {/* History Section */}
+          <section className="w-full flex flex-col gap-4">
+            <h2 className="text-black text-lg md:text-2xl font-bold font-['Manrope']">История на GeoSolver</h2>
+            <div className="w-full p-4 md:p-10 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col gap-10">
+              <div className="flex flex-col items-center gap-2">
+                <span className="text-black text-lg md:text-2xl font-semibold font-['Manrope']">2023</span>
+                <span className="text-center text-black text-sm md:text-lg font-semibold font-['Manrope']">
+                  Идеята за GeoSolver се заражда – необходимостта от уеб базирано приложение за геодезически изчисления.
+                </span>
               </div>
-              <label className="toggle-fav">
-                <input type="checkbox" />
-                <span className="switch"></span>
-                Покажи задачи в разработка
-              </label>
-            </div>
-
-            <div className="grid">
-              <div className="card">
-                <div className="card-title">
-                  <i className="fas fa-location-arrow"></i>
-                  <h3>ПЪРВА ОСНОВНА ЗАДАЧА</h3>
-                </div>
-                <p className="description">
-                  Изчисляване на координати по начална точка, ъгъл и дължина.
-                </p>
-                <ul className="details">
-                  <li>
-                    <strong>Параметри:</strong> 1 точка, ъгъл, дължина
-                  </li>
-                  <li>
-                    <strong>Тип:</strong> трансформация / полярен метод
-                  </li>
-                  <li>
-                    <strong>Изчисление:</strong> &lt; 0.05s
-                  </li>
-                </ul>
-                <div className="card-actions">
-                  <Link to="/first-task">
-                    <button>Изчисли</button>
-                  </Link>
-                  <div className="tooltip">
-                    <button>Инфо</button>
-                    <div className="tooltip-text">
-                      Използва се за определяне на координати чрез посока и
-                      разстояние от начална точка.
-                      <br />
-                      <br />
-                      Натиснете бутона за повече информация и скици.
+              <div className="w-full flex flex-col md:flex-row gap-3 items-center">
+                {["2023", "2024", "2025", "Планове за бъдещето"].map((label, i) => (
+                  <React.Fragment key={label}>
+                    <div className={`px-3 py-1 rounded-lg flex justify-center items-center gap-2.5 ${i === 0 ? "bg-black text-white" : "bg-gray-200 text-black"} text-base md:text-lg font-semibold font-['Manrope']`}>
+                      {label}
                     </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="card">
-                <div className="card-title">
-                  <i className="fas fa-compass"></i>
-                  <h3>ВТОРА ОСНОВНА ЗАДАЧА</h3>
-                </div>
-                <p className="description">
-                  Изчисляване на ъгъл и разстояние между две точки по координати.
-                </p>
-                <ul className="details">
-                  <li>
-                    <strong>Параметри:</strong> 4 входни координати
-                  </li>
-                  <li>
-                    <strong>Тип:</strong> GNSS / координатна геодезия
-                  </li>
-                  <li>
-                    <strong>Изчисление:</strong> &lt; 0.1s
-                  </li>
-                </ul>
-                <div className="card-actions">
-                  <Link to="/second-task">
-                    <button>Изчисли</button>
-                  </Link>
-                  <div className="tooltip">
-                    <button>Инфо</button>
-                    <div className="tooltip-text">
-                      Изчисляване на азимут и дължина между две точки с известни
-                      координати.
-                      <br />
-                      <br />
-                      За повече информация и скици, натиснете бутона.
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="card">
-                <div className="card-title">
-                  <i className="fas fa-ruler-horizontal"></i>
-                  <h3>ПРАВА ЗАСЕЧКА</h3>
-                </div>
-                <p className="description">
-                  Координати чрез посока и разстояние от известна точка.
-                </p>
-                <ul className="details">
-                  <li>
-                    <strong>Параметри:</strong> 1 известна точка + мерки
-                  </li>
-                  <li>
-                    <strong>Тип:</strong> GNSS / тахиметрично измерване
-                  </li>
-                  <li>
-                    <strong>Изчисление:</strong> &lt; 0.08s
-                  </li>
-                </ul>
-                <div className="card-actions">
-                  <Link to="/forward-intersection">
-                    <button>Изчисли</button>
-                  </Link>
-                  <div className="tooltip">
-                    <button>Инфо</button>
-                    <div className="tooltip-text">
-                      Определяне на позиция чрез мерки от една известна точка.
-                      <br />
-                      <br />
-                      За детайли и графики – натиснете бутона.
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="card">
-                <div className="card-title">
-                  <i className="fas fa-crosshairs"></i>
-                  <h3>ОБРАТНА ЗАСЕЧКА</h3>
-                </div>
-                <p className="description">
-                  Определяне на позиция по ъгли от известни точки.
-                </p>
-                <ul className="details">
-                  <li>
-                    <strong>Параметри:</strong> 2–3 известни точки и ъгли
-                  </li>
-                  <li>
-                    <strong>Тип:</strong> координатна геодезия / класика
-                  </li>
-                  <li>
-                    <strong>Изчисление:</strong> ~0.1s
-                  </li>
-                </ul>
-                <div className="card-actions">
-                  <Link to="/resection">
-                    <button>Изчисли</button>
-                  </Link>
-                  <div className="tooltip">
-                    <button>Инфо</button>
-                    <div className="tooltip-text">
-                      Използва се при определяне на координати чрез посока към
-                      известни точки.
-                      <br />
-                      <br />
-                      Още информация чрез бутона.
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="card">
-                <div className="card-title">
-                  <i className="fas fa-map-marker-alt"></i>
-                  <h3>ПОЛЯРНА ЗАСЕЧКА</h3>
-                </div>
-                <p className="description">
-                  Изчисления на непознати точки по мерки от база.
-                </p>
-                <ul className="details">
-                  <li>
-                    <strong>Параметри:</strong> 2 точки база + мерки
-                  </li>
-                  <li>
-                    <strong>Тип:</strong> полярни координати
-                  </li>
-                  <li>
-                    <strong>Изчисление:</strong> &lt; 0.09s
-                  </li>
-                </ul>
-                <div className="card-actions">
-                  <button>Изчисли</button>
-                  <div className="tooltip">
-                    <button>Инфо</button>
-                    <div className="tooltip-text">
-                      Прилага се при засичане на точка по база и измерени мерки.
-                      <br />
-                      <br />
-                      Вижте още чрез бутона.
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="card">
-                <div className="card-title">
-                  <i className="fas fa-exchange-alt"></i>
-                  <h3>КООРДИНАТНА ТРАНСФОРМАЦИЯ</h3>
-                </div>
-                <p className="description">
-                  Преобразуване между локални и глобални координатни системи.
-                </p>
-                <ul className="details">
-                  <li>
-                    <strong>Параметри:</strong> 3+ точки / трансформационни
-                  </li>
-                  <li>
-                    <strong>Тип:</strong> Хелмерт, афинна, 7 параметъра
-                  </li>
-                  <li>
-                    <strong>Изчисление:</strong> &lt; 0.2s
-                  </li>
-                </ul>
-                <div className="card-actions">
-                  <button>Изчисли</button>
-                  <div className="tooltip">
-                    <button>Инфо</button>
-                    <div className="tooltip-text">
-                      Използва се при прехвърляне на координати между две системи.
-                      <br />
-                      <br />
-                      Повече информация чрез бутона.
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="card">
-                <div className="card-title">
-                  <i className="fas fa-equals"></i>
-                  <h3>ЗАДАЧА НА ХАНЗЕН</h3>
-                </div>
-                <p className="description">
-                  Изчисляване на координатите на точка чрез ъглово преместване от
-                  две известни точки (A и B).
-                </p>
-                <ul className="details">
-                  <li>
-                    <strong>Параметри:</strong> координати на A и B + ъгли α, β
-                  </li>
-                  <li>
-                    <strong>Тип:</strong> аналитична триангулация
-                  </li>
-                  <li>
-                    <strong>Изчисление:</strong> &lt; 0.1s
-                  </li>
-                </ul>
-                <div className="card-actions">
-                  <a href="zadacha-na-hanzen.html">
-                    <button>Изчисли</button>
-                  </a>
-                  <div className="tooltip">
-                    <button>Инфо</button>
-                    <div className="tooltip-text">
-                      Класическа задача за определяне на непозната точка чрез две
-                      известни и измерени посочни ъгли.
-                      <br />
-                      За повече информация и скица – натиснете бутона.
-                    </div>
-                  </div>
-                </div>
+                    {i < 3 && <div className="flex-1 h-0 outline outline-1 outline-offset-[-0.5px] outline-gray-200" />}
+                  </React.Fragment>
+                ))}
               </div>
             </div>
-          </div>
+          </section>
         </div>
       </Layout>
     </>
