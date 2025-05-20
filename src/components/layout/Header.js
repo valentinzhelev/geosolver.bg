@@ -37,6 +37,9 @@ const Header = () => {
           <div data-property-1="Default" className="px-3 py-1 rounded-lg flex justify-center items-center gap-2.5 hover:text-black">
             <div className="justify-start text-neutral-400 text-base font-medium font-['Manrope']">Контакти</div>
           </div>
+          <div data-property-1="Default" className="px-3 py-1 rounded-lg flex justify-center items-center gap-2.5 hover:text-black">
+            <div className="justify-start text-neutral-400 text-base font-medium font-['Manrope']">За преподаватели</div>
+          </div>
         </div>
         <div className="flex-1 flex justify-end items-center gap-3">
           <div className="w-9 h-9 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 flex justify-center items-center gap-3">

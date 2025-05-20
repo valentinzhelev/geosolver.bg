@@ -12,7 +12,7 @@ const Footer = () => {
           </div>
           <div className="self-stretch inline-flex justify-start items-center gap-3">
             <div className="flex-1 justify-start text-neutral-400 text-sm md:text-base font-medium font-['Manrope']">
-              © GEOSOLVER, 2025.<br />Всички права запазени.<br />Текуща версия: v2.0.1-beta.1
+              © GEOSOLVER, 2025.<br />Всички права запазени.<br />Текуща версия: v2.0.2-beta.1
             </div>
           </div>
         </div>
