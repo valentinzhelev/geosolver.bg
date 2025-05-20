@@ -19,26 +19,26 @@ const Breadcrumbs = () => {
     const crumbs = parts.map((part, index) => {
         const path = '/' + parts.slice(0, index + 1).join('/');
         const label = pathNames[path] || part;
-
+        // All breadcrumbs clickable, last one styled gray
         return (
-            <Link to={path}>{label}</Link>
+            <Link to={path} style={index === parts.length - 1 ? { color: '#999', pointerEvents: 'auto', textDecoration: 'underline' } : { textDecoration: 'underline' }}>
+                {label}
+            </Link>
         );
     });
 
     return (
         <div className="breadcrumbs">
-            <Link to="/">Начало</Link>
             {crumbs.map((crumb, index) => (
                 <React.Fragment key={index}>
-                    <i className="fas fa-angle-right" style={{ margin: '0 0.5em', color: '#999' }}></i>
+                    {index > 0 && (
+                        <i className="fas fa-angle-right" style={{ margin: '0 0.5em', color: '#999' }}></i>
+                    )}
                     {crumb}
                 </React.Fragment>
             ))}
         </div>
     );
-
-
-
 };
 
 export default Breadcrumbs;

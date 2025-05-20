@@ -27,13 +27,24 @@ const Header = () => {
           </Link>
           <Link
             to="/tools"
-            className={`px-3 py-1 rounded-lg flex justify-center items-center gap-2.5 ${location.pathname === '/tools' ? 'text-black' : 'text-neutral-400'} text-base font-medium font-['Manrope'] hover:text-black`}
+            className={`px-3 py-1 rounded-lg flex justify-center items-center gap-2.5 ${
+              location.pathname === '/tools' ||
+              location.pathname.startsWith('/first-task') ||
+              location.pathname.startsWith('/second-task') ||
+              location.pathname.startsWith('/forward-intersection') ||
+              location.pathname.startsWith('/resection')
+                ? 'text-black'
+                : 'text-neutral-400'
+            } text-base font-medium font-['Manrope'] hover:text-black`}
           >
             Инструменти
           </Link>
-          <div data-property-1="Default" className="px-3 py-1 rounded-lg flex justify-center items-center gap-2.5 hover:text-black">
-            <div className="justify-start text-neutral-400 text-base font-medium font-['Manrope']">Цени</div>
-          </div>
+          <Link
+            to="/prices"
+            className={`px-3 py-1 rounded-lg flex justify-center items-center gap-2.5 ${location.pathname === '/prices' ? 'text-black' : 'text-neutral-400'} text-base font-medium font-['Manrope'] hover:text-black`}
+          >
+            Цени
+          </Link>
           <div data-property-1="Default" className="px-3 py-1 rounded-lg flex justify-center items-center gap-2.5 hover:text-black">
             <div className="justify-start text-neutral-400 text-base font-medium font-['Manrope']">Контакти</div>
           </div>
@@ -89,22 +100,22 @@ const Header = () => {
               </button>
             </div>
             <div className="self-stretch flex flex-col justify-center items-start gap-2">
-              <div className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-3">
+              <Link to="/" onClick={() => setMobileMenuOpen(false)} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-3">
                 <div className="justify-start text-black text-sm font-medium font-['Manrope']">Начало</div>
                 <img src="/small_header_icon.svg" alt="Arrow" className="w-3 h-3" />
-              </div>
-              <div className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-3">
+              </Link>
+              <Link to="/tools" onClick={() => setMobileMenuOpen(false)} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-3">
                 <div className="justify-start text-black text-sm font-medium font-['Manrope']">Инструменти</div>
                 <img src="/small_header_icon.svg" alt="Arrow" className="w-3 h-3" />
-              </div>
-              <div className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-3">
+              </Link>
+              <Link to="/prices" onClick={() => setMobileMenuOpen(false)} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-3">
                 <div className="justify-start text-black text-sm font-medium font-['Manrope']">Цени</div>
                 <img src="/small_header_icon.svg" alt="Arrow" className="w-3 h-3" />
-              </div>
-              <div className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-3">
+              </Link>
+              <Link to="/contacts" onClick={() => setMobileMenuOpen(false)} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-3">
                 <div className="justify-start text-black text-sm font-medium font-['Manrope']">Контакти</div>
                 <img src="/small_header_icon.svg" alt="Arrow" className="w-3 h-3" />
-              </div>
+              </Link>
             </div>
             <div className="inline-flex justify-end items-center gap-3">
               <div className="px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3">

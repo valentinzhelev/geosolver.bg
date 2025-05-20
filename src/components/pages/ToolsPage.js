@@ -75,28 +75,28 @@ const ToolsPage = () => {
 
   return (
     <Layout>
-      <div className="min-h-[calc(100vh-300px)] bg-stone-50 w-full overflow-hidden py-10">
-        <div className="max-w-[1180px] w-full mx-auto flex flex-col justify-center items-start gap-10">
+      <div className="min-h-[calc(100vh-300px)] bg-stone-50 w-full overflow-hidden py-6 md:py-10">
+        <div className="max-w-[400px] md:max-w-[1180px] w-full mx-auto flex flex-col justify-center items-start gap-6 md:gap-10 px-4 md:px-0">
           {/* Header Section */}
-          <div className="w-full flex justify-between items-end">
-            <div className="w-[580px] flex flex-col justify-start items-start gap-1">
-              <div className="text-black text-3xl font-bold font-['Manrope']">Инструменти</div>
-              <div className="text-neutral-400 text-base font-semibold font-['Manrope']">Интерактивни инструменти за решаване на задачи в геодезията – от координатни трансформации до класически засечки.</div>
+          <div className="w-full flex flex-col md:flex-row md:justify-between md:items-end gap-4 md:gap-0">
+            <div className="w-full md:w-[580px] flex flex-col justify-start items-start gap-1">
+              <div className="text-black text-2xl md:text-3xl font-bold font-['Manrope']">Инструменти</div>
+              <div className="text-neutral-400 text-xs md:text-base font-semibold font-['Manrope']">Интерактивни инструменти за решаване на задачи в геодезията – от координатни трансформации до класически засечки.</div>
             </div>
             <div className="flex justify-start items-center gap-3">
-              <div className="text-black text-base font-semibold font-['Manrope']">Инструменти в разработка</div>
-              <div className="w-12 h-6 p-1 bg-black rounded-[30px] flex justify-end items-center gap-2">
-                <div className="w-4 h-4 bg-white rounded-full" />
+              <div className="text-black text-sm md:text-base font-semibold font-['Manrope']">Инструменти в разработка</div>
+              <div className="w-10 h-5 md:w-12 md:h-6 p-[3.33px] md:p-1 bg-black rounded-3xl flex justify-end items-center gap-1.5 md:gap-2">
+                <div className="w-3.5 h-3.5 md:w-4 md:h-4 bg-white rounded-full" />
               </div>
             </div>
           </div>
           {/* Tools Grid */}
-          <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+          <div className="w-full grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-5">
             {tools.map((tool) => (
               <Link
                 to={tool.route}
                 key={tool.title}
-                className="w-72 p-4 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex justify-start items-start gap-3 hover:shadow-lg transition"
+                className="w-full md:w-72 p-3 md:p-4 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex justify-start items-start gap-3 shadow-[0_2px_8px_0_rgba(0,0,0,0.04)] hover:shadow-[0_4px_24px_0_rgba(0,0,0,0.08)] transition"
               >
                 <div className="flex-1 flex flex-col justify-start items-start gap-3">
                   <div className="w-full flex justify-between items-center">
@@ -104,26 +104,26 @@ const ToolsPage = () => {
                       <div className="w-7 h-7 bg-black rounded flex flex-col justify-center items-center">
                         <img src={tool.icon} alt="Tool Icon" className="w-4 h-4" />
                       </div>
-                      <div className="text-black text-base font-semibold font-['Manrope']">{tool.title}</div>
+                      <div className="text-black text-sm md:text-base font-semibold font-['Manrope']">{tool.title}</div>
                     </div>
-                    <div className="w-4 h-4 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 flex items-center justify-center">
+                    <div className="w-5 h-5 md:w-4 md:h-4 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 flex items-center justify-center">
                       <img src="/question_icon.svg" alt="?" className="w-2.5 h-2.5" />
                     </div>
                   </div>
                   <div className="w-full h-0 outline outline-1 outline-offset-[-0.50px] outline-gray-200" />
-                  <div className="text-neutral-400 text-sm font-medium font-['Manrope']">{tool.description}</div>
+                  <div className="text-neutral-400 text-xs md:text-sm font-medium font-['Manrope']">{tool.description}</div>
                   <div className="w-full flex flex-col justify-start items-start gap-2">
                     <div className="w-full px-3 py-2 bg-stone-50 rounded-lg flex flex-col justify-start items-start">
-                      <div className="text-black text-sm font-medium font-['Manrope']">Параметри</div>
-                      <div className="text-neutral-400 text-sm font-medium font-['Manrope']">{tool.parameters}</div>
+                      <div className="text-black text-xs md:text-sm font-medium font-['Manrope']">Параметри</div>
+                      <div className="text-neutral-400 text-xs md:text-sm font-medium font-['Manrope']">{tool.parameters}</div>
                     </div>
                     <div className="w-full px-3 py-2 bg-stone-50 rounded-lg flex flex-col justify-start items-start">
-                      <div className="text-black text-sm font-medium font-['Manrope']">Тип</div>
-                      <div className="text-neutral-400 text-sm font-medium font-['Manrope']">{tool.type}</div>
+                      <div className="text-black text-xs md:text-sm font-medium font-['Manrope']">Тип</div>
+                      <div className="text-neutral-400 text-xs md:text-sm font-medium font-['Manrope']">{tool.type}</div>
                     </div>
                     <div className="w-full px-3 py-2 bg-stone-50 rounded-lg flex flex-col justify-start items-start">
-                      <div className="text-black text-sm font-medium font-['Manrope']">Изчисление</div>
-                      <div className="text-neutral-400 text-sm font-medium font-['Manrope']">{tool.calculation}</div>
+                      <div className="text-black text-xs md:text-sm font-medium font-['Manrope']">Изчисление</div>
+                      <div className="text-neutral-400 text-xs md:text-sm font-medium font-['Manrope']">{tool.calculation}</div>
                     </div>
                   </div>
                 </div>

@@ -1,237 +1,402 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../layout/Layout';
-import Breadcrumbs from '../layout/Breadcrumbs';
-import jsPDF from 'jspdf';
-import { Helmet } from "react-helmet";
+import { Helmet } from 'react-helmet';
 
-const PravaZasechka = () => {
-    const initialMessage = ['Въведете данни и натиснете "Изчисли", за да видите резултати тук.'];
-
-    const [form, setForm] = useState({ xA: '', yA: '', xB: '', yB: '', beta1: '', beta2: '' });
-    const [fullLines, setFullLines] = useState(initialMessage);
-    const [linesToAnimate, setLinesToAnimate] = useState(initialMessage);
-    const [displayedLines, setDisplayedLines] = useState([]);
-    const [currentLine, setCurrentLine] = useState(0);
-    const [currentCharIndex, setCurrentCharIndex] = useState(0);
-    const [isDetailed, setIsDetailed] = useState(true);
-    const [animationDone, setAnimationDone] = useState(false);
-
-    const stepDelay = 30;
-
-    useEffect(() => {
-        if (currentLine < linesToAnimate.length) {
-            if (currentCharIndex <= linesToAnimate[currentLine].length) {
-                const timer = setTimeout(() => {
-                    const newText = linesToAnimate[currentLine].slice(0, currentCharIndex);
-                    setDisplayedLines((prev) => {
-                        const copy = [...prev];
-                        copy[currentLine] = newText;
-                        return copy;
-                    });
-                    setCurrentCharIndex(currentCharIndex + 1);
-                }, stepDelay);
-
-                return () => clearTimeout(timer);
-            } else {
-                setCurrentLine(currentLine + 1);
-                setCurrentCharIndex(0);
-            }
-        } else {
-            // Когато анимацията достигне края, маркираме като завършена
-            setAnimationDone(true);
-        }
-    }, [currentCharIndex, currentLine, linesToAnimate]);
-
-    // Управление на показваните редове при смяна на режим (подробен / финал)
-    useEffect(() => {
-        if (!animationDone) {
-            if (isDetailed) {
-                setLinesToAnimate(fullLines);
-            } else {
-                setLinesToAnimate(fullLines.length > 0 ? [fullLines[fullLines.length - 2], fullLines[fullLines.length - 1]] : []);
-            }
-            setDisplayedLines([]);
-            setCurrentLine(0);
-            setCurrentCharIndex(0);
-        } else {
-            // Ако анимацията вече е направена, просто превключваме без анимация
-            if (isDetailed) {
-                setDisplayedLines(fullLines);
-            } else {
-                setDisplayedLines(fullLines.length > 0 ? [fullLines[fullLines.length - 2], fullLines[fullLines.length - 1]] : []);
-            }
-        }
-    }, [isDetailed, fullLines, animationDone]);
-
-    const handleChange = (e) => {
-        setForm({ ...form, [e.target.id]: e.target.value });
-    };
-
-    const copyToClipboard = () => {
-        const plainText = displayedLines.join('\n');
-        navigator.clipboard.writeText(plainText).then(() => alert("Резултатът е копиран."));
-    };
-
-    const exportToPDF = () => {
-        const doc = new jsPDF();
-        let y = 10;
-
-        displayedLines.forEach((line) => {
-            doc.text(line, 10, y);
-            y += 7;
-        });
-
-        doc.save('prava_zasechka.pdf');
-    };
-
-    const calculate = () => {
-        setAnimationDone(false);  // ресетваме флага при ново изчисление
-        setDisplayedLines([]);
-        setCurrentLine(0);
-        setCurrentCharIndex(0);
-
-        const { xA, yA, xB, yB, beta1, beta2 } = form;
-        const toNum = (v) => parseFloat(v);
-        const round = (val, dec = 2) => Math.round(val * 10 ** dec) / 10 ** dec;
-        const round4 = (val) => Math.round(val * 10000) / 10000;
-        const round3 = (val) => Math.round(val * 1000) / 1000; // нов метод за 3 знака след запетая
-        const toRad = (g) => g * 0.015708;
-
-        const xA_ = toNum(xA), yA_ = toNum(yA), xB_ = toNum(xB), yB_ = toNum(yB);
-        const beta1_ = toNum(beta1), beta2_ = toNum(beta2);
-
-        if ([xA_, yA_, xB_, yB_, beta1_, beta2_].some(isNaN)) {
-            alert("Моля, попълнете всички полета коректно.");
-            return;
-        }
-
-        const dX = round(xB_ - xA_, 2);
-        const dY = round(yB_ - yA_, 2);
-        const alphaABTablic = round4(Math.abs(Math.atan(dY / dX) * (200 / Math.PI)));
-
-        const lines = [
-            `1) tg\u03B1\u2090\u2091 = \u0394Y / \u0394X = ${dY} / ${dX} → Изчисляваме посоката AB`,
-            `α\u2090\u2091 таблично = ${alphaABTablic} gon`,
-        ];
-
-        let alphaAB = 0;
-        if (dY > 0 && dX > 0) alphaAB = alphaABTablic;
-        else if (dY > 0 && dX < 0) alphaAB = 200 - alphaABTablic;
-        else if (dY < 0 && dX < 0) alphaAB = 200 + alphaABTablic;
-        else if (dY < 0 && dX > 0) alphaAB = 400 - alphaABTablic;
-
-        lines.push(`α\u2090\u2091 = ${round4(alphaAB)} gon (според квадрант)`);
-
-        const sAB = round(Math.sqrt(Math.pow(xB_ - xA_, 2) + Math.pow(yB_ - yA_, 2)));
-        lines.push(`s\u2090\u2091 = √(ΔX² + ΔY²) = ${sAB} → Дължина на страната AB`);
-
-        const alphaBA = alphaAB > 200 ? alphaAB - 200 : alphaAB + 200;
-        const alphaAP = round4(alphaAB - beta1_);
-        const alphaBP = round4(alphaBA + beta2_);
-
-        lines.push(`2) α\u2090P = α\u2090\u2091 - β₁ = ${round4(alphaAB)} - ${beta1_} = ${alphaAP} → Посока към P от A`);
-        lines.push(`α\u2090P = α\u2090A + β₂ = ${round4(alphaBA)} + ${beta2_} = ${alphaBP} → Посока към P от B`);
-
-        const sAP = round((sAB * Math.sin(toRad(beta2_))) / Math.sin(toRad(beta1_ + beta2_)));
-        const sBP = round((sAB * Math.sin(toRad(beta1_))) / Math.sin(toRad(beta1_ + beta2_)));
-
-        lines.push(`3) s\u2090P = (s\u2090\u2091·sinβ₂) / sin(β₁ + β₂) = ${sAP} → Изчисляваме дължина от A до P`);
-        lines.push(`s\u2090P = (s\u2090\u2091·sinβ₁) / sin(β₁ + β₂) = ${sBP} → Изчисляваме дължина от B до P`);
-
-        const xPrimP = xA_ + round(sAP * Math.cos(toRad(alphaAP)), 4);
-        const yPrimP = yA_ + round(sAP * Math.sin(toRad(alphaAP)), 4);
-        const xSecondP = xB_ + round(sBP * Math.cos(toRad(alphaBP)), 4);
-        const ySecondP = yB_ + round(sBP * Math.sin(toRad(alphaBP)), 4);
-
-        lines.push(`4) ΔX\u2090P = s\u2090P·cos(α\u2090P), ΔY\u2090P = s\u2090P·sin(α\u2090P)`);
-        lines.push(`ΔX\u2090P = s\u2090P·cos(α\u2090P), ΔY\u2090P = s\u2090P·sin(α\u2090P)`);
-
-        const xP = round3((xPrimP + xSecondP) / 2);
-        const yP = round3((yPrimP + ySecondP) / 2);
-
-        lines.push(`5a) X' = ${round(xPrimP, 2)}, X" = ${round(xSecondP, 2)} → X = ${xP}`);
-        lines.push(`5b) Y' = ${round(yPrimP, 2)}, Y" = ${round(ySecondP, 2)} → Y = ${yP}`);
-
-        setFullLines(lines);
-
-        if (!isDetailed) {
-            setLinesToAnimate(lines.slice(-2));
-        } else {
-            setLinesToAnimate(lines);
-        }
-    };
-
-    const resetForm = () => {
-        setForm({ xA: '', yA: '', xB: '', yB: '', beta1: '', beta2: '' });
-        setFullLines(initialMessage);
-        setLinesToAnimate(initialMessage);
-        setDisplayedLines([]);
-        setCurrentLine(0);
-        setCurrentCharIndex(0);
-        setAnimationDone(false);
-    };
-
-    return (
-        <>
-            <Helmet>
-                <title>Права засечка – Геодезически калкулатор | GeoSolver</title>
-                <meta
-                    name="description"
-                    content="Онлайн калкулатор за права засечка – изчисляване на координати чрез посока и разстояние от известна точка. Точни и бързи геодезически изчисления."
-                />
-                <meta
-                    name="keywords"
-                    content="права засечка, геодезически калкулатор, координати, геодезия, тахиметрия, геодезически изчисления, онлайн геодезия, GNSS, координатни системи"
-                />
-                <meta name="robots" content="index, follow" />
-                <meta name="author" content="GeoSolver" />
-            </Helmet>
-            <Layout>
-                <Breadcrumbs />
-                <h1 style={{ textAlign: 'center', fontSize: '1.8em', marginTop: '1em' }}>
-                    <i className="fas fa-crosshairs" style={{ color: '#0d99ff', marginRight: '0.4em' }}></i>
-                    ПРАВА ЗАСЕЧКА
-                </h1>
-                <div className="task-layout">
-                    <div className="task-left">
-                        <h2>Входни данни</h2>
-                        {['yA', 'xA', 'yB', 'xB', 'beta1', 'beta2'].map((id) => (
-                            <div className="form-group" key={id}>
-                                <label htmlFor={id}>{id.toUpperCase()}</label>
-                                <input type="number" id={id} value={form[id]} onChange={handleChange} step="any" />
-                            </div>
-                        ))}
-                        <div className="btn-row">
-                            <button onClick={calculate}>Изчисли</button>
-                            <button onClick={resetForm}>Изчисти</button>
-                            <button onClick={copyToClipboard}>Копирай резултата</button>
-                            <button onClick={exportToPDF}>Запази като PDF</button>
-                            <button onClick={() => setIsDetailed(!isDetailed)}>
-                                {isDetailed ? 'Покажи само финал' : 'Покажи подробно'}
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="task-right">
-                        <h2><i className="fas fa-chart-line"></i> Изчисления</h2>
-                        <div className="output">
-                            {displayedLines.length > 0
-                                ? displayedLines.map((line, index) => (
-                                    <div key={index} style={{ marginBottom: '6px' }}>
-                                        {line}
-                                    </div>
-                                ))
-                                : initialMessage.map((line, index) => (
-                                    <div key={index} style={{ marginBottom: '6px' }}>
-                                        {line}
-                                    </div>
-                                ))}
-                        </div>
-                    </div>
-                </div>
-            </Layout>
-        </>
-    );
+const getHistory = () => {
+  const data = localStorage.getItem('forwardIntersectionHistory');
+  return data ? JSON.parse(data) : [];
+};
+const saveHistory = (entry) => {
+  const history = getHistory();
+  history.unshift(entry);
+  localStorage.setItem('forwardIntersectionHistory', JSON.stringify(history.slice(0, 20)));
 };
 
-export default PravaZasechka;
+const ForwardIntersection = () => {
+  const [form, setForm] = useState({ yA: '', xA: '', yB: '', xB: '', beta1: '', beta2: '' });
+  const [result, setResult] = useState('Въведете данни и натиснете "Изчисли", за да видите резултати тук.');
+  const [history, setHistory] = useState([]);
+
+  useEffect(() => {
+    setHistory(getHistory());
+  }, []);
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.id]: e.target.value });
+  };
+
+  const calculate = () => {
+    const yA = parseFloat(form.yA);
+    const xA = parseFloat(form.xA);
+    const yB = parseFloat(form.yB);
+    const xB = parseFloat(form.xB);
+    const beta1 = parseFloat(form.beta1);
+    const beta2 = parseFloat(form.beta2);
+    if ([yA, xA, yB, xB, beta1, beta2].some(isNaN)) {
+      alert('Моля, попълнете всички полета коректно.');
+      return;
+    }
+    // Calculation logic (dummy for now)
+    const output = `yA = ${yA}, xA = ${xA}\nyB = ${yB}, xB = ${xB}\nbeta1 = ${beta1}, beta2 = ${beta2}`;
+    setResult(output);
+    const entry = {
+      yA, xA, yB, xB, beta1, beta2,
+      date: new Date().toISOString(),
+    };
+    saveHistory(entry);
+    setHistory(getHistory());
+  };
+
+  const resetForm = () => {
+    setForm({ yA: '', xA: '', yB: '', xB: '', beta1: '', beta2: '' });
+    setResult('Въведете данни и натиснете "Изчисли", за да видите резултати тук.');
+  };
+
+  // Table headers
+  const tableHeaders = [
+    { key: 'yA', label: 'Yₐ' },
+    { key: 'xA', label: 'Xₐ' },
+    { key: 'yB', label: 'Yᵦ' },
+    { key: 'xB', label: 'Xᵦ' },
+    { key: 'beta1', label: 'β₁' },
+    { key: 'beta2', label: 'β₂' },
+    { key: 'date', label: 'Дата' },
+    { key: 'download', label: 'Изтегли' },
+  ];
+
+  return (
+    <>
+      <Helmet>
+        <title>Права засечка – Геодезически калкулатор | GeoSolver</title>
+        <meta name="description" content="Онлайн калкулатор за права засечка – изчисляване на координати чрез посока и разстояние от известна точка. Точни и бързи геодезически изчисления." />
+        <meta name="keywords" content="права засечка, геодезически калкулатор, координати, геодезия, тахиметрия, геодезически изчисления, онлайн геодезия, GNSS, координатни системи" />
+        <meta name="robots" content="index, follow" />
+        <meta name="author" content="GeoSolver" />
+      </Helmet>
+      <Layout>
+        {/* MOBILE LAYOUT */}
+        <div className="block md:hidden w-full max-w-md mx-auto min-h-screen bg-stone-50 relative px-4 py-4">
+          <div className="flex flex-col justify-start items-start gap-6 w-full">
+            <div className="self-stretch flex flex-col justify-start items-start gap-1">
+              <div className="inline-flex items-center gap-3 w-full">
+                <button className="w-8 h-8 flex items-center justify-center rounded-xl bg-gray-200 text-black focus:outline-none">
+                  <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><path d="M13 15l-5-5 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </button>
+                <span className="text-black text-2xl font-bold font-['Manrope']">Права засечка</span>
+              </div>
+            </div>
+            <div className="p-1.5 bg-white rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-2 mb-2">
+              <div className="px-3 py-1 bg-gray-200 rounded flex justify-center items-center gap-2.5">
+                <div className="text-black text-base font-medium font-['Manrope']">Инструмент</div>
+              </div>
+              <div className="px-3 py-1 rounded flex justify-center items-center gap-2.5">
+                <div className="text-neutral-400 text-base font-medium font-['Manrope']">Документация</div>
+              </div>
+            </div>
+            <div className="self-stretch flex flex-col justify-start items-start gap-10 w-full">
+              <div className="self-stretch flex flex-col justify-start items-start gap-5 w-full">
+                {/* Form Card */}
+                <div className="self-stretch p-3 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-center items-end gap-3 w-full">
+                  <div className="self-stretch text-black text-base font-semibold font-['Manrope']">Входни данни</div>
+                  <div className="self-stretch flex flex-col justify-start items-start gap-4 w-full">
+                    {/* yA */}
+                    <div className="self-stretch flex flex-col justify-start items-start gap-2 w-full">
+                      <div className="text-black text-xs font-medium font-['Manrope']">Yₐ</div>
+                      <input type="number" id="yA" value={form.yA} onChange={handleChange} step="any" className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-xs font-medium font-['Manrope']" placeholder="Въведете Yₐ" />
+                    </div>
+                    {/* xA */}
+                    <div className="self-stretch flex flex-col justify-start items-start gap-2 w-full">
+                      <div className="text-black text-xs font-medium font-['Manrope']">Xₐ</div>
+                      <input type="number" id="xA" value={form.xA} onChange={handleChange} step="any" className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-xs font-medium font-['Manrope']" placeholder="Въведете Xₐ" />
+                    </div>
+                    {/* yB */}
+                    <div className="self-stretch flex flex-col justify-start items-start gap-2 w-full">
+                      <div className="text-black text-xs font-medium font-['Manrope']">Yᵦ</div>
+                      <input type="number" id="yB" value={form.yB} onChange={handleChange} step="any" className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-xs font-medium font-['Manrope']" placeholder="Въведете Yᵦ" />
+                    </div>
+                    {/* xB */}
+                    <div className="self-stretch flex flex-col justify-start items-start gap-2 w-full">
+                      <div className="text-black text-xs font-medium font-['Manrope']">Xᵦ</div>
+                      <input type="number" id="xB" value={form.xB} onChange={handleChange} step="any" className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-xs font-medium font-['Manrope']" placeholder="Въведете Xᵦ" />
+                    </div>
+                    {/* beta1 */}
+                    <div className="self-stretch flex flex-col justify-start items-start gap-2 w-full">
+                      <div className="text-black text-xs font-medium font-['Manrope']">β₁</div>
+                      <input type="number" id="beta1" value={form.beta1} onChange={handleChange} step="any" className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-xs font-medium font-['Manrope']" placeholder="Въведете β₁" />
+                    </div>
+                    {/* beta2 */}
+                    <div className="self-stretch flex flex-col justify-start items-start gap-2 w-full">
+                      <div className="text-black text-xs font-medium font-['Manrope']">β₂</div>
+                      <input type="number" id="beta2" value={form.beta2} onChange={handleChange} step="any" className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-xs font-medium font-['Manrope']" placeholder="Въведете β₂" />
+                    </div>
+                  </div>
+                  <div className="inline-flex justify-end items-center gap-3 w-full">
+                    <button type="button" onClick={resetForm} className="px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3">
+                      <div className="text-black text-sm font-medium font-['Manrope']">Нулирай</div>
+                    </button>
+                    <button type="button" onClick={calculate} className="px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3">
+                      <div className="text-white text-sm font-medium font-['Manrope']">Изчисли</div>
+                      <img src="/white_right_arrow.svg" alt="Изчисли" className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+                {/* Results Card */}
+                <div className="self-stretch p-3 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-center items-end gap-3 w-full">
+                  <div className="self-stretch text-black text-base font-semibold font-['Manrope']">Резултати</div>
+                  <div className="self-stretch p-3 bg-stone-50 rounded-lg flex flex-col justify-start items-start w-full">
+                    <div className="self-stretch text-neutral-400 text-sm font-medium font-['Manrope'] whitespace-pre-line">{result}</div>
+                  </div>
+                </div>
+              </div>
+              {/* History Table */}
+              <div className="self-stretch flex flex-col justify-start items-start gap-3">
+                <div className="text-black text-lg font-bold font-['Manrope']">История на изчисленията</div>
+                <div className="w-full overflow-x-auto">
+                  <div className="min-w-[800px] rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-100 flex flex-col justify-start items-start overflow-hidden">
+                    <div className="w-full shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] inline-flex justify-start items-start gap-px bg-white">
+                      {tableHeaders.map((h, i) => (
+                        <div key={i} className="flex-1 px-3 py-2 bg-white flex justify-start items-center gap-2.5 border-r border-gray-100">
+                          <div className="text-black text-sm font-medium font-['Manrope']">{h.label}</div>
+                        </div>
+                      ))}
+                    </div>
+                    {history.length === 0 ? (
+                      <div className="w-full px-3 py-2 bg-[#FAFAFA] text-neutral-400 text-sm font-medium font-['Manrope'] border-b border-gray-100">Няма изчисления.</div>
+                    ) : (
+                      history.map((entry, idx) => (
+                        <div key={idx} className="w-full inline-flex">
+                          <div className="flex-1 px-3 py-2 bg-[#FAFAFA] flex justify-start items-center border-r border-b border-gray-100 gap-2.5">
+                            <div className="text-neutral-400 text-sm font-medium font-['Manrope']">{entry.yA ?? ''}</div>
+                          </div>
+                          <div className="flex-1 px-3 py-2 bg-[#FAFAFA] flex justify-start items-center border-r border-b border-gray-100 gap-2.5">
+                            <div className="text-neutral-400 text-sm font-medium font-['Manrope']">{entry.xA ?? ''}</div>
+                          </div>
+                          <div className="flex-1 px-3 py-2 bg-[#FAFAFA] flex justify-start items-center border-r border-b border-gray-100 gap-2.5">
+                            <div className="text-neutral-400 text-sm font-medium font-['Manrope']">{entry.yB ?? ''}</div>
+                          </div>
+                          <div className="flex-1 px-3 py-2 bg-[#FAFAFA] flex justify-start items-center border-r border-b border-gray-100 gap-2.5">
+                            <div className="text-neutral-400 text-sm font-medium font-['Manrope']">{entry.xB ?? ''}</div>
+                          </div>
+                          <div className="flex-1 px-3 py-2 bg-[#FAFAFA] flex justify-start items-center border-r border-b border-gray-100 gap-2.5">
+                            <div className="text-neutral-400 text-sm font-medium font-['Manrope']">{entry.beta1 ?? ''}</div>
+                          </div>
+                          <div className="flex-1 px-3 py-2 bg-[#FAFAFA] flex justify-start items-center border-r border-b border-gray-100 gap-2.5">
+                            <div className="text-neutral-400 text-sm font-medium font-['Manrope']">{entry.beta2 ?? ''}</div>
+                          </div>
+                          <div className="flex-1 px-3 py-2 bg-[#FAFAFA] flex justify-start items-center border-r border-b border-gray-100 gap-2.5">
+                            <div className="text-neutral-400 text-sm font-medium font-['Manrope']">{entry.date ? (() => { const d = new Date(entry.date); return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()}` })() : ''}</div>
+                          </div>
+                          <div className="flex-1 self-stretch px-3 py-2 bg-[#FAFAFA] flex justify-center items-center border-b border-gray-100 gap-2.5">
+                            <button type="button" className="w-5 h-5 flex items-center justify-center rounded bg-gray-100 opacity-50 cursor-not-allowed">
+                              <img src="/download_icon.svg" alt="Изтегли" className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+                <div className="self-stretch inline-flex justify-center items-center gap-4 w-full mt-2">
+                  <div className="flex justify-start items-center gap-2">
+                    <div className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center">
+                      <img src="/small_left_arrow.svg" alt="Назад" className="w-3 h-3" />
+                    </div>
+                    <div className="w-7 px-2 py-1 bg-gray-200 rounded inline-flex flex-col justify-center items-center">
+                      <div className="text-black text-sm font-medium font-['Manrope']">1</div>
+                    </div>
+                    <div className="w-7 px-2 py-1 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-center items-center">
+                      <div className="text-neutral-400 text-sm font-medium font-['Manrope']">2</div>
+                    </div>
+                    <div className="w-7 px-2 py-1 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-center items-center">
+                      <div className="text-neutral-400 text-sm font-medium font-['Manrope']">3</div>
+                    </div>
+                    <div className="w-7 px-2 py-1 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-center items-center">
+                      <div className="text-neutral-400 text-sm font-medium font-['Manrope']">4</div>
+                    </div>
+                    <div className="w-7 px-2 py-1 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-center items-center">
+                      <div className="text-neutral-400 text-sm font-medium font-['Manrope']">5</div>
+                    </div>
+                    <div className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center">
+                      <img src="/small_right_arrow.svg" alt="Напред" className="w-3 h-3" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* DESKTOP LAYOUT */}
+        <div className="hidden md:flex w-[1180px] mx-auto my-10 flex-col justify-start items-start gap-10">
+          <div className="self-stretch flex flex-col justify-center items-start gap-10">
+            {/* Breadcrumbs and Title */}
+            <div className="w-[580px] flex flex-col justify-start items-start gap-4">
+              <div className="flex flex-col justify-start items-start gap-1">
+                <div className="text-neutral-400 text-base font-medium font-['Manrope']">
+                  <span className="underline">Инструменти</span><span> &gt; Права засечка</span>
+                </div>
+                <div className="text-black text-3xl font-bold font-['Manrope']">Права засечка</div>
+              </div>
+              <div className="p-1.5 bg-white rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-2">
+                <div className="px-3 py-1 bg-gray-200 rounded flex justify-center items-center gap-2.5">
+                  <div className="text-black text-base font-medium font-['Manrope']">Инструмент</div>
+                </div>
+                <div className="px-3 py-1 rounded flex justify-center items-center gap-2.5">
+                  <div className="text-neutral-400 text-base font-medium font-['Manrope']">Документация</div>
+                </div>
+              </div>
+            </div>
+            {/* Form and Results */}
+            <div className="self-stretch inline-flex justify-start items-start gap-5">
+              {/* Form Card */}
+              <div className="flex-1 p-4 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-center items-end gap-4">
+                <div className="self-stretch text-black text-lg font-semibold font-['Manrope']">Входни данни</div>
+                <div className="self-stretch flex flex-col justify-start items-start gap-4">
+                  {/* yA */}
+                  <div className="self-stretch flex flex-col justify-start items-start gap-2">
+                    <div className="text-black text-sm font-medium font-['Manrope']">Yₐ</div>
+                    <input type="number" id="yA" value={form.yA} onChange={handleChange} step="any" className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']" placeholder="Въведете Yₐ" />
+                  </div>
+                  {/* xA */}
+                  <div className="self-stretch flex flex-col justify-start items-start gap-2">
+                    <div className="text-black text-sm font-medium font-['Manrope']">Xₐ</div>
+                    <input type="number" id="xA" value={form.xA} onChange={handleChange} step="any" className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']" placeholder="Въведете Xₐ" />
+                  </div>
+                  {/* yB */}
+                  <div className="self-stretch flex flex-col justify-start items-start gap-2">
+                    <div className="text-black text-sm font-medium font-['Manrope']">Yᵦ</div>
+                    <input type="number" id="yB" value={form.yB} onChange={handleChange} step="any" className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']" placeholder="Въведете Yᵦ" />
+                  </div>
+                  {/* xB */}
+                  <div className="self-stretch flex flex-col justify-start items-start gap-2">
+                    <div className="text-black text-sm font-medium font-['Manrope']">Xᵦ</div>
+                    <input type="number" id="xB" value={form.xB} onChange={handleChange} step="any" className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']" placeholder="Въведете Xᵦ" />
+                  </div>
+                  {/* beta1 */}
+                  <div className="self-stretch flex flex-col justify-start items-start gap-2">
+                    <div className="text-black text-sm font-medium font-['Manrope']">β₁</div>
+                    <input type="number" id="beta1" value={form.beta1} onChange={handleChange} step="any" className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']" placeholder="Въведете β₁" />
+                  </div>
+                  {/* beta2 */}
+                  <div className="self-stretch flex flex-col justify-start items-start gap-2">
+                    <div className="text-black text-sm font-medium font-['Manrope']">β₂</div>
+                    <input type="number" id="beta2" value={form.beta2} onChange={handleChange} step="any" className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']" placeholder="Въведете β₂" />
+                  </div>
+                </div>
+                <div className="inline-flex justify-start items-start gap-3">
+                  {/* Scan button (inactive, with tooltip) */}
+                  <button
+                    type="button"
+                    aria-disabled="true"
+                    title="Тази функция е в процес на разработка и интеграция."
+                    className="px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3 opacity-50 select-none cursor-not-allowed"
+                  >
+                    <img src="/scan_icon.svg" alt="Сканирай" className="w-4 h-4" />
+                    <span className="justify-start text-black text-base font-medium font-['Manrope']">Сканирай</span>
+                  </button>
+                  {/* Reset button */}
+                  <button type="button" onClick={resetForm} className="px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3">
+                    <div className="justify-start text-black text-base font-medium font-['Manrope']">Нулирай</div>
+                  </button>
+                  {/* Calculate button */}
+                  <button type="button" onClick={calculate} className="px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3">
+                    <div className="justify-start text-white text-base font-medium font-['Manrope']">Изчисли</div>
+                    <img src="/white_right_arrow.svg" alt="Изчисли" className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+              {/* Results Card */}
+              <div className="flex-1 self-stretch p-4 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-center items-end gap-3">
+                <div className="self-stretch text-black text-lg font-semibold font-['Manrope']">Резултати</div>
+                <div className="self-stretch flex-1 p-3 bg-stone-50 rounded-lg flex flex-col justify-start items-start">
+                  <div className="self-stretch text-neutral-400 text-sm font-medium font-['Manrope'] whitespace-pre-line">{result}</div>
+                </div>
+                <button
+                  type="button"
+                  className={`px-4 py-2 ${!result || result.includes('Въведете данни') ? 'opacity-20 cursor-not-allowed' : ''} bg-gray-200 rounded-lg inline-flex justify-start items-center gap-3`}
+                  disabled={!result || result.includes('Въведете данни')}
+                >
+                  <img src="/download_icon.svg" alt="Изтегли" className="w-4 h-4" />
+                  <div className="text-black text-base font-medium font-['Manrope']">Изтегли</div>
+                </button>
+              </div>
+            </div>
+          </div>
+          {/* History Table */}
+          <div className="self-stretch flex flex-col justify-start items-start gap-4">
+            <div className="text-black text-2xl font-bold font-['Manrope']">История на изчисленията</div>
+            <div className="self-stretch w-full rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-100 flex flex-col justify-start items-start gap-px overflow-hidden">
+              <div className="self-stretch shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] inline-flex justify-start items-start gap-px bg-white w-full">
+                {tableHeaders.map((h, i) => (
+                  <div key={i} className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5 border-r border-gray-100">
+                    <div className="text-black text-sm font-medium font-['Manrope']">{h.label}</div>
+                  </div>
+                ))}
+              </div>
+              {history.length === 0 ? (
+                <div className="w-full px-3 py-2 bg-[#FAFAFA] text-neutral-400 text-sm font-medium font-['Manrope'] border-b border-gray-100">Няма изчисления.</div>
+              ) : (
+                history.map((entry, idx) => (
+                  <div key={idx} className="inline-flex w-full">
+                    <div className="flex-1 px-3 py-2 bg-[#FAFAFA] flex justify-center items-center border-r border-b border-gray-100 gap-2.5">
+                      <div className="text-neutral-400 text-sm font-medium font-['Manrope']">{entry.yA ?? ''}</div>
+                    </div>
+                    <div className="flex-1 px-3 py-2 bg-[#FAFAFA] flex justify-center items-center border-r border-b border-gray-100 gap-2.5">
+                      <div className="text-neutral-400 text-sm font-medium font-['Manrope']">{entry.xA ?? ''}</div>
+                    </div>
+                    <div className="flex-1 px-3 py-2 bg-[#FAFAFA] flex justify-center items-center border-r border-b border-gray-100 gap-2.5">
+                      <div className="text-neutral-400 text-sm font-medium font-['Manrope']">{entry.yB ?? ''}</div>
+                    </div>
+                    <div className="flex-1 px-3 py-2 bg-[#FAFAFA] flex justify-center items-center border-r border-b border-gray-100 gap-2.5">
+                      <div className="text-neutral-400 text-sm font-medium font-['Manrope']">{entry.xB ?? ''}</div>
+                    </div>
+                    <div className="flex-1 px-3 py-2 bg-[#FAFAFA] flex justify-center items-center border-r border-b border-gray-100 gap-2.5">
+                      <div className="text-neutral-400 text-sm font-medium font-['Manrope']">{entry.beta1 ?? ''}</div>
+                    </div>
+                    <div className="flex-1 px-3 py-2 bg-[#FAFAFA] flex justify-center items-center border-r border-b border-gray-100 gap-2.5">
+                      <div className="text-neutral-400 text-sm font-medium font-['Manrope']">{entry.beta2 ?? ''}</div>
+                    </div>
+                    <div className="flex-1 px-3 py-2 bg-[#FAFAFA] flex justify-center items-center border-r border-b border-gray-100 gap-2.5">
+                      <div className="text-neutral-400 text-sm font-medium font-['Manrope']">{entry.date ? (() => { const d = new Date(entry.date); return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()}` })() : ''}</div>
+                    </div>
+                    <div className="flex-1 self-stretch px-3 py-2 bg-[#FAFAFA] flex justify-center items-center border-b border-gray-100 gap-2.5">
+                      <button type="button" className="w-5 h-5 flex items-center justify-center rounded bg-gray-100 opacity-50 cursor-not-allowed">
+                        <img src="/download_icon.svg" alt="Изтегли" className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+            <div className="self-stretch inline-flex justify-center items-center gap-4 w-full mt-2">
+              <div className="flex justify-start items-center gap-2">
+                <div className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center">
+                  <img src="/small_left_arrow.svg" alt="Назад" className="w-3 h-3" />
+                </div>
+                <div className="w-7 px-2 py-1 bg-gray-200 rounded inline-flex flex-col justify-center items-center">
+                  <div className="text-black text-sm font-medium font-['Manrope']">1</div>
+                </div>
+                <div className="w-7 px-2 py-1 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-center items-center">
+                  <div className="text-neutral-400 text-sm font-medium font-['Manrope']">2</div>
+                </div>
+                <div className="w-7 px-2 py-1 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-center items-center">
+                  <div className="text-neutral-400 text-sm font-medium font-['Manrope']">3</div>
+                </div>
+                <div className="w-7 px-2 py-1 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-center items-center">
+                  <div className="text-neutral-400 text-sm font-medium font-['Manrope']">4</div>
+                </div>
+                <div className="w-7 px-2 py-1 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-center items-center">
+                  <div className="text-neutral-400 text-sm font-medium font-['Manrope']">5</div>
+                </div>
+                <div className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center">
+                  <img src="/small_right_arrow.svg" alt="Напред" className="w-3 h-3" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Layout>
+    </>
+  );
+};
+
+export default ForwardIntersection;
