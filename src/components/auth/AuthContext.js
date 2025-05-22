@@ -14,7 +14,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     if (token) {
       setLoading(true);
-      fetch(`${BASE_URL}/api/account`, {
+      fetch(`${BASE_URL}/api/auth/account`, {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then(res => res.ok ? res.json() : Promise.reject(res))
@@ -31,7 +31,7 @@ export function AuthProvider({ children }) {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${BASE_URL}/api/login`, {
+      const res = await fetch(`${BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -66,7 +66,7 @@ export function AuthProvider({ children }) {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${BASE_URL}/api/register`, {
+      const res = await fetch(`${BASE_URL}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password, repeatPassword, purpose }),
