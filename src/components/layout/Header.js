@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../auth/AuthContext';
 
 const Header = () => {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, loading, logout } = useAuth();
 
   return (
     <>
@@ -59,10 +61,24 @@ const Header = () => {
           <div className="w-9 h-9 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 flex justify-center items-center gap-3">
             <img src="/icons/night_mode_icon.svg" alt="Night Mode Icon" className="w-6 h-6" />
           </div>
-          <div className="px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3">
-            <div className="justify-start text-white text-base font-medium font-['Manrope']">Вход</div>
-            <img src="/icons/login_icon.svg" alt="Login Icon" className="w-5 h-5" />
-          </div>
+          {loading ? (
+            <div className="px-4 py-2 text-neutral-400">Зареждане...</div>
+          ) : user ? (
+            <>
+              <Link to="/account" className="px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3">
+                <div className="justify-start text-white text-base font-medium font-['Manrope']">{user.name || 'Акаунт'}</div>
+                <img src="/icons/account_icon.svg" alt="Account Icon" className="w-5 h-5" />
+              </Link>
+              <button onClick={logout} className="px-4 py-2 bg-white rounded-lg outline outline-1 outline-gray-200 flex justify-start items-center gap-3">
+                <div className="justify-start text-black text-base font-medium font-['Manrope']">Изход</div>
+              </button>
+            </>
+          ) : (
+            <Link to="/login" className="px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3">
+              <div className="justify-start text-white text-base font-medium font-['Manrope']">Вход</div>
+              <img src="/icons/login_icon.svg" alt="Login Icon" className="w-5 h-5" />
+            </Link>
+          )}
         </div>
       </div>
 
@@ -118,10 +134,24 @@ const Header = () => {
               </Link>
             </div>
             <div className="inline-flex justify-end items-center gap-3">
-              <div className="px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3">
-                <div className="justify-start text-white text-sm font-medium font-['Manrope']">Вход</div>
-                <img src="/icons/login_icon.svg" alt="Login" className="w-3 h-3" />
-              </div>
+              {loading ? (
+                <div className="px-4 py-2 text-neutral-400">Зареждане...</div>
+              ) : user ? (
+                <>
+                  <Link to="/account" onClick={() => setMobileMenuOpen(false)} className="px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3">
+                    <div className="justify-start text-white text-sm font-medium font-['Manrope']">{user.name || 'Акаунт'}</div>
+                    <img src="/icons/account_icon.svg" alt="Account Icon" className="w-4 h-4" />
+                  </Link>
+                  <button onClick={() => { logout(); setMobileMenuOpen(false); }} className="px-4 py-2 bg-white rounded-lg outline outline-1 outline-gray-200 flex justify-start items-center gap-3">
+                    <div className="justify-start text-black text-sm font-medium font-['Manrope']">Изход</div>
+                  </button>
+                </>
+              ) : (
+                <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="justify-start text-white text-sm font-medium font-['Manrope'] px-4 py-2 bg-black rounded-lg flex items-center gap-3">
+                  Вход
+                  <img src="/icons/login_icon.svg" alt="Login" className="w-3 h-3" />
+                </Link>
+              )}
               <div className="w-9 self-stretch rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 flex justify-center items-center gap-3">
                 <img src="/icons/calc_icon.svg" alt="Calculator" className="w-3.5 h-3.5" />
               </div>
