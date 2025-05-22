@@ -1,8 +1,7 @@
 import React from "react";
-import Layout from '../layout/Layout';
+import Layout from '../../layout/Layout';
 import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
-import { useLocation } from "react-router-dom";
 
 const ToolsPage = () => {
   const tools = [
@@ -13,7 +12,7 @@ const ToolsPage = () => {
       type: "Трансформация / полярен метод",
       calculation: "< 0.05s",
       route: "/first-task",
-      icon: "/first_task_icon.svg"
+      icon: "/icons/first_task_icon.svg"
     },
     {
       title: "Втора основна задача",
@@ -22,7 +21,7 @@ const ToolsPage = () => {
       type: "GNSS / координатна геодезия",
       calculation: "< 0.1s",
       route: "/second-task",
-      icon: "/second_task_icon.svg"    
+      icon: "/icons/second_task_icon.svg"    
     },
     {
       title: "Права засечка",
@@ -31,7 +30,7 @@ const ToolsPage = () => {
       type: "GNSS / тахиметрично измерване",
       calculation: "< 0.08s",
       route: "/forward-intersection",
-      icon: "/forward_intersection_icon.svg"
+      icon: "/icons/forward_intersection_icon.svg"
     },
     {
       title: "Обратна засечка",
@@ -40,7 +39,7 @@ const ToolsPage = () => {
       type: "координатна геодезия / класика",
       calculation: "~ 0.1s",
       route: "/resection",
-      icon: "/resection_icon.svg"
+      icon: "/icons/resection_icon.svg"
     },
     {
       title: "Полярна засечка",
@@ -49,7 +48,7 @@ const ToolsPage = () => {
       type: "полярни координати",
       calculation: "< 0.09s",
       route: "/polar-intersection",
-      icon: "/polar_intersection_icon.svg"
+      icon: "/icons/polar_intersection_icon.svg"
     },
     {
       title: "Координатна трансформация",
@@ -58,7 +57,7 @@ const ToolsPage = () => {
       type: "Хелмерт, афинна, 7 параметъра",
       calculation: "< 0.2s",
       route: "/coordinate-transformation",
-      icon: "/coordinate_transformation_icon.svg"
+      icon: "/icons/coordinate_transformation_icon.svg"
     },
     {
       title: "Задача за ханзен",
@@ -67,13 +66,25 @@ const ToolsPage = () => {
       type: "аналитична триангулация",
       calculation: "< 0.1s",
       route: "/hansen-task",
-      icon: "/hansen-task-icon.svg"
+      icon: "/icons/hansen-task-icon.svg"
     }
   ];
 
-  const location = useLocation();
-
   return (
+    <>
+    <Helmet>
+      <title>Инструменти – Геодезически калкулатори и задачи | GeoSolver</title>
+      <meta
+        name="description"
+        content="Интерактивни геодезически инструменти за координатни трансформации, засечки, изчисления на ъгли и разстояния. Всичко за геодезията на едно място – бързо, лесно и удобно."
+      />
+      <meta
+        name="keywords"
+        content="геодезия, инструменти, калкулатори, координатни трансформации, права засечка, обратна засечка, полярна засечка, Hansen, GNSS, онлайн изчисления"
+      />
+      <meta name="robots" content="index, follow" />
+      <meta name="author" content="GeoSolver" />
+    </Helmet>
     <Layout>
       <div className="min-h-[calc(100vh-300px)] bg-stone-50 w-full overflow-hidden py-6 md:py-10">
         <div className="max-w-[400px] md:max-w-[1180px] w-full mx-auto flex flex-col justify-center items-start gap-6 md:gap-10 px-4 md:px-0">
@@ -107,7 +118,7 @@ const ToolsPage = () => {
                       <div className="text-black text-sm md:text-base font-semibold font-['Manrope']">{tool.title}</div>
                     </div>
                     <div className="w-5 h-5 md:w-4 md:h-4 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 flex items-center justify-center">
-                      <img src="/question_icon.svg" alt="?" className="w-2.5 h-2.5" />
+                      <img src="/icons/question_icon.svg" alt="?" className="w-2.5 h-2.5" />
                     </div>
                   </div>
                   <div className="w-full h-0 outline outline-1 outline-offset-[-0.50px] outline-gray-200" />
@@ -133,6 +144,7 @@ const ToolsPage = () => {
         </div>
       </div>
     </Layout>
+    </>
   );
 };
 

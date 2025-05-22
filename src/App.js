@@ -3,9 +3,8 @@ import HomePage from './components/pages/HomePage/HomePage';
 import FirstTask from './components/tasks/FirstTask';
 import SecondTask from './components/tasks/SecondTask';
 import ForwardIntersection from './components/tasks/ForwardIntersection';
-import AboutPage from './components/pages/AboutPage/AboutPage';
 import Prices from './components/pages/Prices/Prices';
-import ToolsPage from './components/pages/ToolsPage';
+import ToolsPage from './components/pages/Tools/ToolsPage';
 import { Helmet } from "react-helmet";
 
 function App() {
@@ -31,7 +30,6 @@ function App() {
           <Route path="/first-task" element={<FirstTask />} />
           <Route path="/second-task" element={<SecondTask />} />
           <Route path="/forward-intersection" element={<ForwardIntersection />} />
-          <Route path="/about-us" element={<AboutPage />} />
           <Route path="/prices" element={<Prices />} />
           <Route path="/tools" element={<ToolsPage />} />
         </Routes>

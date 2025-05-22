@@ -1,20 +1,96 @@
 import React, { useState, useEffect } from 'react';
-import { saveCalculation, getRecentCalculations } from "../shared/historyService";
 import { Helmet } from "react-helmet";
 import Layout from '../layout/Layout';
-import Breadcrumbs from '../layout/Breadcrumbs';
+import { Link } from 'react-router-dom';
+// Custom hook for typewriter effect
+const useTypewriter = (text, speed = 12) => {
+  const [displayText, setDisplayText] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+
+  useEffect(() => {
+    const safeText = typeof text === 'string' ? text : (text ? String(text) : '');
+    if (!safeText) {
+      setDisplayText('');
+      return;
+    }
+    setIsTyping(true);
+    let currentIndex = 0;
+    let cancelled = false;
+    let buffer = '';
+    let lastTime = performance.now();
+    function typeNext(now) {
+      if (cancelled) return;
+      if (now - lastTime >= speed) {
+        buffer += safeText[currentIndex] ?? '';
+        setDisplayText(buffer);
+        currentIndex++;
+        lastTime = now;
+      }
+      if (currentIndex < safeText.length) {
+        requestAnimationFrame(typeNext);
+      } else {
+        setIsTyping(false);
+      }
+    }
+    setDisplayText('');
+    requestAnimationFrame(typeNext);
+    return () => { cancelled = true; };
+  }, [text, speed]);
+  return { displayText, isTyping };
+};
+
+// Helpers for localStorage history for each input
+const getInputHistory = (key) => {
+  try {
+    const data = localStorage.getItem('inputHistory_' + key);
+    return data ? JSON.parse(data) : [];
+  } catch {
+    return [];
+  }
+};
+const saveInputHistory = (key, value) => {
+  if (!value) return;
+  let history = getInputHistory(key);
+  // Remove duplicates
+  history = history.filter((v) => v !== value);
+  history.unshift(value);
+  if (history.length > 5) history = history.slice(0, 5);
+  localStorage.setItem('inputHistory_' + key, JSON.stringify(history));
+};
+
+// Local history for FirstTask (like SecondTask.js)
+const getHistory = () => {
+  const data = localStorage.getItem('firstTaskHistory');
+  return data ? JSON.parse(data) : [];
+};
+const saveHistory = (entry) => {
+  const history = getHistory();
+  history.unshift(entry);
+  localStorage.setItem('firstTaskHistory', JSON.stringify(history.slice(0, 20)));
+};
 
 const PurvaZadacha = () => {
   const [form, setForm] = useState({ y1: '', x1: '', alpha: '', s: '' });
-  const [result, setResult] = useState('Въведете данни и натиснете "Изчисли", за да видите резултати тук.');
+  const [resultText, setResultText] = useState('Въведете данни и натиснете "Изчисли", за да видите резултати тук.');
   const [history, setHistory] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+  const totalPages = Math.ceil(history.length / itemsPerPage);
+  const paginatedHistory = history.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const { displayText, isTyping } = useTypewriter(resultText);
+
+  // Debug: виж какво се сетва
+  useEffect(() => {
+    console.log('setResultText value:', resultText);
+  }, [resultText]);
 
   useEffect(() => {
-    getRecentCalculations().then(setHistory).catch(() => {});
+    setHistory(getHistory());
   }, []);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.id]: e.target.value });
+    saveInputHistory(e.target.id, e.target.value);
   };
 
   const calculate = async () => {
@@ -26,22 +102,90 @@ const PurvaZadacha = () => {
       alert("Моля, попълнете всички полета коректно.");
       return;
     }
-    const alphaRad = alpha * Math.PI / 200;
+
+    const result = purvaOsnovnaZadacha(y1, x1, alpha, s);
+    const output = `--------- Първа основна геодезическа задача ---------
+Y1 = ${result.y1}, X1 = ${result.x1}
+S₁,₂ = ${result.s}, α₁,₂ = ${result.alphaGon} gon
+------------------------------------------------------
+α в радиани = ${result.alphaRad.toFixed(6)} rad
+sin(α) = ${result.sinAlpha.toFixed(6)}
+cos(α) = ${result.cosAlpha.toFixed(6)}
+------------------------------------------------------
+Y2 = ${result.y2.toFixed(2)}
+X2 = ${result.x2.toFixed(2)}
+------------------------------------------------------`;
+    
+    setResultText(output ? String(output) : "");
+    // Save to local history
+    const entry = {
+      y1: result.y1,
+      x1: result.x1,
+      alpha: result.alphaGon,
+      s: result.s,
+      y2: parseFloat(result.y2.toFixed(2)),
+      x2: parseFloat(result.x2.toFixed(2)),
+      date: new Date().toISOString(),
+    };
+    saveHistory(entry);
+    setHistory(getHistory());
+  };
+
+  /**
+   * Първа основна геодезическа задача:
+   * Дадени са начална точка (X1, Y1), посочен ъгъл α (в гради) и дължина S.
+   * Търсят се координатите на точка 2 (X2, Y2).
+   * @param {number} y1 - Y координата на точка 1
+   * @param {number} x1 - X координата на точка 1
+   * @param {number} alphaGon - посочен ъгъл в гради
+   * @param {number} s - дължина на отсечката
+   * @returns {Object} - координати на точка 2 и междинни изчисления
+   */
+  const purvaOsnovnaZadacha = (y1, x1, alphaGon, s) => {
+    const alphaRad = alphaGon * Math.PI / 200;
     const sinAlpha = Math.sin(alphaRad);
     const cosAlpha = Math.cos(alphaRad);
     const y2 = y1 + s * sinAlpha;
     const x2 = x1 + s * cosAlpha;
-    const output = `Y1 = ${y1}, X1 = ${x1}\nS = ${s}, α = ${alpha} gon\nα в радиани = ${alphaRad.toFixed(6)}\n---------------------------------------\nsin(α) = ${sinAlpha.toFixed(6)}\ncos(α) = ${cosAlpha.toFixed(6)}\n---------------------------------------\nY2 = ${y2.toFixed(2)}\nX2 = ${x2.toFixed(2)}`;
-    setResult(output);
-    try {
-      await saveCalculation({ x1, y1, alpha, s, x2: parseFloat(x2.toFixed(2)), y2: parseFloat(y2.toFixed(2)), date: new Date() });
-      getRecentCalculations().then(setHistory);
-    } catch {}
+
+    return {
+      x1, y1, alphaGon, s,
+      alphaRad,
+      sinAlpha,
+      cosAlpha,
+      x2,
+      y2
+    };
   };
 
   const resetForm = () => {
     setForm({ y1: '', x1: '', alpha: '', s: '' });
-    setResult('Въведете данни и натиснете "Изчисли", за да видите резултати тук.');
+    setResultText('Въведете данни и натиснете "Изчисли", за да видите резултати тук.');
+  };
+
+  const handleDownload = (entry) => {
+    const text = `Y1: ${entry.y1}\nX1: ${entry.x1}\nα: ${entry.alpha}\nS: ${entry.s}\nY2: ${entry.y2}\nX2: ${entry.x2}\nДата: ${(() => { const d = new Date(entry.date); return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()}` })()}`;
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `result_${entry.y1}_${entry.x1}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // Проверка дали всички полета са попълнени
+  const isFormValid = () => {
+    return (
+      form.y1 !== '' &&
+      form.x1 !== '' &&
+      form.alpha !== '' &&
+      form.s !== '' &&
+      !isNaN(parseFloat(form.y1)) &&
+      !isNaN(parseFloat(form.x1)) &&
+      !isNaN(parseFloat(form.alpha)) &&
+      !isNaN(parseFloat(form.s))
+    );
   };
 
   return (
@@ -62,7 +206,7 @@ const PurvaZadacha = () => {
               <div className="inline-flex items-center gap-3 w-full">
                 {/* Back button */}
                 <button className="w-8 h-8 flex items-center justify-center rounded-xl bg-gray-200 text-black focus:outline-none">
-                  <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><path d="M13 15l-5-5 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><path d="M13 15l-5-5 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
                 </button>
                 <span className="text-black text-2xl font-bold font-['Manrope']">Първа основна задача</span>
               </div>
@@ -93,7 +237,11 @@ const PurvaZadacha = () => {
                         step="any"
                         className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-xs font-medium font-['Manrope']"
                         placeholder="Въведете координата Y1"
+                        list="y1-history"
                       />
+                      <datalist id="y1-history">
+                        {getInputHistory('y1').map((v, i) => <option value={v} key={i} />)}
+                      </datalist>
                     </div>
                     {/* X1 */}
                     <div className="self-stretch flex flex-col justify-start items-start gap-2 w-full">
@@ -106,7 +254,11 @@ const PurvaZadacha = () => {
                         step="any"
                         className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-xs font-medium font-['Manrope']"
                         placeholder="Въведете координата X1"
+                        list="x1-history"
                       />
+                      <datalist id="x1-history">
+                        {getInputHistory('x1').map((v, i) => <option value={v} key={i} />)}
+                      </datalist>
                     </div>
                     {/* Alpha */}
                     <div className="self-stretch flex flex-col justify-start items-start gap-2 w-full">
@@ -119,7 +271,11 @@ const PurvaZadacha = () => {
                         step="any"
                         className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-xs font-medium font-['Manrope']"
                         placeholder="Въведете ъгъл α"
+                        list="alpha-history"
                       />
+                      <datalist id="alpha-history">
+                        {getInputHistory('alpha').map((v, i) => <option value={v} key={i} />)}
+                      </datalist>
                     </div>
                     {/* S */}
                     <div className="self-stretch flex flex-col justify-start items-start gap-2 w-full">
@@ -132,16 +288,29 @@ const PurvaZadacha = () => {
                         step="any"
                         className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-xs font-medium font-['Manrope']"
                         placeholder="Въведете дължина S"
+                        list="s-history"
                       />
+                      <datalist id="s-history">
+                        {getInputHistory('s').map((v, i) => <option value={v} key={i} />)}
+                      </datalist>
                     </div>
                   </div>
                   <div className="inline-flex justify-end items-center gap-3 w-full">
+                    <button
+                      type="button"
+                      aria-disabled="true"
+                      title="Тази функция е в процес на разработка и интеграция."
+                      className="px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3 opacity-50 select-none cursor-not-allowed"
+                    >
+                      <img src="/icons/scan_icon.svg" alt="Сканирай" className="w-4 h-4" />
+                      <span className="justify-start text-black text-sm font-medium font-['Manrope']">Сканирай</span>
+                    </button>
                     <button type="button" onClick={resetForm} className="px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3">
                       <div className="justify-start text-black text-sm font-medium font-['Manrope']">Нулирай</div>
                     </button>
-                    <button type="button" onClick={calculate} className="px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3">
+                    <button type="button" onClick={calculate} disabled={!isFormValid()} className={`px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3${!isFormValid() ? ' opacity-50 cursor-not-allowed' : ''}`}>
                       <div className="justify-start text-white text-sm font-medium font-['Manrope']">Изчисли</div>
-                      <img src="/white_right_arrow.svg" alt="Изчисли" className="w-4 h-4" />
+                      <img src="/icons/white_right_arrow.svg" alt="Изчисли" className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
@@ -149,7 +318,10 @@ const PurvaZadacha = () => {
                 <div className="self-stretch p-3 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-center items-end gap-3 w-full">
                   <div className="self-stretch justify-start text-black text-base font-semibold font-['Manrope']">Резултати</div>
                   <div className="self-stretch p-3 bg-stone-50 rounded-lg flex flex-col justify-start items-start w-full">
-                    <div className="self-stretch justify-start text-neutral-400 text-sm font-medium font-['Manrope'] whitespace-pre-line">{result}</div>
+                    <div className="self-stretch justify-start text-neutral-400 text-sm font-medium font-['Manrope'] whitespace-pre-line">
+                      {displayText}
+                      {isTyping && <span className="animate-pulse">|</span>}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -157,85 +329,83 @@ const PurvaZadacha = () => {
               <div className="self-stretch flex flex-col justify-start items-start gap-3 w-full">
                 <div className="justify-start text-black text-lg font-bold font-['Manrope']">История на изчисленията</div>
                 <div className="self-stretch flex flex-col justify-start items-start gap-2.5 w-full">
-                  <div className="w-full rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-start items-start gap-px overflow-hidden">
-                    <div className="self-stretch shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] inline-flex justify-start items-start gap-px">
-                      <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                        <div className="justify-start text-black text-sm font-medium font-['Manrope']">Y₁</div>
-                      </div>
-                      <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                        <div className="justify-start text-black text-sm font-medium font-['Manrope']">X₁</div>
-                      </div>
-                      <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                        <div className="justify-start text-black text-sm font-medium font-['Manrope']">α</div>
-                      </div>
-                      <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                        <div className="justify-start text-black text-sm font-medium font-['Manrope']">S</div>
-                      </div>
-                      <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                        <div className="justify-start text-black text-sm font-medium font-['Manrope']">Y₂</div>
-                      </div>
-                      <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                        <div className="justify-start text-black text-sm font-medium font-['Manrope']">X₂</div>
-                      </div>
-                      <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                        <div className="justify-start text-black text-sm font-medium font-['Manrope']">Дата</div>
-                      </div>
-                    </div>
-                    {history.length === 0 ? (
-                      <div className="w-full px-3 py-2 bg-white text-neutral-400 text-sm font-medium font-['Manrope']">Няма изчисления.</div>
-                    ) : (
-                      history.map((entry, idx) => (
-                        <div key={idx} className="self-stretch inline-flex justify-start items-start gap-px">
-                          <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                            <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{entry.y1}</div>
-                          </div>
-                          <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                            <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{entry.x1}</div>
-                          </div>
-                          <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                            <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{entry.alpha}</div>
-                          </div>
-                          <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                            <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{entry.s}</div>
-                          </div>
-                          <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                            <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{entry.y2}</div>
-                          </div>
-                          <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                            <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{entry.x2}</div>
-                          </div>
-                          <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                            <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{new Date(entry.date).toLocaleString("bg-BG")}</div>
-                          </div>
+                  <div className="w-full overflow-x-auto">
+                    <div className="min-w-[800px] rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-start items-start gap-px overflow-hidden">
+                      <div className="self-stretch shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] inline-flex justify-start items-start gap-px bg-white">
+                        <div className="flex-1 px-3 py-2 min-w-[80px] flex justify-center items-center gap-2.5 text-center border-r border-gray-200">
+                          <div className="text-black text-sm font-medium font-['Manrope'] text-center">Y₁</div>
                         </div>
-                      ))
-                    )}
+                        <div className="flex-1 px-3 py-2 min-w-[80px] flex justify-center items-center gap-2.5 text-center border-r border-gray-200">
+                          <div className="text-black text-sm font-medium font-['Manrope'] text-center">X₁</div>
+                        </div>
+                        <div className="flex-1 px-3 py-2 min-w-[80px] flex justify-center items-center gap-2.5 text-center border-r border-gray-200">
+                          <div className="text-black text-sm font-medium font-['Manrope'] text-center">α</div>
+                        </div>
+                        <div className="flex-1 px-3 py-2 min-w-[80px] flex justify-center items-center gap-2.5 text-center border-r border-gray-200">
+                          <div className="text-black text-sm font-medium font-['Manrope'] text-center">S</div>
+                        </div>
+                        <div className="flex-1 px-3 py-2 min-w-[80px] flex justify-center items-center gap-2.5 text-center border-r border-gray-200">
+                          <div className="text-black text-sm font-medium font-['Manrope'] text-center">Y₂</div>
+                        </div>
+                        <div className="flex-1 px-3 py-2 min-w-[80px] flex justify-center items-center gap-2.5 text-center border-r border-gray-200">
+                          <div className="text-black text-sm font-medium font-['Manrope'] text-center">X₂</div>
+                        </div>
+                        <div className="flex-1 px-3 py-2 min-w-[80px] flex justify-center items-center gap-2.5 text-center border-r border-gray-200">
+                          <div className="text-black text-sm font-medium font-['Manrope'] text-center">Дата</div>
+                        </div>
+                        <div className="flex-1 px-3 py-2 min-w-[80px] flex justify-center items-center gap-2.5 text-center">
+                          <div className="text-black text-sm font-medium font-['Manrope'] text-center">Изтегли</div>
+                        </div>
+                      </div>
+                      {paginatedHistory.length === 0 ? (
+                        <div className="w-full px-3 py-2 bg-white text-neutral-400 text-sm font-medium font-['Manrope']">Няма изчисления.</div>
+                      ) : (
+                        paginatedHistory.map((entry, idx) => (
+                          <div key={idx} className="self-stretch inline-flex justify-start items-start gap-px">
+                            <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
+                              <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{entry.y1}</div>
+                            </div>
+                            <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
+                              <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{entry.x1}</div>
+                            </div>
+                            <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
+                              <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{entry.alpha}</div>
+                            </div>
+                            <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
+                              <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{entry.s}</div>
+                            </div>
+                            <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
+                              <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{entry.y2}</div>
+                            </div>
+                            <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
+                              <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{entry.x2}</div>
+                            </div>
+                            <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
+                              <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{(() => { const d = new Date(entry.date); return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()}` })()}</div>
+                            </div>
+                            <div className="flex-1 self-stretch px-3 py-2 bg-white flex justify-center items-center gap-2.5">
+                              <button onClick={() => handleDownload(entry)} className="flex items-center justify-center"><svg className="w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" strokeLinecap="round" strokeLinejoin="round"/></svg></button>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
                   </div>
                 </div>
                 {/* Pagination (static, for design) */}
                 <div className="self-stretch inline-flex justify-center items-center gap-4 w-full">
                   <div className="flex justify-start items-center gap-2">
-                    <div className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center">
-                      <img src="/small_left_arrow.svg" alt="Назад" className="w-3 h-3" />
-                    </div>
-                    <div className="w-7 px-2 py-1 bg-gray-200 rounded inline-flex flex-col justify-center items-center">
-                      <div className="justify-start text-black text-sm font-medium font-['Manrope']">1</div>
-                    </div>
-                    <div className="w-7 px-2 py-1 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-center items-center">
-                      <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">2</div>
-                    </div>
-                    <div className="w-7 px-2 py-1 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-center items-center">
-                      <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">3</div>
-                    </div>
-                    <div className="w-7 px-2 py-1 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-center items-center">
-                      <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">4</div>
-                    </div>
-                    <div className="w-7 px-2 py-1 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-center items-center">
-                      <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">5</div>
-                    </div>
-                    <div className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center">
-                      <img src="/small_right_arrow.svg" alt="Напред" className="w-3 h-3" />
-                    </div>
+                    <button className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>
+                      <img src="/icons/small_left_arrow.svg" alt="Назад" className="w-3 h-3 opacity-70" />
+                    </button>
+                    {Array.from({ length: totalPages }, (_, i) => (
+                      <button key={i} className={`w-7 px-2 py-1 rounded ${currentPage === i + 1 ? 'bg-gray-200 text-black' : 'outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400'} inline-flex flex-col justify-center items-center`} onClick={() => setCurrentPage(i + 1)} disabled={currentPage === i + 1}>
+                        <div className="justify-start text-sm font-medium font-['Manrope']">{i + 1}</div>
+                      </button>
+                    ))}
+                    <button className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages || totalPages === 0}>
+                      <img src="/icons/small_right_arrow.svg" alt="Напред" className="w-3 h-3 opacity-70" />
+                    </button>
                   </div>
                 </div>
               </div>
@@ -248,7 +418,10 @@ const PurvaZadacha = () => {
             {/* Breadcrumbs and Title */}
             <div className="w-[580px] flex flex-col justify-start items-start gap-4">
               <div className="flex flex-col justify-start items-start gap-1">
-                <div className="justify-start"><span className="text-neutral-400 text-base font-medium font-['Manrope'] underline">Инструменти</span><span className="text-neutral-400 text-base font-medium font-['Manrope']"> &gt; Първа основна задача</span></div>
+                <div className="justify-start">
+                  <Link to="/tools" className="text-neutral-400 text-base font-medium font-['Manrope'] underline hover:text-black">Инструменти</Link>
+                  <span className="text-neutral-400 text-base font-medium font-['Manrope']"> &gt; Първа основна задача</span>
+                </div>
                 <div className="justify-start text-black text-3xl font-bold font-['Manrope']">Първа основна задача</div>
               </div>
               <div className="p-1.5 bg-white rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-2">
@@ -277,7 +450,11 @@ const PurvaZadacha = () => {
                       step="any"
                       className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']"
                       placeholder="Въведете координата Y1"
+                      list="y1-history"
                     />
+                    <datalist id="y1-history">
+                      {getInputHistory('y1').map((v, i) => <option value={v} key={i} />)}
+                    </datalist>
                   </div>
                   {/* X1 */}
                   <div className="self-stretch flex flex-col justify-start items-start gap-2">
@@ -290,7 +467,11 @@ const PurvaZadacha = () => {
                       step="any"
                       className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']"
                       placeholder="Въведете координата X1"
+                      list="x1-history"
                     />
+                    <datalist id="x1-history">
+                      {getInputHistory('x1').map((v, i) => <option value={v} key={i} />)}
+                    </datalist>
                   </div>
                   {/* Alpha */}
                   <div className="self-stretch flex flex-col justify-start items-start gap-2">
@@ -303,7 +484,11 @@ const PurvaZadacha = () => {
                       step="any"
                       className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']"
                       placeholder="Въведете ъгъл α"
+                      list="alpha-history"
                     />
+                    <datalist id="alpha-history">
+                      {getInputHistory('alpha').map((v, i) => <option value={v} key={i} />)}
+                    </datalist>
                   </div>
                   {/* S */}
                   <div className="self-stretch flex flex-col justify-start items-start gap-2">
@@ -316,7 +501,11 @@ const PurvaZadacha = () => {
                       step="any"
                       className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']"
                       placeholder="Въведете дължина S"
+                      list="s-history"
                     />
+                    <datalist id="s-history">
+                      {getInputHistory('s').map((v, i) => <option value={v} key={i} />)}
+                    </datalist>
                   </div>
                 </div>
                 <div className="inline-flex justify-start items-start gap-3">
@@ -327,7 +516,7 @@ const PurvaZadacha = () => {
                     title="Тази функция е в процес на разработка и интеграция."
                     className="px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3 opacity-50 select-none cursor-not-allowed"
                   >
-                    <img src="/scan_icon.svg" alt="Сканирай" className="w-4 h-4" />
+                    <img src="/icons/scan_icon.svg" alt="Сканирай" className="w-4 h-4" />
                     <span className="justify-start text-black text-base font-medium font-['Manrope']">Сканирай</span>
                   </button>
                   {/* Reset button */}
@@ -335,9 +524,9 @@ const PurvaZadacha = () => {
                     <div className="justify-start text-black text-base font-medium font-['Manrope']">Нулирай</div>
                   </button>
                   {/* Calculate button */}
-                  <button type="button" onClick={calculate} className="px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3">
+                  <button type="button" onClick={calculate} disabled={!isFormValid()} className={`px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3${!isFormValid() ? ' opacity-50 cursor-not-allowed' : ''}`}>
                     <div className="justify-start text-white text-base font-medium font-['Manrope']">Изчисли</div>
-                    <img src="/white_right_arrow.svg" alt="Изчисли" className="w-4 h-4" />
+                    <img src="/icons/white_right_arrow.svg" alt="Изчисли" className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -345,14 +534,27 @@ const PurvaZadacha = () => {
               <div className="flex-1 self-stretch p-4 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-center items-end gap-3">
                 <div className="self-stretch justify-start text-black text-lg font-semibold font-['Manrope']">Резултати</div>
                 <div className="self-stretch flex-1 p-3 bg-stone-50 rounded-lg flex flex-col justify-start items-start">
-                  <div className="self-stretch justify-start text-neutral-400 text-sm font-medium font-['Manrope'] whitespace-pre-line">{result}</div>
+                  <div className="self-stretch justify-start text-neutral-400 text-sm font-medium font-['Manrope'] whitespace-pre-line">
+                    {displayText}
+                    {isTyping && <span className="animate-pulse">|</span>}
+                  </div>
                 </div>
                 <button
                   type="button"
-                  className={`px-4 py-2 ${!result || result.includes('Въведете данни') ? 'opacity-20 cursor-not-allowed' : ''} bg-gray-200 rounded-lg inline-flex justify-start items-center gap-3`}
-                  disabled={!result || result.includes('Въведете данни')}
+                  className={`px-4 py-2 ${!resultText || resultText.includes('Въведете данни') ? 'opacity-20 cursor-not-allowed' : ''} bg-gray-200 rounded-lg inline-flex justify-start items-center gap-3`}
+                  disabled={!resultText || resultText.includes('Въведете данни')}
+                  onClick={() => {
+                    if (!resultText || resultText.includes('Въведете данни')) return;
+                    const blob = new Blob([resultText], { type: 'text/plain' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'geosolver_result.txt';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                  }}
                 >
-                  <img src="/download_icon.svg" alt="Изтегли" className="w-4 h-4" />
+                  <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" strokeLinecap="round" strokeLinejoin="round"/></svg>
                   <div className="justify-start text-black text-base font-medium font-['Manrope']">Изтегли</div>
                 </button>
               </div>
@@ -388,10 +590,10 @@ const PurvaZadacha = () => {
                   <div className="justify-start text-black text-sm font-medium font-['Manrope']">Изтегли</div>
                 </div>
               </div>
-              {history.length === 0 ? (
+              {paginatedHistory.length === 0 ? (
                 <div className="w-full px-3 py-2 bg-white text-neutral-400 text-sm font-medium font-['Manrope']">Няма изчисления.</div>
               ) : (
-                history.map((entry, idx) => (
+                paginatedHistory.map((entry, idx) => (
                   <div key={idx} className="self-stretch inline-flex justify-start items-start gap-px">
                     <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
                       <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{entry.y1}</div>
@@ -412,10 +614,10 @@ const PurvaZadacha = () => {
                       <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{entry.x2}</div>
                     </div>
                     <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                      <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{new Date(entry.date).toLocaleString("bg-BG")}</div>
+                      <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{(() => { const d = new Date(entry.date); return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()}` })()}</div>
                     </div>
                     <div className="flex-1 self-stretch px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                      <div className="w-3.5 h-3.5 bg-neutral-400" />
+                      <button onClick={() => handleDownload(entry)} className="flex items-center justify-center"><svg className="w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" strokeLinecap="round" strokeLinejoin="round"/></svg></button>
                     </div>
                   </div>
                 ))
@@ -424,27 +626,17 @@ const PurvaZadacha = () => {
             {/* Pagination (static, for design) */}
             <div className="self-stretch inline-flex justify-center items-center gap-4">
               <div className="flex justify-start items-center gap-2">
-                <div className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center">
-                  <img src="/small_left_arrow.svg" alt="Назад" className="w-3 h-3" />
-                </div>
-                <div className="w-7 px-2 py-1 bg-gray-200 rounded inline-flex flex-col justify-center items-center">
-                  <div className="justify-start text-black text-sm font-medium font-['Manrope']">1</div>
-                </div>
-                <div className="w-7 px-2 py-1 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-center items-center">
-                  <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">2</div>
-                </div>
-                <div className="w-7 px-2 py-1 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-center items-center">
-                  <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">3</div>
-                </div>
-                <div className="w-7 px-2 py-1 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-center items-center">
-                  <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">4</div>
-                </div>
-                <div className="w-7 px-2 py-1 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-center items-center">
-                  <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">5</div>
-                </div>
-                <div className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center">
-                  <img src="/small_right_arrow.svg" alt="Напред" className="w-3 h-3" />
-                </div>
+                <button className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>
+                  <img src="/icons/small_left_arrow.svg" alt="Назад" className="w-3 h-3 opacity-70" />
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <button key={i} className={`w-7 px-2 py-1 rounded ${currentPage === i + 1 ? 'bg-gray-200 text-black' : 'outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400'} inline-flex flex-col justify-center items-center`} onClick={() => setCurrentPage(i + 1)} disabled={currentPage === i + 1}>
+                    <div className="justify-start text-sm font-medium font-['Manrope']">{i + 1}</div>
+                  </button>
+                ))}
+                <button className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages || totalPages === 0}>
+                  <img src="/icons/small_right_arrow.svg" alt="Напред" className="w-3 h-3 opacity-70" />
+                </button>
               </div>
             </div>
           </div>

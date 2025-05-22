@@ -43,8 +43,8 @@ const HomePage = () => {
                 >
                   <span className="text-black text-sm font-semibold font-['Manrope'] md:text-base">{text}</span>
                   <>
-                    <img src="/hero_buttons_arrow.svg" alt="Arrow" className="w-4 h-4 md:hidden" />
-                    <img src="/hero_buttons_arrow.svg" alt="Arrow" className="hidden md:block w-4 h-4" />
+                    <img src="/icons/hero_buttons_arrow.svg" alt="Arrow" className="w-4 h-4 md:hidden" />
+                    <img src="/icons/hero_buttons_arrow.svg" alt="Arrow" className="hidden md:block w-4 h-4" />
                   </>
                 </Link>
               ))}
@@ -54,7 +54,7 @@ const HomePage = () => {
             <div
               className="w-full p-6 relative rounded-xl flex flex-col justify-center items-center gap-4 overflow-hidden md:h-64 md:p-14 md:bg-black/20"
               style={{
-                backgroundImage: "url('/gradient_wallpaper.jpg')",
+                backgroundImage: "url('/images/gradient_wallpaper.jpg')",
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat'
@@ -63,7 +63,7 @@ const HomePage = () => {
               {/* Overlay for darkening */}
               <div className="absolute inset-0 bg-black/20 pointer-events-none rounded-xl" />
               {/* Logo */}
-              <img src="/Vector_logo.png" alt="GeoSolver Logo" className="w-7 h-8 z-10 mb-2 md:w-8 md:h-10 md:mb-2" />
+              <img src="/images/Vector_logo.png" alt="GeoSolver Logo" className="w-7 h-8 z-10 mb-2 md:w-8 md:h-10 md:mb-2" />
               {/* Text */}
               <div className="relative z-10 text-center text-white text-base font-medium font-['Manrope'] md:text-lg md:font-semibold">
                 GeoSolver е проект, роден от желанието да се улесни ежедневната работа  на геодезисти чрез достъпен онлайн инструмент. Платформата предоставя  прецизни изчисления, интуитивен интерфейс и възможност за съхраняване на история на изчисленията.

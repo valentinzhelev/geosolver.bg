@@ -72,7 +72,7 @@ const Prices = () => {
               {/* Free Plan */}
               <div className="flex-1 p-4 bg-white rounded-xl inline-flex flex-col justify-center items-center gap-4 outline outline-1 outline-offset-[-1px] outline-gray-200 self-stretch">
                 <div className="flex flex-col justify-start items-center gap-3">
-                  <img src="/price_free.svg" alt="Безплатен план" className="w-6 h-6" />
+                  <img src="/icons/price_free.svg" alt="Безплатен план" className="w-6 h-6" />
                   <div className="justify-start text-black text-lg font-semibold font-['Manrope']">Безплатен план</div>
                 </div>
                 <div className="self-stretch h-0 outline outline-1 outline-offset-[-0.5px] outline-gray-200" />
@@ -99,7 +99,7 @@ const Prices = () => {
                 </div>
                 <div className="self-stretch p-4 bg-white rounded-tl rounded-tr rounded-bl-xl rounded-br-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] flex flex-col justify-center items-center gap-4 overflow-hidden">
                   <div className="flex flex-col justify-start items-center gap-3">
-                    <img src="/price_logo.svg" alt="Професионален план" className="w-5 h-6" />
+                    <img src="/icons/price_logo.svg" alt="Професионален план" className="w-5 h-6" />
                     <div className="justify-start text-black text-lg font-semibold font-['Manrope']">Професионален план</div>
                   </div>
                   <div className="self-stretch h-0 outline outline-1 outline-offset-[-0.5px] outline-gray-200" />
@@ -125,7 +125,7 @@ const Prices = () => {
               {/* Custom Plan */}
               <div className="flex-1 p-4 bg-white rounded-xl inline-flex flex-col justify-center items-center gap-4 outline outline-1 outline-offset-[-1px] outline-gray-200 self-stretch">
                 <div className="flex flex-col justify-start items-center gap-3">
-                  <img src="/price_personal.svg" alt="Персонализиран план" className="w-6 h-6" />
+                  <img src="/icons/price_personal.svg" alt="Персонализиран план" className="w-6 h-6" />
                   <div className="justify-start text-black text-lg font-semibold font-['Manrope']">Персонализиран план</div>
                 </div>
                 <div className="self-stretch h-0 outline outline-1 outline-offset-[-0.5px] outline-gray-200" />
@@ -148,7 +148,7 @@ const Prices = () => {
                 {/* Free Plan */}
                 <div className="flex-shrink-0 min-w-[280px] max-w-[320px] md:min-w-0 md:max-w-none md:flex-1 md:p-4 md:bg-white md:rounded-xl md:inline-flex md:flex-col md:justify-center md:items-center md:gap-4 md:outline md:outline-1 md:outline-offset-[-1px] md:outline-gray-200 md:self-stretch md:mx-0 p-4 bg-white rounded-xl flex flex-col justify-center items-center gap-4 outline outline-1 outline-offset-[-1px] outline-gray-200 w-full mx-auto snap-center">
                   <div className="flex flex-col justify-start items-center gap-3">
-                    <img src="/price_free.svg" alt="Безплатен план" className="w-6 h-6" />
+                    <img src="/icons/price_free.svg" alt="Безплатен план" className="w-6 h-6" />
                     <div className="text-black text-lg font-semibold font-['Manrope']">Безплатен план</div>
                   </div>
                   <div className="self-stretch h-0 outline outline-1 outline-offset-[-0.5px] outline-gray-200" />
@@ -174,7 +174,7 @@ const Prices = () => {
                   </div>
                   <div className="w-full p-3 bg-white rounded-b-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] flex flex-col items-center gap-3 overflow-hidden">
                     <div className="flex flex-col justify-start items-center gap-2">
-                      <img src="/price_logo.svg" alt="Професионален план" className="w-5 h-6" />
+                      <img src="/icons/price_logo.svg" alt="Професионален план" className="w-5 h-6" />
                       <div className="text-black text-base font-semibold font-['Manrope']">Професионален план</div>
                     </div>
                     <div className="w-full h-0 outline outline-1 outline-offset-[-0.5px] outline-gray-200" />
@@ -200,7 +200,7 @@ const Prices = () => {
                 {/* Corporate Plan */}
                 <div className="flex-shrink-0 min-w-[280px] max-w-[320px] md:flex-1 p-4 bg-white rounded-xl flex flex-col justify-center items-center gap-4 outline outline-1 outline-offset-[-1px] outline-gray-200 w-full mx-auto snap-center">
                   <div className="flex flex-col justify-start items-center gap-3">
-                    <img src="/price_personal.svg" alt="Корпоративен план" className="w-6 h-6" />
+                    <img src="/icons/price_personal.svg" alt="Корпоративен план" className="w-6 h-6" />
                     <div className="text-black text-lg font-semibold font-['Manrope']">Персонализиран план</div>
                   </div>
                   <div className="w-full h-0 outline outline-1 outline-offset-[-0.5px] outline-gray-200" />

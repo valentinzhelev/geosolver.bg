@@ -136,7 +136,7 @@ const ForwardIntersection = () => {
                     </button>
                     <button type="button" onClick={calculate} className="px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3">
                       <div className="text-white text-sm font-medium font-['Manrope']">Изчисли</div>
-                      <img src="/white_right_arrow.svg" alt="Изчисли" className="w-4 h-4" />
+                      <img src="/icons/white_right_arrow.svg" alt="Изчисли" className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
@@ -188,7 +188,7 @@ const ForwardIntersection = () => {
                           </div>
                           <div className="flex-1 self-stretch px-3 py-2 bg-[#FAFAFA] flex justify-center items-center border-b border-gray-100 gap-2.5">
                             <button type="button" className="w-5 h-5 flex items-center justify-center rounded bg-gray-100 opacity-50 cursor-not-allowed">
-                              <img src="/download_icon.svg" alt="Изтегли" className="w-4 h-4" />
+                              <img src="/icons/download_icon.svg" alt="Изтегли" className="w-4 h-4" />
                             </button>
                           </div>
                         </div>
@@ -199,7 +199,7 @@ const ForwardIntersection = () => {
                 <div className="self-stretch inline-flex justify-center items-center gap-4 w-full mt-2">
                   <div className="flex justify-start items-center gap-2">
                     <div className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center">
-                      <img src="/small_left_arrow.svg" alt="Назад" className="w-3 h-3" />
+                      <img src="/icons/small_left_arrow.svg" alt="Назад" className="w-3 h-3" />
                     </div>
                     <div className="w-7 px-2 py-1 bg-gray-200 rounded inline-flex flex-col justify-center items-center">
                       <div className="text-black text-sm font-medium font-['Manrope']">1</div>
@@ -217,7 +217,7 @@ const ForwardIntersection = () => {
                       <div className="text-neutral-400 text-sm font-medium font-['Manrope']">5</div>
                     </div>
                     <div className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center">
-                      <img src="/small_right_arrow.svg" alt="Напред" className="w-3 h-3" />
+                      <img src="/icons/small_right_arrow.svg" alt="Напред" className="w-3 h-3" />
                     </div>
                   </div>
                 </div>
@@ -290,7 +290,7 @@ const ForwardIntersection = () => {
                     title="Тази функция е в процес на разработка и интеграция."
                     className="px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3 opacity-50 select-none cursor-not-allowed"
                   >
-                    <img src="/scan_icon.svg" alt="Сканирай" className="w-4 h-4" />
+                    <img src="/icons/scan_icon.svg" alt="Сканирай" className="w-4 h-4" />
                     <span className="justify-start text-black text-base font-medium font-['Manrope']">Сканирай</span>
                   </button>
                   {/* Reset button */}
@@ -300,7 +300,7 @@ const ForwardIntersection = () => {
                   {/* Calculate button */}
                   <button type="button" onClick={calculate} className="px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3">
                     <div className="justify-start text-white text-base font-medium font-['Manrope']">Изчисли</div>
-                    <img src="/white_right_arrow.svg" alt="Изчисли" className="w-4 h-4" />
+                    <img src="/icons/white_right_arrow.svg" alt="Изчисли" className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -315,7 +315,7 @@ const ForwardIntersection = () => {
                   className={`px-4 py-2 ${!result || result.includes('Въведете данни') ? 'opacity-20 cursor-not-allowed' : ''} bg-gray-200 rounded-lg inline-flex justify-start items-center gap-3`}
                   disabled={!result || result.includes('Въведете данни')}
                 >
-                  <img src="/download_icon.svg" alt="Изтегли" className="w-4 h-4" />
+                  <img src="/icons/download_icon.svg" alt="Изтегли" className="w-4 h-4" />
                   <div className="text-black text-base font-medium font-['Manrope']">Изтегли</div>
                 </button>
               </div>
@@ -360,7 +360,7 @@ const ForwardIntersection = () => {
                     </div>
                     <div className="flex-1 self-stretch px-3 py-2 bg-[#FAFAFA] flex justify-center items-center border-b border-gray-100 gap-2.5">
                       <button type="button" className="w-5 h-5 flex items-center justify-center rounded bg-gray-100 opacity-50 cursor-not-allowed">
-                        <img src="/download_icon.svg" alt="Изтегли" className="w-4 h-4" />
+                        <img src="/icons/download_icon.svg" alt="Изтегли" className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
@@ -370,7 +370,7 @@ const ForwardIntersection = () => {
             <div className="self-stretch inline-flex justify-center items-center gap-4 w-full mt-2">
               <div className="flex justify-start items-center gap-2">
                 <div className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center">
-                  <img src="/small_left_arrow.svg" alt="Назад" className="w-3 h-3" />
+                  <img src="/icons/small_left_arrow.svg" alt="Назад" className="w-3 h-3" />
                 </div>
                 <div className="w-7 px-2 py-1 bg-gray-200 rounded inline-flex flex-col justify-center items-center">
                   <div className="text-black text-sm font-medium font-['Manrope']">1</div>
@@ -388,7 +388,7 @@ const ForwardIntersection = () => {
                   <div className="text-neutral-400 text-sm font-medium font-['Manrope']">5</div>
                 </div>
                 <div className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center">
-                  <img src="/small_right_arrow.svg" alt="Напред" className="w-3 h-3" />
+                  <img src="/icons/small_right_arrow.svg" alt="Напред" className="w-3 h-3" />
                 </div>
               </div>
             </div>
