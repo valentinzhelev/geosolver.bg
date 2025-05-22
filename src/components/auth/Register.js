@@ -63,23 +63,23 @@ const Register = () => {
                 <div className="w-full flex flex-col justify-start items-start gap-4">
                   {/* Name */}
                   <div className="w-full flex flex-col justify-start items-start gap-2">
-                    <label className="text-black text-sm font-medium font-['Manrope']">Имена</label>
-                    <input type="text" placeholder="Имена" className="w-full p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']" value={name} onChange={e => setName(e.target.value)} required />
+                    <label className="text-black text-sm font-medium font-['Manrope']">Име и фамилия</label>
+                    <input type="text" placeholder="Въведете вашето име и фамилия" className="w-full p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']" value={name} onChange={e => setName(e.target.value)} required />
                   </div>
                   {/* Email */}
                   <div className="w-full flex flex-col justify-start items-start gap-2">
                     <label className="text-black text-sm font-medium font-['Manrope']">Имейл</label>
-                    <input type="email" placeholder="Имейл" className="w-full p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']" value={email} onChange={e => setEmail(e.target.value)} required />
+                    <input type="email" placeholder="Въведете вашият имейл" className="w-full p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']" value={email} onChange={e => setEmail(e.target.value)} required />
                   </div>
                   {/* Password */}
                   <div className="w-full flex flex-col justify-start items-start gap-2">
                     <label className="text-black text-sm font-medium font-['Manrope']">Парола</label>
-                    <input type="password" placeholder="Парола" className="w-full p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']" value={password} onChange={e => setPassword(e.target.value)} required />
+                    <input type="password" placeholder="Въведете вашата парола" className="w-full p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']" value={password} onChange={e => setPassword(e.target.value)} required />
                   </div>
                   {/* Repeat Password */}
                   <div className="w-full flex flex-col justify-start items-start gap-2">
                     <label className="text-black text-sm font-medium font-['Manrope']">Повтори паролата</label>
-                    <input type="password" placeholder="Повтори паролата" className="w-full p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']" value={repeatPassword} onChange={e => setRepeatPassword(e.target.value)} required />
+                    <input type="password" placeholder="Повторете вашата парола" className="w-full p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']" value={repeatPassword} onChange={e => setRepeatPassword(e.target.value)} required />
                   </div>
                   {/* Usage Purpose */}
                   <div className="w-full flex flex-col justify-start items-start gap-2">
