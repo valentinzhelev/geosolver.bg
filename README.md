@@ -7,17 +7,19 @@
 ## 🛠️ Technologies Used
 
 ### 🔷 Frontend
-- [React](https://reactjs.org/) – Component-based architecture for a responsive SPA
-- React Router – For intuitive client-side routing
-- CSS + Font Awesome – Styling and iconography
-- Vanilla JavaScript – Handles the geodetic calculation logic
-- [Vercel](https://vercel.com/) – CI/CD and deployment for the frontend
+- [React 19.1.0](https://reactjs.org/) – Component-based architecture for a responsive SPA
+- [React Router v7](https://reactrouter.com/) – For intuitive client-side routing
+- [TailwindCSS v4](https://tailwindcss.com/) – Utility-first CSS framework
+- [Axios](https://axios-http.com/) – HTTP client for API requests
+- [jspdf](https://www.npmjs.com/package/jspdf) & [html2canvas](https://html2canvas.hertzen.com/) – PDF generation
+- [React Helmet](https://github.com/nfl/react-helmet) – SEO management
+- [Vercel](https://vercel.com/) – CI/CD and deployment
 
 ### 🔶 Backend
-- [Node.js + Express](https://expressjs.com/) – RESTful API for calculation history and processing
-- [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) – Cloud database for persistent storage
-- [Railway](https://railway.app/) – Backend hosting and CI pipeline
-- Mongoose – ODM for defining and interacting with MongoDB models
+- [Node.js + Express](https://expressjs.com/) – RESTful API
+- [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) – Cloud database
+- [Railway](https://railway.app/) – Backend hosting
+- [Mongoose](https://mongoosejs.com/) – MongoDB ODM
 
 ---
 
@@ -29,10 +31,22 @@
   - Angular resection (Back Intersection)
   - Polar intersection
   - Direction and distance computations
+- PDF export functionality for calculation results
 - Auto-typing animation for step-by-step visualization
 - Save and view recent calculation history
-- Toggle between light and dark themes (UI)
-- Fully responsive on desktop and mobile devices
+- Toggle between light and dark themes
+- SEO optimized with React Helmet
+- Fully responsive design with TailwindCSS
+- Modern UI with Montserrat typography
+
+### 🔐 Authentication System
+- Secure user registration and login
+- JWT-based authentication
+- Protected routes for authenticated users
+- Password recovery via email
+- Persistent login sessions
+- Secure password storage with bcrypt
+- CORS protection for API requests
 
 ---
 
@@ -47,15 +61,17 @@ npm install
 npm start
 ```
 
-## 🔧 Backend Setup
+The application will be available at `http://localhost:3000`
 
-### The backend project is located in /geosolver-backend (if using the provided monorepo):
+### 🔧 Backend Setup
 
 ```bash
-cd geosolver-backend
+cd ../geosolver-backend
 npm install
-npm run dev
+npm start
 ```
+
+The API will be available at `http://localhost:5000`
 
 ## 📦 Deployment
 
@@ -63,12 +79,26 @@ npm run dev
 - Backend: Automatically deployed to Railway
 - MongoDB is provisioned via MongoDB Atlas
 
-## 🧪 Roadmap
+## 🏗️ Project Structure
 
-- Add support for more coordinate systems (e.g., UTM, BGS2005)
-- User authentication and role-based access
-- Export to DXF / CSV formats
-- Enhanced visualization of results (SVG/sketch rendering)
+```
+src/
+├── components/     # Reusable UI components
+├── pages/         # Page components
+├── utils/         # Utility functions
+├── styles/        # Global styles and Tailwind config
+└── assets/        # Static assets
+```
+
+## 🧪 Development Guidelines
+
+- Follow React best practices and hooks
+- Use TailwindCSS for styling
+- Implement responsive design
+- Write clean, documented code
+- Follow the established folder structure
+- Implement proper authentication flows
+- Handle API errors gracefully
 
 ## 📜 License
 
