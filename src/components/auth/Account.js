@@ -38,10 +38,11 @@ const Account = () => {
                 </div>
                 <div className="inline-flex justify-center items-center gap-2">
                   <button onClick={logout} className="px-4 py-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 flex justify-start items-center gap-3">
+                    <img src="/icons/account_x.svg" alt="Изход" className="w-5 h-5" />
                     <span className="text-black text-base font-medium font-['Manrope']">Излез от акаунта</span>
                   </button>
                   <div className="w-9 h-9 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 flex justify-center items-center gap-3">
-                    <div className="w-5 h-5 bg-black" />
+                    <img src="/icons/account_settings.svg" alt="Настройки" className="w-5 h-5" />
                   </div>
                 </div>
               </div>
@@ -66,13 +67,10 @@ const Account = () => {
                 {paymentMethods.map((pm, i) => (
                   <div key={i} className="w-full flex justify-between items-center">
                     <div className="flex items-center gap-4">
-                      <div className={`w-12 h-6 p-1 ${pm.active ? 'bg-black' : 'outline outline-1 outline-gray-200'} rounded-[30px] flex ${pm.active ? 'justify-end' : 'justify-start'} items-center gap-2`}>
-                        <div className="w-4 h-4 bg-white rounded-full" />
-                      </div>
-                      <div className="w-8 h-2.5 bg-black" />
+                      <img src={`/icons/visa${pm.active ? '' : '_small'}.svg`} alt="Visa" className="w-8 h-8" />
                       <div className="text-neutral-400 text-base font-medium font-['Manrope']">**** {pm.last4}</div>
                     </div>
-                    <div className="w-3 h-3 bg-neutral-400" />
+                    <img src="/icons/account_settings.svg" alt="Настройки" className="w-5 h-5 opacity-60" />
                   </div>
                 ))}
                 <div className="w-full h-0 outline outline-1 outline-offset-[-0.5px] outline-gray-200" />
@@ -119,7 +117,7 @@ const Account = () => {
                   {paymentHistory.map((h, i) => (
                     <div key={i} className="w-full flex justify-between items-center bg-white">
                       <div className="flex items-center gap-2">
-                        <div className="w-6 h-2 bg-black" />
+                        <img src="/icons/visa_small.svg" alt="Visa Small" className="w-6 h-6" />
                         <div className="text-neutral-400 text-sm font-medium font-['Manrope']">{h.method}</div>
                       </div>
                       <div className="text-neutral-400 text-sm font-medium font-['Manrope']">{h.amount}</div>
