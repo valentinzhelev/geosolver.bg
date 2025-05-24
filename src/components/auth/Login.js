@@ -9,11 +9,12 @@ const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const ok = await login(email, password);
+    const ok = await login(email, password, rememberMe);
     if (ok) {
       setSuccess(true);
       setTimeout(() => navigate('/account'), 1000);
@@ -97,7 +98,8 @@ const Login = () => {
                     <input 
                       type="checkbox"
                       className="w-6 h-6 bg-white rounded border border-gray-200"
-                      disabled
+                      checked={rememberMe}
+                      onChange={e => setRememberMe(e.target.checked)}
                     />
                     <span className="text-black text-sm font-medium font-['Manrope']">
                       Запомни ме

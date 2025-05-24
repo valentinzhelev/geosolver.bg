@@ -5,9 +5,12 @@ const BASE_URL = 'https://geosolver-backend-production.up.railway.app';
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
+  const getInitialToken = () => localStorage.getItem('token') || sessionStorage.getItem('token');
+  const getInitialRefreshToken = () => localStorage.getItem('refreshToken') || sessionStorage.getItem('refreshToken');
+
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(() => localStorage.getItem('token'));
-  const [refreshToken, setRefreshToken] = useState(() => localStorage.getItem('refreshToken'));
+  const [token, setToken] = useState(getInitialToken);
+  const [refreshToken, setRefreshToken] = useState(getInitialRefreshToken);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -28,7 +31,7 @@ export function AuthProvider({ children }) {
   }, [token]);
 
   // Login function
-  const login = async (email, password) => {
+  const login = async (email, password, rememberMe = false) => {
     setLoading(true);
     setError(null);
     try {
@@ -40,10 +43,18 @@ export function AuthProvider({ children }) {
       const data = await res.json();
       if (res.ok && data.token) {
         setToken(data.token);
-        localStorage.setItem('token', data.token);
-        if (data.refreshToken) {
-          setRefreshToken(data.refreshToken);
-          localStorage.setItem('refreshToken', data.refreshToken);
+        setRefreshToken(data.refreshToken);
+        // Съхраняване според rememberMe
+        if (rememberMe) {
+          localStorage.setItem('token', data.token);
+          if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
+          sessionStorage.removeItem('token');
+          sessionStorage.removeItem('refreshToken');
+        } else {
+          sessionStorage.setItem('token', data.token);
+          if (data.refreshToken) sessionStorage.setItem('refreshToken', data.refreshToken);
+          localStorage.removeItem('token');
+          localStorage.removeItem('refreshToken');
         }
         setUser(data.user);
         setError(null);
@@ -55,6 +66,8 @@ export function AuthProvider({ children }) {
         setRefreshToken(null);
         localStorage.removeItem('token');
         localStorage.removeItem('refreshToken');
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('refreshToken');
         return false;
       }
     } catch (e) {
@@ -64,6 +77,8 @@ export function AuthProvider({ children }) {
       setRefreshToken(null);
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('refreshToken');
       return false;
     } finally {
       setLoading(false);
@@ -83,11 +98,12 @@ export function AuthProvider({ children }) {
       const data = await res.json();
       if (res.ok && data.token) {
         setToken(data.token);
+        setRefreshToken(data.refreshToken);
+        // По подразбиране регистрацията ще пази в localStorage
         localStorage.setItem('token', data.token);
-        if (data.refreshToken) {
-          setRefreshToken(data.refreshToken);
-          localStorage.setItem('refreshToken', data.refreshToken);
-        }
+        if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('refreshToken');
         setUser(data.user);
         setError(null);
         return true;
@@ -98,6 +114,8 @@ export function AuthProvider({ children }) {
         setRefreshToken(null);
         localStorage.removeItem('token');
         localStorage.removeItem('refreshToken');
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('refreshToken');
         return false;
       }
     } catch (e) {
@@ -107,6 +125,8 @@ export function AuthProvider({ children }) {
       setRefreshToken(null);
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('refreshToken');
       return false;
     } finally {
       setLoading(false);
@@ -129,6 +149,8 @@ export function AuthProvider({ children }) {
     setRefreshToken(null);
     localStorage.removeItem('token');
     localStorage.removeItem('refreshToken');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('refreshToken');
   };
 
   // Forgot password function

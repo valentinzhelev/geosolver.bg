@@ -7,6 +7,24 @@ const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, loading, logout } = useAuth();
 
+  // Debug: виж user в конзолата
+  console.log('user in Header:', user);
+
+  // Функция за показване на име или fallback
+  const getAccountLabel = () => {
+    if (!user) return 'Вход';
+    if (user.name && user.name.trim() !== '') return user.name;
+    return 'Акаунт';
+  };
+
+  // Loader компонент
+  const Loader = () => (
+    <div className="px-4 py-2 flex items-center gap-2">
+      <span className="loader w-4 h-4 border-2 border-gray-300 border-t-black rounded-full animate-spin"></span>
+      <span className="text-neutral-400 text-base font-medium font-['Manrope']">Зареждане...</span>
+    </div>
+  );
+
   return (
     <>
       {/* Desktop Header */}
@@ -62,11 +80,11 @@ const Header = () => {
             <img src="/icons/night_mode_icon.svg" alt="Night Mode Icon" className="w-6 h-6" />
           </div>
           {loading ? (
-            <div className="px-4 py-2 text-neutral-400">Зареждане...</div>
+            <Loader />
           ) : user ? (
             <>
               <Link to="/account" className="px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3">
-                <div className="justify-start text-white text-base font-medium font-['Manrope']">{user.name || 'Акаунт'}</div>
+                <div className="justify-start text-white text-base font-medium font-['Manrope']">{getAccountLabel()}</div>
                 <img src="/icons/account_icon.svg" alt="Account Icon" className="w-5 h-5" />
               </Link>
               <button onClick={logout} className="px-4 py-2 bg-white rounded-lg outline outline-1 outline-gray-200 flex justify-start items-center gap-3">
@@ -135,11 +153,11 @@ const Header = () => {
             </div>
             <div className="inline-flex justify-end items-center gap-3">
               {loading ? (
-                <div className="px-4 py-2 text-neutral-400">Зареждане...</div>
+                <Loader />
               ) : user ? (
                 <>
                   <Link to="/account" onClick={() => setMobileMenuOpen(false)} className="px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3">
-                    <div className="justify-start text-white text-sm font-medium font-['Manrope']">{user.name || 'Акаунт'}</div>
+                    <div className="justify-start text-white text-sm font-medium font-['Manrope']">{getAccountLabel()}</div>
                     <img src="/icons/account_icon.svg" alt="Account Icon" className="w-4 h-4" />
                   </Link>
                   <button onClick={() => { logout(); setMobileMenuOpen(false); }} className="px-4 py-2 bg-white rounded-lg outline outline-1 outline-gray-200 flex justify-start items-center gap-3">
