@@ -82,15 +82,10 @@ const Header = () => {
           {loading ? (
             <Loader />
           ) : user ? (
-            <>
-              <Link to="/account" className="px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3">
-                <div className="justify-start text-white text-base font-medium font-['Manrope']">{getAccountLabel()}</div>
-                <img src="/icons/account_icon.svg" alt="Account Icon" className="w-5 h-5" />
-              </Link>
-              <button onClick={logout} className="px-4 py-2 bg-white rounded-lg outline outline-1 outline-gray-200 flex justify-start items-center gap-3">
-                <div className="justify-start text-black text-base font-medium font-['Manrope']">Изход</div>
-              </button>
-            </>
+            <Link to="/account" className="px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3">
+              <div className="justify-start text-white text-base font-medium font-['Manrope']">Акаунт</div>
+              <img src="/icons/login_icon.svg" alt="Account Icon" className="w-5 h-5" />
+            </Link>
           ) : (
             <Link to="/login" className="px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3">
               <div className="justify-start text-white text-base font-medium font-['Manrope']">Вход</div>
@@ -155,15 +150,10 @@ const Header = () => {
               {loading ? (
                 <Loader />
               ) : user ? (
-                <>
-                  <Link to="/account" onClick={() => setMobileMenuOpen(false)} className="px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3">
-                    <div className="justify-start text-white text-sm font-medium font-['Manrope']">{getAccountLabel()}</div>
-                    <img src="/icons/account_icon.svg" alt="Account Icon" className="w-4 h-4" />
-                  </Link>
-                  <button onClick={() => { logout(); setMobileMenuOpen(false); }} className="px-4 py-2 bg-white rounded-lg outline outline-1 outline-gray-200 flex justify-start items-center gap-3">
-                    <div className="justify-start text-black text-sm font-medium font-['Manrope']">Изход</div>
-                  </button>
-                </>
+                <Link to="/account" onClick={() => setMobileMenuOpen(false)} className="px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3">
+                  <div className="justify-start text-white text-sm font-medium font-['Manrope']">{getAccountLabel()}</div>
+                  <img src="/icons/account_icon.svg" alt="Account Icon" className="w-4 h-4" />
+                </Link>
               ) : (
                 <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="justify-start text-white text-sm font-medium font-['Manrope'] px-4 py-2 bg-black rounded-lg flex items-center gap-3">
                   Вход

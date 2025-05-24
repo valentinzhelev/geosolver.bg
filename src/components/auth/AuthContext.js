@@ -16,13 +16,14 @@ export function AuthProvider({ children }) {
 
   // Fetch user info on mount if token exists
   useEffect(() => {
+    console.log('AuthContext useEffect token:', token);
     if (token) {
       setLoading(true);
       fetch(`${BASE_URL}/api/auth/account`, {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then(res => res.ok ? res.json() : Promise.reject(res))
-        .then(data => setUser(data.user))
+        .then(data => setUser(data.user || data))
         .catch(() => setUser(null))
         .finally(() => setLoading(false));
     } else {

@@ -27,140 +27,182 @@ const Account = () => {
         <meta name="description" content="Вашият GeoSolver акаунт, абонамент, история и настройки." />
       </Helmet>
       <div className="w-full min-h-screen bg-stone-50 flex flex-col items-center">
-        <div className="w-[1180px] mt-16 flex flex-col items-start gap-10">
-          <div className="text-black text-3xl font-bold font-['Manrope'] mb-2">Акаунт</div>
-          <div className="w-full flex flex-row gap-5 items-start">
-            {/* Left column */}
-            <div className="w-96 flex flex-col gap-5">
-              {/* User card */}
-              <div className="p-4 bg-white rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-0.5px] outline-gray-200 flex flex-col gap-4">
-                <div className="flex flex-col gap-2">
-                  <div className="text-black text-lg font-semibold font-['Manrope']">{user?.name || 'Потребител'}</div>
-                  <div className="text-neutral-400 text-base font-semibold font-['Manrope']">{user?.email || ''}</div>
+        <div className="w-[1180px] mt-8 mb-8 inline-flex flex-col justify-start items-start gap-10">
+          <div className="self-stretch justify-start text-black text-3xl font-bold font-['Manrope']">Акаунт</div>
+          <div className="self-stretch inline-flex justify-start items-start gap-5">
+            <div className="w-96 inline-flex flex-col justify-center items-center gap-5">
+              <div className="self-stretch p-4 bg-white rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-0.50px] outline-gray-200 flex flex-col justify-start items-start gap-4 overflow-hidden">
+                <div className="flex flex-col justify-start items-start gap-2">
+                  <div className="justify-start text-black text-lg font-semibold font-['Manrope']">{user?.name || 'Потребител'}</div>
+                  <div className="justify-start text-neutral-400 text-base font-semibold font-['Manrope']">{user?.email || ''}</div>
                 </div>
-                <div className="inline-flex items-center gap-2">
-                  <button onClick={logout} className="px-4 py-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 flex items-center gap-3">
-                    <span className="text-black text-base font-medium font-['Manrope']">Излез от акаунта</span>
+                <div className="inline-flex justify-center items-center gap-2">
+                  <button onClick={logout} className="px-4 py-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 flex justify-start items-center gap-3">
+                    <div className="justify-start text-black text-base font-medium font-['Manrope']">Излез от акаунта</div>
                   </button>
-                  <div className="w-9 h-9 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 flex items-center justify-center">
+                  <div className="w-9 h-9 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 flex justify-center items-center gap-3">
                     <img src="/icons/account_settings.svg" alt="Настройки" className="w-5 h-5" />
                   </div>
                 </div>
               </div>
-              {/* Plan card */}
-              <div className="rounded-[20px] flex flex-col items-center gap-1 w-full">
-                <div className="w-full px-4 py-2 relative bg-black rounded-tl-xl rounded-tr-xl flex flex-col items-center gap-4 overflow-hidden">
-                  <img className="w-96 h-52 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 origin-top-left rotate-180 opacity-50" src="/images/gradient_wallpaper.jpg" alt="Plan" />
-                  <div className="text-center text-white text-lg font-semibold font-['Manrope']">{plan.name}</div>
+              <div className="self-stretch rounded-[20px] flex flex-col justify-center items-center gap-1 relative overflow-hidden">
+                <div className="self-stretch px-4 py-2 relative bg-black rounded-tl-xl rounded-tr-xl rounded-bl rounded-br inline-flex flex-col justify-center items-center gap-4 overflow-hidden">
+                  <img
+                    className="w-96 h-52 left-[380px] top-[127.42px] absolute origin-top-left rotate-180 opacity-50"
+                    src="/images/gradient_wallpaper.jpg"
+                    alt="Plan Gradient"
+                    style={{ zIndex: 1 }}
+                  />
+                  <div className="text-center justify-start text-white text-lg font-semibold font-['Manrope'] z-10" style={{ opacity: 1 }}>
+                    Професионален план (Месечен)
+                  </div>
                 </div>
-                <div className="w-full p-4 bg-white rounded-b-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-0.5px] outline-gray-200 flex flex-col gap-4">
-                  <div><span className="text-black text-base font-medium font-['Manrope']">{plan.daysActive} дни</span><span className="text-neutral-400 text-base font-medium font-['Manrope']"> от началото на плана Ви</span></div>
-                  <div><span className="text-black text-base font-medium font-['Manrope']">{plan.daysToNext} дни</span><span className="text-neutral-400 text-base font-medium font-['Manrope']"> до следващото плащане</span></div>
-                  <button className="px-4 py-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 flex items-center gap-3">
-                    <span className="text-black text-base font-medium font-['Manrope']">Промяна на плана</span>
-                  </button>
+                <div className="self-stretch p-4 bg-white rounded-tl rounded-tr rounded-bl-xl rounded-br-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-0.50px] outline-gray-200 flex flex-col justify-start items-start gap-4 overflow-hidden z-10 relative">
+                  <div className="justify-start"><span className="text-black text-base font-medium font-['Manrope']">216 дни</span><span className="text-neutral-400 text-base font-medium font-['Manrope']"> от началото на плана Ви</span></div>
+                  <div className="justify-start"><span className="text-black text-base font-medium font-['Manrope']">4 дни</span><span className="text-neutral-400 text-base font-medium font-['Manrope']"> до следващото плащане</span></div>
+                  <div className="px-4 py-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-3">
+                    <div className="justify-start text-black text-base font-medium font-['Manrope']">Промяна на плана</div>
+                  </div>
                 </div>
               </div>
-              {/* Payment methods */}
-              <div className="p-4 bg-white rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-0.5px] outline-gray-200 flex flex-col gap-4">
-                <div className="text-black text-lg font-semibold font-['Manrope']">Методи за плащане</div>
-                <div className="w-full h-0 outline outline-1 outline-offset-[-0.5px] outline-gray-200" />
-                {/* Активна карта */}
-                <div className="w-full flex justify-between items-center">
-                  <div className="flex items-center gap-4">
-                    {/* Switch ON */}
+              <div className="self-stretch p-4 bg-white rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-0.50px] outline-gray-200 flex flex-col justify-start items-start gap-4 overflow-hidden">
+                <div className="justify-start text-black text-lg font-semibold font-['Manrope']">Методи за плащане</div>
+                <div className="self-stretch h-0 outline outline-1 outline-offset-[-0.50px] outline-gray-200" />
+                <div className="self-stretch inline-flex justify-between items-center">
+                  <div className="flex justify-center items-center gap-4">
                     <div className="w-12 h-6 p-1 bg-black rounded-[30px] flex justify-end items-center gap-2">
                       <div className="w-4 h-4 bg-white rounded-full" />
                     </div>
                     <img src="/icons/visa.svg" alt="Visa" className="w-8 h-8" />
-                    <div className="text-neutral-400 text-base font-medium font-['Manrope']">**** 6225</div>
+                    <div className="justify-start text-neutral-400 text-base font-medium font-['Manrope']">**** 6225</div>
                   </div>
                   <button className="w-5 h-5 flex items-center justify-center">
                     <img src="/icons/account_x.svg" alt="Премахни" className="w-4 h-4 opacity-60" />
                   </button>
                 </div>
-                <div className="w-full h-0 outline outline-1 outline-offset-[-0.5px] outline-gray-200" />
-                {/* Неактивна карта */}
-                <div className="w-full flex justify-between items-center">
-                  <div className="flex items-center gap-4">
-                    {/* Switch OFF */}
+                <div className="self-stretch h-0 outline outline-1 outline-offset-[-0.50px] outline-gray-200" />
+                <div className="self-stretch inline-flex justify-between items-center">
+                  <div className="flex justify-center items-center gap-4">
                     <div className="w-12 h-6 p-1 rounded-[30px] outline outline-1 outline-offset-[-1px] outline-gray-200 flex justify-start items-center gap-2">
                       <div className="w-4 h-4 bg-black rounded-full" />
                     </div>
                     <img src="/icons/visa.svg" alt="Visa" className="w-8 h-8" />
-                    <div className="text-neutral-400 text-base font-medium font-['Manrope']">**** 4448</div>
+                    <div className="justify-start text-neutral-400 text-base font-medium font-['Manrope']">**** 4448</div>
                   </div>
                   <button className="w-5 h-5 flex items-center justify-center">
                     <img src="/icons/account_x.svg" alt="Премахни" className="w-4 h-4 opacity-60" />
                   </button>
                 </div>
-                <div className="w-full h-0 outline outline-1 outline-offset-[-0.5px] outline-gray-200" />
-                <button className="px-4 py-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 flex items-center gap-3">
-                  <span className="text-black text-base font-medium font-['Manrope']">Добави нов метод</span>
-                </button>
+                <div className="self-stretch h-0 outline outline-1 outline-offset-[-0.50px] outline-gray-200" />
+                <div className="px-4 py-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-3">
+                  <div className="justify-start text-black text-base font-medium font-['Manrope']">Добави нов метод</div>
+                </div>
               </div>
             </div>
-            {/* Right column */}
-            <div className="flex-1 flex flex-col gap-5">
-              {/* Usage history */}
-              <div className="p-4 bg-white rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-0.5px] outline-gray-200 flex flex-col gap-4">
-                <div className="flex items-center justify-between">
-                  <div className="text-black text-lg font-semibold font-['Manrope']">История на използване</div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-neutral-400 text-sm font-medium font-['Manrope']">{totalCalculations} изчисления</span>
-                    <div className="w-64 h-3 bg-gray-200 rounded-full relative overflow-hidden">
-                      <div className="absolute left-0 top-0 h-3 bg-gradient-to-r from-orange-300 via-orange-400 to-black rounded-full" style={{ width: '90%' }} />
-                    </div>
-                    <img src="/icons/infinity.svg" alt="Infinity" className="w-5 h-5" />
+            <div className="flex-1 inline-flex flex-col justify-center items-start gap-5">
+              <div className="self-stretch p-4 bg-white rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-0.50px] outline-gray-200 flex flex-col justify-start items-start gap-4 overflow-hidden">
+                <div className="justify-start text-black text-lg font-semibold font-['Manrope']">История на използване</div>
+                <div className="self-stretch p-3 bg-white rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-start items-start gap-3">
+                  <div className="self-stretch inline-flex justify-between items-center">
+                    <div className="justify-start text-black text-sm font-medium font-['Manrope']">{totalCalculations} изчисления</div>
+                    <img src="/icons/infinity.svg" alt="Infinity" className="w-3 h-2"/>
+                  </div>
+                  <div className="w-[723.13px] h-2 origin-top-left rotate-180 rounded-[100px]">
+                    <img
+                      src="/images/account_gradient.png"
+                      alt="Прогрес"
+                      className="w-[723.13px] h-2 origin-top-left rotate-180 rounded-[100px]"
+                      style={{ objectFit: 'cover' }}
+                    />
                   </div>
                 </div>
-                <div className="p-3 bg-white rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col gap-3">
-                  <div className="flex justify-between items-center">
-                    <div className="text-black text-sm font-medium font-['Manrope']">Инструмент</div>
-                    <div className="text-black text-sm font-medium font-['Manrope']">Дата</div>
+                <div className="self-stretch bg-stone-50 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-start items-start gap-px overflow-hidden">
+                  <div className="self-stretch shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] inline-flex justify-start items-start gap-px">
+                    <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
+                      <div className="justify-start text-black text-sm font-medium font-['Manrope']">Инструмент</div>
+                    </div>
+                    <div className="w-48 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
+                      <div className="justify-start text-black text-sm font-medium font-['Manrope']">Дата</div>
+                    </div>
                   </div>
                   {usageHistory.map((h, i) => (
-                    <div key={i} className="flex justify-between items-center">
-                      <div className="text-neutral-400 text-sm font-medium font-['Manrope']">{h.tool}</div>
-                      <div className="text-neutral-400 text-sm font-medium font-['Manrope']">{h.date}</div>
+                    <div key={i} className="self-stretch inline-flex justify-start items-start gap-px">
+                      <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
+                        <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{h.tool}</div>
+                      </div>
+                      <div className="w-48 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
+                        <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{h.date}</div>
+                      </div>
                     </div>
                   ))}
                 </div>
-                {/* Pagination */}
-                <div className="flex justify-center items-center gap-2 mt-2">
-                  <div className="w-7 px-2 py-1 bg-gray-200 rounded flex flex-col justify-center items-center">
-                    <span className="text-black text-sm font-medium font-['Manrope']">1</span>
-                  </div>
-                  <div className="w-7 px-2 py-1 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-center items-center">
-                    <span className="text-neutral-400 text-sm font-medium font-['Manrope']">2</span>
-                  </div>
-                  <div className="w-7 px-2 py-1 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-center items-center">
-                    <span className="text-neutral-400 text-sm font-medium font-['Manrope']">3</span>
-                  </div>
-                  <div className="w-7 px-2 py-1 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-center items-center">
-                    <span className="text-neutral-400 text-sm font-medium font-['Manrope']">4</span>
+                <div className="self-stretch inline-flex justify-center items-center gap-4">
+                  <div className="flex justify-start items-center gap-2">
+                    <div className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center">
+                    <img src="/icons/small_left_arrow.svg" alt="Назад" className="w-3 h-3" />
+                    </div>
+                    <div className="w-7 px-2 py-1 bg-gray-200 rounded inline-flex flex-col justify-center items-center">
+                      <div className="justify-start text-black text-sm font-medium font-['Manrope']">1</div>
+                    </div>
+                    <div className="w-7 px-2 py-1 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-center items-center">
+                      <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">2</div>
+                    </div>
+                    <div className="w-7 px-2 py-1 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-center items-center">
+                      <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">3</div>
+                    </div>
+                    <div className="w-7 px-2 py-1 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-center items-center">
+                      <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">4</div>
+                    </div>
+                    <div className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center">
+                    <img src="/icons/small_right_arrow.svg" alt="Напред" className="w-3 h-3" />
+                    </div>
                   </div>
                 </div>
               </div>
-              {/* Payment history */}
-              <div className="p-4 bg-white rounded-xl outline outline-1 outline-offset-[-0.5px] outline-gray-200 flex flex-col gap-4">
-                <div className="text-black text-lg font-semibold font-['Manrope']">История на плащания</div>
-                <div className="bg-stone-50 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col gap-px overflow-hidden">
-                  <div className="flex justify-between items-center bg-white">
-                    <div className="text-black text-sm font-medium font-['Manrope']">Метод на плащане</div>
-                    <div className="text-black text-sm font-medium font-['Manrope']">Стойност</div>
-                    <div className="text-black text-sm font-medium font-['Manrope']">Дата</div>
+              <div className="self-stretch p-4 bg-white rounded-xl outline outline-1 outline-offset-[-0.50px] outline-gray-200 inline-flex flex-col justify-start items-start gap-4 overflow-hidden">
+                <div className="justify-start text-black text-lg font-semibold font-['Manrope']">История на плащания</div>
+                <div className="self-stretch bg-stone-50 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-start items-start gap-px overflow-hidden">
+                  <div className="self-stretch shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] inline-flex justify-start items-start gap-px">
+                    <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
+                      <div className="justify-start text-black text-sm font-medium font-['Manrope']">Метод на плащане</div>
+                    </div>
+                    <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
+                      <div className="justify-start text-black text-sm font-medium font-['Manrope']">Стойност</div>
+                    </div>
+                    <div className="w-48 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
+                      <div className="justify-start text-black text-sm font-medium font-['Manrope']">Дата</div>
+                    </div>
                   </div>
-                  {paymentHistory.map((h, i) => (
-                    <div key={i} className="flex justify-between items-center bg-white">
-                      <div className="flex items-center gap-2">
-                        <img src="/icons/visa.svg" alt="Visa Small" className="w-6 h-6" />
-                        <div className="text-neutral-400 text-sm font-medium font-['Manrope']">{h.method}</div>
+                  {Array(10).fill(0).map((_, i) => (
+                    <div key={i} className="self-stretch inline-flex justify-start items-center gap-px">
+                      <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
+                        <img src="/icons/visa_small.svg" alt="Visa" className="w-5 h-5" />
+                        <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">**** 6225</div>
                       </div>
-                      <div className="text-neutral-400 text-sm font-medium font-['Manrope']">{h.amount}</div>
-                      <div className="text-neutral-400 text-sm font-medium font-['Manrope']">{h.date}</div>
+                      <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
+                        <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">19.99лв</div>
+                      </div>
+                      <div className="w-48 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
+                        <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">18.04.2025 14:25</div>
+                      </div>
                     </div>
                   ))}
+                </div>
+                <div className="self-stretch inline-flex justify-center items-center gap-4">
+                  <div className="flex justify-start items-center gap-2">
+                    <div className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center">
+                      <img src="/icons/small_left_arrow.svg" alt="Назад" className="w-3 h-3" />
+                    </div>
+                    <div className="w-7 px-2 py-1 bg-gray-200 rounded inline-flex flex-col justify-center items-center">
+                      <div className="justify-start text-black text-sm font-medium font-['Manrope']">1</div>
+                    </div>
+                    <div className="w-7 px-2 py-1 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-center items-center">
+                      <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">2</div>
+                    </div>
+                    <div className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center">
+                      <img src="/icons/small_right_arrow.svg" alt="Напред" className="w-3 h-3" />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
