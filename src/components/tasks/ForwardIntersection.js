@@ -40,6 +40,25 @@ const saveHistory = (entry) => {
   localStorage.setItem('forwardIntersectionHistory', JSON.stringify(history.slice(0, 20)));
 };
 
+// Добавям helpers за input history:
+const getInputHistory = (key) => {
+  try {
+    const data = localStorage.getItem('inputHistory_' + key);
+    return data ? JSON.parse(data) : [];
+  } catch {
+    return [];
+  }
+};
+
+const saveInputHistory = (key, value) => {
+  if (!value) return;
+  let history = getInputHistory(key);
+  history = history.filter((v) => v !== value);
+  history.unshift(value);
+  if (history.length > 5) history = history.slice(0, 5);
+  localStorage.setItem('inputHistory_' + key, JSON.stringify(history));
+};
+
 const initialForm = { yA: '', xA: '', yB: '', xB: '', beta1: '', beta2: '' };
 
 /**
@@ -134,7 +153,10 @@ const ForwardIntersection = () => {
 
   useEffect(() => { setHistory(getHistory()); }, []);
 
-  const handleChange = (e) => setForm({ ...form, [e.target.id]: e.target.value });
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.id]: e.target.value });
+    saveInputHistory(e.target.id, e.target.value);
+  };
 
   const isFormValid = () => Object.values(form).every(v => v !== '' && !isNaN(parseFloat(v)));
 
@@ -208,6 +230,7 @@ Xₚ = ${results.xP} m
     { key: 'beta1', label: 'β₁' },
     { key: 'beta2', label: 'β₂' },
     { key: 'date', label: 'Дата' },
+    { key: 'download', label: 'Изтегли' }
   ];
 
   return (
@@ -243,32 +266,38 @@ Xₚ = ${results.xP} m
                   {/* Yₐ */}
                   <div className="self-stretch flex flex-col justify-start items-start gap-2">
                     <div className="justify-start text-black text-sm font-medium font-['Manrope']">Yₐ</div>
-                    <input type="number" id="yA" value={form.yA} onChange={handleChange} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']" placeholder="Въведете Yₐ" />
+                    <input type="number" id="yA" value={form.yA} onChange={handleChange} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']" placeholder="Въведете Yₐ" list="yA-history" />
+                    <datalist id="yA-history">{getInputHistory('yA').map((v, i) => <option value={v} key={i} />)}</datalist>
                   </div>
                   {/* Xₐ */}
                   <div className="self-stretch flex flex-col justify-start items-start gap-2">
                     <div className="justify-start text-black text-sm font-medium font-['Manrope']">Xₐ</div>
-                    <input type="number" id="xA" value={form.xA} onChange={handleChange} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']" placeholder="Въведете Xₐ" />
+                    <input type="number" id="xA" value={form.xA} onChange={handleChange} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']" placeholder="Въведете Xₐ" list="xA-history" />
+                    <datalist id="xA-history">{getInputHistory('xA').map((v, i) => <option value={v} key={i} />)}</datalist>
                   </div>
                   {/* Yᵦ */}
                   <div className="self-stretch flex flex-col justify-start items-start gap-2">
                     <div className="justify-start text-black text-sm font-medium font-['Manrope']">Yᵦ</div>
-                    <input type="number" id="yB" value={form.yB} onChange={handleChange} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']" placeholder="Въведете Yᵦ" />
+                    <input type="number" id="yB" value={form.yB} onChange={handleChange} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']" placeholder="Въведете Yᵦ" list="yB-history" />
+                    <datalist id="yB-history">{getInputHistory('yB').map((v, i) => <option value={v} key={i} />)}</datalist>
                   </div>
                   {/* Xᵦ */}
                   <div className="self-stretch flex flex-col justify-start items-start gap-2">
                     <div className="justify-start text-black text-sm font-medium font-['Manrope']">Xᵦ</div>
-                    <input type="number" id="xB" value={form.xB} onChange={handleChange} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']" placeholder="Въведете Xᵦ" />
+                    <input type="number" id="xB" value={form.xB} onChange={handleChange} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']" placeholder="Въведете Xᵦ" list="xB-history" />
+                    <datalist id="xB-history">{getInputHistory('xB').map((v, i) => <option value={v} key={i} />)}</datalist>
                   </div>
                   {/* β₁ */}
                   <div className="self-stretch flex flex-col justify-start items-start gap-2">
                     <div className="justify-start text-black text-sm font-medium font-['Manrope']">β₁</div>
-                    <input type="number" id="beta1" value={form.beta1} onChange={handleChange} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']" placeholder="Въведете β₁" />
+                    <input type="number" id="beta1" value={form.beta1} onChange={handleChange} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']" placeholder="Въведете β₁" list="beta1-history" />
+                    <datalist id="beta1-history">{getInputHistory('beta1').map((v, i) => <option value={v} key={i} />)}</datalist>
                   </div>
                   {/* β₂ */}
                   <div className="self-stretch flex flex-col justify-start items-start gap-2">
                     <div className="justify-start text-black text-sm font-medium font-['Manrope']">β₂</div>
-                    <input type="number" id="beta2" value={form.beta2} onChange={handleChange} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']" placeholder="Въведете β₂" />
+                    <input type="number" id="beta2" value={form.beta2} onChange={handleChange} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']" placeholder="Въведете β₂" list="beta2-history" />
+                    <datalist id="beta2-history">{getInputHistory('beta2').map((v, i) => <option value={v} key={i} />)}</datalist>
                   </div>
                 </div>
                 <div className="inline-flex justify-end items-center gap-3 w-full">
@@ -342,6 +371,13 @@ Xₚ = ${results.xP} m
                       <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
                         <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{(() => { const d = new Date(entry.date); return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()}` })()}</div>
                       </div>
+                      <div className="flex-1 self-stretch px-3 py-2 bg-white flex justify-center items-center gap-2.5">
+                        <button onClick={() => handleDownload(entry)} className="flex items-center justify-center">
+                          <svg className="w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <path d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </button>
+                      </div>
                     </div>
                   ))
                 )}
@@ -388,34 +424,40 @@ Xₚ = ${results.xP} m
                   <div className="self-stretch justify-start text-black text-base font-semibold font-['Manrope']">Входни данни</div>
                   <div className="self-stretch flex flex-col justify-start items-start gap-4 w-full">
                     {/* Yₐ */}
-                    <div className="self-stretch flex flex-col justify-start items-start gap-2 w-full">
-                      <div className="justify-start text-black text-xs font-medium font-['Manrope']">Yₐ</div>
-                      <input type="number" id="yA" value={form.yA} onChange={handleChange} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-xs font-medium font-['Manrope']" placeholder="Въведете Yₐ" />
+                    <div className="self-stretch flex flex-col justify-start items-start gap-2">
+                      <div className="justify-start text-black text-sm font-medium font-['Manrope']">Yₐ</div>
+                      <input type="number" id="yA" value={form.yA} onChange={handleChange} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']" placeholder="Въведете Yₐ" list="yA-history-mobile" />
+                      <datalist id="yA-history-mobile">{getInputHistory('yA').map((v, i) => <option value={v} key={i} />)}</datalist>
                     </div>
                     {/* Xₐ */}
-                    <div className="self-stretch flex flex-col justify-start items-start gap-2 w-full">
-                      <div className="justify-start text-black text-xs font-medium font-['Manrope']">Xₐ</div>
-                      <input type="number" id="xA" value={form.xA} onChange={handleChange} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-xs font-medium font-['Manrope']" placeholder="Въведете Xₐ" />
+                    <div className="self-stretch flex flex-col justify-start items-start gap-2">
+                      <div className="justify-start text-black text-sm font-medium font-['Manrope']">Xₐ</div>
+                      <input type="number" id="xA" value={form.xA} onChange={handleChange} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']" placeholder="Въведете Xₐ" list="xA-history-mobile" />
+                      <datalist id="xA-history-mobile">{getInputHistory('xA').map((v, i) => <option value={v} key={i} />)}</datalist>
                     </div>
                     {/* Yᵦ */}
-                    <div className="self-stretch flex flex-col justify-start items-start gap-2 w-full">
-                      <div className="justify-start text-black text-xs font-medium font-['Manrope']">Yᵦ</div>
-                      <input type="number" id="yB" value={form.yB} onChange={handleChange} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-xs font-medium font-['Manrope']" placeholder="Въведете Yᵦ" />
+                    <div className="self-stretch flex flex-col justify-start items-start gap-2">
+                      <div className="justify-start text-black text-sm font-medium font-['Manrope']">Yᵦ</div>
+                      <input type="number" id="yB" value={form.yB} onChange={handleChange} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']" placeholder="Въведете Yᵦ" list="yB-history-mobile" />
+                      <datalist id="yB-history-mobile">{getInputHistory('yB').map((v, i) => <option value={v} key={i} />)}</datalist>
                     </div>
                     {/* Xᵦ */}
-                    <div className="self-stretch flex flex-col justify-start items-start gap-2 w-full">
-                      <div className="justify-start text-black text-xs font-medium font-['Manrope']">Xᵦ</div>
-                      <input type="number" id="xB" value={form.xB} onChange={handleChange} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-xs font-medium font-['Manrope']" placeholder="Въведете Xᵦ" />
+                    <div className="self-stretch flex flex-col justify-start items-start gap-2">
+                      <div className="justify-start text-black text-sm font-medium font-['Manrope']">Xᵦ</div>
+                      <input type="number" id="xB" value={form.xB} onChange={handleChange} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']" placeholder="Въведете Xᵦ" list="xB-history-mobile" />
+                      <datalist id="xB-history-mobile">{getInputHistory('xB').map((v, i) => <option value={v} key={i} />)}</datalist>
                     </div>
                     {/* β₁ */}
-                    <div className="self-stretch flex flex-col justify-start items-start gap-2 w-full">
-                      <div className="justify-start text-black text-xs font-medium font-['Manrope']">β₁</div>
-                      <input type="number" id="beta1" value={form.beta1} onChange={handleChange} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-xs font-medium font-['Manrope']" placeholder="Въведете β₁" />
+                    <div className="self-stretch flex flex-col justify-start items-start gap-2">
+                      <div className="justify-start text-black text-sm font-medium font-['Manrope']">β₁</div>
+                      <input type="number" id="beta1" value={form.beta1} onChange={handleChange} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']" placeholder="Въведете β₁" list="beta1-history-mobile" />
+                      <datalist id="beta1-history-mobile">{getInputHistory('beta1').map((v, i) => <option value={v} key={i} />)}</datalist>
                     </div>
                     {/* β₂ */}
-                    <div className="self-stretch flex flex-col justify-start items-start gap-2 w-full">
-                      <div className="justify-start text-black text-xs font-medium font-['Manrope']">β₂</div>
-                      <input type="number" id="beta2" value={form.beta2} onChange={handleChange} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-xs font-medium font-['Manrope']" placeholder="Въведете β₂" />
+                    <div className="self-stretch flex flex-col justify-start items-start gap-2">
+                      <div className="justify-start text-black text-sm font-medium font-['Manrope']">β₂</div>
+                      <input type="number" id="beta2" value={form.beta2} onChange={handleChange} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']" placeholder="Въведете β₂" list="beta2-history-mobile" />
+                      <datalist id="beta2-history-mobile">{getInputHistory('beta2').map((v, i) => <option value={v} key={i} />)}</datalist>
                     </div>
                   </div>
                   <div className="inline-flex justify-end items-center gap-3 w-full">
@@ -473,6 +515,13 @@ Xₚ = ${results.xP} m
                             </div>
                             <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
                               <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{(() => { const d = new Date(entry.date); return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()}` })()}</div>
+                            </div>
+                            <div className="flex-1 self-stretch px-3 py-2 bg-white flex justify-center items-center gap-2.5">
+                              <button onClick={() => handleDownload(entry)} className="flex items-center justify-center">
+                                <svg className="w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                  <path d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                              </button>
                             </div>
                           </div>
                         ))
