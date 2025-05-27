@@ -111,3 +111,57 @@ We welcome contributions! Please fork the repo and submit a pull request. For ma
 ## 📬 Contact
 Created and maintained by **@valentinjelev**
 Feel free to reach out for feedback, suggestions, or collaboration.
+
+## Testing
+
+This project uses the following tools for unit and integration testing:
+
+### 1. Jest
+- The main testing framework for JavaScript/React applications.
+- Used to run and organize all tests.
+- Configured via `jest.config.js`.
+
+### 2. React Testing Library
+- Library for testing React components by simulating real user behavior.
+- Allows rendering components, simulating clicks, typing, and more.
+- Main functions: `render`, `screen`, `fireEvent`, `userEvent`.
+
+### 3. @testing-library/jest-dom
+- Adds extra matchers to Jest for easier DOM assertions.
+- Example: `expect(element).toBeInTheDocument()`.
+
+### 4. Babel + babel-jest
+- Babel is used to transform modern JavaScript and JSX code so Jest can execute it.
+- Configured via `.babelrc`.
+
+### 5. Mocking
+- We use mocks for `localStorage` and `react-router-dom` in tests to avoid errors when there is no real browser or Router context.
+
+---
+
+## How to Run the Tests
+
+1. Install dependencies:
+   ```sh
+   npm install
+   ```
+2. Run all tests:
+   ```sh
+   npm test
+   ```
+
+Tests are located in `__tests__` folders next to the relevant components.
+
+---
+
+## Example Tests
+- Rendering a component
+- Input validation
+- Saving to calculation history
+- Downloading results
+
+---
+
+For more information:
+- [Jest documentation](https://jestjs.io/)
+- [React Testing Library documentation](https://testing-library.com/docs/react-testing-library/intro/)
