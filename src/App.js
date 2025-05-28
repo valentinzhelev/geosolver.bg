@@ -13,6 +13,7 @@ import { AuthProvider } from './components/auth/AuthContext';
 import { Helmet } from "react-helmet";
 import ForgotPassword from './components/auth/ForgotPassword';
 import ResetPassword from './components/auth/ResetPassword';
+import Contacts from './components/contacts/Contacts';
 
 function App() {
   return (
@@ -45,6 +46,7 @@ function App() {
             <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/contacts" element={<Contacts />} />
           </Routes>
         </Router>
       </AuthProvider>

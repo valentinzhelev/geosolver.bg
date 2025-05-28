@@ -65,9 +65,12 @@ const Header = () => {
           >
             Цени
           </Link>
-          <div data-property-1="Default" className="px-3 py-1 rounded-lg flex justify-center items-center gap-2.5 hover:text-black">
-            <div className="justify-start text-neutral-400 text-base font-medium font-['Manrope']">Контакти</div>
-          </div>
+          <Link
+            to="/contacts"
+            className={`px-3 py-1 rounded-lg flex justify-center items-center gap-2.5 ${location.pathname === '/contacts' ? 'text-black' : 'text-neutral-400'} text-base font-medium font-['Manrope'] hover:text-black`}
+          >
+            Контакти
+          </Link>
           <div data-property-1="Default" className="px-3 py-1 rounded-lg flex justify-center items-center gap-2.5 hover:text-black">
             <div className="justify-start text-neutral-400 text-base font-medium font-['Manrope']">За преподаватели</div>
           </div>
