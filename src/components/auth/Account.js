@@ -54,12 +54,12 @@ const Account = () => {
                     style={{ zIndex: 1 }}
                   />
                   <div className="text-center justify-start text-white text-lg font-semibold font-['Manrope'] z-10" style={{ opacity: 1 }}>
-                    Професионален план (Месечен)
+                    {plan.name}
                   </div>
                 </div>
                 <div className="self-stretch p-4 bg-white rounded-tl rounded-tr rounded-bl-xl rounded-br-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-0.50px] outline-gray-200 flex flex-col justify-start items-start gap-4 overflow-hidden z-10 relative">
-                  <div className="justify-start"><span className="text-black text-base font-medium font-['Manrope']">216 дни</span><span className="text-neutral-400 text-base font-medium font-['Manrope']"> от началото на плана Ви</span></div>
-                  <div className="justify-start"><span className="text-black text-base font-medium font-['Manrope']">4 дни</span><span className="text-neutral-400 text-base font-medium font-['Manrope']"> до следващото плащане</span></div>
+                  <div className="justify-start"><span className="text-black text-base font-medium font-['Manrope']">{plan.daysActive} дни</span><span className="text-neutral-400 text-base font-medium font-['Manrope']"> от началото на плана Ви</span></div>
+                  <div className="justify-start"><span className="text-black text-base font-medium font-['Manrope']">{plan.daysToNext} дни</span><span className="text-neutral-400 text-base font-medium font-['Manrope']"> до следващото плащане</span></div>
                   <div className="px-4 py-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-3">
                     <div className="justify-start text-black text-base font-medium font-['Manrope']">Промяна на плана</div>
                   </div>
@@ -68,31 +68,20 @@ const Account = () => {
               <div className="self-stretch p-4 bg-white rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-0.50px] outline-gray-200 flex flex-col justify-start items-start gap-4 overflow-hidden">
                 <div className="justify-start text-black text-lg font-semibold font-['Manrope']">Методи за плащане</div>
                 <div className="self-stretch h-0 outline outline-1 outline-offset-[-0.50px] outline-gray-200" />
-                <div className="self-stretch inline-flex justify-between items-center">
-                  <div className="flex justify-center items-center gap-4">
-                    <div className="w-12 h-6 p-1 bg-black rounded-[30px] flex justify-end items-center gap-2">
-                      <div className="w-4 h-4 bg-white rounded-full" />
+                {paymentMethods.map((method, index) => (
+                  <div key={index} className="self-stretch inline-flex justify-between items-center">
+                    <div className="flex justify-center items-center gap-4">
+                      <div className={`w-12 h-6 p-1 ${method.active ? 'bg-black' : 'rounded-[30px] outline outline-1 outline-offset-[-1px] outline-gray-200'} flex ${method.active ? 'justify-end' : 'justify-start'} items-center gap-2`}>
+                        <div className={`w-4 h-4 ${method.active ? 'bg-white' : 'bg-black'} rounded-full`} />
+                      </div>
+                      <img src="/icons/visa.svg" alt="Visa" className="w-8 h-8" />
+                      <div className="justify-start text-neutral-400 text-base font-medium font-['Manrope']">**** {method.last4}</div>
                     </div>
-                    <img src="/icons/visa.svg" alt="Visa" className="w-8 h-8" />
-                    <div className="justify-start text-neutral-400 text-base font-medium font-['Manrope']">**** 6225</div>
+                    <button className="w-5 h-5 flex items-center justify-center">
+                      <img src="/icons/account_x.svg" alt="Премахни" className="w-4 h-4 opacity-60" />
+                    </button>
                   </div>
-                  <button className="w-5 h-5 flex items-center justify-center">
-                    <img src="/icons/account_x.svg" alt="Премахни" className="w-4 h-4 opacity-60" />
-                  </button>
-                </div>
-                <div className="self-stretch h-0 outline outline-1 outline-offset-[-0.50px] outline-gray-200" />
-                <div className="self-stretch inline-flex justify-between items-center">
-                  <div className="flex justify-center items-center gap-4">
-                    <div className="w-12 h-6 p-1 rounded-[30px] outline outline-1 outline-offset-[-1px] outline-gray-200 flex justify-start items-center gap-2">
-                      <div className="w-4 h-4 bg-black rounded-full" />
-                    </div>
-                    <img src="/icons/visa.svg" alt="Visa" className="w-8 h-8" />
-                    <div className="justify-start text-neutral-400 text-base font-medium font-['Manrope']">**** 4448</div>
-                  </div>
-                  <button className="w-5 h-5 flex items-center justify-center">
-                    <img src="/icons/account_x.svg" alt="Премахни" className="w-4 h-4 opacity-60" />
-                  </button>
-                </div>
+                ))}
                 <div className="self-stretch h-0 outline outline-1 outline-offset-[-0.50px] outline-gray-200" />
                 <div className="px-4 py-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-3">
                   <div className="justify-start text-black text-base font-medium font-['Manrope']">Добави нов метод</div>
@@ -173,17 +162,17 @@ const Account = () => {
                       <div className="justify-start text-black text-sm font-medium font-['Manrope']">Дата</div>
                     </div>
                   </div>
-                  {Array(10).fill(0).map((_, i) => (
+                  {paymentHistory.map((payment, i) => (
                     <div key={i} className="self-stretch inline-flex justify-start items-center gap-px">
                       <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
                         <img src="/icons/visa_small.svg" alt="Visa" className="w-5 h-5" />
-                        <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">**** 6225</div>
+                        <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{payment.method}</div>
                       </div>
                       <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                        <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">19.99лв</div>
+                        <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{payment.amount}</div>
                       </div>
                       <div className="w-48 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                        <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">18.04.2025 14:25</div>
+                        <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{payment.date}</div>
                       </div>
                     </div>
                   ))}

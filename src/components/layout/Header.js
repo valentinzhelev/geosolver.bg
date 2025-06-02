@@ -153,10 +153,16 @@ const Header = () => {
               {loading ? (
                 <Loader />
               ) : user ? (
-                <Link to="/account" onClick={() => setMobileMenuOpen(false)} className="px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3">
-                  <div className="justify-start text-white text-sm font-medium font-['Manrope']">{getAccountLabel()}</div>
-                  <img src="/icons/account_icon.svg" alt="Account Icon" className="w-4 h-4" />
-                </Link>
+                <div className="flex items-center gap-3">
+                  <Link to="/account" onClick={() => setMobileMenuOpen(false)} className="px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3">
+                    <div className="justify-start text-white text-sm font-medium font-['Manrope']">{getAccountLabel()}</div>
+                    <img src="/icons/account_icon.svg" alt="Account Icon" className="w-4 h-4" />
+                  </Link>
+                  <button onClick={() => { logout(); setMobileMenuOpen(false); }} className="px-4 py-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 flex justify-start items-center gap-3">
+                    <div className="justify-start text-black text-sm font-medium font-['Manrope']">Изход</div>
+                    <img src="/icons/logout_icon.svg" alt="Logout" className="w-4 h-4" />
+                  </button>
+                </div>
               ) : (
                 <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="justify-start text-white text-sm font-medium font-['Manrope'] px-4 py-2 bg-black rounded-lg flex items-center gap-3">
                   Вход
