@@ -419,18 +419,18 @@ X2 = ${result.x2.toFixed(2)}
             <div className="w-[580px] flex flex-col justify-start items-start gap-4">
               <div className="flex flex-col justify-start items-start gap-1">
                 <div className="justify-start">
-                  <Link to="/tools" className="text-neutral-400 text-base font-medium font-['Manrope'] underline hover:text-black">Инструменти</Link>
-                  <span className="text-neutral-400 text-base font-medium font-['Manrope']"> &gt; Първа основна задача</span>
+                  <Link to="/tools" className="text-neutral-400 text-base font-medium font-['Manrope'] underline">Инструменти</Link>
+                  <span className="text-neutral-400 text-base font-medium font-['Manrope']"> {'>'} Първа основна задача</span>
                 </div>
                 <div className="justify-start text-black text-3xl font-bold font-['Manrope']">Първа основна задача</div>
               </div>
               <div className="p-1.5 bg-white rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-2">
-                <div data-property-1="Default" className="px-3 py-1 bg-gray-200 rounded flex justify-center items-center gap-2.5">
+                <div className="px-3 py-1 bg-gray-200 rounded flex justify-center items-center gap-2.5">
                   <div className="justify-start text-black text-base font-medium font-['Manrope']">Инструмент</div>
                 </div>
-                <div data-property-1="Default" className="px-3 py-1 rounded flex justify-center items-center gap-2.5">
+                <Link to="/first-task/docs" className="px-3 py-1 bg-white rounded flex justify-center items-center gap-2.5">
                   <div className="justify-start text-neutral-400 text-base font-medium font-['Manrope']">Документация</div>
-                </div>
+                </Link>
               </div>
             </div>
             {/* Form and Results */}

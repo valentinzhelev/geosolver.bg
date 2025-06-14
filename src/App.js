@@ -14,6 +14,7 @@ import { Helmet } from "react-helmet";
 import ForgotPassword from './components/auth/ForgotPassword';
 import ResetPassword from './components/auth/ResetPassword';
 import Contacts from './components/contacts/Contacts';
+import FirstTaskDocs from './components/tasks/FirstTaskDocs';
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/contacts" element={<Contacts />} />
+            <Route path="/first-task/docs" element={<FirstTaskDocs />} />
           </Routes>
         </Router>
       </AuthProvider>
