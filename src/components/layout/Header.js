@@ -175,7 +175,7 @@ const Header = () => {
               <div className="w-9 self-stretch rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 flex justify-center items-center gap-3">
                 <img src="/icons/night_mode_icon.svg" alt="Night Mode" className="w-4 h-4" />
               </div>
-            </div>
+            </div>3
           </div>
         </div>
       )}
