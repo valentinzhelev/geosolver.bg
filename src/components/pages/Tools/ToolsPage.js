@@ -2,68 +2,85 @@ import React from "react";
 import Layout from '../../layout/Layout';
 import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
+import { useTranslation } from '../../../hooks/useTranslation';
 
 const ToolsPage = () => {
+  const { t, language } = useTranslation();
+
   const tools = [
     {
-      title: "Първа основна задача",
-      description: "Изчисляване на координати по начална точка, ъгъл и дължина.",
-      parameters: "1 точка, ъгъл, дължина",
-      type: "Трансформация / полярен метод",
+      title: language === 'bg' ? "Първа основна задача" : "First Basic Task",
+      description: language === 'bg' 
+        ? "Изчисляване на координати по начална точка, ъгъл и дължина."
+        : "Calculate coordinates using initial point, angle, and distance.",
+      parameters: language === 'bg' ? "1 точка, ъгъл, дължина" : "1 point, angle, distance",
+      type: language === 'bg' ? "Трансформация / полярен метод" : "Transformation / polar method",
       calculation: "< 0.05s",
       route: "/first-task",
       icon: "/icons/first_task_icon.svg"
     },
     {
-      title: "Втора основна задача",
-      description: "Изчисляване на ъгъл и разстояние между две точки по координати.",
-      parameters: "4 входни координати",
-      type: "GNSS / координатна геодезия",
+      title: language === 'bg' ? "Втора основна задача" : "Second Basic Task",
+      description: language === 'bg'
+        ? "Изчисляване на ъгъл и разстояние между две точки по координати."
+        : "Calculate angle and distance between two points using coordinates.",
+      parameters: language === 'bg' ? "4 входни координати" : "4 input coordinates",
+      type: language === 'bg' ? "GNSS / координатна геодезия" : "GNSS / coordinate geodesy",
       calculation: "< 0.1s",
       route: "/second-task",
       icon: "/icons/second_task_icon.svg"    
     },
     {
-      title: "Права засечка",
-      description: "Координати чрез посока и разстояние от известна точка.",
-      parameters: "1 известна точка + мерки",
-      type: "GNSS / тахиметрично измерване",
+      title: language === 'bg' ? "Права засечка" : "Forward Intersection",
+      description: language === 'bg'
+        ? "Координати чрез посока и разстояние от известна точка."
+        : "Coordinates through direction and distance from a known point.",
+      parameters: language === 'bg' ? "1 известна точка + мерки" : "1 known point + measurements",
+      type: language === 'bg' ? "GNSS / тахиметрично измерване" : "GNSS / tacheometric measurement",
       calculation: "< 0.08s",
       route: "/forward-intersection",
       icon: "/icons/forward_intersection_icon.svg"
     },
     {
-      title: "Обратна засечка",
-      description: "Определяне на позиция по ъгли от известни точки.",
-      parameters: "2–3 известни точки и ъгли",
-      type: "координатна геодезия / класика",
+      title: language === 'bg' ? "Обратна засечка" : "Resection",
+      description: language === 'bg'
+        ? "Определяне на позиция по ъгли от известни точки."
+        : "Determine position using angles from known points.",
+      parameters: language === 'bg' ? "2–3 известни точки и ъгли" : "2–3 known points and angles",
+      type: language === 'bg' ? "координатна геодезия / класика" : "coordinate geodesy / classic",
       calculation: "~ 0.1s",
       route: "/resection",
       icon: "/icons/resection_icon.svg"
     },
     {
-      title: "Полярна засечка",
-      description: "Изчисления на непознати точки по мерки от база.",
-      parameters: "2 точки база + мерки",
-      type: "полярни координати",
+      title: language === 'bg' ? "Полярна засечка" : "Polar Intersection",
+      description: language === 'bg'
+        ? "Изчисления на непознати точки по мерки от база."
+        : "Calculate unknown points using measurements from base.",
+      parameters: language === 'bg' ? "2 точки база + мерки" : "2 base points + measurements",
+      type: language === 'bg' ? "полярни координати" : "polar coordinates",
       calculation: "< 0.09s",
       route: "/polar-intersection",
       icon: "/icons/polar_intersection_icon.svg"
     },
     {
-      title: "Координатна трансформация",
-      description: "Преобразуване между локални и глобални координатни системи.",
-      parameters: "3+ точки / трансформационни",
-      type: "Хелмерт, афинна, 7 параметъра",
+      title: language === 'bg' ? "Координатна трансформация" : "Coordinate Transformation",
+      description: language === 'bg'
+        ? "Преобразуване между локални и глобални координатни системи."
+        : "Convert between local and global coordinate systems.",
+      parameters: language === 'bg' ? "3+ точки / трансформационни" : "3+ points / transformational",
+      type: language === 'bg' ? "Хелмерт, афинна, 7 параметъра" : "Helmert, affine, 7 parameters",
       calculation: "< 0.2s",
       route: "/coordinate-transformation",
       icon: "/icons/coordinate_transformation_icon.svg"
     },
     {
-      title: "Задача за ханзен",
-      description: "Изчисляване на координатите на точка чрез ъглово преместване от две известни точки (A и B).",
-      parameters: "координати на A и B + ъгли α, β",
-      type: "аналитична триангулация",
+      title: language === 'bg' ? "Задача за ханзен" : "Hansen Task",
+      description: language === 'bg'
+        ? "Изчисляване на координатите на точка чрез ъглово преместване от две известни точки (A и B)."
+        : "Calculate point coordinates using angular displacement from two known points (A and B).",
+      parameters: language === 'bg' ? "координати на A и B + ъгли α, β" : "coordinates of A and B + angles α, β",
+      type: language === 'bg' ? "аналитична триангулация" : "analytical triangulation",
       calculation: "< 0.1s",
       route: "/hansen-task",
       icon: "/icons/hansen-task-icon.svg"
@@ -73,14 +90,25 @@ const ToolsPage = () => {
   return (
     <>
     <Helmet>
-      <title>Инструменти – Геодезически калкулатори и задачи | GeoSolver</title>
+      <title>
+        {language === 'bg' 
+          ? 'Инструменти – Геодезически калкулатори и задачи | GeoSolver'
+          : 'Tools – Geodetic Calculators and Tasks | GeoSolver'
+        }
+      </title>
       <meta
         name="description"
-        content="Интерактивни геодезически инструменти за координатни трансформации, засечки, изчисления на ъгли и разстояния. Всичко за геодезията на едно място – бързо, лесно и удобно."
+        content={language === 'bg'
+          ? "Интерактивни геодезически инструменти за координатни трансформации, засечки, изчисления на ъгли и разстояния. Всичко за геодезията на едно място – бързо, лесно и удобно."
+          : "Interactive geodetic tools for coordinate transformations, intersections, angle and distance calculations. Everything for geodesy in one place - fast, easy, and convenient."
+        }
       />
       <meta
         name="keywords"
-        content="геодезия, инструменти, калкулатори, координатни трансформации, права засечка, обратна засечка, полярна засечка, Hansen, GNSS, онлайн изчисления"
+        content={language === 'bg'
+          ? "геодезия, инструменти, калкулатори, координатни трансформации, права засечка, обратна засечка, полярна засечка, Hansen, GNSS, онлайн изчисления"
+          : "geodesy, tools, calculators, coordinate transformations, forward intersection, resection, polar intersection, Hansen, GNSS, online calculations"
+        }
       />
       <meta name="robots" content="index, follow" />
       <meta name="author" content="GeoSolver" />
@@ -91,11 +119,18 @@ const ToolsPage = () => {
           {/* Header Section */}
           <div className="w-full flex flex-col md:flex-row md:justify-between md:items-end gap-4 md:gap-0">
             <div className="w-full md:w-[580px] flex flex-col justify-start items-start gap-1">
-              <div className="text-black text-2xl md:text-3xl font-bold font-['Manrope']">Инструменти</div>
-              <div className="text-neutral-400 text-xs md:text-base font-semibold font-['Manrope']">Интерактивни инструменти за решаване на задачи в геодезията – от координатни трансформации до класически засечки.</div>
+              <div className="text-black text-2xl md:text-3xl font-bold font-['Manrope']">{t.toolsTitle}</div>
+              <div className="text-neutral-400 text-xs md:text-base font-semibold font-['Manrope']">
+                {language === 'bg'
+                  ? "Интерактивни инструменти за решаване на задачи в геодезията – от координатни трансформации до класически засечки."
+                  : "Interactive tools for solving geodesy tasks - from coordinate transformations to classic intersections."
+                }
+              </div>
             </div>
             <div className="flex justify-start items-center gap-3">
-              <div className="text-black text-sm md:text-base font-semibold font-['Manrope']">Инструменти в разработка</div>
+              <div className="text-black text-sm md:text-base font-semibold font-['Manrope']">
+                {language === 'bg' ? "Инструменти в разработка" : "Tools in development"}
+              </div>
               <div className="w-10 h-5 md:w-12 md:h-6 p-[3.33px] md:p-1 bg-black rounded-3xl flex justify-end items-center gap-1.5 md:gap-2">
                 <div className="w-3.5 h-3.5 md:w-4 md:h-4 bg-white rounded-full" />
               </div>
@@ -125,15 +160,21 @@ const ToolsPage = () => {
                   <div className="text-neutral-400 text-xs md:text-sm font-medium font-['Manrope']">{tool.description}</div>
                   <div className="w-full flex flex-col justify-start items-start gap-2">
                     <div className="w-full px-3 py-2 bg-stone-50 rounded-lg flex flex-col justify-start items-start">
-                      <div className="text-black text-xs md:text-sm font-medium font-['Manrope']">Параметри</div>
+                      <div className="text-black text-xs md:text-sm font-medium font-['Manrope']">
+                        {language === 'bg' ? "Параметри" : "Parameters"}
+                      </div>
                       <div className="text-neutral-400 text-xs md:text-sm font-medium font-['Manrope']">{tool.parameters}</div>
                     </div>
                     <div className="w-full px-3 py-2 bg-stone-50 rounded-lg flex flex-col justify-start items-start">
-                      <div className="text-black text-xs md:text-sm font-medium font-['Manrope']">Тип</div>
+                      <div className="text-black text-xs md:text-sm font-medium font-['Manrope']">
+                        {language === 'bg' ? "Тип" : "Type"}
+                      </div>
                       <div className="text-neutral-400 text-xs md:text-sm font-medium font-['Manrope']">{tool.type}</div>
                     </div>
                     <div className="w-full px-3 py-2 bg-stone-50 rounded-lg flex flex-col justify-start items-start">
-                      <div className="text-black text-xs md:text-sm font-medium font-['Manrope']">Изчисление</div>
+                      <div className="text-black text-xs md:text-sm font-medium font-['Manrope']">
+                        {language === 'bg' ? "Изчисление" : "Calculation"}
+                      </div>
                       <div className="text-neutral-400 text-xs md:text-sm font-medium font-['Manrope']">{tool.calculation}</div>
                     </div>
                   </div>

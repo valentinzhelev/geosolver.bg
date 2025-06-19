@@ -10,49 +10,51 @@ import Register from './components/auth/Register';
 import Account from './components/auth/Account';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { AuthProvider } from './components/auth/AuthContext';
+import { LanguageProvider } from './context/LanguageContext';
 import { Helmet } from "react-helmet";
 import ForgotPassword from './components/auth/ForgotPassword';
 import ResetPassword from './components/auth/ResetPassword';
+import CookieConsent from './components/shared/CookieConsent';
 import Contacts from './components/contacts/Contacts';
 import FirstTaskDocs from './components/tasks/FirstTaskDocs';
 
 function App() {
   return (
-    <>
-      <Helmet>
-        <title>GeoSolver - Онлайн калкулатор за геодезия</title>
-        <meta
-          name="description"
-          content="GeoSolver - онлайн геодезически калкулатор за точни и бързи изчисления. Решавай задачи като права засечка, обратна засечка и трансформации с интуитивен интерфейс и запазване на историята."
-        />
-        <meta
-          name="keywords"
-          content="геодезия, геодезически калкулатори, права засечка, обратна засечка, онлайн изчисления, координатни трансформации, геодезически задачи"
-        />
-        <meta name="robots" content="index, follow" />
-        <meta name="author" content="GeoSolver" />
-      </Helmet>
-
+    <Router>
       <AuthProvider>
-        <Router>
+        <LanguageProvider>
+          <Helmet>
+            <meta charSet="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <meta name="theme-color" content="#000000" />
+            <link rel="icon" href="/favicon.png" />
+          </Helmet>
           <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/tools" element={<ToolsPage />} />
             <Route path="/first-task" element={<FirstTask />} />
             <Route path="/second-task" element={<SecondTask />} />
             <Route path="/forward-intersection" element={<ForwardIntersection />} />
             <Route path="/prices" element={<Prices />} />
-            <Route path="/tools" element={<ToolsPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route
+              path="/account"
+              element={
+                <ProtectedRoute>
+                  <Account />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/contacts" element={<Contacts />} />
             <Route path="/first-task/docs" element={<FirstTaskDocs />} />
           </Routes>
-        </Router>
+          <CookieConsent />
+        </LanguageProvider>
       </AuthProvider>
-    </>
+    </Router>
   );
 }
 

@@ -2,37 +2,54 @@ import React, { useState } from 'react';
 import Layout from '../../layout/Layout';
 import './AboutPage.css';
 import { Helmet } from "react-helmet";
-
-const events = [
-    {
-        year: '2023',
-        description: 'Идеята за GeoSolver се заражда – необходимостта от уеб базирано приложение за геодезически изчисления.'
-    },
-    {
-        year: '2024',
-        description: 'Стартиране на активната разработка: изградени са основите на фронтенда и бекенда.'
-    },
-    {
-        year: '2025',
-        description: 'Публична версия 1.0 с основните функции: трансформации, засечки, базова история на изчисленията.'
-    }
-];
+import { useTranslation } from '../../../hooks/useTranslation';
 
 const AboutPage = () => {
     const [activeIndex, setActiveIndex] = useState(0);
+    const { t, language } = useTranslation();
+
+    const events = [
+        {
+            year: '2023',
+            description: language === 'bg'
+                ? 'Идеята за GeoSolver се заражда – необходимостта от уеб базирано приложение за геодезически изчисления.'
+                : 'The idea for GeoSolver is born – the need for a web-based application for geodetic calculations.'
+        },
+        {
+            year: '2024',
+            description: language === 'bg'
+                ? 'Стартиране на активната разработка: изградени са основите на фронтенда и бекенда.'
+                : 'Active development begins: frontend and backend foundations are built.'
+        },
+        {
+            year: '2025',
+            description: language === 'bg'
+                ? 'Публична версия 1.0 с основните функции: трансформации, засечки, базова история на изчисленията.'
+                : 'Public version 1.0 with core features: transformations, intersections, basic calculation history.'
+        }
+    ];
+
     const progressPercent = (activeIndex) / (events.length - 1) * 100;
 
     return (
         <>
             <Helmet>
-                <title>За нас - История на GeoSolver</title>
+                <title>
+                    {language === 'bg' ? 'За нас - История на GeoSolver' : 'About Us - GeoSolver History'}
+                </title>
                 <meta
                     name="description"
-                    content="Научете историята на GeoSolver – онлайн платформа за геодезически изчисления с лесен и интуитивен интерфейс, предназначена за професионални геодезисти."
+                    content={language === 'bg'
+                        ? "Научете историята на GeoSolver – онлайн платформа за геодезически изчисления с лесен и интуитивен интерфейс, предназначена за професионални геодезисти."
+                        : "Learn about GeoSolver's history – an online platform for geodetic calculations with an easy and intuitive interface, designed for professional surveyors."
+                    }
                 />
                 <meta
                     name="keywords"
-                    content="GeoSolver, геодезия, история на GeoSolver, онлайн геодезически калкулатор, геодезически изчисления, права засечка, трансформации"
+                    content={language === 'bg'
+                        ? "GeoSolver, геодезия, история на GeoSolver, онлайн геодезически калкулатор, геодезически изчисления, права засечка, трансформации"
+                        : "GeoSolver, geodesy, GeoSolver history, online geodetic calculator, geodetic calculations, forward intersection, transformations"
+                    }
                 />
                 <meta name="robots" content="index, follow" />
                 <meta name="author" content="GeoSolver" />
@@ -40,25 +57,29 @@ const AboutPage = () => {
             <Layout>
                 <div className="about-section">
                     <div className="about-container">
-                        <h1 className="about-title">История на <span className="blue">GeoSolver</span></h1>
+                        <h1 className="about-title">
+                            {language === 'bg' ? 'История на ' : 'History of '}
+                            <span className="blue">GeoSolver</span>
+                        </h1>
                         <p className="about-intro">
-                            GeoSolver е проект, роден от желанието да се улесни ежедневната работа на геодезисти чрез достъпен онлайн инструмент.
-                            Платформата предоставя прецизни изчисления, интуитивен интерфейс и възможност за съхраняване на история на изчисленията.
+                            {language === 'bg'
+                                ? 'GeoSolver е проект, роден от желанието да се улесни ежедневната работа на геодезисти чрез достъпен онлайн инструмент. Платформата предоставя прецизни изчисления, интуитивен интерфейс и възможност за съхраняване на история на изчисленията.'
+                                : 'GeoSolver is a project born from the desire to simplify the daily work of surveyors through an accessible online tool. The platform provides precise calculations, an intuitive interface, and the ability to store calculation history.'
+                            }
                         </p>
 
                         <div className="timeline-arrow-wrapper">
                             <div className="timeline-arrow-line">
-
-                                {/* Линията в светло синьо (основа) */}
+                                {/* Base line in light blue */}
                                 <div className="timeline-arrow-base" />
 
-                                {/* Линията в синьо (прогрес) */}
+                                {/* Progress line in blue */}
                                 <div
                                     className="timeline-arrow-progress"
                                     style={{ width: `max(${progressPercent}%, 17.9%)` }}
                                 />
 
-                                {/* Точките */}
+                                {/* Points */}
                                 {events.map((event, index) => (
                                     <div
                                         key={index}
@@ -69,12 +90,11 @@ const AboutPage = () => {
                                     </div>
                                 ))}
 
-                                {/* Стрелката */}
+                                {/* Arrow */}
                                 <div
                                     className={`timeline-arrow-head ${activeIndex === events.length - 1 ? 'full' : ''}`}
                                 />
                             </div>
-
                         </div>
                         <div className="timeline-description">
                             {events[activeIndex] && (

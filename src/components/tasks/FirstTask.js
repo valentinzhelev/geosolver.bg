@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Helmet } from "react-helmet";
 import Layout from '../layout/Layout';
 import { Link } from 'react-router-dom';
+import { useTranslation } from '../../hooks/useTranslation';
 // Custom hook for typewriter effect
 const useTypewriter = (text, speed = 12) => {
   const [displayText, setDisplayText] = useState('');
@@ -71,7 +72,8 @@ const saveHistory = (entry) => {
 
 const PurvaZadacha = () => {
   const [form, setForm] = useState({ y1: '', x1: '', alpha: '', s: '' });
-  const [resultText, setResultText] = useState('Въведете данни и натиснете "Изчисли", за да видите резултати тук.');
+  const { t, language } = useTranslation();
+  const [resultText, setResultText] = useState(t.defaultResultText);
   const [history, setHistory] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
@@ -99,16 +101,28 @@ const PurvaZadacha = () => {
     const alpha = parseFloat(form.alpha);
     const s = parseFloat(form.s);
     if (isNaN(y1) || isNaN(x1) || isNaN(alpha) || isNaN(s)) {
-      alert("Моля, попълнете всички полета коректно.");
+      alert(language === 'bg' ? "Моля, попълнете всички полета коректно." : "Please fill in all fields correctly.");
       return;
     }
 
     const result = purvaOsnovnaZadacha(y1, x1, alpha, s);
-    const output = `--------- Първа основна геодезическа задача ---------
+    const output = language === 'bg' 
+      ? `--------- Първа основна геодезическа задача ---------
 Y1 = ${result.y1}, X1 = ${result.x1}
 S₁,₂ = ${result.s}, α₁,₂ = ${result.alphaGon} gon
 ------------------------------------------------------
 α в радиани = ${result.alphaRad.toFixed(6)} rad
+sin(α) = ${result.sinAlpha.toFixed(6)}
+cos(α) = ${result.cosAlpha.toFixed(6)}
+------------------------------------------------------
+Y2 = ${result.y2.toFixed(2)}
+X2 = ${result.x2.toFixed(2)}
+------------------------------------------------------`
+      : `--------- First Basic Geodetic Task ---------
+Y1 = ${result.y1}, X1 = ${result.x1}
+S₁,₂ = ${result.s}, α₁,₂ = ${result.alphaGon} gon
+------------------------------------------------------
+α in radians = ${result.alphaRad.toFixed(6)} rad
 sin(α) = ${result.sinAlpha.toFixed(6)}
 cos(α) = ${result.cosAlpha.toFixed(6)}
 ------------------------------------------------------
@@ -160,11 +174,13 @@ X2 = ${result.x2.toFixed(2)}
 
   const resetForm = () => {
     setForm({ y1: '', x1: '', alpha: '', s: '' });
-    setResultText('Въведете данни и натиснете "Изчисли", за да видите резултати тук.');
+    setResultText(t.defaultResultText);
   };
 
   const handleDownload = (entry) => {
-    const text = `Y1: ${entry.y1}\nX1: ${entry.x1}\nα: ${entry.alpha}\nS: ${entry.s}\nY2: ${entry.y2}\nX2: ${entry.x2}\nДата: ${(() => { const d = new Date(entry.date); return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()}` })()}`;
+    const text = language === 'bg'
+      ? `Y1: ${entry.y1}\nX1: ${entry.x1}\nα: ${entry.alpha}\nS: ${entry.s}\nY2: ${entry.y2}\nX2: ${entry.x2}\nДата: ${(() => { const d = new Date(entry.date); return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()}` })()}`
+      : `Y1: ${entry.y1}\nX1: ${entry.x1}\nα: ${entry.alpha}\nS: ${entry.s}\nY2: ${entry.y2}\nX2: ${entry.x2}\nDate: ${(() => { const d = new Date(entry.date); return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()}` })()}`;
     const blob = new Blob([text], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
