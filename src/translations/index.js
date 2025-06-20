@@ -20,7 +20,7 @@ export const translations = {
     socialNetworks: 'Социални мрежи',
     language: 'Български език',
     theme: 'Светъл режим',
-    copyright: '© GEOSOLVER, 2025.\nВсички права запазени.\nТекуща версия: v2.1.12-beta.2',
+    copyright: '© GEOSOLVER, 2025.\nВсички права запазени.\nТекуща версия: v2.1.13-beta.2',
 
     // FirstTask translations
     firstTaskTitle: 'Първа основна задача',
@@ -131,7 +131,7 @@ export const translations = {
     socialNetworks: 'Social Networks',
     language: 'English',
     theme: 'Light Mode',
-    copyright: '© GEOSOLVER, 2025.\nAll rights reserved.\nCurrent version: v2.1.12-beta.2',
+    copyright: '© GEOSOLVER, 2025.\nAll rights reserved.\nCurrent version: v2.1.13-beta.2',
 
     // FirstTask translations
     firstTaskTitle: 'First Basic Task',
