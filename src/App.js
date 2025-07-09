@@ -18,6 +18,8 @@ import ResetPassword from './components/auth/ResetPassword';
 import CookieConsent from './components/shared/CookieConsent';
 import Contacts from './components/contacts/Contacts';
 import FirstTaskDocs from './components/tasks/FirstTaskDocs';
+import ForTeachers from './components/pages/ForTeachers/ForTeachers';
+import ScientificCalculator from './components/pages/ScientificCalculator/ScientificCalculator';
 
 function App() {
   return (
@@ -52,6 +54,8 @@ function App() {
               />
               <Route path="/contacts" element={<Contacts />} />
               <Route path="/first-task/docs" element={<FirstTaskDocs />} />
+              <Route path="/for-teachers" element={<ForTeachers />} />
+              <Route path="/scientific-calculator" element={<ScientificCalculator />} />
             </Routes>
             <CookieConsent />
           </LanguageProvider>

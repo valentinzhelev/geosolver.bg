@@ -75,14 +75,17 @@ const Header = () => {
           >
             {t.contacts}
           </Link>
-          <div data-property-1="Default" className="px-3 py-1 rounded-lg flex justify-center items-center gap-2.5 hover:text-black dark:hover:text-white">
-            <div className="justify-start text-neutral-400 dark:text-gray-300 text-base font-medium font-['Manrope']">{t.forTeachers}</div>
-          </div>
+          <Link
+            to="/for-teachers"
+            className={`px-3 py-1 rounded-lg flex justify-center items-center gap-2.5 ${location.pathname === '/for-teachers' ? 'text-black dark:text-white' : 'text-neutral-400 dark:text-gray-300'} text-base font-medium font-['Manrope'] hover:text-black dark:hover:text-white`}
+          >
+            {t.forTeachers}
+          </Link>
         </div>
         <div className="flex-1 flex justify-end items-center gap-3">
-          <div className="w-9 h-9 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-gray-600 flex justify-center items-center gap-3">
+          <Link to="/scientific-calculator" className="w-9 h-9 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-gray-600 flex justify-center items-center gap-3 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <img src="/icons/calc_icon.svg" alt="Calculator Icon" className="w-6 h-6" />
-          </div>
+          </Link>
           <button
             onClick={toggleTheme}
             className="w-9 h-9 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-gray-600 flex justify-center items-center gap-3 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
@@ -153,6 +156,10 @@ const Header = () => {
               </Link>
               <Link to="/contacts" onClick={() => setMobileMenuOpen(false)} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-gray-600 inline-flex justify-start items-center gap-3">
                 <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{t.contacts}</div>
+                <img src="/icons/small_header_icon.svg" alt="Arrow" className="w-3 h-3" />
+              </Link>
+              <Link to="/for-teachers" onClick={() => setMobileMenuOpen(false)} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-gray-600 inline-flex justify-start items-center gap-3">
+                <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{t.forTeachers}</div>
                 <img src="/icons/small_header_icon.svg" alt="Arrow" className="w-3 h-3" />
               </Link>
             </div>

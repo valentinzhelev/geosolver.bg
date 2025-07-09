@@ -56,34 +56,56 @@ const ResetPassword = () => {
         <title>Нова парола | GeoSolver</title>
       </Helmet>
       <div className="w-full min-h-screen bg-stone-50 flex flex-col items-center justify-center">
-        <div className="max-w-[400px] w-full bg-white rounded-xl p-8 shadow flex flex-col gap-6">
-          <h2 className="text-xl font-bold text-center">Въведи нова парола</h2>
-          {success ? (
-            <div className="text-green-600 text-center">Паролата е сменена успешно! Пренасочване към вход...</div>
-          ) : (
-            <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-              <input
-                type="password"
-                className="p-3 rounded-lg outline outline-1 outline-gray-200"
-                placeholder="Нова парола"
-                value={newPassword}
-                onChange={e => setNewPassword(e.target.value)}
-                required
-              />
-              <input
-                type="password"
-                className="p-3 rounded-lg outline outline-1 outline-gray-200"
-                placeholder="Повтори новата парола"
-                value={repeatPassword}
-                onChange={e => setRepeatPassword(e.target.value)}
-                required
-              />
-              <button type="submit" className="bg-black text-white rounded-lg py-2" disabled={loading}>
-                {loading ? 'Записване...' : 'Запази новата парола'}
-              </button>
-              {error && <div className="text-red-500 text-center text-sm">{error}</div>}
-            </form>
-          )}
+        <div className="w-[580px] inline-flex flex-col justify-start items-start gap-5">
+          <div className="self-stretch px-14 py-10 relative rounded-xl inline-flex justify-center items-center gap-4 overflow-hidden" style={{backgroundColor: '#000'}}>
+            <div className="absolute inset-0 w-full h-full" style={{backgroundImage: 'url(/images/gradient_wallpaper.jpg)', backgroundSize: 'cover', backgroundPosition: 'left', transform: 'scaleX(-1)', zIndex: 0}} />
+            <div className="absolute inset-0 bg-black opacity-30 pointer-events-none" style={{zIndex: 1}} />
+            <div className="relative w-full flex justify-center items-center" style={{zIndex: 2}}>
+              <span className="flex-1 text-center text-white text-2xl font-semibold font-['Manrope']">...важното е да се учим от тях.</span>
+            </div>
+          </div>
+          <div className="self-stretch px-10 flex flex-col justify-center items-center gap-2.5">
+            <div className="self-stretch p-4 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-center items-center gap-6">
+              {success ? (
+                <div className="text-green-600 text-center self-stretch">Паролата е сменена успешно! Пренасочване към вход...</div>
+              ) : (
+                <form className="self-stretch flex flex-col justify-start items-start gap-4" onSubmit={handleSubmit}>
+                  <div className="self-stretch flex flex-col justify-start items-start gap-2">
+                    <div className="justify-start text-black text-sm font-medium font-['Manrope']">Нова парола</div>
+                    <input
+                      type="password"
+                      className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-start items-start text-sm font-medium font-['Manrope']"
+                      placeholder="Нова парола"
+                      value={newPassword}
+                      onChange={e => setNewPassword(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="self-stretch flex flex-col justify-start items-start gap-2">
+                    <div className="justify-start text-black text-sm font-medium font-['Manrope']">Повтори нова парола</div>
+                    <input
+                      type="password"
+                      className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-start items-start text-sm font-medium font-['Manrope']"
+                      placeholder="Повтори нова парола"
+                      value={repeatPassword}
+                      onChange={e => setRepeatPassword(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-black rounded-lg inline-flex items-center gap-3 self-center"
+                    disabled={loading}
+                  >
+                    <div className="justify-start text-white text-base font-medium font-['Manrope']">
+                      {loading ? 'Записване...' : 'Потвърди'}
+                    </div>
+                  </button>
+                  {error && <div className="text-red-500 text-center text-sm self-stretch">{error}</div>}
+                </form>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </Layout>

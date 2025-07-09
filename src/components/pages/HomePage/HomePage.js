@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from 'react-router-dom';
 import Layout from '../../layout/Layout';
 import { Helmet } from "react-helmet";
@@ -28,7 +28,7 @@ const HomePage = () => {
   const timelineItems = [
     {
       year: '2023',
-      text: t.historyText
+      text: language === 'bg' ? 'Идеята беше в главата ми и започна планиране.' : 'The idea was in my head and planning started.'
     },
     {
       year: '2024',
@@ -43,6 +43,8 @@ const HomePage = () => {
       text: language === 'bg' ? 'Постоянно развитие и подобрения според нуждите на потребителите.' : 'Continuous development and improvements based on user needs.'
     }
   ];
+
+  const [selectedYear, setSelectedYear] = useState(timelineItems[0].year);
 
   return (
     <>
@@ -123,7 +125,7 @@ const HomePage = () => {
                       { mt: 'mt-3', ml: 'ml-3.5' }      // Future Plans
                     ].map((dotStyle, idx) => (
                       <div key={idx} className={`flex-1 flex items-start ${idx !== 3 ? 'mb-4' : ''} w-full`}>
-                        <div className={`relative z-10 w-3 h-3 rounded-full bg-black border-2 border-white ${dotStyle.mt} ${dotStyle.ml}`} />
+                        <div className={`relative z-10 w-3 h-3 rounded-full border-2 border-white ${selectedYear === timelineItems[idx].year ? 'bg-black' : 'bg-gray-200'} ${dotStyle.mt} ${dotStyle.ml}`} />
                       </div>
                     ))}
                   </div>
@@ -131,8 +133,15 @@ const HomePage = () => {
                   <div className="flex-1 flex flex-col">
                     {timelineItems.map((item, idx, arr) => (
                       <div key={item.year} className={`flex flex-col gap-1 ${idx !== arr.length - 1 ? 'mb-4' : ''}`}> 
-                        <span className="text-black text-base font-semibold font-['Manrope']">{item.year}</span>
-                        <span className="text-neutral-600 text-sm font-medium font-['Manrope']">{item.text}</span>
+                        <button
+                          onClick={() => setSelectedYear(item.year)}
+                          className={`text-left text-base font-semibold font-['Manrope'] rounded px-1 py-0.5 transition-colors duration-200 ${selectedYear === item.year ? 'bg-black text-white' : 'bg-gray-200 text-black'}`}
+                        >
+                          {item.year}
+                        </button>
+                        {selectedYear === item.year && (
+                          <span className="text-neutral-600 text-sm font-medium font-['Manrope']">{item.text}</span>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -142,17 +151,23 @@ const HomePage = () => {
               <div className="hidden md:block">
                 <div className="p-4 bg-white rounded-xl outline outline-1 outline-gray-200 flex flex-col gap-10 md:p-10 md:gap-10">
                   <div className="flex flex-col items-center gap-2 md:gap-3">
-                    <span className="text-black text-lg font-semibold font-['Manrope'] md:text-2xl">2023</span>
+                    <span className="text-black text-lg font-semibold font-['Manrope'] md:text-2xl">
+                      {selectedYear}
+                    </span>
                     <span className="text-center text-black text-sm font-semibold font-['Manrope'] md:text-lg md:font-semibold">
-                      {t.historyText}
+                      {timelineItems.find(item => item.year === selectedYear)?.text}
                     </span>
                   </div>
                   <div className="w-full flex flex-row gap-3 items-center overflow-x-auto pb-1 md:gap-3 md:overflow-visible md:pb-0">
                     {timelineItems.map((item, i, arr) => (
                       <React.Fragment key={item.year}>
-                        <div className={`px-3 py-1 rounded-lg flex justify-center items-center gap-2.5 whitespace-nowrap min-w-max ${i === 0 ? "bg-black text-white" : "bg-gray-200 text-black"} text-base font-semibold font-['Manrope'] md:text-lg md:flex-shrink-0`}>
+                        <button
+                          onClick={() => setSelectedYear(item.year)}
+                          className={`px-3 py-1 rounded-lg flex justify-center items-center gap-2.5 whitespace-nowrap min-w-max text-base font-semibold font-['Manrope'] md:text-lg md:flex-shrink-0 transition-colors duration-200 ${selectedYear === item.year ? 'bg-black text-white' : 'bg-gray-200 text-black'}`}
+                          style={{ outline: selectedYear === item.year ? '2px solid #000' : 'none' }}
+                        >
                           {item.year}
-                        </div>
+                        </button>
                         {i < arr.length - 1 && (
                           <>
                             <div className="flex-1 h-0 outline outline-1 outline-offset-[-0.5px] outline-gray-200 md:hidden" />
