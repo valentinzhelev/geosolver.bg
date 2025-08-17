@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 
 const FirstTaskDocs = () => {
-  const { t, language } = useTranslation();
+  const { t } = useTranslation();
 
   return (
     <Layout>

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Layout from '../../layout/Layout';
 import { Helmet } from "react-helmet";
-import { evaluate, format, pi, e } from "mathjs";
+import { evaluate, format } from "mathjs";
 
 const angleModes = [
   { label: "DEG", value: "deg" },

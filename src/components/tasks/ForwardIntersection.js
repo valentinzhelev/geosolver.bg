@@ -1,31 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../layout/Layout';
 import { Helmet } from 'react-helmet';
-
-// Typewriter hook
-const useTypewriter = (text, speed = 12) => {
-  const [displayText, setDisplayText] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  useEffect(() => {
-    if (!text) { setDisplayText(''); return; }
-    setIsTyping(true);
-    let i = 0, buffer = '', cancelled = false, last = performance.now();
-    function typeNext(now) {
-      if (cancelled) return;
-      if (now - last >= speed) {
-        buffer += text[i] ?? '';
-        setDisplayText(buffer);
-        i++; last = now;
-      }
-      if (i < text.length) requestAnimationFrame(typeNext);
-      else setIsTyping(false);
-    }
-    setDisplayText('');
-    requestAnimationFrame(typeNext);
-    return () => { cancelled = true; };
-  }, [text, speed]);
-  return { displayText, isTyping };
-};
+import useTypewriter from '../../hooks/useTypewriter';
 
 // LocalStorage helpers
 const getHistory = () => {
