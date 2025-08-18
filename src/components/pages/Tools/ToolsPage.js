@@ -125,13 +125,13 @@ const ToolsPage = () => {
       <meta name="author" content="GeoSolver" />
     </Helmet>
     <Layout>
-      <div className="min-h-[calc(100vh-300px)] bg-stone-50 w-full overflow-hidden py-6 md:py-10">
+      <div className="min-h-[calc(100vh-300px)] bg-stone-50 dark:bg-neutral-950 w-full overflow-hidden py-6 md:py-10">
         <div className="max-w-[400px] md:max-w-[1180px] w-full mx-auto flex flex-col justify-center items-start gap-6 md:gap-10 px-4 md:px-0">
           {/* Header Section */}
           <div className="w-full flex flex-col md:flex-row md:justify-between md:items-end gap-4 md:gap-0">
             <div className="w-full md:w-[580px] flex flex-col justify-start items-start gap-1">
-              <div className="text-black text-2xl md:text-3xl font-bold font-['Manrope']">{t.toolsTitle}</div>
-              <div className="text-neutral-400 text-xs md:text-base font-semibold font-['Manrope']">
+              <div className="text-black dark:text-white text-2xl md:text-3xl font-bold font-['Manrope']">{t.toolsTitle}</div>
+              <div className="text-neutral-400 dark:text-neutral-400 text-xs md:text-base font-semibold font-['Manrope']">
                 {language === 'bg'
                   ? "Интерактивни инструменти за решаване на задачи в геодезията – от координатни трансформации до класически засечки."
                   : "Interactive tools for solving geodesy tasks - from coordinate transformations to classic intersections."
@@ -139,7 +139,7 @@ const ToolsPage = () => {
               </div>
             </div>
             <div className="flex justify-start items-center gap-3">
-              <div className="text-black text-sm md:text-base font-semibold font-['Manrope']">
+              <div className="text-black dark:text-white text-sm md:text-base font-semibold font-['Manrope']">
                 {language === 'bg' ? "Инструменти в разработка" : "Tools in development"}
               </div>
                              <button
@@ -161,40 +161,40 @@ const ToolsPage = () => {
               <Link
                 to={tool.route}
                 key={tool.title}
-                className="w-full md:w-72 p-3 md:p-4 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex justify-start items-start gap-3 shadow-[0_2px_8px_0_rgba(0,0,0,0.04)] hover:shadow-[0_4px_24px_0_rgba(0,0,0,0.08)] transition"
+                className="w-full md:w-72 p-3 md:p-4 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex justify-start items-start gap-3 shadow-[0_2px_8px_0_rgba(0,0,0,0.04)] dark:shadow-[0_2px_8px_0_rgba(0,0,0,0.2)] hover:shadow-[0_4px_24px_0_rgba(0,0,0,0.08)] dark:hover:shadow-[0_4px_24px_0_rgba(0,0,0,0.3)] transition"
               >
                 <div className="flex-1 flex flex-col justify-start items-start gap-3">
                   <div className="w-full flex justify-between items-center">
                     <div className="flex justify-start items-center gap-2">
-                      <div className="w-7 h-7 bg-black rounded flex flex-col justify-center items-center">
+                      <div className="w-7 h-7 bg-black dark:bg-white rounded flex flex-col justify-center items-center">
                         <img src={tool.icon} alt="Tool Icon" className="w-4 h-4" />
                       </div>
-                      <div className="text-black text-sm md:text-base font-semibold font-['Manrope']">{tool.title}</div>
+                      <div className="text-black dark:text-white text-sm md:text-base font-semibold font-['Manrope']">{tool.title}</div>
                     </div>
-                    <div className="w-5 h-5 md:w-4 md:h-4 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 flex items-center justify-center">
+                    <div className="w-5 h-5 md:w-4 md:h-4 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex items-center justify-center">
                       <img src="/icons/question_icon.svg" alt="?" className="w-2.5 h-2.5" />
                     </div>
                   </div>
-                  <div className="w-full h-0 outline outline-1 outline-offset-[-0.50px] outline-gray-200" />
-                  <div className="text-neutral-400 text-xs md:text-sm font-medium font-['Manrope']">{tool.description}</div>
+                  <div className="w-full h-0 outline outline-1 outline-offset-[-0.50px] outline-gray-200 dark:outline-zinc-800" />
+                  <div className="text-neutral-400 dark:text-neutral-400 text-xs md:text-sm font-medium font-['Manrope']">{tool.description}</div>
                   <div className="w-full flex flex-col justify-start items-start gap-2">
-                    <div className="w-full px-3 py-2 bg-stone-50 rounded-lg flex flex-col justify-start items-start">
-                      <div className="text-black text-xs md:text-sm font-medium font-['Manrope']">
+                    <div className="w-full px-3 py-2 bg-stone-50 dark:bg-zinc-800 rounded-lg flex flex-col justify-start items-start">
+                      <div className="text-black dark:text-white text-xs md:text-sm font-medium font-['Manrope']">
                         {language === 'bg' ? "Параметри" : "Parameters"}
                       </div>
-                      <div className="text-neutral-400 text-xs md:text-sm font-medium font-['Manrope']">{tool.parameters}</div>
+                      <div className="text-neutral-400 dark:text-neutral-400 text-xs md:text-sm font-medium font-['Manrope']">{tool.parameters}</div>
                     </div>
-                    <div className="w-full px-3 py-2 bg-stone-50 rounded-lg flex flex-col justify-start items-start">
-                      <div className="text-black text-xs md:text-sm font-medium font-['Manrope']">
+                    <div className="w-full px-3 py-2 bg-stone-50 dark:bg-zinc-800 rounded-lg flex flex-col justify-start items-start">
+                      <div className="text-black dark:text-white text-xs md:text-sm font-medium font-['Manrope']">
                         {language === 'bg' ? "Тип" : "Type"}
                       </div>
-                      <div className="text-neutral-400 text-xs md:text-sm font-medium font-['Manrope']">{tool.type}</div>
+                      <div className="text-neutral-400 dark:text-neutral-400 text-xs md:text-sm font-medium font-['Manrope']">{tool.type}</div>
                     </div>
-                    <div className="w-full px-3 py-2 bg-stone-50 rounded-lg flex flex-col justify-start items-start">
-                      <div className="text-black text-xs md:text-sm font-medium font-['Manrope']">
+                    <div className="w-full px-3 py-2 bg-stone-50 dark:bg-zinc-800 rounded-lg flex flex-col justify-start items-start">
+                      <div className="text-black dark:text-white text-xs md:text-sm font-medium font-['Manrope']">
                         {language === 'bg' ? "Изчисление" : "Calculation"}
                       </div>
-                      <div className="text-neutral-400 text-xs md:text-sm font-medium font-['Manrope']">{tool.calculation}</div>
+                      <div className="text-neutral-400 dark:text-neutral-400 text-xs md:text-sm font-medium font-['Manrope']">{tool.calculation}</div>
                     </div>
                   </div>
                 </div>

@@ -8,7 +8,6 @@ export const googleAuthService = {
       console.log('Google script loaded, initializing...');
       window.google.accounts.id.initialize({
         client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
-        callback: this.handleCredentialResponse.bind(this),
         auto_select: false,
         cancel_on_tap_outside: true,
       });
@@ -74,10 +73,11 @@ export const googleAuthService = {
           text: 'signin_with',
           shape: 'rectangular',
           logo_alignment: 'left',
+          callback: options.callback || this.handleCredentialResponse.bind(this),
           ...options
         }
       );
-      console.log('Google Sign-In button rendered');
+      console.log('Google Sign-In button rendered with callback');
     } else {
       console.log('Google script not available for button rendering');
     }

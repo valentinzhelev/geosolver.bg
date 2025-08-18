@@ -3,7 +3,6 @@ import { Helmet } from 'react-helmet';
 import Layout from '../layout/Layout';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
-import { googleAuthService } from '../../services/googleAuthService';
 
 const Login = () => {
   const { login, loginWithGoogle, loading, error } = useAuth();
@@ -17,7 +16,7 @@ const Login = () => {
     console.log('Login component: Google sign-in callback triggered', response);
     try {
       console.log('Login component: Calling loginWithGoogle...');
-      const ok = await loginWithGoogle(rememberMe);
+      const ok = await loginWithGoogle(response, rememberMe);
       console.log('Login component: loginWithGoogle result:', ok);
       if (ok) {
         console.log('Login component: Login successful, setting success state');
@@ -34,19 +33,49 @@ const Login = () => {
     }
   }, [loginWithGoogle, rememberMe, navigate]);
 
+  // Initialize Google OAuth
+  useEffect(() => {
+    const initGoogleOAuth = () => {
+      if (window.google) {
+        console.log('Initializing Google OAuth...');
+        window.google.accounts.id.initialize({
+          client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
+          auto_select: false,
+          cancel_on_tap_outside: true,
+        });
+        console.log('Google OAuth initialized with client ID:', process.env.REACT_APP_GOOGLE_CLIENT_ID);
+      } else {
+        setTimeout(initGoogleOAuth, 100);
+      }
+    };
+    
+    initGoogleOAuth();
+  }, []);
+
   // Initialize Google OAuth button
   useEffect(() => {
     const initGoogleAuth = () => {
       if (window.google) {
-        googleAuthService.renderButton('google-signin-button', {
-          type: 'standard',
-          theme: 'outline',
-          size: 'large',
-          text: 'signin_with',
-          shape: 'rectangular',
-          logo_alignment: 'left',
-          callback: handleGoogleSignIn
-        });
+        // Clear any existing button
+        const buttonContainer = document.getElementById('google-signin-button');
+        if (buttonContainer) {
+          buttonContainer.innerHTML = '';
+        }
+        
+        // Render the button with our callback
+        window.google.accounts.id.renderButton(
+          document.getElementById('google-signin-button'),
+          {
+            type: 'standard',
+            theme: 'outline',
+            size: 'large',
+            text: 'signin_with',
+            shape: 'rectangular',
+            logo_alignment: 'left',
+            callback: handleGoogleSignIn
+          }
+        );
+        console.log('Google Sign-In button rendered with callback');
       } else {
         // Retry if Google script hasn't loaded yet
         setTimeout(initGoogleAuth, 100);

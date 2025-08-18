@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { googleAuthService } from '../../services/googleAuthService';
 
 const BASE_URL = 'https://geosolver-backend-production.up.railway.app';
 
@@ -15,9 +14,16 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Initialize Google OAuth on mount
+  // Initialize auth state on mount
   useEffect(() => {
-    googleAuthService.initializeGoogleAuth();
+    console.log('AuthContext useEffect token:', token);
+    const savedToken = localStorage.getItem('token') || sessionStorage.getItem('token');
+    const savedRefreshToken = localStorage.getItem('refreshToken') || sessionStorage.getItem('refreshToken');
+    
+    if (savedToken) {
+      setToken(savedToken);
+      setRefreshToken(savedRefreshToken);
+    }
   }, []);
 
   // Fetch user info on mount if token exists
@@ -38,31 +44,40 @@ export function AuthProvider({ children }) {
   }, [token]);
 
   // Google login function
-  const loginWithGoogle = async (rememberMe = false) => {
+  const loginWithGoogle = async (response, rememberMe = false) => {
     setLoading(true);
     setError(null);
     try {
-      const result = await googleAuthService.handleCredentialResponse();
-      if (result && result.token) {
-        setToken(result.token);
-        setRefreshToken(result.refreshToken);
+      const result = await fetch(`${BASE_URL}/api/google-auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token: response.credential }),
+      });
+
+      const data = await result.json();
+      
+      if (result.ok && data.token) {
+        setToken(data.token);
+        setRefreshToken(data.refreshToken);
         // Съхраняване според rememberMe
         if (rememberMe) {
-          localStorage.setItem('token', result.token);
-          if (result.refreshToken) localStorage.setItem('refreshToken', result.refreshToken);
+          localStorage.setItem('token', data.token);
+          if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
           sessionStorage.removeItem('token');
           sessionStorage.removeItem('refreshToken');
         } else {
-          sessionStorage.setItem('token', result.token);
-          if (result.refreshToken) sessionStorage.setItem('refreshToken', result.refreshToken);
+          sessionStorage.setItem('token', data.token);
+          if (data.refreshToken) sessionStorage.setItem('refreshToken', data.refreshToken);
           localStorage.removeItem('token');
           localStorage.removeItem('refreshToken');
         }
-        setUser(result.user);
+        setUser(data.user);
         setError(null);
         return true;
       } else {
-        setError('Грешка при Google вход.');
+        setError(data.message || 'Грешка при Google вход.');
         return false;
       }
     } catch (e) {
