@@ -3,9 +3,12 @@ import Layout from '../../layout/Layout';
 import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
 import { useTranslation } from '../../../hooks/useTranslation';
+import { useUserPreferences } from '../../../hooks/useUserPreferences';
+import { isToolInDevelopment } from '../../../config/toolsConfig';
 
 const ToolsPage = () => {
   const { t, language } = useTranslation();
+  const { showToolsInDevelopment, toggleToolsInDevelopment, loading } = useUserPreferences();
 
   const tools = [
     {
@@ -87,6 +90,14 @@ const ToolsPage = () => {
     }
   ];
 
+  // Filter tools based on development status
+  const filteredTools = tools.filter(tool => {
+    if (isToolInDevelopment(tool.route)) {
+      return !showToolsInDevelopment; // Show when toggle is OFF (gray), hide when ON (dark)
+    }
+    return true; // Always show tools that are not in development
+  });
+
   return (
     <>
     <Helmet>
@@ -131,14 +142,22 @@ const ToolsPage = () => {
               <div className="text-black text-sm md:text-base font-semibold font-['Manrope']">
                 {language === 'bg' ? "Инструменти в разработка" : "Tools in development"}
               </div>
-              <div className="w-10 h-5 md:w-12 md:h-6 p-[3.33px] md:p-1 bg-black rounded-3xl flex justify-end items-center gap-1.5 md:gap-2">
+                             <button
+                 onClick={toggleToolsInDevelopment}
+                 disabled={loading}
+                 className={`w-10 h-5 md:w-12 md:h-6 p-[3.33px] md:p-1 rounded-3xl flex items-center gap-1.5 md:gap-2 transition-all duration-200 ${
+                   showToolsInDevelopment 
+                     ? 'bg-gray-400 justify-start' 
+                     : 'bg-black justify-end'
+                 } ${loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+               >
                 <div className="w-3.5 h-3.5 md:w-4 md:h-4 bg-white rounded-full" />
-              </div>
+              </button>
             </div>
           </div>
           {/* Tools Grid */}
           <div className="w-full grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-5">
-            {tools.map((tool) => (
+            {filteredTools.map((tool) => (
               <Link
                 to={tool.route}
                 key={tool.title}

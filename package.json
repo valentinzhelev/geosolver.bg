@@ -18,13 +18,11 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "jest",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
-      "react-app",
-      "react-app/jest"
+      "react-app"
     ]
   },
   "browserslist": {
@@ -42,12 +40,7 @@
   "devDependencies": {
     "@babel/preset-env": "^7.27.2",
     "@babel/preset-react": "^7.27.1",
-    "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.3.0",
-    "@testing-library/user-event": "^14.6.1",
     "autoprefixer": "^10.4.21",
-    "babel-jest": "^30.0.0-beta.3",
-    "jest": "^27.5.1",
     "postcss": "^8.5.3",
     "tailwindcss": "^4.1.7"
   }
