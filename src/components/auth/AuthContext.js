@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { googleAuthService } from '../../services/googleAuthService';
 
 const BASE_URL = 'https://geosolver-backend-production.up.railway.app';
 
@@ -13,6 +14,11 @@ export function AuthProvider({ children }) {
   const [refreshToken, setRefreshToken] = useState(getInitialRefreshToken);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // Initialize Google OAuth on mount
+  useEffect(() => {
+    googleAuthService.initializeGoogleAuth();
+  }, []);
 
   // Fetch user info on mount if token exists
   useEffect(() => {
@@ -30,6 +36,42 @@ export function AuthProvider({ children }) {
       setUser(null);
     }
   }, [token]);
+
+  // Google login function
+  const loginWithGoogle = async (rememberMe = false) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await googleAuthService.handleCredentialResponse();
+      if (result && result.token) {
+        setToken(result.token);
+        setRefreshToken(result.refreshToken);
+        // Съхраняване според rememberMe
+        if (rememberMe) {
+          localStorage.setItem('token', result.token);
+          if (result.refreshToken) localStorage.setItem('refreshToken', result.refreshToken);
+          sessionStorage.removeItem('token');
+          sessionStorage.removeItem('refreshToken');
+        } else {
+          sessionStorage.setItem('token', result.token);
+          if (result.refreshToken) sessionStorage.setItem('refreshToken', result.refreshToken);
+          localStorage.removeItem('token');
+          localStorage.removeItem('refreshToken');
+        }
+        setUser(result.user);
+        setError(null);
+        return true;
+      } else {
+        setError('Грешка при Google вход.');
+        return false;
+      }
+    } catch (e) {
+      setError('Грешка при Google вход.');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Login function
   const login = async (email, password, rememberMe = false) => {
@@ -210,7 +252,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, error, login, register, logout, forgotPassword, changePassword }}>
+    <AuthContext.Provider value={{ user, token, loading, error, login, loginWithGoogle, register, logout, forgotPassword, changePassword }}>
       {children}
     </AuthContext.Provider>
   );

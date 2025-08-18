@@ -1,16 +1,60 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Helmet } from 'react-helmet';
 import Layout from '../layout/Layout';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
+import { googleAuthService } from '../../services/googleAuthService';
 
 const Login = () => {
-  const { login, loading, error } = useAuth();
+  const { login, loginWithGoogle, loading, error } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  const handleGoogleSignIn = useCallback(async (response) => {
+    console.log('Login component: Google sign-in callback triggered', response);
+    try {
+      console.log('Login component: Calling loginWithGoogle...');
+      const ok = await loginWithGoogle(rememberMe);
+      console.log('Login component: loginWithGoogle result:', ok);
+      if (ok) {
+        console.log('Login component: Login successful, setting success state');
+        setSuccess(true);
+        setTimeout(() => {
+          console.log('Login component: Navigating to account page');
+          navigate('/account');
+        }, 1000);
+      } else {
+        console.log('Login component: Login failed');
+      }
+    } catch (error) {
+      console.error('Login component: Google sign-in error:', error);
+    }
+  }, [loginWithGoogle, rememberMe, navigate]);
+
+  // Initialize Google OAuth button
+  useEffect(() => {
+    const initGoogleAuth = () => {
+      if (window.google) {
+        googleAuthService.renderButton('google-signin-button', {
+          type: 'standard',
+          theme: 'outline',
+          size: 'large',
+          text: 'signin_with',
+          shape: 'rectangular',
+          logo_alignment: 'left',
+          callback: handleGoogleSignIn
+        });
+      } else {
+        // Retry if Google script hasn't loaded yet
+        setTimeout(initGoogleAuth, 100);
+      }
+    };
+
+    initGoogleAuth();
+  }, [handleGoogleSignIn]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -125,12 +169,7 @@ const Login = () => {
 
               {/* Social Login & Register */}
               <div className="w-full p-4 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col md:flex-row justify-center items-center gap-3">
-                <button className="w-full md:flex-1 px-3 py-2 bg-gray-200 rounded-lg flex justify-center items-center gap-3" disabled>
-                  <img className="w-5 h-5" src="/icons/google.svg" alt="Google" />
-                  <span className="text-black text-sm md:text-base font-medium font-['Manrope']">
-                    Вход с Google
-                  </span>
-                </button>
+                <div id="google-signin-button" className="w-full md:flex-1"></div>
                 <Link to="/register" className="w-full md:flex-1 px-3 py-2 bg-black rounded-lg flex justify-center items-center gap-3 text-white text-sm md:text-base font-medium font-['Manrope']">
                   Регистрация
                 </Link>
