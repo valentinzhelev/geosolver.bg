@@ -8,7 +8,7 @@ const Header = () => {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, loading, logout } = useAuth();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const { isDark, toggleTheme } = useTheme();
 
   // Debug: виж user в конзолата
@@ -83,6 +83,14 @@ const Header = () => {
           </Link>
         </div>
         <div className="flex-1 flex justify-end items-center gap-3">
+          {user && (user.role === 'teacher' || user.role === 'admin') && (
+            <Link to="/teacher/dashboard" className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg flex justify-start items-center gap-3 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200">
+              <img src="/icons/homepage_login_icon.svg" alt="Teacher Icon" className="w-5 h-5" />
+              <div className="justify-start text-black dark:text-white text-base font-medium font-['Manrope']">
+                {language === 'bg' ? 'Панел' : 'Dashboard'}
+              </div>
+            </Link>
+          )}
           <Link to="/scientific-calculator" className="w-9 h-9 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-900 flex justify-center items-center gap-3 hover:bg-gray-100 dark:hover:bg-zinc-900 transition-colors">
             <img src={isDark ? "/icons/homepage_calc_icon.svg" : "/icons/calc_icon.svg"} alt="Calculator Icon" className="w-6 h-6" />
           </Link>
@@ -162,6 +170,12 @@ const Header = () => {
                 <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{t.forTeachers}</div>
                 <img src="/icons/small_header_icon.svg" alt="Arrow" className="w-3 h-3" />
               </Link>
+              {user && (user.role === 'teacher' || user.role === 'admin') && (
+                <Link to="/teacher/dashboard" onClick={() => setMobileMenuOpen(false)} className="self-stretch p-3 bg-gray-200 dark:bg-gray-700 rounded-lg inline-flex justify-start items-center gap-3 transition-colors duration-200 hover:bg-gray-300 dark:hover:bg-gray-600">
+                  <div className="justify-start text-black dark:text-white text-sm font-semibold font-['Manrope']">{language === 'bg' ? 'Панел' : 'Dashboard'}</div>
+                  <img src="/icons/small_header_icon.svg" alt="Arrow" className="w-3 h-3" />
+                </Link>
+              )}
             </div>
             <div className="inline-flex justify-end items-center gap-3">
               {loading ? (

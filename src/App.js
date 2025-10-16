@@ -9,6 +9,7 @@ import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import Account from './components/auth/Account';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import TeacherRoute from './components/auth/TeacherRoute';
 import { AuthProvider } from './components/auth/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -20,6 +21,10 @@ import Contacts from './components/contacts/Contacts';
 import FirstTaskDocs from './components/tasks/FirstTaskDocs';
 import ForTeachers from './components/pages/ForTeachers/ForTeachers';
 import ScientificCalculator from './components/pages/ScientificCalculator/ScientificCalculator';
+import TeacherDashboard from './components/pages/TeacherDashboard/TeacherDashboard';
+import TaskGenerator from './components/pages/TeacherDashboard/TaskGenerator';
+import StudentManagement from './components/pages/TeacherDashboard/StudentManagement';
+import ScanInterface from './components/pages/TeacherDashboard/ScanInterface';
 
 function App() {
   return (
@@ -56,6 +61,38 @@ function App() {
               <Route path="/first-task/docs" element={<FirstTaskDocs />} />
               <Route path="/for-teachers" element={<ForTeachers />} />
               <Route path="/scientific-calculator" element={<ScientificCalculator />} />
+              <Route
+                path="/teacher/dashboard"
+                element={
+                  <TeacherRoute>
+                    <TeacherDashboard />
+                  </TeacherRoute>
+                }
+              />
+              <Route
+                path="/teacher/create-assignment"
+                element={
+                  <TeacherRoute>
+                    <TaskGenerator />
+                  </TeacherRoute>
+                }
+              />
+              <Route
+                path="/teacher/students"
+                element={
+                  <TeacherRoute>
+                    <StudentManagement />
+                  </TeacherRoute>
+                }
+              />
+              <Route
+                path="/teacher/scan-submissions"
+                element={
+                  <TeacherRoute>
+                    <ScanInterface />
+                  </TeacherRoute>
+                }
+              />
             </Routes>
             <CookieConsent />
           </LanguageProvider>
