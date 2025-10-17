@@ -25,6 +25,10 @@ import TeacherDashboard from './components/pages/TeacherDashboard/TeacherDashboa
 import TaskGenerator from './components/pages/TeacherDashboard/TaskGenerator';
 import StudentManagement from './components/pages/TeacherDashboard/StudentManagement';
 import ScanInterface from './components/pages/TeacherDashboard/ScanInterface';
+import CoordinateTransformation from './components/tasks/CoordinateTransformation';
+import AreaCalculation from './components/tasks/AreaCalculation';
+import DistanceBearing from './components/tasks/DistanceBearing';
+import Resection from './components/tasks/Resection';
 
 function App() {
   return (
@@ -61,6 +65,10 @@ function App() {
               <Route path="/first-task/docs" element={<FirstTaskDocs />} />
               <Route path="/for-teachers" element={<ForTeachers />} />
               <Route path="/scientific-calculator" element={<ScientificCalculator />} />
+              <Route path="/coordinate-transformation" element={<CoordinateTransformation />} />
+              <Route path="/area-calculation" element={<AreaCalculation />} />
+              <Route path="/distance-bearing" element={<DistanceBearing />} />
+              <Route path="/resection" element={<Resection />} />
               <Route
                 path="/teacher/dashboard"
                 element={

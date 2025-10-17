@@ -38,7 +38,19 @@ const saveInputHistory = (key, value) => {
 const initialForm = { yA: '', xA: '', yB: '', xB: '', beta1: '', beta2: '' };
 
 /**
- * Изчислява координатите на точка P чрез права засечка
+ * Изчислява координатите на точка P чрез права засечка (Enhanced)
+ * 
+ * Формули:
+ * αAB = atan2(ΔY, ΔX) * 200/π
+ * SAB = √(ΔX² + ΔY²)
+ * αBA = αAB ± 200
+ * αAP = αAB - β₁
+ * αBP = αBA + β₂
+ * SAP = SAB * sin(β₂) / sin(β₁ + β₂)
+ * SBP = SAB * sin(β₁) / sin(β₁ + β₂)
+ * XP = XA + SAP * cos(αAP)
+ * YP = YA + SAP * sin(αAP)
+ * 
  * @param {number} yA - Y координата на точка A
  * @param {number} xA - X координата на точка A
  * @param {number} yB - Y координата на точка B
@@ -48,52 +60,61 @@ const initialForm = { yA: '', xA: '', yB: '', xB: '', beta1: '', beta2: '' };
  * @returns {Object} Резултати от изчисленията
  */
 function calculateForwardIntersection(yA, xA, yB, xB, beta1, beta2) {
+  // Валидация на входните данни
+  if (beta1 <= 0 || beta2 <= 0) {
+    throw new Error('Ъглите трябва да бъдат положителни');
+  }
+  if (beta1 + beta2 >= 200) {
+    throw new Error('Сумата от ъглите не може да бъде по-голяма от 200 гради');
+  }
+  if (xA === xB && yA === yB) {
+    throw new Error('Точките A и B не могат да съвпадат');
+  }
+
   // Изчисляване на разликите в координатите
   const deltaY = yB - yA;
   const deltaX = xB - xA;
 
-  // Изчисляване на табличния ъгъл
-  const alphaABTablic = Math.abs(Math.atan(deltaY / deltaX) * (200 / Math.PI));
-  
-  // Определяне на квадранта и изчисляване на αAB
-  let alphaAB = 0;
-  if (deltaY > 0 && deltaX > 0) { // Първи квадрант
-    alphaAB = alphaABTablic;
-  } else if (deltaY > 0 && deltaX < 0) { // Втори квадрант
-    alphaAB = 200 - alphaABTablic;
-  } else if (deltaY < 0 && deltaX < 0) { // Трети квадрант
-    alphaAB = 200 + alphaABTablic;
-  } else if (deltaY < 0 && deltaX > 0) { // Четвърти квадрант
-    alphaAB = 400 - alphaABTablic;
-  }
-
   // Изчисляване на разстоянието SAB
-  const sAB = Math.round(Math.sqrt(Math.pow(deltaY, 2) + Math.pow(deltaX, 2)) * 100) / 100;
+  const sAB = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+  // Изчисляване на αAB с atan2 за точност
+  const alphaABRad = Math.atan2(deltaY, deltaX);
+  let alphaAB = alphaABRad * 200 / Math.PI;
+  if (alphaAB < 0) alphaAB += 400;
 
   // Изчисляване на αBA
-  const alphaBA = alphaAB > 200 ? alphaAB - 200 : alphaAB + 200;
+  const alphaBA = alphaAB >= 200 ? alphaAB - 200 : alphaAB + 200;
 
   // Изчисляване на αAP и αBP
-  const alphaAP = alphaAB - beta1;
-  const alphaBP = alphaBA + beta2;
+  let alphaAP = alphaAB - beta1;
+  let alphaBP = alphaBA + beta2;
+  
+  // Нормализиране на ъглите (0-400 гради)
+  if (alphaAP < 0) alphaAP += 400;
+  if (alphaAP >= 400) alphaAP -= 400;
+  if (alphaBP < 0) alphaBP += 400;
+  if (alphaBP >= 400) alphaBP -= 400;
 
   // Константа за преобразуване от гради в радиани
-  const r = 0.015708;
+  const gonToRad = Math.PI / 200;
 
   // Изчисляване на ъглите в радиани
-  const beta2R = beta2 * r;
-  const beta1R = beta1 * r;
-  const beta3R = (beta1 + beta2) * r;
+  const beta1Rad = beta1 * gonToRad;
+  const beta2Rad = beta2 * gonToRad;
+  const beta3Rad = (beta1 + beta2) * gonToRad;
+  const alphaAPRad = alphaAP * gonToRad;
+  const alphaBPRad = alphaBP * gonToRad;
 
   // Изчисляване на разстоянията SAP и SBP
-  const sAP = Math.round((sAB * Math.sin(beta2R)) / Math.sin(beta3R) * 100) / 100;
-  const sBP = Math.round((sAB * Math.sin(beta1R)) / Math.sin(beta3R) * 100) / 100;
+  const sAP = (sAB * Math.sin(beta2Rad)) / Math.sin(beta3Rad);
+  const sBP = (sAB * Math.sin(beta1Rad)) / Math.sin(beta3Rad);
 
   // Изчисляване на разликите в координатите
-  const deltaX_AP = Math.round((sAP * Math.cos(alphaAP * r)) * 100) / 100;
-  const deltaY_AP = Math.round((sAP * Math.sin(alphaAP * r)) * 100) / 100;
-  const deltaX_BP = Math.round((sBP * Math.cos(alphaBP * r)) * 100) / 100;
-  const deltaY_BP = Math.round((sBP * Math.sin(alphaBP * r)) * 100) / 100;
+  const deltaX_AP = sAP * Math.cos(alphaAPRad);
+  const deltaY_AP = sAP * Math.sin(alphaAPRad);
+  const deltaX_BP = sBP * Math.cos(alphaBPRad);
+  const deltaY_BP = sBP * Math.sin(alphaBPRad);
 
   // Изчисляване на координатите на точка P от двете посоки
   const xPrimP = xA + deltaX_AP;
@@ -102,18 +123,53 @@ function calculateForwardIntersection(yA, xA, yB, xB, beta1, beta2) {
   const ySecondP = yB + deltaY_BP;
 
   // Финални координати на точка P (средно аритметично)
-  const xP = Math.round((xPrimP + xSecondP) / 2 * 100) / 100;
-  const yP = Math.round((yPrimP + ySecondP) / 2 * 100) / 100;
+  const xP = (xPrimP + xSecondP) / 2;
+  const yP = (yPrimP + ySecondP) / 2;
+
+  // Изчисляване на разликите за проверка
+  const diffX = Math.abs(xPrimP - xSecondP);
+  const diffY = Math.abs(yPrimP - ySecondP);
+  const maxDiff = Math.max(diffX, diffY);
+
+  // Проверка на изчисленията
+  const checkSAP = Math.sqrt((xP - xA) * (xP - xA) + (yP - yA) * (yP - yA));
+  const checkSBP = Math.sqrt((xP - xB) * (xP - xB) + (yP - yB) * (yP - yB));
 
   return {
-    alphaAB: Math.round(alphaAB * 10000) / 10000,
-    sAB,
-    alphaAP: Math.round(alphaAP * 10000) / 10000,
-    alphaBP: Math.round(alphaBP * 10000) / 10000,
-    sAP,
-    sBP,
-    xP,
-    yP
+    // Основни резултати
+    deltaX: Math.round(deltaX * 1000) / 1000,
+    deltaY: Math.round(deltaY * 1000) / 1000,
+    alphaAB: Math.round(alphaAB * 1000) / 1000,
+    alphaBA: Math.round(alphaBA * 1000) / 1000,
+    sAB: Math.round(sAB * 1000) / 1000,
+    alphaAP: Math.round(alphaAP * 1000) / 1000,
+    alphaBP: Math.round(alphaBP * 1000) / 1000,
+    sAP: Math.round(sAP * 1000) / 1000,
+    sBP: Math.round(sBP * 1000) / 1000,
+    xP: Math.round(xP * 1000) / 1000,
+    yP: Math.round(yP * 1000) / 1000,
+    
+    // Междинни изчисления
+    deltaX_AP: Math.round(deltaX_AP * 1000) / 1000,
+    deltaY_AP: Math.round(deltaY_AP * 1000) / 1000,
+    deltaX_BP: Math.round(deltaX_BP * 1000) / 1000,
+    deltaY_BP: Math.round(deltaY_BP * 1000) / 1000,
+    xPrimP: Math.round(xPrimP * 1000) / 1000,
+    yPrimP: Math.round(yPrimP * 1000) / 1000,
+    xSecondP: Math.round(xSecondP * 1000) / 1000,
+    ySecondP: Math.round(ySecondP * 1000) / 1000,
+    
+    // Проверки
+    diffX: Math.round(diffX * 1000) / 1000,
+    diffY: Math.round(diffY * 1000) / 1000,
+    maxDiff: Math.round(maxDiff * 1000) / 1000,
+    checkSAP: Math.round(checkSAP * 1000) / 1000,
+    checkSBP: Math.round(checkSBP * 1000) / 1000,
+    
+    // Ъгли в радиани за проверка
+    alphaABRad: Math.round(alphaABRad * 1000000) / 1000000,
+    alphaAPRad: Math.round(alphaAPRad * 1000000) / 1000000,
+    alphaBPRad: Math.round(alphaBPRad * 1000000) / 1000000
   };
 }
 
@@ -152,20 +208,44 @@ const ForwardIntersection = () => {
       Number(beta2)
     );
     
-    const output = `--------- Права засечка ---------
+    const output = `--------- Права засечка (Enhanced) ---------
 Yₐ = ${yA}, Xₐ = ${xA}
 Yᵦ = ${yB}, Xᵦ = ${xB}
 β₁ = ${beta1}, β₂ = ${beta2}
 -------------------------------------
-αAB = ${results.alphaAB} gon
-SAB = ${results.sAB} m
-αAP = ${results.alphaAP} gon
-αBP = ${results.alphaBP} gon
-SAP = ${results.sAP} m
-SBP = ${results.sBP} m
+Координатни разлики:
+ΔX = Xᵦ - Xₐ = ${yB} - ${xA} = ${results.deltaX} м
+ΔY = Yᵦ - Yₐ = ${yB} - ${yA} = ${results.deltaY} м
 -------------------------------------
-Yₚ = ${results.yP} m
-Xₚ = ${results.xP} m
+Разстояние и ъгли:
+SAB = √(ΔX² + ΔY²) = √(${results.deltaX}² + ${results.deltaY}²) = ${results.sAB} м
+αAB = atan2(ΔY, ΔX) = ${results.alphaAB} гради
+αBA = αAB ± 200 = ${results.alphaBA} гради
+-------------------------------------
+Изчислени ъгли:
+αAP = αAB - β₁ = ${results.alphaAB} - ${beta1} = ${results.alphaAP} гради
+αBP = αBA + β₂ = ${results.alphaBA} + ${beta2} = ${results.alphaBP} гради
+-------------------------------------
+Разстояния до точка P:
+SAP = SAB × sin(β₂) / sin(β₁ + β₂) = ${results.sAB} × sin(${beta2}) / sin(${Number(beta1) + Number(beta2)}) = ${results.sAP} м
+SBP = SAB × sin(β₁) / sin(β₁ + β₂) = ${results.sAB} × sin(${beta1}) / sin(${Number(beta1) + Number(beta2)}) = ${results.sBP} м
+-------------------------------------
+Координати на точка P:
+От точка A: Xₚ' = Xₐ + SAP × cos(αAP) = ${xA} + ${results.sAP} × cos(${results.alphaAP}) = ${results.xPrimP} м
+           Yₚ' = Yₐ + SAP × sin(αAP) = ${yA} + ${results.sAP} × sin(${results.alphaAP}) = ${results.yPrimP} м
+От точка B: Xₚ'' = Xᵦ + SBP × cos(αBP) = ${xB} + ${results.sBP} × cos(${results.alphaBP}) = ${results.xSecondP} м
+           Yₚ'' = Yᵦ + SBP × sin(αBP) = ${yB} + ${results.sBP} × sin(${results.alphaBP}) = ${results.ySecondP} м
+-------------------------------------
+Финален резултат (средно аритметично):
+Xₚ = (Xₚ' + Xₚ'') / 2 = (${results.xPrimP} + ${results.xSecondP}) / 2 = ${results.xP} м
+Yₚ = (Yₚ' + Yₚ'') / 2 = (${results.yPrimP} + ${results.ySecondP}) / 2 = ${results.yP} м
+-------------------------------------
+Проверка на точността:
+Разлика по X: ${results.diffX} м
+Разлика по Y: ${results.diffY} м
+Максимална разлика: ${results.maxDiff} м
+Проверка SAP: ${results.checkSAP} м
+Проверка SBP: ${results.checkSBP} м
 -------------------------------------`;
     
     setResultText(output);

@@ -37,10 +37,18 @@ const saveInputHistory = (key, value) => {
 const round4 = (num) => Math.round(num * 10000) / 10000;
 
 /**
- * Втора основна геодезическа задача:
+ * Втора основна геодезическа задача (Enhanced):
  * Дадени са координатите на две точки (X1, Y1) и (X2, Y2).
  * Изчисляват се: ΔX, ΔY, тангенс, табличен арктангенс, квадрант,
  * посочен ъгъл α (в гради) и дължина на отсечката S.
+ * 
+ * Формули:
+ * ΔX = X2 - X1
+ * ΔY = Y2 - Y1
+ * S = √(ΔX² + ΔY²)
+ * tan(α) = ΔY/ΔX
+ * α = atan2(ΔY, ΔX) * 200/π (в гради)
+ * 
  * @param {number} x1 - X координата на точка 1
  * @param {number} y1 - Y координата на точка 1
  * @param {number} x2 - X координата на точка 2
@@ -48,34 +56,86 @@ const round4 = (num) => Math.round(num * 10000) / 10000;
  * @returns {Object} Резултати: ΔX, ΔY, тангенс, табличен ъгъл, квадрант, α (gon), S (m)
  */
 function vtoraOsnovnaZadacha(x1, y1, x2, y2) {
+  // Валидация на входните данни
+  if (x1 === x2 && y1 === y2) {
+    throw new Error('Точките не могат да съвпадат');
+  }
+
+  // Изчисляване на координатните разлики
   const deltaX = x2 - x1;
   const deltaY = y2 - y1;
-  const distance = Math.sqrt(deltaX ** 2 + deltaY ** 2);
-  const tangens = deltaY / deltaX;
+  
+  // Изчисляване на разстоянието
+  const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+  
+  // Изчисляване на тангенса (с проверка за деление на нула)
+  const tangens = deltaX !== 0 ? deltaY / deltaX : (deltaY > 0 ? Infinity : -Infinity);
+  
+  // Изчисляване на табличния арктангенс (абсолютна стойност)
   const arctanTab = Math.atan(Math.abs(tangens)) * 200 / Math.PI;
-  let quadrant;
-  let alpha;
-  if (deltaY >= 0 && deltaX >= 0) {
+  
+  // Определяне на квадранта и посочния ъгъл
+  let quadrant, quadrantName, alpha;
+  
+  if (deltaX > 0 && deltaY >= 0) {
+    // Първи квадрант (0° - 100 gon)
     quadrant = 1;
+    quadrantName = 'I';
     alpha = arctanTab;
-  } else if (deltaY >= 0 && deltaX < 0) {
+  } else if (deltaX <= 0 && deltaY > 0) {
+    // Втори квадрант (100° - 200 gon)
     quadrant = 2;
+    quadrantName = 'II';
     alpha = 200 - arctanTab;
-  } else if (deltaY < 0 && deltaX < 0) {
+  } else if (deltaX < 0 && deltaY <= 0) {
+    // Трети квадрант (200° - 300 gon)
     quadrant = 3;
+    quadrantName = 'III';
     alpha = 200 + arctanTab;
-  } else if (deltaY < 0 && deltaX >= 0) {
+  } else if (deltaX >= 0 && deltaY < 0) {
+    // Четвърти квадрант (300° - 400 gon)
     quadrant = 4;
+    quadrantName = 'IV';
     alpha = 400 - arctanTab;
   }
+  
+  // Изчисляване на ъгъла в радиани
+  const alphaRad = alpha * Math.PI / 200;
+  
+  // Проверка с atan2 за точност
+  const alphaAtan2 = Math.atan2(deltaY, deltaX) * 200 / Math.PI;
+  const alphaAtan2Normalized = alphaAtan2 < 0 ? alphaAtan2 + 400 : alphaAtan2;
+  
+  // Изчисляване на sin и cos за проверка
+  const sinAlpha = Math.sin(alphaRad);
+  const cosAlpha = Math.cos(alphaRad);
+  
+  // Проверка на изчисленията
+  const checkDeltaX = distance * cosAlpha;
+  const checkDeltaY = distance * sinAlpha;
+  
   return {
-    deltaX,
-    deltaY,
-    tangens,
-    arctanTab,
+    // Основни резултати
+    deltaX: Math.round(deltaX * 1000) / 1000,
+    deltaY: Math.round(deltaY * 1000) / 1000,
+    distance: Math.round(distance * 1000) / 1000,
+    tangens: Math.round(tangens * 1000000) / 1000000,
+    arctanTab: Math.round(arctanTab * 1000) / 1000,
     quadrant,
-    alpha,
-    distance
+    quadrantName,
+    alpha: Math.round(alpha * 1000) / 1000,
+    
+    // Допълнителни изчисления
+    alphaRad: Math.round(alphaRad * 1000000) / 1000000,
+    alphaAtan2: Math.round(alphaAtan2Normalized * 1000) / 1000,
+    sinAlpha: Math.round(sinAlpha * 1000000) / 1000000,
+    cosAlpha: Math.round(cosAlpha * 1000000) / 1000000,
+    
+    // Проверки
+    checkDeltaX: Math.round(checkDeltaX * 1000) / 1000,
+    checkDeltaY: Math.round(checkDeltaY * 1000) / 1000,
+    differenceX: Math.round((deltaX - checkDeltaX) * 1000) / 1000,
+    differenceY: Math.round((deltaY - checkDeltaY) * 1000) / 1000
   };
 }
 
@@ -111,19 +171,34 @@ const SecondTask = () => {
       return;
     }
     const [X1, Y1, X2, Y2] = vals;
-    const { deltaX, deltaY, tangens, arctanTab, quadrant, alpha, distance } = vtoraOsnovnaZadacha(X1, Y1, X2, Y2);
-    const output = `--------- Втора основна геодезическа задача ---------
+    const result = vtoraOsnovnaZadacha(X1, Y1, X2, Y2);
+    const output = `--------- Втора основна геодезическа задача (Enhanced) ---------
 X1 = ${X1}, Y1 = ${Y1}
 X2 = ${X2}, Y2 = ${Y2}
 -------------------------------------
-ΔX = ${deltaX.toFixed(2)}
-ΔY = ${deltaY.toFixed(2)}
-tg = ${tangens.toFixed(4)}
-arctg (таблично) = ${round4(arctanTab).toFixed(4)} gon
-Квадрант = ${quadrant}
+Координатни разлики:
+ΔX = X2 - X1 = ${X2} - ${X1} = ${result.deltaX} м
+ΔY = Y2 - Y1 = ${Y2} - ${Y1} = ${result.deltaY} м
 -------------------------------------
-α₁,₂ = ${round4(alpha).toFixed(4)} gon
-S₁,₂ = ${distance.toFixed(2)} m
+Разстояние:
+S = √(ΔX² + ΔY²) = √(${result.deltaX}² + ${result.deltaY}²) = ${result.distance} м
+-------------------------------------
+Тригонометрични функции:
+tg(α) = ΔY/ΔX = ${result.deltaY}/${result.deltaX} = ${result.tangens}
+arctg (таблично) = ${result.arctanTab} гради
+-------------------------------------
+Квадрант: ${result.quadrant} (${result.quadrantName})
+Посочен ъгъл: α = ${result.alpha} гради
+-------------------------------------
+Проверка с atan2: ${result.alphaAtan2} гради
+sin(α) = ${result.sinAlpha}
+cos(α) = ${result.cosAlpha}
+-------------------------------------
+Проверка на изчисленията:
+ΔX проверка = S·cos(α) = ${result.distance}·${result.cosAlpha} = ${result.checkDeltaX} м
+ΔY проверка = S·sin(α) = ${result.distance}·${result.sinAlpha} = ${result.checkDeltaY} м
+Разлика ΔX: ${result.differenceX} м
+Разлика ΔY: ${result.differenceY} м
 -------------------------------------`;
     setResultText(output);
     const entry = {
@@ -131,8 +206,8 @@ S₁,₂ = ${distance.toFixed(2)} m
       y1: Y1,
       x2: X2,
       y2: Y2,
-      alpha: round4(alpha).toFixed(4),
-      s: distance.toFixed(2),
+      alpha: result.alpha,
+      s: result.distance,
       date: new Date().toISOString(),
     };
     saveHistory(entry);

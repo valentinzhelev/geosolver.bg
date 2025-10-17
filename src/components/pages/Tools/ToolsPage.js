@@ -87,6 +87,28 @@ const ToolsPage = () => {
       calculation: "< 0.1s",
       route: "/hansen-task",
       icon: "/icons/hansen-task-icon.svg"
+    },
+    {
+      title: language === 'bg' ? "Изчисляване на площ" : "Area Calculation",
+      description: language === 'bg'
+        ? "Изчисляване на площта на многоъгълник по различни методи (Shoelace, Trapezoidal, Simpson)."
+        : "Calculate polygon area using different methods (Shoelace, Trapezoidal, Simpson).",
+      parameters: language === 'bg' ? "3+ точки с координати" : "3+ points with coordinates",
+      type: language === 'bg' ? "площни изчисления" : "area calculations",
+      calculation: "< 0.05s",
+      route: "/area-calculation",
+      icon: "/icons/area_calculation_icon.svg"
+    },
+    {
+      title: language === 'bg' ? "Разстояние и посока" : "Distance & Bearing",
+      description: language === 'bg'
+        ? "Изчисляване на разстоянието и посочния ъгъл между две точки по координати."
+        : "Calculate distance and bearing between two points using coordinates.",
+      parameters: language === 'bg' ? "2 точки с координати" : "2 points with coordinates",
+      type: language === 'bg' ? "полярни координати" : "polar coordinates",
+      calculation: "< 0.03s",
+      route: "/distance-bearing",
+      icon: "/icons/distance_bearing_icon.svg"
     }
   ];
 

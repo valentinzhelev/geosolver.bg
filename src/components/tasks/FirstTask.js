@@ -72,27 +72,43 @@ const PurvaZadacha = () => {
 
     const result = purvaOsnovnaZadacha(y1, x1, alpha, s);
     const output = language === 'bg' 
-      ? `--------- Първа основна геодезическа задача ---------
+      ? `--------- Първа основна геодезическа задача (Enhanced) ---------
 Y1 = ${result.y1}, X1 = ${result.x1}
 S₁,₂ = ${result.s}, α₁,₂ = ${result.alphaGon} gon
 ------------------------------------------------------
 α в радиани = ${result.alphaRad.toFixed(6)} rad
-sin(α) = ${result.sinAlpha.toFixed(6)}
-cos(α) = ${result.cosAlpha.toFixed(6)}
+sin(α) = ${result.sinAlpha}
+cos(α) = ${result.cosAlpha}
 ------------------------------------------------------
-Y2 = ${result.y2.toFixed(2)}
-X2 = ${result.x2.toFixed(2)}
+Координатни разлики:
+ΔX = S·cos(α) = ${result.s}·${result.cosAlpha} = ${result.deltaX} м
+ΔY = S·sin(α) = ${result.s}·${result.sinAlpha} = ${result.deltaY} м
+------------------------------------------------------
+Y2 = Y1 + ΔY = ${result.y1} + ${result.deltaY} = ${result.y2} м
+X2 = X1 + ΔX = ${result.x1} + ${result.deltaX} = ${result.x2} м
+------------------------------------------------------
+Квадрант: ${result.quadrant}
+Проверка - разстояние: ${result.calculatedDistance} м
+Проверка - ъгъл: ${result.calculatedAngle} гради
 ------------------------------------------------------`
-      : `--------- First Basic Geodetic Task ---------
+      : `--------- First Basic Geodetic Task (Enhanced) ---------
 Y1 = ${result.y1}, X1 = ${result.x1}
 S₁,₂ = ${result.s}, α₁,₂ = ${result.alphaGon} gon
 ------------------------------------------------------
 α in radians = ${result.alphaRad.toFixed(6)} rad
-sin(α) = ${result.sinAlpha.toFixed(6)}
-cos(α) = ${result.cosAlpha.toFixed(6)}
+sin(α) = ${result.sinAlpha}
+cos(α) = ${result.cosAlpha}
 ------------------------------------------------------
-Y2 = ${result.y2.toFixed(2)}
-X2 = ${result.x2.toFixed(2)}
+Coordinate differences:
+ΔX = S·cos(α) = ${result.s}·${result.cosAlpha} = ${result.deltaX} m
+ΔY = S·sin(α) = ${result.s}·${result.sinAlpha} = ${result.deltaY} m
+------------------------------------------------------
+Y2 = Y1 + ΔY = ${result.y1} + ${result.deltaY} = ${result.y2} m
+X2 = X1 + ΔX = ${result.x1} + ${result.deltaX} = ${result.x2} m
+------------------------------------------------------
+Quadrant: ${result.quadrant}
+Check - distance: ${result.calculatedDistance} m
+Check - angle: ${result.calculatedAngle} gon
 ------------------------------------------------------`;
     
     setResultText(output ? String(output) : "");
@@ -111,29 +127,66 @@ X2 = ${result.x2.toFixed(2)}
   };
 
   /**
-   * Първа основна геодезическа задача:
+   * Първа основна геодезическа задача (Enhanced):
    * Дадени са начална точка (X1, Y1), посочен ъгъл α (в гради) и дължина S.
    * Търсят се координатите на точка 2 (X2, Y2).
+   * 
+   * Формули:
+   * ΔX = S · cos(α)
+   * ΔY = S · sin(α)
+   * X2 = X1 + ΔX
+   * Y2 = Y1 + ΔY
+   * 
    * @param {number} y1 - Y координата на точка 1
    * @param {number} x1 - X координата на точка 1
-   * @param {number} alphaGon - посочен ъгъл в гради
-   * @param {number} s - дължина на отсечката
+   * @param {number} alphaGon - посочен ъгъл в гради (0-400)
+   * @param {number} s - дължина на отсечката (м)
    * @returns {Object} - координати на точка 2 и междинни изчисления
    */
   const purvaOsnovnaZadacha = (y1, x1, alphaGon, s) => {
+    // Валидация на входните данни
+    if (alphaGon < 0 || alphaGon >= 400) {
+      throw new Error('Посочният ъгъл трябва да бъде между 0 и 400 гради');
+    }
+    if (s <= 0) {
+      throw new Error('Дължината трябва да бъде положителна');
+    }
+
+    // Преобразуване от гради в радиани
     const alphaRad = alphaGon * Math.PI / 200;
+    
+    // Изчисляване на тригонометричните функции
     const sinAlpha = Math.sin(alphaRad);
     const cosAlpha = Math.cos(alphaRad);
-    const y2 = y1 + s * sinAlpha;
-    const x2 = x1 + s * cosAlpha;
+    
+    // Изчисляване на координатните разлики
+    const deltaX = s * cosAlpha;
+    const deltaY = s * sinAlpha;
+    
+    // Изчисляване на координатите на точка 2
+    const x2 = x1 + deltaX;
+    const y2 = y1 + deltaY;
+
+    // Определяне на квадранта
+    let quadrant = '';
+    if (deltaX >= 0 && deltaY >= 0) quadrant = 'I';
+    else if (deltaX < 0 && deltaY >= 0) quadrant = 'II';
+    else if (deltaX < 0 && deltaY < 0) quadrant = 'III';
+    else if (deltaX >= 0 && deltaY < 0) quadrant = 'IV';
 
     return {
       x1, y1, alphaGon, s,
       alphaRad,
-      sinAlpha,
-      cosAlpha,
-      x2,
-      y2
+      sinAlpha: Math.round(sinAlpha * 1000000) / 1000000,
+      cosAlpha: Math.round(cosAlpha * 1000000) / 1000000,
+      deltaX: Math.round(deltaX * 1000) / 1000,
+      deltaY: Math.round(deltaY * 1000) / 1000,
+      x2: Math.round(x2 * 1000) / 1000,
+      y2: Math.round(y2 * 1000) / 1000,
+      quadrant,
+      // Допълнителни изчисления за проверка
+      calculatedDistance: Math.round(Math.sqrt(deltaX * deltaX + deltaY * deltaY) * 1000) / 1000,
+      calculatedAngle: Math.round(Math.atan2(deltaY, deltaX) * 200 / Math.PI * 1000) / 1000
     };
   };
 
