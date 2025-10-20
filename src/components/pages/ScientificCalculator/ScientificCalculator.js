@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Layout from '../../layout/Layout';
 import { Helmet } from "react-helmet";
 import { evaluate, format } from "mathjs";
@@ -19,27 +19,27 @@ const scientificButtons = [
 ];
 
 const docRows = [
-  { buttons: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"], usage: "Въвеждане на цифри" },
-  { buttons: ["+", "-", "*", "/"], usage: "Основни операции (събиране, изваждане, умножение, деление)" },
-  { buttons: ["="], usage: "Получаване на резултата от изчисление" },
-  { buttons: ["C"], usage: "Изчистване на екрана на калкулатора" },
-  { buttons: ["←"], usage: "Изтриване на последния въведен символ" },
-  { buttons: ["(", ")"], usage: "Скоби за групиране на изрази" },
-  { buttons: ["."], usage: "Десетична точка" },
-  { buttons: ["+/-"], usage: "Промяна на знака на числото" },
-  { buttons: ["%"], usage: "Процент от число" },
-  { buttons: [","], usage: "Разделяне на аргументи на функция" },
-  { buttons: ["x^2", "x^3", "x^y", "10^x"], usage: "Степенуване" },
-  { buttons: ["√x", "³√x", "y√x"], usage: "Коренуване" },
-  { buttons: ["1/x"], usage: "Обратно число" },
-  { buttons: ["!"], usage: "Факториел" },
-  { buttons: ["mod"], usage: "Остатък от деление" },
-  { buttons: ["nCr", "nPr"], usage: "Комбинаторика" },
-  { buttons: ["π", "e"], usage: "Математически константи" },
-  { buttons: ["sin", "cos", "tan", "cot", "sec", "csc"], usage: "Тригонометрични функции (според избрания режим)" },
-  { buttons: ["sinh", "cosh", "tanh"], usage: "Хиперболични функции" },
-  { buttons: ["asin", "acos", "atan", "acot", "asec", "acsc"], usage: "Обратни тригонометрични функции" },
-  { buttons: ["log", "ln", "exp"], usage: "Логаритми и експоненциални функции" }
+  { buttons: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"], usage: "Въвеждане на цифри (0-9)" },
+  { buttons: ["+", "-", "*", "/"], usage: "Основни операции: събиране (+), изваждане (-), умножение (*), деление (/)" },
+  { buttons: ["="], usage: "Получаване на резултата от изчисление (Enter)" },
+  { buttons: ["C"], usage: "Изчистване на екрана на калкулатора (Escape или C)" },
+  { buttons: ["←"], usage: "Изтриване на последния въведен символ (Backspace)" },
+  { buttons: ["(", ")"], usage: "Скоби за групиране на изрази и приоритет на операциите" },
+  { buttons: ["."], usage: "Десетична точка за дробни числа" },
+  { buttons: ["+/-"], usage: "Промяна на знака на числото (позитивно/негативно)" },
+  { buttons: ["%"], usage: "Процент от число (например: 50% от 200 = 100)" },
+  { buttons: [","], usage: "Разделяне на аргументи на функции (например: log(10,2))" },
+  { buttons: ["x^2", "x^3", "x^y", "10^x"], usage: "Степенуване: квадрат, куб, произволна степен, 10 на степен x" },
+  { buttons: ["√x", "³√x", "y√x"], usage: "Коренуване: квадратен корен, кубичен корен, корен от произволна степен" },
+  { buttons: ["1/x"], usage: "Обратно число (реципрочно: 1/x)" },
+  { buttons: ["!"], usage: "Факториел (n! = 1×2×3×...×n)" },
+  { buttons: ["mod"], usage: "Остатък от деление (modulo: a mod b)" },
+  { buttons: ["nCr", "nPr"], usage: "Комбинаторика: комбинации (nCr) и пермутации (nPr)" },
+  { buttons: ["π", "e"], usage: "Математически константи: π ≈ 3.14159, e ≈ 2.71828" },
+  { buttons: ["sin", "cos", "tan", "cot", "sec", "csc"], usage: "Тригонометрични функции (според избрания режим: DEG/RAD/GRAD)" },
+  { buttons: ["sinh", "cosh", "tanh"], usage: "Хиперболични функции: хиперболичен синус, косинус, тангенс" },
+  { buttons: ["asin", "acos", "atan", "acot", "asec", "acsc"], usage: "Обратни тригонометрични функции (аркус функции)" },
+  { buttons: ["log", "ln", "exp"], usage: "Логаритми: log (десетичен), ln (натурален), exp (експонента)" }
 ];
 
 const functionButtons = [
@@ -85,7 +85,7 @@ const ScientificCalculator = () => {
   const [result, setResult] = useState("0");
   const [history, setHistory] = useState([]);
 
-  const handleButton = (btn) => {
+  const handleButton = useCallback((btn) => {
     if (btn === "C") {
       setExpression("");
       setResult("0");
@@ -96,12 +96,24 @@ const ScientificCalculator = () => {
       return;
     }
     if (btn === "=") {
+      if (!expression.trim()) {
+        setResult("0");
+        return;
+      }
       try {
         const expr = preprocess(expression, angleMode);
-        const res = format(evaluate(expr), { precision: 14 });
-        setResult(res);
-        setHistory([{ expr: expression, res }, ...history]);
-      } catch {
+        const res = evaluate(expr);
+        
+        // Check for valid result
+        if (typeof res === 'number' && !isNaN(res) && isFinite(res)) {
+          const formattedRes = format(res, { precision: 14 });
+          setResult(formattedRes);
+          setHistory([{ expr: expression, res: formattedRes }, ...history.slice(0, 9)]); // Keep only 10 items
+        } else {
+          setResult("Грешка");
+        }
+      } catch (error) {
+        console.error('Calculation error:', error);
         setResult("Грешка");
       }
       return;
@@ -118,7 +130,45 @@ const ScientificCalculator = () => {
       return;
     }
     setExpression(expression + btn);
-  };
+  }, [expression, angleMode, history]);
+
+  // Keyboard support
+  useEffect(() => {
+    const handleKeyPress = (event) => {
+      const key = event.key;
+      
+      // Prevent default for calculator keys
+      if (/[0-9+\-*/.=()%]/.test(key) || key === 'Enter' || key === 'Backspace' || key === 'Delete') {
+        event.preventDefault();
+      }
+      
+      // Handle number keys
+      if (/[0-9]/.test(key)) {
+        handleButton(key);
+        return;
+      }
+      
+      // Handle operation keys
+      if (key === '+') handleButton('+');
+      else if (key === '-') handleButton('-');
+      else if (key === '*') handleButton('*');
+      else if (key === '/') handleButton('/');
+      else if (key === '.') handleButton('.');
+      else if (key === '(') handleButton('(');
+      else if (key === ')') handleButton(')');
+      else if (key === '%') handleButton('%');
+      else if (key === '=' || key === 'Enter') handleButton('=');
+      else if (key === 'Backspace' || key === 'Delete') handleButton('←');
+      else if (key === 'Escape' || key.toLowerCase() === 'c') handleButton('C');
+      
+      // Handle special keys
+      else if (key.toLowerCase() === 'p') handleButton('π');
+      else if (key.toLowerCase() === 'e') handleButton('e');
+    };
+    
+    document.addEventListener('keydown', handleKeyPress);
+    return () => document.removeEventListener('keydown', handleKeyPress);
+  }, [handleButton]);
 
   return (
     <>
@@ -180,6 +230,77 @@ const ScientificCalculator = () => {
             {/* Desktop version */}
             <div className="hidden md:flex w-full p-6 bg-white rounded-3xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-1px] outline-gray-200 flex-col gap-6">
               <div className="justify-start text-black text-3xl font-bold font-['Manrope']">Документация</div>
+              
+              {/* Примери */}
+              <div className="w-full bg-stone-50 rounded-xl p-4">
+                <div className="text-black text-lg font-semibold font-['Manrope'] mb-3">Примери за използване:</div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <div className="font-medium text-black mb-2">Основни операции:</div>
+                    <div className="text-neutral-600 space-y-1">
+                      <div>• 2 + 3 * 4 = 14</div>
+                      <div>• (2 + 3) * 4 = 20</div>
+                      <div>• 10 / 2 + 5 = 10</div>
+                      <div>• 2^3 + 4^2 = 24</div>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="font-medium text-black mb-2">Тригонометрия:</div>
+                    <div className="text-neutral-600 space-y-1">
+                      <div>• sin(30) = 0.5 (в DEG режим)</div>
+                      <div>• cos(π/3) = 0.5 (в RAD режим)</div>
+                      <div>• tan(45) = 1</div>
+                      <div>• asin(0.5) = 30°</div>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="font-medium text-black mb-2">Логаритми и степени:</div>
+                    <div className="text-neutral-600 space-y-1">
+                      <div>• log(100) = 2</div>
+                      <div>• ln(e) = 1</div>
+                      <div>• 10^2 = 100</div>
+                      <div>• √16 = 4</div>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="font-medium text-black mb-2">Специални функции:</div>
+                    <div className="text-neutral-600 space-y-1">
+                      <div>• 5! = 120</div>
+                      <div>• 10 mod 3 = 1</div>
+                      <div>• 1/4 = 0.25</div>
+                      <div>• π * 2 = 6.283</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Клавиатурни съкращения */}
+              <div className="w-full bg-stone-50 rounded-xl p-4">
+                <div className="text-black text-lg font-semibold font-['Manrope'] mb-3">Клавиатурни съкращения:</div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <div className="font-medium text-black mb-2">Основни клавиши:</div>
+                    <div className="text-neutral-600 space-y-1">
+                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">0-9</span> - Цифри</div>
+                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">+ - * /</span> - Операции</div>
+                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">Enter</span> - Изчисли (=)</div>
+                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">Backspace</span> - Изтрий (←)</div>
+                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">Escape</span> - Изчисти (C)</div>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="font-medium text-black mb-2">Специални клавиши:</div>
+                    <div className="text-neutral-600 space-y-1">
+                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">( )</span> - Скоби</div>
+                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">.</span> - Десетична точка</div>
+                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">%</span> - Процент</div>
+                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">P</span> - π (пи)</div>
+                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">E</span> - e (експонента)</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
               <div className="self-stretch bg-stone-50 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-start items-start gap-px overflow-hidden">
                 <div className="self-stretch shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] inline-flex justify-start items-start gap-px">
                   <div className="w-72 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
@@ -208,6 +329,63 @@ const ScientificCalculator = () => {
             {/* Mobile version */}
             <div className="flex md:hidden self-stretch inline-flex flex-col justify-start items-start gap-3">
               <div className="justify-start text-black text-lg font-bold font-['Manrope']">Документация</div>
+              
+              {/* Примери за мобилна версия */}
+              <div className="w-full bg-stone-50 rounded-xl p-4">
+                <div className="text-black text-base font-semibold font-['Manrope'] mb-3">Примери за използване:</div>
+                <div className="text-sm space-y-2">
+                  <div>
+                    <div className="font-medium text-black mb-1">Основни операции:</div>
+                    <div className="text-neutral-600 text-xs space-y-1">
+                      <div>• 2 + 3 * 4 = 14</div>
+                      <div>• (2 + 3) * 4 = 20</div>
+                      <div>• 10 / 2 + 5 = 10</div>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="font-medium text-black mb-1">Тригонометрия:</div>
+                    <div className="text-neutral-600 text-xs space-y-1">
+                      <div>• sin(30) = 0.5 (DEG режим)</div>
+                      <div>• cos(π/3) = 0.5 (RAD режим)</div>
+                      <div>• tan(45) = 1</div>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="font-medium text-black mb-1">Логаритми и степени:</div>
+                    <div className="text-neutral-600 text-xs space-y-1">
+                      <div>• log(100) = 2</div>
+                      <div>• ln(e) = 1</div>
+                      <div>• 10^2 = 100</div>
+                      <div>• √16 = 4</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Клавиатурни съкращения за мобилна версия */}
+              <div className="w-full bg-stone-50 rounded-xl p-4">
+                <div className="text-black text-base font-semibold font-['Manrope'] mb-3">Клавиатурни съкращения:</div>
+                <div className="text-sm space-y-2">
+                  <div>
+                    <div className="font-medium text-black mb-1">Основни клавиши:</div>
+                    <div className="text-neutral-600 text-xs space-y-1">
+                      <div>• <span className="font-mono bg-gray-200 px-1 rounded text-xs">0-9</span> - Цифри</div>
+                      <div>• <span className="font-mono bg-gray-200 px-1 rounded text-xs">+ - * /</span> - Операции</div>
+                      <div>• <span className="font-mono bg-gray-200 px-1 rounded text-xs">Enter</span> - Изчисли</div>
+                      <div>• <span className="font-mono bg-gray-200 px-1 rounded text-xs">Backspace</span> - Изтрий</div>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="font-medium text-black mb-1">Специални клавиши:</div>
+                    <div className="text-neutral-600 text-xs space-y-1">
+                      <div>• <span className="font-mono bg-gray-200 px-1 rounded text-xs">Escape</span> - Изчисти</div>
+                      <div>• <span className="font-mono bg-gray-200 px-1 rounded text-xs">P</span> - π (пи)</div>
+                      <div>• <span className="font-mono bg-gray-200 px-1 rounded text-xs">E</span> - e (експонента)</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
               <div className="w-96 flex flex-col justify-start items-start gap-2.5">
                 <div className="bg-stone-50 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-start items-start gap-px overflow-hidden">
                   <div className="shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] inline-flex justify-start items-start gap-px">

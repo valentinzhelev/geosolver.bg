@@ -20,7 +20,7 @@ export const translations = {
     socialNetworks: 'Социални мрежи',
     language: 'Български език',
     theme: 'Светъл режим',
-    copyright: '© GEOSOLVER, 2025.\nВсички права запазени.\nТекуща версия: v2.2.2-beta.2',
+    copyright: '© GEOSOLVER, 2025.\nВсички права запазени.\nТекуща версия: v2.2.3-beta.2',
 
     // FirstTask translations
     firstTaskTitle: 'Първа основна задача',
@@ -108,7 +108,36 @@ export const translations = {
       'Знаците на ΔYAB и ΔXAB се определят по таблицата по-горе.',
       'В електронните калкулатори често се използва директно формулата с тригонометричните функции.'
     ],
-    example: 'Пример'
+    example: 'Пример',
+
+    // Account page translations
+    accountTitle: 'Акаунт',
+    accountDescription: 'Вашият GeoSolver акаунт, абонамент, история и настройки.',
+    user: 'Потребител',
+    logoutFromAccount: 'Излез от акаунта',
+    settings: 'Настройки',
+    professionalPlanMonthly: 'Професионален план (Месечен)',
+    daysFromStart: 'дни от началото на плана Ви',
+    daysToNext: 'дни до следващото плащане',
+    changePlan: 'Промяна на плана',
+    paymentMethods: 'Методи за плащане',
+    remove: 'Премахни',
+    addNewMethod: 'Добави нов метод',
+    usageHistory: 'История на използване',
+    calculations: 'изчисления',
+    tool: 'Инструмент',
+    paymentHistory: 'История на плащания',
+    paymentMethod: 'Метод на плащане',
+    value: 'Стойност',
+    firstBasicTask: 'Първа основна задача',
+    secondBasicTask: 'Втора основна задача',
+    forwardIntersection: 'Права засечка',
+    resection: 'Обратна засечка',
+    polarIntersection: 'Полярна засечка',
+    coordinateTransformation: 'Коорд. трансформация',
+    hansenTask: 'Задача за ханзен',
+    areaCalculation: 'Изчисляване на площ',
+    distanceBearing: 'Разстояние и посока'
   },
   en: {
     // Header translations
@@ -131,7 +160,7 @@ export const translations = {
     socialNetworks: 'Social Networks',
     language: 'English',
     theme: 'Light Mode',
-    copyright: '© GEOSOLVER, 2025.\nAll rights reserved.\nCurrent version: v2.2.2-beta.2',
+    copyright: '© GEOSOLVER, 2025.\nAll rights reserved.\nCurrent version: v2.2.3-beta.2',
 
     // FirstTask translations
     firstTaskTitle: 'First Basic Task',
@@ -219,6 +248,35 @@ export const translations = {
       'The signs of ΔYAB and ΔXAB are determined by the table above.',
       'In electronic calculators, the formula with trigonometric functions is often used directly.'
     ],
-    example: 'Example'
+    example: 'Example',
+
+    // Account page translations
+    accountTitle: 'Account',
+    accountDescription: 'Your GeoSolver account, subscription, history and settings.',
+    user: 'User',
+    logoutFromAccount: 'Log out of account',
+    settings: 'Settings',
+    professionalPlanMonthly: 'Professional Plan (Monthly)',
+    daysFromStart: 'days since the start of your plan',
+    daysToNext: 'days until the next payment',
+    changePlan: 'Change plan',
+    paymentMethods: 'Payment Methods',
+    remove: 'Remove',
+    addNewMethod: 'Add new method',
+    usageHistory: 'Usage History',
+    calculations: 'calculations',
+    tool: 'Tool',
+    paymentHistory: 'Payment History',
+    paymentMethod: 'Payment Method',
+    value: 'Value',
+    firstBasicTask: 'First Basic Task',
+    secondBasicTask: 'Second Basic Task',
+    forwardIntersection: 'Forward Intersection',
+    resection: 'Resection',
+    polarIntersection: 'Polar Intersection',
+    coordinateTransformation: 'Coordinate Transformation',
+    hansenTask: 'Hansen Task',
+    areaCalculation: 'Area Calculation',
+    distanceBearing: 'Distance & Bearing'
   }
 };
