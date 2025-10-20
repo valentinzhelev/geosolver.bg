@@ -67,7 +67,7 @@ const ToolsPage = () => {
       icon: "/icons/polar_intersection_icon.svg"
     },
     {
-      title: language === 'bg' ? "Координатна трансформация" : "Coordinate Transformation",
+      title: language === 'bg' ? "Коорд. трансформация" : "Coordinate Transformation",
       description: language === 'bg'
         ? "Преобразуване между локални и глобални координатни системи."
         : "Convert between local and global coordinate systems.",
@@ -97,7 +97,7 @@ const ToolsPage = () => {
       type: language === 'bg' ? "площни изчисления" : "area calculations",
       calculation: "< 0.05s",
       route: "/area-calculation",
-      icon: "/icons/area_calculation_icon.svg"
+      icon: "/icons/homepage_night_icon.svg"
     },
     {
       title: language === 'bg' ? "Разстояние и посока" : "Distance & Bearing",
@@ -108,7 +108,7 @@ const ToolsPage = () => {
       type: language === 'bg' ? "полярни координати" : "polar coordinates",
       calculation: "< 0.03s",
       route: "/distance-bearing",
-      icon: "/icons/distance_bearing_icon.svg"
+      icon: "/icons/homepage_gray_arrow_icon.svg"
     }
   ];
 
@@ -187,11 +187,11 @@ const ToolsPage = () => {
               >
                 <div className="flex-1 flex flex-col justify-start items-start gap-3">
                   <div className="w-full flex justify-between items-center">
-                    <div className="flex justify-start items-center gap-2">
-                      <div className="w-7 h-7 bg-black dark:bg-white rounded flex flex-col justify-center items-center">
+                    <div className="flex justify-start items-center gap-2 flex-1 min-w-0">
+                      <div className="w-7 h-7 bg-black dark:bg-white rounded flex flex-col justify-center items-center flex-shrink-0">
                         <img src={tool.icon} alt="Tool Icon" className="w-4 h-4" />
                       </div>
-                      <div className="text-black dark:text-white text-sm md:text-base font-semibold font-['Manrope']">{tool.title}</div>
+                      <div className="text-black dark:text-white text-sm md:text-base font-semibold font-['Manrope'] truncate">{tool.title}</div>
                     </div>
                     <div className="w-5 h-5 md:w-4 md:h-4 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex items-center justify-center">
                       <img src="/icons/question_icon.svg" alt="?" className="w-2.5 h-2.5" />

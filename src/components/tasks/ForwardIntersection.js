@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { Helmet } from "react-helmet";
 import Layout from '../layout/Layout';
-import { Helmet } from 'react-helmet';
+import { Link } from 'react-router-dom';
+import { useTranslation } from '../../hooks/useTranslation';
 import useTypewriter from '../../hooks/useTypewriter';
 
 // LocalStorage helpers
@@ -175,7 +177,8 @@ function calculateForwardIntersection(yA, xA, yB, xB, beta1, beta2) {
 
 const ForwardIntersection = () => {
   const [form, setForm] = useState(initialForm);
-  const [resultText, setResultText] = useState('Въведете данни и натиснете "Изчисли", за да видите резултатите тук.');
+  const { language } = useTranslation();
+  const [resultText, setResultText] = useState(language === 'bg' ? 'Въведете данни и натиснете "Изчисли", за да видите резултатите тук.' : 'Enter data and click "Calculate" to see the results here.');
   const [history, setHistory] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
@@ -260,7 +263,7 @@ Yₚ = (Yₚ' + Yₚ'') / 2 = (${results.yPrimP} + ${results.ySecondP}) / 2 = ${
 
   const resetForm = () => {
     setForm(initialForm);
-    setResultText('Въведете данни и натиснете "Изчисли", за да видите резултатите тук.');
+    setResultText(language === 'bg' ? 'Въведете данни и натиснете "Изчисли", за да видите резултатите тук.' : 'Enter data and click "Calculate" to see the results here.');
   };
 
   const handleDownload = (entry) => {
@@ -292,8 +295,11 @@ Yₚ = (Yₚ' + Yₚ'') / 2 = (${results.yPrimP} + ${results.ySecondP}) / 2 = ${
   return (
     <>
       <Helmet>
-        <title>Права засечка – Геодезически калкулатор | GeoSolver</title>
+        <title>Права засечка – Изчисляване на координати чрез посока и разстояние | GeoSolver</title>
         <meta name="description" content="Онлайн калкулатор за права засечка – изчисляване на координати чрез посока и разстояние от известна точка. Точни и бързи геодезически изчисления." />
+        <meta name="keywords" content="геодезия, права засечка, координати, посока, разстояние, геодезически калкулатор, онлайн изчисления, тахиметрия, GNSS, аналитична геодезия" />
+        <meta name="robots" content="index, follow" />
+        <meta name="author" content="GeoSolver" />
       </Helmet>
       <Layout>
         {/* DESKTOP LAYOUT */}
@@ -302,15 +308,19 @@ Yₚ = (Yₚ' + Yₚ'') / 2 = (${results.yPrimP} + ${results.ySecondP}) / 2 = ${
             {/* Breadcrumbs and Title */}
             <div className="w-[580px] flex flex-col justify-start items-start gap-4">
               <div className="flex flex-col justify-start items-start gap-1">
+                <div className="justify-start">
+                  <Link to="/tools" className="text-neutral-400 text-base font-medium font-['Manrope'] underline">Инструменти</Link>
+                  <span className="text-neutral-400 text-base font-medium font-['Manrope']"> {'>'} Права засечка</span>
+                </div>
                 <div className="justify-start text-black text-3xl font-bold font-['Manrope']">Права засечка</div>
               </div>
               <div className="p-1.5 bg-white rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-2">
                 <div className="px-3 py-1 bg-gray-200 rounded flex justify-center items-center gap-2.5">
                   <div className="justify-start text-black text-base font-medium font-['Manrope']">Инструмент</div>
                 </div>
-                <div className="px-3 py-1 rounded flex justify-center items-center gap-2.5">
+                <Link to="/forward-intersection/docs" className="px-3 py-1 bg-white rounded flex justify-center items-center gap-2.5">
                   <div className="justify-start text-neutral-400 text-base font-medium font-['Manrope']">Документация</div>
-                </div>
+                </Link>
               </div>
             </div>
             {/* Form and Results */}
@@ -462,6 +472,10 @@ Yₚ = (Yₚ' + Yₚ'') / 2 = (${results.yPrimP} + ${results.ySecondP}) / 2 = ${
           <div className="flex flex-col justify-start items-start gap-6 w-full">
             <div className="self-stretch flex flex-col justify-start items-start gap-1">
               <div className="inline-flex items-center gap-3 w-full">
+                {/* Back button */}
+                <button className="w-8 h-8 flex items-center justify-center rounded-xl bg-gray-200 text-black focus:outline-none">
+                  <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><path d="M13 15l-5-5 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                </button>
                 <span className="text-black text-2xl font-bold font-['Manrope']">Права засечка</span>
               </div>
             </div>
@@ -469,9 +483,9 @@ Yₚ = (Yₚ' + Yₚ'') / 2 = (${results.yPrimP} + ${results.ySecondP}) / 2 = ${
               <div className="px-3 py-1 bg-gray-200 rounded flex justify-center items-center gap-2.5">
                 <div className="justify-start text-black text-base font-medium font-['Manrope']">Инструмент</div>
               </div>
-              <div className="px-3 py-1 rounded flex justify-center items-center gap-2.5">
+              <Link to="/forward-intersection/docs" className="px-3 py-1 bg-white rounded flex justify-center items-center gap-2.5">
                 <div className="justify-start text-neutral-400 text-base font-medium font-['Manrope']">Документация</div>
-              </div>
+              </Link>
             </div>
             <div className="self-stretch flex flex-col justify-start items-start gap-10 w-full">
               <div className="self-stretch flex flex-col justify-start items-start gap-5 w-full">
@@ -517,11 +531,21 @@ Yₚ = (Yₚ' + Yₚ'') / 2 = (${results.yPrimP} + ${results.ySecondP}) / 2 = ${
                     </div>
                   </div>
                   <div className="inline-flex justify-end items-center gap-3 w-full">
+                    <button
+                      type="button"
+                      aria-disabled="true"
+                      title="Тази функция е в процес на разработка и интеграция."
+                      className="px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3 opacity-50 select-none cursor-not-allowed"
+                    >
+                      <img src="/icons/scan_icon.svg" alt="Сканирай" className="w-4 h-4" />
+                      <span className="justify-start text-black text-sm font-medium font-['Manrope']">Сканирай</span>
+                    </button>
                     <button type="button" onClick={resetForm} className="px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3">
                       <div className="justify-start text-black text-sm font-medium font-['Manrope']">Нулирай</div>
                     </button>
-                    <button type="button" onClick={calculate} disabled={!isFormValid()} className={`px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3${!isFormValid() ? ' opacity-50 cursor-not-allowed' : ''}`}> 
+                    <button type="button" onClick={calculate} disabled={!isFormValid()} className={`px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3${!isFormValid() ? ' opacity-50 cursor-not-allowed' : ''}`}>
                       <div className="justify-start text-white text-sm font-medium font-['Manrope']">Изчисли</div>
+                      <img src="/icons/white_right_arrow.svg" alt="Изчисли" className="w-4 h-4" />
                     </button>
                   </div>
                 </div>

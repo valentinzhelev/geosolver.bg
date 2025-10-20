@@ -33,8 +33,8 @@ const saveInputHistory = (key, value) => {
   localStorage.setItem('inputHistory_' + key, JSON.stringify(history));
 };
 
-// Helper for correct rounding to 4 decimals
-const round4 = (num) => Math.round(num * 10000) / 10000;
+// Helper for correct rounding to 4 decimals (currently unused)
+// const round4 = (num) => Math.round(num * 10000) / 10000;
 
 /**
  * Втора основна геодезическа задача (Enhanced):
@@ -259,9 +259,9 @@ cos(α) = ${result.cosAlpha}
               <div data-property-1="Default" className="px-3 py-1 bg-gray-200 rounded flex justify-center items-center gap-2.5">
                 <div className="justify-start text-black text-base font-medium font-['Manrope']">Инструмент</div>
               </div>
-              <div data-property-1="Default" className="px-3 py-1 rounded flex justify-center items-center gap-2.5">
+              <Link to="/second-task/docs" className="px-3 py-1 bg-white rounded flex justify-center items-center gap-2.5">
                 <div className="justify-start text-neutral-400 text-base font-medium font-['Manrope']">Документация</div>
-              </div>
+              </Link>
             </div>
             <div className="self-stretch flex flex-col justify-start items-start gap-10 w-full">
               <div className="self-stretch flex flex-col justify-start items-start gap-5 w-full">
@@ -413,9 +413,9 @@ cos(α) = ${result.cosAlpha}
                 <div data-property-1="Default" className="px-3 py-1 bg-gray-200 rounded flex justify-center items-center gap-2.5">
                   <div className="justify-start text-black text-base font-medium font-['Manrope']">Инструмент</div>
                 </div>
-                <div data-property-1="Default" className="px-3 py-1 rounded flex justify-center items-center gap-2.5">
+                <Link to="/second-task/docs" className="px-3 py-1 bg-white rounded flex justify-center items-center gap-2.5">
                   <div className="justify-start text-neutral-400 text-base font-medium font-['Manrope']">Документация</div>
-                </div>
+                </Link>
               </div>
             </div>
             {/* Form and Results */}

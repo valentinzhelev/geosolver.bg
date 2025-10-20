@@ -19,6 +19,14 @@ import ResetPassword from './components/auth/ResetPassword';
 import CookieConsent from './components/shared/CookieConsent';
 import Contacts from './components/contacts/Contacts';
 import FirstTaskDocs from './components/tasks/FirstTaskDocs';
+import ForwardIntersectionDocs from './components/tasks/ForwardIntersectionDocs';
+import ResectionDocs from './components/tasks/ResectionDocs';
+import PolarIntersectionDocs from './components/tasks/PolarIntersectionDocs';
+import HansenTaskDocs from './components/tasks/HansenTaskDocs';
+import CoordinateTransformationDocs from './components/tasks/CoordinateTransformationDocs';
+import AreaCalculationDocs from './components/tasks/AreaCalculationDocs';
+import DistanceBearingDocs from './components/tasks/DistanceBearingDocs';
+import SecondTaskDocs from './components/tasks/SecondTaskDocs';
 import ForTeachers from './components/pages/ForTeachers/ForTeachers';
 import ScientificCalculator from './components/pages/ScientificCalculator/ScientificCalculator';
 import TeacherDashboard from './components/pages/TeacherDashboard/TeacherDashboard';
@@ -29,6 +37,8 @@ import CoordinateTransformation from './components/tasks/CoordinateTransformatio
 import AreaCalculation from './components/tasks/AreaCalculation';
 import DistanceBearing from './components/tasks/DistanceBearing';
 import Resection from './components/tasks/Resection';
+import PolarIntersection from './components/tasks/PolarIntersection';
+import HansenTask from './components/tasks/HansenTask';
 
 function App() {
   return (
@@ -63,12 +73,22 @@ function App() {
               />
               <Route path="/contacts" element={<Contacts />} />
               <Route path="/first-task/docs" element={<FirstTaskDocs />} />
+              <Route path="/second-task/docs" element={<SecondTaskDocs />} />
+              <Route path="/forward-intersection/docs" element={<ForwardIntersectionDocs />} />
+              <Route path="/resection/docs" element={<ResectionDocs />} />
+              <Route path="/polar-intersection/docs" element={<PolarIntersectionDocs />} />
+              <Route path="/hansen-task/docs" element={<HansenTaskDocs />} />
+              <Route path="/coordinate-transformation/docs" element={<CoordinateTransformationDocs />} />
+              <Route path="/area-calculation/docs" element={<AreaCalculationDocs />} />
+              <Route path="/distance-bearing/docs" element={<DistanceBearingDocs />} />
               <Route path="/for-teachers" element={<ForTeachers />} />
               <Route path="/scientific-calculator" element={<ScientificCalculator />} />
               <Route path="/coordinate-transformation" element={<CoordinateTransformation />} />
               <Route path="/area-calculation" element={<AreaCalculation />} />
               <Route path="/distance-bearing" element={<DistanceBearing />} />
               <Route path="/resection" element={<Resection />} />
+              <Route path="/polar-intersection" element={<PolarIntersection />} />
+              <Route path="/hansen-task" element={<HansenTask />} />
               <Route
                 path="/teacher/dashboard"
                 element={
