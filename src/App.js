@@ -39,6 +39,7 @@ import DistanceBearing from './components/tasks/DistanceBearing';
 import Resection from './components/tasks/Resection';
 import PolarIntersection from './components/tasks/PolarIntersection';
 import HansenTask from './components/tasks/HansenTask';
+import Checkout from './components/pages/Checkout/Checkout';
 
 function App() {
   return (
@@ -89,6 +90,7 @@ function App() {
               <Route path="/resection" element={<Resection />} />
               <Route path="/polar-intersection" element={<PolarIntersection />} />
               <Route path="/hansen-task" element={<HansenTask />} />
+              <Route path="/checkout/:planId/:billingCycle" element={<Checkout />} />
               <Route
                 path="/teacher/dashboard"
                 element={

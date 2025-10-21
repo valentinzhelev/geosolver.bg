@@ -1,0 +1,85 @@
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+
+class CalculationService {
+  // Записване на изчисление
+  static async saveCalculation(calculationData) {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE_URL}/calculations`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(calculationData)
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to save calculation');
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error saving calculation:', error);
+      throw error;
+    }
+  }
+
+  // Вземане на история на изчисленията
+  static async getCalculationHistory(page = 1, limit = 10, toolName = null) {
+    try {
+      const token = localStorage.getItem('token');
+      let url = `${API_BASE_URL}/calculations?page=${page}&limit=${limit}`;
+      if (toolName) url += `&toolName=${toolName}`;
+      
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      if (!response.ok) throw new Error('Failed to fetch calculation history');
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching calculation history:', error);
+      throw error;
+    }
+  }
+
+  // Вземане на статистики за изчисления
+  static async getCalculationStats() {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE_URL}/calculations/stats`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      if (!response.ok) throw new Error('Failed to fetch calculation stats');
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching calculation stats:', error);
+      throw error;
+    }
+  }
+
+  // Проверка на лимити преди изчисление
+  static async checkLimits() {
+    try {
+      const stats = await this.getCalculationStats();
+      return {
+        canCalculate: stats.userLimits.unlimited || stats.userLimits.used < stats.userLimits.limit,
+        used: stats.userLimits.used,
+        limit: stats.userLimits.limit,
+        unlimited: stats.userLimits.unlimited
+      };
+    } catch (error) {
+      console.error('Error checking limits:', error);
+      return { canCalculate: false, used: 0, limit: 0, unlimited: false };
+    }
+  }
+}
+
+export default CalculationService;

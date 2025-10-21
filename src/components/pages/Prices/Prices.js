@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import Layout from '../../layout/Layout';
 import { Helmet } from 'react-helmet';
 import { useTranslation } from '../../../hooks/useTranslation';
@@ -121,11 +122,11 @@ const Prices = () => {
                   </div>
                   <div className="w-full flex justify-between items-center">
                     <div className="text-black text-base lg:text-lg font-semibold font-['Manrope']">0.00{language === 'bg' ? 'лв' : 'BGN'}</div>
-                    <button className="px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3">
+                    <Link to="/register" className="px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3">
                       <span className="text-white text-sm lg:text-base font-medium font-['Manrope']">
                         {language === 'bg' ? 'Регистрация' : 'Register'}
                       </span>
-                    </button>
+                    </Link>
                   </div>
                 </div>
 
@@ -170,11 +171,11 @@ const Prices = () => {
                       <div className="text-black text-base lg:text-lg font-semibold font-['Manrope']">
                         {tab === 'year' ? `191.90${language === 'bg' ? 'лв/г' : 'BGN/y'}` : `19.99${language === 'bg' ? 'лв/м' : 'BGN/m'}`}
                       </div>
-                      <button className="px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3">
+                      <Link to={`/checkout/professional/${tab}`} className="px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3">
                         <span className="text-white text-sm lg:text-base font-medium font-['Manrope']">
                           {language === 'bg' ? 'Абониране' : 'Subscribe'}
                         </span>
-                      </button>
+                      </Link>
                     </div>
                   </div>
                 </div>

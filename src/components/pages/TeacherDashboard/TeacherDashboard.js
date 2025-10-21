@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { teacherApi, getRecentActivity } from '../../../services/teacherApi';
 
 const TeacherDashboard = () => {
-  const { t, language } = useTranslation();
+  const { language } = useTranslation();
   const [activeTab, setActiveTab] = useState('overview');
   const [stats, setStats] = useState({
     totalStudents: 0,
@@ -89,7 +89,7 @@ const TeacherDashboard = () => {
                     {language === 'bg' ? 'Учителски панел' : 'Teacher Dashboard'}
                   </h1>
                   <p className="text-neutral-600 text-sm lg:text-base mt-1">
-                    {language === 'bg' ? 'Добре дошли в вашия учителски център' : 'Welcome to your teaching center'}
+                    {language === 'bg' ? 'Добре дошли във вашият учителски център' : 'Welcome to your teaching center'}
                   </p>
                 </div>
                 <Link

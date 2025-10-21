@@ -4,6 +4,7 @@ import Layout from '../layout/Layout';
 import { Link } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 import useTypewriter from '../../hooks/useTypewriter';
+import { useCalculationTracking } from '../../hooks/useCalculationTracking';
 
 // Helpers for localStorage history for each input
 const getInputHistory = (key) => {
@@ -45,6 +46,7 @@ const PurvaZadacha = () => {
   const totalPages = Math.ceil(history.length / itemsPerPage);
   const paginatedHistory = history.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
   const { displayText, isTyping } = useTypewriter(resultText);
+  const { trackCalculation, checkLimits } = useCalculationTracking();
 
   // Debug: виж какво се сетва
   useEffect(() => {
@@ -70,7 +72,21 @@ const PurvaZadacha = () => {
       return;
     }
 
+    // Проверка на лимити преди изчисление
+    const limits = await checkLimits();
+    console.log('Limits check result:', limits);
+    if (!limits.canCalculate) {
+      alert(language === 'bg' 
+        ? `Достигнахте лимита от ${limits.limit} изчисления. Моля, абонирайте се за професионален план.`
+        : `You have reached the limit of ${limits.limit} calculations. Please subscribe to a professional plan.`
+      );
+      return;
+    }
+
+    const startTime = performance.now();
     const result = purvaOsnovnaZadacha(y1, x1, alpha, s);
+    const endTime = performance.now();
+    const calculationTime = endTime - startTime;
     const output = language === 'bg' 
       ? `--------- Първа основна геодезическа задача (Enhanced) ---------
 Y1 = ${result.y1}, X1 = ${result.x1}
@@ -112,6 +128,7 @@ Check - angle: ${result.calculatedAngle} gon
 ------------------------------------------------------`;
     
     setResultText(output ? String(output) : "");
+    
     // Save to local history
     const entry = {
       y1: result.y1,
@@ -124,6 +141,20 @@ Check - angle: ${result.calculatedAngle} gon
     };
     saveHistory(entry);
     setHistory(getHistory());
+
+    // Track calculation in backend
+    try {
+      await trackCalculation(
+        'first-basic-task',
+        { bg: 'Първа основна задача', en: 'First Basic Task' },
+        { y1, x1, alpha, s },
+        { y2: result.y2, x2: result.x2, deltaX: result.deltaX, deltaY: result.deltaY },
+        calculationTime
+      );
+      
+    } catch (error) {
+      console.error('Failed to track calculation:', error);
+    }
   };
 
   /**

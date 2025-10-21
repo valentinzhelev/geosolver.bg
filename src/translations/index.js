@@ -20,7 +20,7 @@ export const translations = {
     socialNetworks: 'Социални мрежи',
     language: 'Български език',
     theme: 'Светъл режим',
-    copyright: '© GEOSOLVER, 2025.\nВсички права запазени.\nТекуща версия: v2.2.3-beta.2',
+    copyright: '© GEOSOLVER, 2025.\nВсички права запазени.\nТекуща версия: v2.2.4-beta.2',
 
     // FirstTask translations
     firstTaskTitle: 'Първа основна задача',
@@ -137,7 +137,24 @@ export const translations = {
     coordinateTransformation: 'Коорд. трансформация',
     hansenTask: 'Задача за ханзен',
     areaCalculation: 'Изчисляване на площ',
-    distanceBearing: 'Разстояние и посока'
+    distanceBearing: 'Разстояние и посока',
+    
+    // Checkout page translations
+    checkoutTitle: 'Завършване на поръчката',
+    checkoutSubtitle: 'Попълнете данните си за плащане, за да активирате абонамента',
+    orderSummary: 'Резюме на поръчката',
+    yearlyBilling: 'Годишно плащане',
+    monthlyBilling: 'Месечно плащане',
+    paymentDetails: 'Данни за плащане',
+    cardNumber: 'Номер на карта',
+    cardholderName: 'Име на притежателя',
+    cardholderNamePlaceholder: 'Иван Иванов',
+    expiryDate: 'Валидна до',
+    completePayment: 'Завърши плащането',
+    processingPayment: 'Обработва се...',
+    securePaymentNotice: 'Вашите данни са защитени с 256-bit SSL криптиране',
+    freePlan: 'Безплатен план (По подразбиране)',
+    accountDescription: 'Вашият GeoSolver акаунт, абонамент, история и настройки.'
   },
   en: {
     // Header translations
@@ -160,7 +177,7 @@ export const translations = {
     socialNetworks: 'Social Networks',
     language: 'English',
     theme: 'Light Mode',
-    copyright: '© GEOSOLVER, 2025.\nAll rights reserved.\nCurrent version: v2.2.3-beta.2',
+    copyright: '© GEOSOLVER, 2025.\nAll rights reserved.\nCurrent version: v2.2.4-beta.2',
 
     // FirstTask translations
     firstTaskTitle: 'First Basic Task',
@@ -277,6 +294,23 @@ export const translations = {
     coordinateTransformation: 'Coordinate Transformation',
     hansenTask: 'Hansen Task',
     areaCalculation: 'Area Calculation',
-    distanceBearing: 'Distance & Bearing'
+    distanceBearing: 'Distance & Bearing',
+    
+    // Checkout page translations
+    checkoutTitle: 'Complete Order',
+    checkoutSubtitle: 'Fill in your payment details to activate your subscription',
+    orderSummary: 'Order Summary',
+    yearlyBilling: 'Yearly billing',
+    monthlyBilling: 'Monthly billing',
+    paymentDetails: 'Payment Details',
+    cardNumber: 'Card Number',
+    cardholderName: 'Cardholder Name',
+    cardholderNamePlaceholder: 'John Doe',
+    expiryDate: 'Expiry Date',
+    completePayment: 'Complete Payment',
+    processingPayment: 'Processing...',
+    securePaymentNotice: 'Your data is protected with 256-bit SSL encryption',
+    freePlan: 'Free Plan (Default)',
+    accountDescription: 'Your GeoSolver account, subscription, history and settings.'
   }
 };
