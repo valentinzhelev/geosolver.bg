@@ -1,113 +1,165 @@
-# 🌐 GeoSolver – Web-Based Geodetic Calculator
+# GeoSolver - Professional Geodetic Calculator
 
-**GeoSolver** is a modern web application designed for performing precise geodetic calculations. It supports core surveying tasks such as coordinate transformations, angular and distance resection, polar methods, and more. The platform provides a clean UI with persistent storage of calculations via an integrated backend and cloud database.
+A comprehensive web-based geodetic calculation platform designed for surveying professionals. GeoSolver provides accurate solutions for complex geodetic problems including coordinate transformations, intersection methods, and area calculations with a modern, responsive interface.
 
----
+## Overview
 
-## 🛠️ Technologies Used
+GeoSolver is a full-stack web application that combines advanced geodetic algorithms with modern web technologies to deliver precise surveying calculations. The platform serves both individual professionals and educational institutions with its intuitive interface and comprehensive calculation suite.
 
-### 🔷 Frontend
-- [React 19.1.0](https://reactjs.org/) – Component-based architecture for a responsive SPA
-- [React Router v7](https://reactrouter.com/) – For intuitive client-side routing
-- [TailwindCSS v4](https://tailwindcss.com/) – Utility-first CSS framework
-- [Axios](https://axios-http.com/) – HTTP client for API requests
-- [jspdf](https://www.npmjs.com/package/jspdf) & [html2canvas](https://html2canvas.hertzen.com/) – PDF generation
-- [React Helmet](https://github.com/nfl/react-helmet) – SEO management
-- [Vercel](https://vercel.com/) – CI/CD and deployment
+## Technical Stack
 
-### 🔶 Backend
-- [Node.js + Express](https://expressjs.com/) – RESTful API
-- [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) – Cloud database
-- [Railway](https://railway.app/) – Backend hosting
-- [Mongoose](https://mongoosejs.com/) – MongoDB ODM
+### Frontend
+- **React 19.1.0** - Modern component-based architecture with hooks
+- **React Router v7** - Client-side routing with protected routes
+- **TailwindCSS v4** - Utility-first CSS framework for responsive design
+- **Axios** - HTTP client for API communication
+- **React Helmet** - SEO optimization and meta tag management
+- **jspdf & html2canvas** - PDF generation for calculation reports
 
----
+### Backend
+- **Node.js & Express** - RESTful API server
+- **MongoDB Atlas** - Cloud database with Mongoose ODM
+- **JWT Authentication** - Secure user authentication system
+- **bcrypt** - Password hashing and security
+- **CORS** - Cross-origin resource sharing configuration
 
-## ✨ Key Features
+### Deployment & Infrastructure
+- **Vercel** - Frontend hosting with automatic CI/CD
+- **Railway** - Backend hosting and deployment
+- **MongoDB Atlas** - Managed cloud database
 
-- Dynamic input forms for all core geodetic tasks
-- Accurate real-time calculations for:
-  - Forward intersection (1st Geodetic Task)
-  - Angular resection (Back Intersection)
-  - Polar intersection
-  - Direction and distance computations
-- PDF export functionality for calculation results
-- Auto-typing animation for step-by-step visualization
-- Save and view recent calculation history
-- Toggle between light and dark themes
-- SEO optimized with React Helmet
-- Fully responsive design with TailwindCSS
-- Modern UI with Montserrat typography
+## Core Features
 
-### 🔐 Authentication System
-- Secure user registration and login
-- JWT-based authentication
-- Protected routes for authenticated users
-- Password recovery via email
-- Persistent login sessions
+### Geodetic Calculations
+- Forward intersection (1st Geodetic Task)
+- Angular resection (Back Intersection)
+- Polar intersection methods
+- Hansen's problem solutions
+- Coordinate transformations
+- Area and distance calculations
+- Scientific calculator with geodetic functions
+
+### User Experience
+- Responsive design optimized for desktop and mobile
+- Dark/light theme toggle
+- Real-time calculation validation
+- Step-by-step solution visualization
+- PDF export functionality
+- Calculation history and persistence
+- Multi-language support (Bulgarian/English)
+
+### Security & Authentication
+- JWT-based authentication system
 - Secure password storage with bcrypt
-- CORS protection for API requests
+- Protected routes and API endpoints
+- CORS protection
+- Input validation and sanitization
 
----
+## Project Structure
 
-## 🚀 Getting Started Locally
+```
+src/
+├── components/
+│   ├── auth/           # Authentication components
+│   ├── layout/         # Layout and navigation
+│   ├── pages/          # Page components
+│   ├── shared/         # Reusable UI components
+│   └── tasks/          # Calculation tool components
+├── config/             # API and configuration files
+├── context/            # React context providers
+├── hooks/              # Custom React hooks
+├── services/           # API service functions
+└── translations/       # Internationalization
+```
 
-### 🔧 Frontend Setup
+## Getting Started
 
+### Prerequisites
+- Node.js 18+ and npm
+- MongoDB Atlas account (for backend)
+- Git
+
+### Installation
+
+1. Clone the repository:
 ```bash
-git clone https://github.com/<your-username>/geosolver.bg.git
+git clone https://github.com/your-username/geosolver.bg.git
 cd geosolver.bg
+```
+
+2. Install dependencies:
+```bash
 npm install
+```
+
+3. Configure environment variables:
+```bash
+cp .env.example .env
+# Edit .env with your configuration
+```
+
+4. Start the development server:
+```bash
 npm start
 ```
 
 The application will be available at `http://localhost:3000`
 
-### 🔧 Backend Setup
+### Backend Setup
 
-```bash
-cd ../geosolver-backend
-npm install
-npm start
-```
+The backend is a separate Node.js application. For detailed setup instructions, API documentation, and backend-specific information, please refer to the [GeoSolver Backend Repository](https://github.com/valentinzhelev/geosolver-backend).
 
-The API will be available at `http://localhost:5000`
+## Development
 
-## 📦 Deployment
+### Code Standards
+- Follow React best practices and functional components
+- Use TypeScript for type safety (planned migration)
+- Implement responsive design with TailwindCSS
+- Write clean, documented code with JSDoc comments
+- Follow established folder structure and naming conventions
 
-- Frontend: Automatically deployed via Vercel
-- Backend: Automatically deployed to Railway
-- MongoDB is provisioned via MongoDB Atlas
+### Testing
+- Unit tests for calculation algorithms
+- Integration tests for API endpoints
+- End-to-end testing with Cypress (planned)
 
-## 🏗️ Project Structure
+### Performance Optimization
+- Code splitting and lazy loading
+- Image optimization and compression
+- API response caching
+- Bundle size optimization
 
-```
-src/
-├── components/     # Reusable UI components
-├── pages/         # Page components
-├── utils/         # Utility functions
-├── styles/        # Global styles and Tailwind config
-└── assets/        # Static assets
-```
+## Deployment
 
-## 🧪 Development Guidelines
+The application is configured for automatic deployment:
+- Frontend deploys to Vercel on push to main branch
+- Backend deploys to Railway with MongoDB Atlas integration
+- Environment variables are managed through deployment platforms
 
-- Follow React best practices and hooks
-- Use TailwindCSS for styling
-- Implement responsive design
-- Write clean, documented code
-- Follow the established folder structure
-- Implement proper authentication flows
-- Handle API errors gracefully
+## API Documentation
 
-## 📜 License
+The backend provides RESTful APIs for:
+- User authentication and management
+- Calculation storage and retrieval
+- PDF generation services
+- Data export functionality
 
-This project is licensed under the MIT License.
+For complete API documentation, endpoints, and backend architecture details, visit the [GeoSolver Backend Repository](https://github.com/valentinzhelev/geosolver-backend).
 
-## 🤝 Contributions
+## Contributing
 
-We welcome contributions! Please fork the repo and submit a pull request. For major changes, open an issue first to discuss the idea.
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## 📬 Contact
-Created and maintained by **@valentinjelev**
-Feel free to reach out for feedback, suggestions, or collaboration.
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Contact
+
+**Valentin Zhelev**
+- LinkedIn: [linkedin.com/in/valentinzhelev](https://www.linkedin.com/in/valentin-zhelev-9b5b30346/)
+- Email: valentin.zhelevbg@gmail.com
