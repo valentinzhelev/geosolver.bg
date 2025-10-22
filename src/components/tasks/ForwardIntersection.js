@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Helmet } from "react-helmet";
+import SEO from '../shared/SEO';
 import Layout from '../layout/Layout';
 import { Link } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
@@ -294,13 +294,12 @@ Yₚ = (Yₚ' + Yₚ'') / 2 = (${results.yPrimP} + ${results.ySecondP}) / 2 = ${
 
   return (
     <>
-      <Helmet>
-        <title>Права засечка – Изчисляване на координати чрез посока и разстояние | GeoSolver</title>
-        <meta name="description" content="Онлайн калкулатор за права засечка – изчисляване на координати чрез посока и разстояние от известна точка. Точни и бързи геодезически изчисления." />
-        <meta name="keywords" content="геодезия, права засечка, координати, посока, разстояние, геодезически калкулатор, онлайн изчисления, тахиметрия, GNSS, аналитична геодезия" />
-        <meta name="robots" content="index, follow" />
-        <meta name="author" content="GeoSolver" />
-      </Helmet>
+      <SEO
+        title="Права засечка – Изчисляване на координати чрез посока и разстояние"
+        description="Онлайн калкулатор за права засечка – изчисляване на координати чрез посока и разстояние от известна точка. Точни и бързи геодезически изчисления."
+        keywords="геодезия, права засечка, координати, посока, разстояние, геодезически калкулатор, онлайн изчисления, тахиметрия, GNSS, аналитична геодезия"
+        canonical="/tools/forward-intersection"
+      />
       <Layout>
         {/* DESKTOP LAYOUT */}
         <div className="hidden md:flex w-[1180px] mx-auto my-10 flex-col gap-10">

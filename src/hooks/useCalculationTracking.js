@@ -22,6 +22,10 @@ export const useCalculationTracking = () => {
       try {
         const result = await CalculationService.saveCalculation(calculationData);
         console.log('Calculation saved to backend:', result);
+        
+        // Dispatch event to update UI
+        window.dispatchEvent(new CustomEvent('calculationCompleted'));
+        
         return result;
       } catch (backendError) {
         console.log('Backend save failed, saving locally:', backendError.message);
@@ -41,6 +45,10 @@ export const useCalculationTracking = () => {
         
         localStorage.setItem('calculationHistory', JSON.stringify(localHistory));
         console.log('Calculation saved locally:', localData);
+        
+        // Dispatch event to update UI
+        window.dispatchEvent(new CustomEvent('calculationCompleted'));
+        
         return { success: true, local: true };
       }
     } catch (err) {

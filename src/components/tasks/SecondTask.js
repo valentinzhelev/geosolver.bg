@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../layout/Layout';
-import { Helmet } from "react-helmet";
+import SEO from '../shared/SEO';
 import { Link } from 'react-router-dom';
 import useTypewriter from '../../hooks/useTypewriter';
 
@@ -234,15 +234,35 @@ cos(α) = ${result.cosAlpha}
   const lastAlpha = history[0]?.alpha || '';
   const lastS = history[0]?.s || '';
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Втора основна задача - GeoSolver",
+    "description": "Онлайн калкулатор за изчисляване на ъгъл и разстояние между две точки по координати",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web Browser",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "BGN"
+    },
+    "featureList": [
+      "Изчисляване на ъгъл между точки",
+      "Изчисляване на разстояние",
+      "Валидация на координати",
+      "История на изчисленията"
+    ]
+  };
+
   return (
     <>
-      <Helmet>
-        <title>Втора основна задача – Изчисляване на ъгъл и разстояние между две точки | GeoSolver</title>
-        <meta name="description" content="Онлайн калкулатор за изчисляване на ъгъл и разстояние между две точки по координати. Бързо и лесно геодезическо изчисление за професионалисти." />
-        <meta name="keywords" content="геодезия, ъгъл между две точки, разстояние, геодезически калкулатор, координати, онлайн изчисления, тахиметрия, GNSS, аналитична геодезия" />
-        <meta name="robots" content="index, follow" />
-        <meta name="author" content="GeoSolver" />
-      </Helmet>
+      <SEO
+        title="Втора основна задача – Изчисляване на ъгъл и разстояние между две точки"
+        description="Онлайн калкулатор за изчисляване на ъгъл и разстояние между две точки по координати. Бързо и лесно геодезическо изчисление за професионалисти."
+        keywords="геодезия, ъгъл между две точки, разстояние, геодезически калкулатор, координати, онлайн изчисления, тахиметрия, GNSS, аналитична геодезия"
+        canonical="/tools/second-task"
+        structuredData={structuredData}
+      />
       <Layout>
         {/* MOBILE LAYOUT */}
         <div className="block md:hidden w-full max-w-md mx-auto min-h-screen bg-stone-50 relative px-4 py-4">

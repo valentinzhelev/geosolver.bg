@@ -1,6 +1,6 @@
 import React from "react";
 import Layout from '../../layout/Layout';
-import { Helmet } from "react-helmet";
+import SEO from '../../shared/SEO';
 import { Link } from "react-router-dom";
 import { useTranslation } from '../../../hooks/useTranslation';
 import { useUserPreferences } from '../../../hooks/useUserPreferences';
@@ -120,32 +120,39 @@ const ToolsPage = () => {
     return true; // Always show tools that are not in development
   });
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": language === 'bg' ? "Геодезически инструменти" : "Geodetic Tools",
+    "description": language === 'bg' 
+      ? "Всички геодезически инструменти на GeoSolver за професионални изчисления"
+      : "All geodetic tools in GeoSolver for professional calculations",
+    "url": "https://www.geosolver.bg/tools",
+    "numberOfItems": tools.length,
+    "itemListElement": tools.map((tool, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "name": tool.title,
+      "description": tool.description,
+      "url": `https://www.geosolver.bg/tools${tool.route}`
+    }))
+  };
+
   return (
     <>
-    <Helmet>
-      <title>
-        {language === 'bg' 
-          ? 'Инструменти – Геодезически калкулатори и задачи | GeoSolver'
-          : 'Tools – Geodetic Calculators and Tasks | GeoSolver'
-        }
-      </title>
-      <meta
-        name="description"
-        content={language === 'bg'
+      <SEO
+        title={language === 'bg' ? 'Инструменти – Геодезически калкулатори и задачи' : 'Tools – Geodetic Calculators and Tasks'}
+        description={language === 'bg'
           ? "Интерактивни геодезически инструменти за координатни трансформации, засечки, изчисления на ъгли и разстояния. Всичко за геодезията на едно място – бързо, лесно и удобно."
           : "Interactive geodetic tools for coordinate transformations, intersections, angle and distance calculations. Everything for geodesy in one place - fast, easy, and convenient."
         }
-      />
-      <meta
-        name="keywords"
-        content={language === 'bg'
+        keywords={language === 'bg'
           ? "геодезия, инструменти, калкулатори, координатни трансформации, права засечка, обратна засечка, полярна засечка, Hansen, GNSS, онлайн изчисления"
           : "geodesy, tools, calculators, coordinate transformations, forward intersection, resection, polar intersection, Hansen, GNSS, online calculations"
         }
+        canonical="/tools"
+        structuredData={structuredData}
       />
-      <meta name="robots" content="index, follow" />
-      <meta name="author" content="GeoSolver" />
-    </Helmet>
     <Layout>
       <div className="min-h-[calc(100vh-300px)] bg-stone-50 dark:bg-neutral-950 w-full overflow-hidden py-6 md:py-10">
         <div className="max-w-[400px] md:max-w-[1180px] w-full mx-auto flex flex-col justify-center items-start gap-6 md:gap-10 px-4 md:px-0">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Helmet } from "react-helmet";
+import SEO from '../shared/SEO';
 import Layout from '../layout/Layout';
 import { Link } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
@@ -317,13 +317,12 @@ Differences:
 
   return (
     <>
-      <Helmet>
-        <title>Координатна трансформация – Трансформация на координати | GeoSolver</title>
-        <meta name="description" content="Трансформация на координати между различни системи с онлайн геодезически калкулатор. Бързи и точни решения за геодезисти." />
-        <meta name="keywords" content="геодезия, онлайн калкулатор, координатна трансформация, координати, трансформация, геодезически изчисления" />
-        <meta name="robots" content="index, follow" />
-        <meta name="author" content="GeoSolver" />
-      </Helmet>
+      <SEO
+        title="Координатна трансформация – Трансформация на координати"
+        description="Трансформация на координати между различни системи с онлайн геодезически калкулатор. Бързи и точни решения за геодезисти."
+        keywords="геодезия, онлайн калкулатор, координатна трансформация, координати, трансформация, геодезически изчисления"
+        canonical="/tools/coordinate-transformation"
+      />
       <Layout>
         {/* MOBILE LAYOUT */}
         <div className="block md:hidden w-full max-w-md mx-auto min-h-screen bg-stone-50 relative px-4 py-4">

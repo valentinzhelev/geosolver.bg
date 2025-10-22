@@ -1,6 +1,6 @@
 import React from "react";
 import Layout from '../../layout/Layout';
-import { Helmet } from "react-helmet";
+import SEO from '../../shared/SEO';
 
 const features = [
   {
@@ -40,13 +40,12 @@ const features = [
 const ForTeachers = () => {
   return (
     <>
-      <Helmet>
-        <title>GeoSolver – За преподаватели</title>
-        <meta name="description" content="GeoSolver предоставя на учителите по геодезия в България безплатен достъп до професионални инструменти за проверка, анализ и създаване на задачи. Бързо, сигурно и модерно образование!" />
-        <meta name="keywords" content="геодезия, образование, учители, преподаватели, безплатно, GeoSolver, дигитални инструменти, проверка на задачи, сканиране, класна стая, обучение" />
-        <meta name="robots" content="index, follow" />
-        <meta name="author" content="GeoSolver" />
-      </Helmet>
+      <SEO
+        title="За преподаватели"
+        description="GeoSolver предоставя на учителите по геодезия в България безплатен достъп до професионални инструменти за проверка, анализ и създаване на задачи. Бързо, сигурно и модерно образование!"
+        keywords="геодезия, образование, учители, преподаватели, безплатно, GeoSolver, дигитални инструменти, проверка на задачи, сканиране, класна стая, обучение"
+        canonical="/for-teachers"
+      />
       <Layout>
         <div className="w-full flex justify-center bg-stone-50 min-h-screen py-8 px-2 md:px-0">
           <div className="w-full max-w-[900px] flex flex-col gap-8">

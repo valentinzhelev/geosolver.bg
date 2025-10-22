@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import Layout from '../../layout/Layout';
-import { Helmet } from 'react-helmet';
+import SEO from '../../shared/SEO';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { Link } from 'react-router-dom';
 
@@ -130,10 +130,11 @@ const ScanInterface = () => {
 
   return (
     <>
-      <Helmet>
-        <title>GeoSolver – {language === 'bg' ? 'Сканиране на решения' : 'Solution Scanning'}</title>
-        <meta name="description" content={language === 'bg' ? 'AI-анализ на геодезически решения' : 'AI analysis of geodesy solutions'} />
-      </Helmet>
+      <SEO
+        title={language === 'bg' ? 'Сканиране на решения' : 'Solution Scanning'}
+        description={language === 'bg' ? 'AI-анализ на геодезически решения' : 'AI analysis of geodesy solutions'}
+        canonical="/teacher/scan"
+      />
       <Layout>
         <div className="w-full min-h-screen bg-stone-50 flex flex-col items-center py-8 px-2 md:px-0">
           <div className="w-full max-w-[1180px] flex flex-col gap-10">

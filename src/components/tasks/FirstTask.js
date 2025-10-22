@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Helmet } from "react-helmet";
+import SEO from '../shared/SEO';
 import Layout from '../layout/Layout';
 import { Link } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
@@ -253,15 +253,35 @@ Check - angle: ${result.calculatedAngle} gon
     );
   };
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Първа основна задача - GeoSolver",
+    "description": "Изчисляване на координати по начална точка, ъгъл и дължина с онлайн геодезически калкулатор",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web Browser",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "BGN"
+    },
+    "featureList": [
+      "Изчисляване на координати",
+      "Трансформация по полярен метод",
+      "Валидация на входни данни",
+      "История на изчисленията"
+    ]
+  };
+
   return (
     <>
-      <Helmet>
-        <title>Първа основна задача – Изчисляване по начална точка, ъгъл и дължина | GeoSolver</title>
-        <meta name="description" content="Изчисляване на координати по начална точка, ъгъл и дължина с онлайн геодезически калкулатор. Бързи и точни решения за геодезисти." />
-        <meta name="keywords" content="геодезия, онлайн калкулатор, първа основна задача, координати, ъгъл, дължина, трансформация, геодезически изчисления" />
-        <meta name="robots" content="index, follow" />
-        <meta name="author" content="GeoSolver" />
-      </Helmet>
+      <SEO
+        title="Първа основна задача – Изчисляване по начална точка, ъгъл и дължина"
+        description="Изчисляване на координати по начална точка, ъгъл и дължина с онлайн геодезически калкулатор. Бързи и точни решения за геодезисти."
+        keywords="геодезия, онлайн калкулатор, първа основна задача, координати, ъгъл, дължина, трансформация, геодезически изчисления"
+        canonical="/tools/first-task"
+        structuredData={structuredData}
+      />
       <Layout>
         {/* MOBILE LAYOUT */}
         <div className="block md:hidden w-full max-w-md mx-auto min-h-screen bg-stone-50 relative px-4 py-4">

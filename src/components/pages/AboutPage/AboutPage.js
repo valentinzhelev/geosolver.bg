@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Layout from '../../layout/Layout';
 import './AboutPage.css';
-import { Helmet } from "react-helmet";
+import SEO from '../../shared/SEO';
 import { useTranslation } from '../../../hooks/useTranslation';
 
 const AboutPage = () => {
@@ -33,27 +33,18 @@ const AboutPage = () => {
 
     return (
         <>
-            <Helmet>
-                <title>
-                    {language === 'bg' ? 'За нас - История на GeoSolver' : 'About Us - GeoSolver History'}
-                </title>
-                <meta
-                    name="description"
-                    content={language === 'bg'
-                        ? "Научете историята на GeoSolver – онлайн платформа за геодезически изчисления с лесен и интуитивен интерфейс, предназначена за професионални геодезисти."
-                        : "Learn about GeoSolver's history – an online platform for geodetic calculations with an easy and intuitive interface, designed for professional surveyors."
-                    }
-                />
-                <meta
-                    name="keywords"
-                    content={language === 'bg'
-                        ? "GeoSolver, геодезия, история на GeoSolver, онлайн геодезически калкулатор, геодезически изчисления, права засечка, трансформации"
-                        : "GeoSolver, geodesy, GeoSolver history, online geodetic calculator, geodetic calculations, forward intersection, transformations"
-                    }
-                />
-                <meta name="robots" content="index, follow" />
-                <meta name="author" content="GeoSolver" />
-            </Helmet>
+            <SEO
+                title={language === 'bg' ? 'За нас - История на GeoSolver' : 'About Us - GeoSolver History'}
+                description={language === 'bg'
+                    ? "Научете историята на GeoSolver – онлайн платформа за геодезически изчисления с лесен и интуитивен интерфейс, предназначена за професионални геодезисти."
+                    : "Learn about GeoSolver's history – an online platform for geodetic calculations with an easy and intuitive interface, designed for professional surveyors."
+                }
+                keywords={language === 'bg'
+                    ? "GeoSolver, геодезия, история на GeoSolver, онлайн геодезически калкулатор, геодезически изчисления, права засечка, трансформации"
+                    : "GeoSolver, geodesy, GeoSolver history, online geodetic calculator, geodetic calculations, forward intersection, transformations"
+                }
+                canonical="/about"
+            />
             <Layout>
                 <div className="about-section">
                     <div className="about-container">

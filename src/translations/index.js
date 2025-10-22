@@ -20,7 +20,7 @@ export const translations = {
     socialNetworks: 'Социални мрежи',
     language: 'Български език',
     theme: 'Светъл режим',
-    copyright: '© GEOSOLVER, 2025.\nВсички права запазени.\nТекуща версия: v2.2.5-beta.2',
+    copyright: '© GEOSOLVER, 2025.\nВсички права запазени.\nТекуща версия: v2.2.6-beta.2',
 
     // FirstTask translations
     firstTaskTitle: 'Първа основна задача',
@@ -154,7 +154,9 @@ export const translations = {
     processingPayment: 'Обработва се...',
     securePaymentNotice: 'Вашите данни са защитени с 256-bit SSL криптиране',
     freePlan: 'Безплатен план (По подразбиране)',
-    accountDescription: 'Вашият GeoSolver акаунт, абонамент, история и настройки.'
+    accountDescription: 'Вашият GeoSolver акаунт, абонамент, история и настройки.',
+    freeCalculationsUntil: 'безплатни изчисления до',
+    viewPlans: 'Виж плановете'
   },
   en: {
     // Header translations
@@ -177,7 +179,7 @@ export const translations = {
     socialNetworks: 'Social Networks',
     language: 'English',
     theme: 'Light Mode',
-    copyright: '© GEOSOLVER, 2025.\nAll rights reserved.\nCurrent version: v2.2.5-beta.2',
+    copyright: '© GEOSOLVER, 2025.\nAll rights reserved.\nCurrent version: v2.2.6-beta.2',
 
     // FirstTask translations
     firstTaskTitle: 'First Basic Task',
@@ -311,6 +313,8 @@ export const translations = {
     processingPayment: 'Processing...',
     securePaymentNotice: 'Your data is protected with 256-bit SSL encryption',
     freePlan: 'Free Plan (Default)',
-    accountDescription: 'Your GeoSolver account, subscription, history and settings.'
+    accountDescription: 'Your GeoSolver account, subscription, history and settings.',
+    freeCalculationsUntil: 'free calculations until',
+    viewPlans: 'View plans'
   }
 };

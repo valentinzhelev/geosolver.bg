@@ -13,7 +13,7 @@ import TeacherRoute from './components/auth/TeacherRoute';
 import { AuthProvider } from './components/auth/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { ThemeProvider } from './context/ThemeContext';
-import { Helmet } from "react-helmet";
+// Helmet removed - using SEO component instead
 import ForgotPassword from './components/auth/ForgotPassword';
 import ResetPassword from './components/auth/ResetPassword';
 import CookieConsent from './components/shared/CookieConsent';
@@ -47,12 +47,7 @@ function App() {
       <Router>
         <AuthProvider>
           <LanguageProvider>
-            <Helmet>
-              <meta charSet="utf-8" />
-              <meta name="viewport" content="width=device-width, initial-scale=1" />
-              <meta name="theme-color" content="#000000" />
-              <link rel="icon" href="/favicon.png" />
-            </Helmet>
+            {/* Global meta tags are now in public/index.html */}
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/tools" element={<ToolsPage />} />

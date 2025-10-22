@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Helmet } from 'react-helmet';
+import SEO from '../shared/SEO';
 import Layout from '../layout/Layout';
 
 const Contacts = () => {
@@ -74,10 +74,11 @@ const Contacts = () => {
 
   return (
     <Layout>
-      <Helmet>
-        <title>Контакти | GeoSolver</title>
-        <meta name="description" content="Свържете се с нас за всякакви въпроси относно GeoSolver - вашият надежден партньор за геодезически изчисления." />
-      </Helmet>
+      <SEO
+        title="Контакти"
+        description="Свържете се с нас за всякакви въпроси относно GeoSolver - вашият надежден партньор за геодезически изчисления."
+        canonical="/contacts"
+      />
 
       {/* Responsive Layout */}
       <div className="w-full min-h-screen bg-stone-50">

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Layout from '../../layout/Layout';
-import { Helmet } from "react-helmet";
+import SEO from '../../shared/SEO';
 import { evaluate, format } from "mathjs";
 
 const angleModes = [
@@ -172,11 +172,12 @@ const ScientificCalculator = () => {
 
   return (
     <>
-      <Helmet>
-        <title>GeoSolver – Научен калкулатор</title>
-        <meta name="description" content="Мощен научен калкулатор за сложни математически изрази, тригонометрия, логаритми, степени и още. Безплатен онлайн калкулатор за ученици, студенти и професионалисти." />
-        <meta name="keywords" content="научен калкулатор, калкулатор, математика, тригонометрия, логаритми, степени, изчисления, GeoSolver" />
-      </Helmet>
+      <SEO
+        title="Научен калкулатор"
+        description="Мощен научен калкулатор за сложни математически изрази, тригонометрия, логаритми, степени и още. Безплатен онлайн калкулатор за ученици, студенти и професионалисти."
+        keywords="научен калкулатор, калкулатор, математика, тригонометрия, логаритми, степени, изчисления, GeoSolver"
+        canonical="/tools/scientific-calculator"
+      />
       <Layout>
         <div className="w-full min-h-screen bg-stone-50 flex flex-col items-center py-8 px-2 md:px-0">
           <div className="w-full max-w-[1180px] flex flex-col gap-10">

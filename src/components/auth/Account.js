@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Helmet } from 'react-helmet';
+import SEO from '../shared/SEO';
 import { Link } from 'react-router-dom';
 import Layout from '../layout/Layout';
 import { useAuth } from './AuthContext';
@@ -12,6 +12,16 @@ const Account = () => {
   const { user, logout } = useAuth();
   const { t } = useTranslation();
   
+  // Function to refresh limits
+  const refreshLimits = async () => {
+    try {
+      const limits = await CalculationService.checkLimits();
+      setCalculationLimits(limits);
+    } catch (error) {
+      console.log('Failed to refresh limits:', error);
+    }
+  };
+  
   // State for real data
   const [plan, setPlan] = useState(null);
   const [subscription, setSubscription] = useState(null);
@@ -19,6 +29,8 @@ const Account = () => {
   const [usageHistory, setUsageHistory] = useState([]);
   const [paymentHistory, setPaymentHistory] = useState([]);
   const [totalCalculations, setTotalCalculations] = useState(0);
+  const [calculationLimits, setCalculationLimits] = useState({ used: 0, limit: 5, unlimited: false });
+  const [planExpiryDate, setPlanExpiryDate] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -43,8 +55,9 @@ const Account = () => {
         }
         
         // Load current subscription and plan
+        let subscriptionData = null;
         try {
-          const subscriptionData = await PlanService.getCurrentSubscription();
+          subscriptionData = await PlanService.getCurrentSubscription();
           setSubscription(subscriptionData);
           if (subscriptionData?.planId) {
             const planData = await PlanService.getPlan(subscriptionData.planId);
@@ -72,7 +85,7 @@ const Account = () => {
           setSubscription(null);
         }
         
-        // Load calculation history from backend
+        // Load calculation history and limits from backend
         try {
           const calculationData = await CalculationService.getCalculationHistory(1, 10);
           setUsageHistory(calculationData.calculations.map(calc => ({
@@ -80,6 +93,20 @@ const Account = () => {
             date: new Date(calc.createdAt).toLocaleString('bg-BG')
           })));
           setTotalCalculations(calculationData.pagination.total);
+          
+          // Load calculation limits
+          const limits = await CalculationService.checkLimits();
+          setCalculationLimits(limits);
+          
+          // Set plan expiry date
+          if (subscriptionData?.endDate) {
+            setPlanExpiryDate(new Date(subscriptionData.endDate));
+          } else {
+            // For free plan, set to end of current month
+            const now = new Date();
+            const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            setPlanExpiryDate(endOfMonth);
+          }
         } catch (calcError) {
           console.log('No calculation history found, using local fallback');
           // Fallback to local storage if backend fails
@@ -90,9 +117,26 @@ const Account = () => {
               date: new Date(calc.timestamp).toLocaleString('bg-BG')
             })));
             setTotalCalculations(localHistory.length);
+            
+            // Set local limits
+            const today = new Date().toDateString();
+            const todayCalculations = localHistory.filter(calc => 
+              new Date(calc.timestamp).toDateString() === today
+            );
+            setCalculationLimits({
+              used: todayCalculations.length,
+              limit: 5,
+              unlimited: false
+            });
+            
+            // Set fallback expiry date
+            const now = new Date();
+            const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            setPlanExpiryDate(endOfMonth);
           } catch (localError) {
             setUsageHistory([]);
             setTotalCalculations(0);
+            setCalculationLimits({ used: 0, limit: 5, unlimited: false });
           }
         }
         
@@ -140,6 +184,36 @@ const Account = () => {
     loadAccountData();
   }, [user, t.language]);
 
+  // Update limits when plan changes
+  useEffect(() => {
+    if (plan) {
+      if (plan.name === 'free') {
+        setCalculationLimits(prev => ({
+          ...prev,
+          limit: plan.limits?.calculationsPerMonth || 5,
+          unlimited: false
+        }));
+      } else {
+        setCalculationLimits(prev => ({
+          ...prev,
+          unlimited: true
+        }));
+      }
+    }
+  }, [plan]);
+
+  // Listen for calculation events to refresh limits
+  useEffect(() => {
+    const handleCalculationUpdate = () => {
+      refreshLimits();
+    };
+
+    window.addEventListener('calculationCompleted', handleCalculationUpdate);
+    return () => {
+      window.removeEventListener('calculationCompleted', handleCalculationUpdate);
+    };
+  }, []);
+
   // Default plan if no subscription
   const defaultPlan = {
     name: t.freePlan,
@@ -169,10 +243,11 @@ const Account = () => {
 
   return (
     <Layout>
-      <Helmet>
-        <title>{t.accountTitle} | GeoSolver</title>
-        <meta name="description" content={t.accountDescription} />
-      </Helmet>
+      <SEO
+        title={t.accountTitle}
+        description={t.accountDescription}
+        canonical="/account"
+      />
       <div className="w-full min-h-screen bg-stone-50 flex flex-col items-center">
         <div className="w-[1180px] mt-8 mb-8 inline-flex flex-col justify-start items-start gap-10">
           <div className="self-stretch justify-start text-black text-3xl font-bold font-['Manrope']">{t.accountTitle}</div>
@@ -238,20 +313,50 @@ const Account = () => {
             <div className="flex-1 inline-flex flex-col justify-center items-start gap-5">
               <div className="self-stretch p-4 bg-white rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-0.50px] outline-gray-200 flex flex-col justify-start items-start gap-4 overflow-hidden">
         <div className="justify-start text-black text-lg font-semibold font-['Manrope']">{t.usageHistory}</div>
-                <div className="self-stretch p-3 bg-white rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-start items-start gap-3">
-                  <div className="self-stretch inline-flex justify-between items-center">
-                    <div className="justify-start text-black text-sm font-medium font-['Manrope']">{totalCalculations} {t.calculations}</div>
-                    <img src="/icons/infinity.svg" alt="Infinity" className="w-3 h-2"/>
+                {/* Progress Bar - Different design for free vs paid plans */}
+                {plan?.name === 'free' || !plan || calculationLimits.unlimited === false ? (
+                  // Free Plan Progress Bar
+                  <div className="w-[748px] p-3 bg-white rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-start items-start gap-3">
+                    <div className="self-stretch inline-flex justify-between items-center">
+                      <div className="justify-start">
+                        <span className="text-black text-sm font-medium font-['Manrope']">
+                          {calculationLimits.used}/{calculationLimits.limit}
+                        </span>
+                        <span className="text-neutral-400 text-sm font-medium font-['Manrope']">
+                          {' '}{t.freeCalculationsUntil} {planExpiryDate ? planExpiryDate.toLocaleDateString(t.language === 'bg' ? 'bg-BG' : 'en-US') : ''}
+                        </span>
+                      </div>
+                      <Link to="/prices" className="flex justify-start items-center gap-2">
+                        <div className="justify-start text-black text-sm font-medium font-['Manrope']">{t.viewPlans}</div>
+                        <div className="w-[5.09px] h-2 bg-black" />
+                      </Link>
+                    </div>
+                    <div className="w-[723.99px] h-2 bg-gray-200 rounded-[30px] relative">
+                      <div 
+                        className="h-2 bg-gradient-to-r from-amber-600 to-gray-800 rounded-[30px] transition-all duration-300"
+                        style={{ 
+                          width: `${Math.min((calculationLimits.used / calculationLimits.limit) * 100, 100)}%` 
+                        }}
+                      />
+                    </div>
                   </div>
-                  <div className="w-[723.13px] h-2 origin-top-left rotate-180 rounded-[100px]">
-                    <img
-                      src="/images/account_gradient.png"
-                      alt="Прогрес"
-                      className="w-[723.13px] h-2 origin-top-left rotate-180 rounded-[100px]"
-                      style={{ objectFit: 'cover' }}
-                    />
+                ) : (
+                  // Paid Plan Progress Bar (Original)
+                  <div className="self-stretch p-3 bg-white rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-start items-start gap-3">
+                    <div className="self-stretch inline-flex justify-between items-center">
+                      <div className="justify-start text-black text-sm font-medium font-['Manrope']">{totalCalculations} {t.calculations}</div>
+                      <img src="/icons/infinity.svg" alt="Infinity" className="w-3 h-2"/>
+                    </div>
+                    <div className="w-[723.13px] h-2 origin-top-left rotate-180 rounded-[100px]">
+                      <img
+                        src="/images/account_gradient.png"
+                        alt="Прогрес"
+                        className="w-[723.13px] h-2 origin-top-left rotate-180 rounded-[100px]"
+                        style={{ objectFit: 'cover' }}
+                      />
+                    </div>
                   </div>
-                </div>
+                )}
                 <div className="self-stretch bg-stone-50 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-start items-start gap-px overflow-hidden">
                   <div className="self-stretch shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] inline-flex justify-start items-start gap-px">
                     <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">

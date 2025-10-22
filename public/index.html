@@ -1,14 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bg">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/icons/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="GEOSOLVER.BG е уеб базиран геодезически калкулатор, създаден с цел бързо и лесно решаване на сложни геодезически задачи."
-    />
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="GeoSolver - Онлайн геодезически калкулатори за професионални геодезисти. Координатни трансформации, засечки, изчисления на площ и дължина. Безплатен план с 5 изчисления месечно." />
+    <meta name="keywords" content="геодезия, калкулатори, онлайн калкулатор, геодезически изчисления, координати, трансформации, засечки, площ, дължина, GNSS, GPS" />
+    <meta name="author" content="GeoSolver Team" />
+    <meta name="robots" content="index, follow" />
+    <meta name="googlebot" content="index, follow" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://www.geosolver.bg/" />
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="GeoSolver - Онлайн геодезически калкулатори" />
+    <meta property="og:description" content="Професионални геодезически калкулатори за бързо и точно решаване на сложни задачи. Координатни трансформации, засечки, изчисления на площ." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.geosolver.bg/" />
+    <meta property="og:image" content="https://www.geosolver.bg/logo.png" />
+    <meta property="og:site_name" content="GeoSolver" />
+    <meta property="og:locale" content="bg_BG" />
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="GeoSolver - Онлайн геодезически калкулатори" />
+    <meta name="twitter:description" content="Професионални геодезически калкулатори за бързо и точно решаване на сложни задачи." />
+    <meta name="twitter:image" content="https://www.geosolver.bg/logo.png" />
+    
+    <!-- Additional Meta Tags -->
+    <meta name="geo.region" content="BG" />
+    <meta name="geo.country" content="Bulgaria" />
+    <meta name="language" content="Bulgarian" />
+    <meta name="revisit-after" content="7 days" />
+    <meta name="distribution" content="global" />
+    <meta name="rating" content="general" />
+    
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <!--
       manifest.json provides metadata used when your web app is installed on a
@@ -24,10 +54,95 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <title>GEOSOLVER.BG - Бъдещето в света на геодезията</title>
+    <title>GeoSolver - Онлайн геодезически калкулатори | Професионални геодезически инструменти</title>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Google OAuth -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <!-- Schema.org Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "GeoSolver",
+      "alternateName": "GeoSolver.bg",
+      "description": "Онлайн геодезически калкулатори за професионални геодезисти. Координатни трансформации, засечки, изчисления на площ и дължина.",
+      "url": "https://www.geosolver.bg",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web Browser",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "BGN",
+        "description": "Безплатен план с 5 изчисления месечно"
+      },
+      "provider": {
+        "@type": "Organization",
+        "name": "GeoSolver Team",
+        "url": "https://www.geosolver.bg"
+      },
+      "featureList": [
+        "Координатни трансформации",
+        "Права и обратна засечка",
+        "Изчисления на площ",
+        "Изчисления на дължина",
+        "GNSS анализ",
+        "Научен калкулатор"
+      ],
+      "screenshot": "https://www.geosolver.bg/logo.png",
+      "softwareVersion": "1.0",
+      "datePublished": "2024-01-01",
+      "dateModified": "2024-01-15",
+      "inLanguage": "bg",
+      "isAccessibleForFree": true,
+      "browserRequirements": "Requires JavaScript. Requires HTML5.",
+      "softwareRequirements": "Web Browser"
+    }
+    </script>
+    
+    <!-- Organization Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "GeoSolver",
+      "url": "https://www.geosolver.bg",
+      "logo": "https://www.geosolver.bg/logo.png",
+      "description": "Професионални геодезически калкулатори за бързо и точно решаване на сложни задачи.",
+      "foundingDate": "2024",
+      "areaServed": "Bulgaria",
+      "serviceType": "Geodetic Software",
+      "knowsAbout": [
+        "Геодезия",
+        "Координатни трансформации",
+        "Засечки",
+        "Изчисления на площ",
+        "GNSS анализ"
+      ]
+    }
+    </script>
+    
+    <!-- Website Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "GeoSolver",
+      "url": "https://www.geosolver.bg",
+      "description": "Онлайн геодезически калкулатори за професионални геодезисти",
+      "inLanguage": "bg",
+      "copyrightYear": "2024",
+      "creator": {
+        "@type": "Organization",
+        "name": "GeoSolver Team"
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://www.geosolver.bg/search?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

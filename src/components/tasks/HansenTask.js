@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Helmet } from "react-helmet";
+import SEO from '../shared/SEO';
 import Layout from '../layout/Layout';
 import { Link } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
@@ -235,13 +235,12 @@ Check - distance BP: ${result.distanceBP.toFixed(3)} m
 
   return (
     <>
-      <Helmet>
-        <title>Задача на Хансен – Ъглово преместване | GeoSolver</title>
-        <meta name="description" content="Изчисляване на координати чрез задача на Хансен с онлайн геодезически калкулатор. Бързи и точни решения за геодезисти." />
-        <meta name="keywords" content="геодезия, онлайн калкулатор, задача на хансен, координати, ъглово преместване, геодезически изчисления" />
-        <meta name="robots" content="index, follow" />
-        <meta name="author" content="GeoSolver" />
-      </Helmet>
+      <SEO
+        title="Задача на Хансен – Ъглово преместване"
+        description="Изчисляване на координати чрез задача на Хансен с онлайн геодезически калкулатор. Бързи и точни решения за геодезисти."
+        keywords="геодезия, онлайн калкулатор, задача на хансен, координати, ъглово преместване, геодезически изчисления"
+        canonical="/tools/hansen-task"
+      />
       <Layout>
         {/* MOBILE LAYOUT */}
         <div className="block md:hidden w-full max-w-md mx-auto min-h-screen bg-stone-50 relative px-4 py-4">

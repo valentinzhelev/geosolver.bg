@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Layout from '../../layout/Layout';
-import { Helmet } from 'react-helmet';
+import SEO from '../../shared/SEO';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { Link } from 'react-router-dom';
 
@@ -71,10 +71,11 @@ const TaskGenerator = () => {
 
   return (
     <>
-      <Helmet>
-        <title>GeoSolver – {language === 'bg' ? 'Генератор на задачи' : 'Task Generator'}</title>
-        <meta name="description" content={language === 'bg' ? 'Създаване на геодезически задачи за ученици' : 'Create geodesy tasks for students'} />
-      </Helmet>
+      <SEO
+        title={language === 'bg' ? 'Генератор на задачи' : 'Task Generator'}
+        description={language === 'bg' ? 'Създаване на геодезически задачи за ученици' : 'Create geodesy tasks for students'}
+        canonical="/teacher/tasks"
+      />
       <Layout>
         <div className="w-full min-h-screen bg-stone-50 flex flex-col items-center py-8 px-2 md:px-0">
           <div className="w-full max-w-[1180px] flex flex-col gap-10">

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '../../layout/Layout';
-import { Helmet } from 'react-helmet';
+import SEO from '../../shared/SEO';
 import { useTranslation } from '../../../hooks/useTranslation';
 
 const Prices = () => {
@@ -35,28 +35,52 @@ const Prices = () => {
     },
   ];
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": "GeoSolver Professional Plan",
+    "description": language === 'bg' 
+      ? "Професионален план за неограничени геодезически изчисления"
+      : "Professional plan for unlimited geodetic calculations",
+    "brand": {
+      "@type": "Brand",
+      "name": "GeoSolver"
+    },
+    "offers": [
+      {
+        "@type": "Offer",
+        "name": language === 'bg' ? "Безплатен план" : "Free Plan",
+        "price": "0",
+        "priceCurrency": "BGN",
+        "description": language === 'bg' ? "5 изчисления месечно" : "5 calculations per month",
+        "availability": "https://schema.org/InStock"
+      },
+      {
+        "@type": "Offer", 
+        "name": language === 'bg' ? "Професионален план" : "Professional Plan",
+        "price": "19.99",
+        "priceCurrency": "BGN",
+        "description": language === 'bg' ? "Неограничени изчисления" : "Unlimited calculations",
+        "availability": "https://schema.org/InStock"
+      }
+    ]
+  };
+
   return (
     <>
-      <Helmet>
-        <title>
-          {language === 'bg' ? 'GeoSolver - Цени и Планове' : 'GeoSolver - Prices and Plans'}
-        </title>
-        <meta 
-          name="description" 
-          content={language === 'bg'
-            ? "GeoSolver - Онлайн геодезически калкулатори. Безплатен план с 5 изчисления месечно или професионален абонамент с неограничен достъп и допълнителни функции."
-            : "GeoSolver - Online geodetic calculators. Free plan with 5 calculations per month or professional subscription with unlimited access and additional features."
-          }
-        />
-        <meta 
-          name="keywords" 
-          content={language === 'bg'
-            ? "геодезия, калкулатори, безплатен план, професионален план, абонамент, изчисления, геодезически инструменти, онлайн калкулатори"
-            : "geodesy, calculators, free plan, professional plan, subscription, calculations, geodetic tools, online calculators"
-          }
-        />
-        <meta name="robots" content="index, follow" />
-      </Helmet>
+      <SEO
+        title={language === 'bg' ? 'Цени и Планове' : 'Prices and Plans'}
+        description={language === 'bg'
+          ? "GeoSolver - Онлайн геодезически калкулатори. Безплатен план с 5 изчисления месечно или професионален абонамент с неограничен достъп и допълнителни функции."
+          : "GeoSolver - Online geodetic calculators. Free plan with 5 calculations per month or professional subscription with unlimited access and additional features."
+        }
+        keywords={language === 'bg'
+          ? "геодезия, калкулатори, безплатен план, професионален план, абонамент, изчисления, геодезически инструменти, онлайн калкулатори"
+          : "geodesy, calculators, free plan, professional plan, subscription, calculations, geodetic tools, online calculators"
+        }
+        canonical="/prices"
+        structuredData={structuredData}
+      />
       <Layout>
         {/* Responsive Layout */}
         <div className="w-full min-h-screen bg-stone-50">

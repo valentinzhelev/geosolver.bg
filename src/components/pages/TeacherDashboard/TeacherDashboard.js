@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../../layout/Layout';
-import { Helmet } from "react-helmet";
+import SEO from '../../shared/SEO';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { Link } from 'react-router-dom';
 import { teacherApi, getRecentActivity } from '../../../services/teacherApi';
@@ -72,11 +72,12 @@ const TeacherDashboard = () => {
 
   return (
     <>
-      <Helmet>
-        <title>GeoSolver – Учителски панел</title>
-        <meta name="description" content="Управлявайте вашите ученици, създавайте задания и проследявайте прогреса с GeoSolver учителския панел." />
-        <meta name="keywords" content="учителски панел, геодезия, образование, задания, ученици, GeoSolver" />
-      </Helmet>
+      <SEO
+        title="Учителски панел"
+        description="Управлявайте вашите ученици, създавайте задания и проследявайте прогреса с GeoSolver учителския панел."
+        keywords="учителски панел, геодезия, образование, задания, ученици, GeoSolver"
+        canonical="/teacher/dashboard"
+      />
       <Layout>
         <div className="w-full min-h-screen bg-stone-50">
           <div className="w-full max-w-[1180px] mx-auto px-4 lg:px-6 pt-6 lg:pt-20 pb-6 lg:pb-20 flex flex-col gap-6 lg:gap-10">

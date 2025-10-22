@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Helmet } from 'react-helmet';
+import SEO from '../shared/SEO';
 import Layout from '../layout/Layout';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -52,9 +52,11 @@ const ResetPassword = () => {
 
   return (
     <Layout>
-      <Helmet>
-        <title>Нова парола | GeoSolver</title>
-      </Helmet>
+      <SEO
+        title="Нова парола"
+        description="Задаване на нова парола за GeoSolver акаунт"
+        canonical="/reset-password"
+      />
       <div className="w-full min-h-screen bg-stone-50 flex flex-col items-center justify-center">
         <div className="w-[580px] inline-flex flex-col justify-start items-start gap-5">
           <div className="self-stretch px-14 py-10 relative rounded-xl inline-flex justify-center items-center gap-4 overflow-hidden" style={{backgroundColor: '#000'}}>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../layout/Layout';
-import { Helmet } from "react-helmet";
+import SEO from '../shared/SEO';
 import { Link } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 import useTypewriter from '../../hooks/useTypewriter';
@@ -254,13 +254,12 @@ Date: ${new Date().toLocaleString('en-US')}`;
 
   return (
     <>
-      <Helmet>
-        <title>Обратна засечка – Определяне на позиция по ъгли от известни точки | GeoSolver</title>
-        <meta name="description" content="Онлайн калкулатор за обратна засечка – определяне на позиция по ъгли от известни точки. Точни и бързи геодезически изчисления." />
-        <meta name="keywords" content="геодезия, обратна засечка, координати, ъгли, геодезически калкулатор, онлайн изчисления, координатна геодезия, класика" />
-        <meta name="robots" content="index, follow" />
-        <meta name="author" content="GeoSolver" />
-      </Helmet>
+      <SEO
+        title="Обратна засечка – Определяне на позиция по ъгли от известни точки"
+        description="Онлайн калкулатор за обратна засечка – определяне на позиция по ъгли от известни точки. Точни и бързи геодезически изчисления."
+        keywords="геодезия, обратна засечка, координати, ъгли, геодезически калкулатор, онлайн изчисления, координатна геодезия, класика"
+        canonical="/tools/resection"
+      />
       <Layout>
         {/* MOBILE LAYOUT */}
         <div className="block md:hidden w-full max-w-md mx-auto min-h-screen bg-stone-50 relative px-4 py-4">

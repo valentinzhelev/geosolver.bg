@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from 'react-router-dom';
 import Layout from '../../layout/Layout';
-import { Helmet } from "react-helmet";
+import SEO from '../../shared/SEO';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { useTheme } from '../../../context/ThemeContext';
 
@@ -9,28 +9,56 @@ const HomePage = () => {
   const { language } = useTranslation();
   const { isDark } = useTheme();
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "GeoSolver",
+    "description": language === 'bg' 
+      ? "Онлайн геодезически калкулатори за професионални геодезисти. Координатни трансформации, засечки, изчисления на площ и дължина."
+      : "Online geodetic calculators for professional surveyors. Coordinate transformations, intersections, area and distance calculations.",
+    "url": "https://www.geosolver.bg",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web Browser",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "BGN",
+      "description": language === 'bg' ? "Безплатен план с 5 изчисления месечно" : "Free plan with 5 calculations per month"
+    },
+    "featureList": language === 'bg' ? [
+      "Координатни трансформации",
+      "Права и обратна засечка", 
+      "Полярна засечка",
+      "Изчисления на площ",
+      "Изчисления на дължина",
+      "GNSS анализ",
+      "Научен калкулатор"
+    ] : [
+      "Coordinate transformations",
+      "Forward and reverse intersection",
+      "Polar intersection", 
+      "Area calculations",
+      "Distance calculations",
+      "GNSS analysis",
+      "Scientific calculator"
+    ]
+  };
+
   return (
     <>
-      <Helmet>
-        <title>{language === 'bg' ? 'GeoSolver - Онлайн калкулатор за геодезия и засечки' : 'GeoSolver - Online Calculator for Geodesy and Intersections'}</title>
-        <meta 
-          name="description" 
-          content={language === 'bg' 
-            ? "GeoSolver предлага онлайн калкулатори за геодезия, включително права засечка, обратна засечка, полярна засечка, координатни трансформации и други. Бързи и точни изчисления за геодезисти и инженери." 
-            : "GeoSolver offers online calculators for geodesy, including forward intersection, resection, polar intersection, coordinate transformations, and more. Fast and accurate calculations for surveyors and engineers."
-          } 
-        />
-        <meta 
-          name="keywords" 
-          content={language === 'bg'
-            ? "геодезия, онлайн калкулатори, права засечка, обратна засечка, полярна засечка, координатни трансформации, геодезически изчисления, GNSS, тахиметрия, координати, азимут, дължина, триангулация, Хелмерт, афинна трансформация, инженерна геодезия"
-            : "geodesy, online calculators, forward intersection, resection, polar intersection, coordinate transformations, geodetic calculations, GNSS, tacheometry, coordinates, azimuth, distance, triangulation, Helmert, affine transformation, engineering geodesy"
-          }
-        />
-        <meta name="robots" content="index, follow" />
-        <meta name="author" content="GeoSolver" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-      </Helmet>
+      <SEO
+        title={language === 'bg' ? 'Онлайн калкулатор за геодезия и засечки' : 'Online Calculator for Geodesy and Intersections'}
+        description={language === 'bg' 
+          ? "GeoSolver предлага онлайн калкулатори за геодезия, включително права засечка, обратна засечка, полярна засечка, координатни трансформации и други. Бързи и точни изчисления за геодезисти и инженери." 
+          : "GeoSolver offers online calculators for geodesy, including forward intersection, resection, polar intersection, coordinate transformations, and more. Fast and accurate calculations for surveyors and engineers."
+        }
+        keywords={language === 'bg'
+          ? "геодезия, онлайн калкулатори, права засечка, обратна засечка, полярна засечка, координатни трансформации, геодезически изчисления, GNSS, тахиметрия, координати, азимут, дължина, триангулация, Хелмерт, афинна трансформация, инженерна геодезия"
+          : "geodesy, online calculators, forward intersection, resection, polar intersection, coordinate transformations, geodetic calculations, GNSS, tacheometry, coordinates, azimuth, distance, triangulation, Helmert, affine transformation, engineering geodesy"
+        }
+        canonical="/"
+        structuredData={structuredData}
+      />
       <Layout>
         <div className="w-full min-h-screen bg-stone-50 dark:bg-neutral-950">
           <div className="w-full max-w-[1180px] mx-auto px-4 lg:px-6 pt-6 lg:pt-20 pb-6 lg:pb-20 flex flex-col gap-6 lg:gap-10">

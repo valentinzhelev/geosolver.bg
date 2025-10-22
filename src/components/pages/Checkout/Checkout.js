@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Helmet } from 'react-helmet';
+import SEO from '../../shared/SEO';
 import { useParams, useNavigate } from 'react-router-dom';
 import Layout from '../../layout/Layout';
 import { useTranslation } from '../../../hooks/useTranslation';
@@ -115,10 +115,11 @@ const Checkout = () => {
 
   return (
     <Layout>
-      <Helmet>
-        <title>{t.checkoutTitle} | GeoSolver</title>
-        <meta name="description" content={t.checkoutDescription} />
-      </Helmet>
+      <SEO
+        title={t.checkoutTitle}
+        description={t.checkoutDescription}
+        canonical="/checkout"
+      />
       
       <div className="w-full min-h-screen bg-stone-50 flex flex-col items-center">
         <div className="w-full max-w-4xl mx-auto px-4 py-8">

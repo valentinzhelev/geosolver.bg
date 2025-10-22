@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Helmet } from 'react-helmet';
+import SEO from '../shared/SEO';
 import Layout from '../layout/Layout';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
@@ -27,10 +27,11 @@ const Register = () => {
 
   return (
     <Layout>
-      <Helmet>
-        <title>Регистрация | GeoSolver</title>
-        <meta name="description" content="Създайте акаунт в GeoSolver за достъп до всички геодезически инструменти и изчисления." />
-      </Helmet>
+      <SEO
+        title="Регистрация"
+        description="Създайте акаунт в GeoSolver за достъп до всички геодезически инструменти и изчисления."
+        canonical="/register"
+      />
       <div className="w-full min-h-screen bg-stone-50">
         <div className="container mx-auto px-4 py-8 md:py-12">
           <div className="max-w-[580px] w-full mx-auto flex flex-col gap-5">
