@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://geosolver-backend-production.up.railway.app/api/history";
+const API_URL = `${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/history`;
 
 export const saveCalculation = async (data) => {
     return await axios.post(API_URL, data);

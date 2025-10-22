@@ -1,4 +1,4 @@
-const BASE_URL = 'https://geosolver-backend-production.up.railway.app';
+const BASE_URL = process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:5000';
 
 export const userPreferencesService = {
   // Get user preferences

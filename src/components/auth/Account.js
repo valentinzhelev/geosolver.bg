@@ -57,9 +57,18 @@ const Account = () => {
           }
         } catch (subError) {
           console.log('No subscription found, using free plan');
-          const plans = await PlanService.getPlans();
-          const freePlan = plans.find(p => p.name === 'free');
-          setPlan(freePlan);
+          try {
+            const plans = await PlanService.getPlans();
+            const freePlan = plans.find(p => p.name === 'free');
+            setPlan(freePlan);
+          } catch (planError) {
+            console.log('Failed to load plans, using default free plan');
+            setPlan({
+              name: 'free',
+              displayName: { bg: 'Безплатен план (По подразбиране)', en: 'Free Plan (Default)' },
+              limits: { calculationsPerMonth: 5, unlimited: false }
+            });
+          }
           setSubscription(null);
         }
         
@@ -72,9 +81,19 @@ const Account = () => {
           })));
           setTotalCalculations(calculationData.pagination.total);
         } catch (calcError) {
-          console.log('No calculation history found');
-          setUsageHistory([]);
-          setTotalCalculations(0);
+          console.log('No calculation history found, using local fallback');
+          // Fallback to local storage if backend fails
+          try {
+            const localHistory = JSON.parse(localStorage.getItem('calculationHistory') || '[]');
+            setUsageHistory(localHistory.slice(0, 10).map(calc => ({
+              tool: calc.toolDisplayName[t.language] || calc.toolDisplayName.bg,
+              date: new Date(calc.timestamp).toLocaleString('bg-BG')
+            })));
+            setTotalCalculations(localHistory.length);
+          } catch (localError) {
+            setUsageHistory([]);
+            setTotalCalculations(0);
+          }
         }
         
         // Load payment history (only if user is logged in)
@@ -98,7 +117,21 @@ const Account = () => {
         
       } catch (err) {
         console.error('Error loading account data:', err);
-        setError(err.message);
+        // Don't show error for network issues, just use fallback data
+        if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
+          console.log('Network error, using fallback data');
+          setPlan({
+            name: 'free',
+            displayName: { bg: 'Безплатен план (По подразбиране)', en: 'Free Plan (Default)' },
+            limits: { calculationsPerMonth: 5, unlimited: false }
+          });
+          setSubscription(null);
+          setUsageHistory([]);
+          setPaymentHistory([]);
+          setTotalCalculations(0);
+        } else {
+          setError(err.message);
+        }
       } finally {
         setLoading(false);
       }

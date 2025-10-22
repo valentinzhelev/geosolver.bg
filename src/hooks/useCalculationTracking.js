@@ -18,10 +18,31 @@ export const useCalculationTracking = () => {
         calculationTime
       };
 
-      // Always save to backend
-      const result = await CalculationService.saveCalculation(calculationData);
-      console.log('Calculation saved to backend:', result);
-      return result;
+      // Try to save to backend first
+      try {
+        const result = await CalculationService.saveCalculation(calculationData);
+        console.log('Calculation saved to backend:', result);
+        return result;
+      } catch (backendError) {
+        console.log('Backend save failed, saving locally:', backendError.message);
+        
+        // Fallback to local storage
+        const localHistory = JSON.parse(localStorage.getItem('calculationHistory') || '[]');
+        const localData = {
+          ...calculationData,
+          timestamp: new Date().toISOString()
+        };
+        localHistory.unshift(localData);
+        
+        // Keep only last 50 calculations
+        if (localHistory.length > 50) {
+          localHistory.splice(50);
+        }
+        
+        localStorage.setItem('calculationHistory', JSON.stringify(localHistory));
+        console.log('Calculation saved locally:', localData);
+        return { success: true, local: true };
+      }
     } catch (err) {
       setError(err.message);
       throw err;
@@ -34,13 +55,37 @@ export const useCalculationTracking = () => {
     console.log('Checking limits...');
     
     try {
-      // Get limits from backend
+      // Try to get limits from backend first
       const result = await CalculationService.checkLimits();
       console.log('Backend limits check:', result);
       return result;
     } catch (backendError) {
-      console.log('Backend limits check failed:', backendError.message);
-      throw backendError;
+      console.log('Backend limits check failed, using local limits:', backendError.message);
+      
+      // Fallback to local storage
+      const localHistory = JSON.parse(localStorage.getItem('calculationHistory') || '[]');
+      const today = new Date().toDateString();
+      const todayCalculations = localHistory.filter(calc => 
+        new Date(calc.timestamp).toDateString() === today
+      );
+      
+      const used = todayCalculations.length;
+      const limit = 5; // Free plan limit
+      
+      console.log('Local limits check:', { 
+        totalCalculations: localHistory.length,
+        todayCalculations: todayCalculations.length,
+        used, 
+        limit, 
+        canCalculate: used < limit 
+      });
+      
+      return {
+        canCalculate: used < limit,
+        used: used,
+        limit: limit,
+        unlimited: false
+      };
     }
   }, []);
 
