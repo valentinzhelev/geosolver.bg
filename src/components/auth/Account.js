@@ -12,6 +12,9 @@ const Account = () => {
   const { user, logout } = useAuth();
   const { t } = useTranslation();
   
+  console.log('Account.js loaded, user:', user);
+  console.log('Token in localStorage:', localStorage.getItem('token'));
+  
   // Function to refresh limits
   const refreshLimits = async () => {
     try {
@@ -139,7 +142,9 @@ const Account = () => {
         
         // Load calculation history and limits from backend
         try {
+          console.log('Loading calculation history...');
           const calculationData = await CalculationService.getCalculationHistory(1, usageItemsPerPage);
+          console.log('Calculation history received:', calculationData);
           setUsageHistory(calculationData.calculations.map(calc => ({
             tool: calc.toolDisplayName[t.language] || calc.toolDisplayName.bg,
             date: new Date(calc.createdAt).toLocaleString('bg-BG')
@@ -147,7 +152,9 @@ const Account = () => {
           setTotalCalculations(calculationData.pagination.total);
           
           // Load calculation limits
+          console.log('Loading calculation limits...');
           const limits = await CalculationService.checkLimits();
+          console.log('Limits received:', limits);
           setCalculationLimits(limits);
           
           // Set plan expiry date
@@ -223,6 +230,8 @@ const Account = () => {
 
   // Listen for calculation events to refresh limits and history
   useEffect(() => {
+    console.log('Setting up calculationCompleted event listener, user:', user);
+    
     const handleCalculationUpdate = () => {
       console.log('Calculation completed event received!');
       refreshLimits();
@@ -237,8 +246,17 @@ const Account = () => {
     };
 
     window.addEventListener('calculationCompleted', handleCalculationUpdate);
+    console.log('Event listener added');
+    
+    // Test: Manually trigger event after 2 seconds to test if listener works
+    setTimeout(() => {
+      console.log('Testing event listener...');
+      window.dispatchEvent(new CustomEvent('calculationCompleted'));
+    }, 2000);
+    
     return () => {
       window.removeEventListener('calculationCompleted', handleCalculationUpdate);
+      console.log('Event listener removed');
     };
   }, [user]);
 
@@ -293,6 +311,36 @@ const Account = () => {
       <div className="w-full min-h-screen bg-stone-50 flex flex-col items-center">
         <div className="w-[1180px] mt-8 mb-8 inline-flex flex-col justify-start items-start gap-10">
           <div className="self-stretch justify-start text-black text-3xl font-bold font-['Manrope']">{t.accountTitle}</div>
+          
+          {/* Debug Test Buttons */}
+          <div className="flex gap-4">
+            <button 
+              onClick={async () => {
+                console.log('Testing API manually...');
+                try {
+                  const limits = await CalculationService.checkLimits();
+                  console.log('Manual limits test:', limits);
+                  const history = await CalculationService.getCalculationHistory(1, 5);
+                  console.log('Manual history test:', history);
+                } catch (error) {
+                  console.error('Manual test error:', error);
+                }
+              }}
+              className="px-4 py-2 bg-red-500 text-white rounded"
+            >
+              Test API Manually
+            </button>
+            
+            <button 
+              onClick={() => {
+                console.log('Manually triggering calculationCompleted event...');
+                window.dispatchEvent(new CustomEvent('calculationCompleted'));
+              }}
+              className="px-4 py-2 bg-blue-500 text-white rounded"
+            >
+              Test Event
+            </button>
+          </div>
           <div className="self-stretch inline-flex justify-start items-start gap-5">
             <div className="w-96 inline-flex flex-col justify-center items-center gap-5">
               <div className="self-stretch p-4 bg-white rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-0.50px] outline-gray-200 flex flex-col justify-start items-start gap-4 overflow-hidden">
