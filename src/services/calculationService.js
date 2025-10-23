@@ -65,15 +65,27 @@ class CalculationService {
     }
   }
 
-  // Проверка на лимити преди изчисление
+  // Проверка на лимити преди изчисление (24-часови лимити)
   static async checkLimits() {
     try {
-      const stats = await this.getCalculationStats();
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE_URL}/calculations/limits`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch calculation limits');
+      }
+      
+      const result = await response.json();
       return {
-        canCalculate: stats.userLimits.unlimited || stats.userLimits.used < stats.userLimits.limit,
-        used: stats.userLimits.used,
-        limit: stats.userLimits.limit,
-        unlimited: stats.userLimits.unlimited
+        canCalculate: result.canCalculate,
+        used: result.used,
+        limit: result.limit,
+        unlimited: result.unlimited
       };
     } catch (error) {
       console.error('Error checking limits:', error);

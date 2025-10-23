@@ -21,6 +21,42 @@ const Account = () => {
       console.log('Failed to refresh limits:', error);
     }
   };
+
+  // Function to reload usage history when page changes
+  const reloadUsageHistory = async (page) => {
+    if (!user) return;
+    try {
+      setLoading(true);
+      const calculationData = await CalculationService.getCalculationHistory(page, usageItemsPerPage);
+      setUsageHistory(calculationData.calculations.map(calc => ({
+        tool: calc.toolDisplayName[t.language] || calc.toolDisplayName.bg,
+        date: new Date(calc.createdAt).toLocaleString('bg-BG')
+      })));
+      setTotalCalculations(calculationData.pagination.total);
+    } catch (error) {
+      console.log('Failed to reload usage history:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Function to reload payment history when page changes
+  const reloadPaymentHistory = async (page) => {
+    if (!user) return;
+    try {
+      setLoading(true);
+      const paymentData = await PaymentService.getPaymentHistory(page, paymentItemsPerPage);
+      setPaymentHistory(paymentData.payments.map(payment => ({
+        method: `**** ${payment.paymentMethod.last4}`,
+        amount: `${payment.amount}${payment.currency}`,
+        date: new Date(payment.createdAt).toLocaleString('bg-BG')
+      })));
+    } catch (error) {
+      console.log('Failed to reload payment history:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
   
   // State for real data
   const [plan, setPlan] = useState(null);
@@ -33,6 +69,18 @@ const Account = () => {
   const [planExpiryDate, setPlanExpiryDate] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Pagination state for usage history
+  const [usageCurrentPage, setUsageCurrentPage] = useState(1);
+  const usageItemsPerPage = 5;
+  const usageTotalPages = Math.ceil(usageHistory.length / usageItemsPerPage);
+  const paginatedUsageHistory = usageHistory.slice((usageCurrentPage - 1) * usageItemsPerPage, usageCurrentPage * usageItemsPerPage);
+
+  // Pagination state for payment history
+  const [paymentCurrentPage, setPaymentCurrentPage] = useState(1);
+  const paymentItemsPerPage = 5;
+  const paymentTotalPages = Math.ceil(paymentHistory.length / paymentItemsPerPage);
+  const paginatedPaymentHistory = paymentHistory.slice((paymentCurrentPage - 1) * paymentItemsPerPage, paymentCurrentPage * paymentItemsPerPage);
 
   // Load account data
   useEffect(() => {
@@ -87,7 +135,7 @@ const Account = () => {
         
         // Load calculation history and limits from backend
         try {
-          const calculationData = await CalculationService.getCalculationHistory(1, 10);
+          const calculationData = await CalculationService.getCalculationHistory(usageCurrentPage, usageItemsPerPage);
           setUsageHistory(calculationData.calculations.map(calc => ({
             tool: calc.toolDisplayName[t.language] || calc.toolDisplayName.bg,
             date: new Date(calc.createdAt).toLocaleString('bg-BG')
@@ -108,41 +156,20 @@ const Account = () => {
             setPlanExpiryDate(endOfMonth);
           }
         } catch (calcError) {
-          console.log('No calculation history found, using local fallback');
-          // Fallback to local storage if backend fails
-          try {
-            const localHistory = JSON.parse(localStorage.getItem('calculationHistory') || '[]');
-            setUsageHistory(localHistory.slice(0, 10).map(calc => ({
-              tool: calc.toolDisplayName[t.language] || calc.toolDisplayName.bg,
-              date: new Date(calc.timestamp).toLocaleString('bg-BG')
-            })));
-            setTotalCalculations(localHistory.length);
-            
-            // Set local limits
-            const today = new Date().toDateString();
-            const todayCalculations = localHistory.filter(calc => 
-              new Date(calc.timestamp).toDateString() === today
-            );
-            setCalculationLimits({
-              used: todayCalculations.length,
-              limit: 5,
-              unlimited: false
-            });
-            
-            // Set fallback expiry date
-            const now = new Date();
-            const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-            setPlanExpiryDate(endOfMonth);
-          } catch (localError) {
-            setUsageHistory([]);
-            setTotalCalculations(0);
-            setCalculationLimits({ used: 0, limit: 5, unlimited: false });
-          }
+          console.log('No calculation history found from database');
+          setUsageHistory([]);
+          setTotalCalculations(0);
+          setCalculationLimits({ used: 0, limit: 5, unlimited: false });
+          
+          // Set fallback expiry date
+          const now = new Date();
+          const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+          setPlanExpiryDate(endOfMonth);
         }
         
         // Load payment history (only if user is logged in)
         try {
-          const paymentData = await PaymentService.getPaymentHistory(1, 10);
+          const paymentData = await PaymentService.getPaymentHistory(paymentCurrentPage, paymentItemsPerPage);
           setPaymentHistory(paymentData.payments.map(payment => ({
             method: `**** ${payment.paymentMethod.last4}`,
             amount: `${payment.amount}${payment.currency}`,
@@ -161,21 +188,9 @@ const Account = () => {
         
       } catch (err) {
         console.error('Error loading account data:', err);
-        // Don't show error for network issues, just use fallback data
-        if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
-          console.log('Network error, using fallback data');
-          setPlan({
-            name: 'free',
-            displayName: { bg: 'Безплатен план (По подразбиране)', en: 'Free Plan (Default)' },
-            limits: { calculationsPerMonth: 5, unlimited: false }
-          });
-          setSubscription(null);
-          setUsageHistory([]);
-          setPaymentHistory([]);
-          setTotalCalculations(0);
-        } else {
-          setError(err.message);
-        }
+        // Show error for any database connection issues
+        console.error('Database connection error:', err);
+        setError('Failed to connect to database. Please check your internet connection and try again.');
       } finally {
         setLoading(false);
       }
@@ -202,17 +217,35 @@ const Account = () => {
     }
   }, [plan]);
 
-  // Listen for calculation events to refresh limits
+  // Listen for calculation events to refresh limits and history
   useEffect(() => {
     const handleCalculationUpdate = () => {
       refreshLimits();
+      // Also refresh usage history when new calculation is completed
+      if (user) {
+        reloadUsageHistory(usageCurrentPage);
+      }
     };
 
     window.addEventListener('calculationCompleted', handleCalculationUpdate);
     return () => {
       window.removeEventListener('calculationCompleted', handleCalculationUpdate);
     };
-  }, []);
+  }, [user, usageCurrentPage]);
+
+  // Reload usage history when page changes
+  useEffect(() => {
+    if (user && usageCurrentPage > 1) {
+      reloadUsageHistory(usageCurrentPage);
+    }
+  }, [usageCurrentPage, user]);
+
+  // Reload payment history when page changes
+  useEffect(() => {
+    if (user && paymentCurrentPage > 1) {
+      reloadPaymentHistory(paymentCurrentPage);
+    }
+  }, [paymentCurrentPage, user]);
 
   // Default plan if no subscription
   const defaultPlan = {
@@ -366,37 +399,45 @@ const Account = () => {
                       <div className="justify-start text-black text-sm font-medium font-['Manrope']">{t.date}</div>
                     </div>
                   </div>
-                  {usageHistory.map((h, i) => (
-                    <div key={i} className="self-stretch inline-flex justify-start items-start gap-px">
-                      <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                        <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{h.tool}</div>
+                  {paginatedUsageHistory.length === 0 ? (
+                    <div className="w-full px-3 py-2 bg-white text-neutral-400 text-sm font-medium font-['Manrope']">Няма изчисления.</div>
+                  ) : (
+                    paginatedUsageHistory.map((h, i) => (
+                      <div key={i} className="self-stretch inline-flex justify-start items-start gap-px">
+                        <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
+                          <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{h.tool}</div>
+                        </div>
+                        <div className="w-48 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
+                          <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{h.date}</div>
+                        </div>
                       </div>
-                      <div className="w-48 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                        <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{h.date}</div>
-                      </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
                 <div className="self-stretch inline-flex justify-center items-center gap-4">
                   <div className="flex justify-start items-center gap-2">
-                    <div className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center">
-                    <img src="/icons/small_left_arrow.svg" alt={t.back} className="w-3 h-3" />
-                    </div>
-                    <div className="w-7 px-2 py-1 bg-gray-200 rounded inline-flex flex-col justify-center items-center">
-                      <div className="justify-start text-black text-sm font-medium font-['Manrope']">1</div>
-                    </div>
-                    <div className="w-7 px-2 py-1 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-center items-center">
-                      <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">2</div>
-                    </div>
-                    <div className="w-7 px-2 py-1 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-center items-center">
-                      <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">3</div>
-                    </div>
-                    <div className="w-7 px-2 py-1 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-center items-center">
-                      <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">4</div>
-                    </div>
-                    <div className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center">
-                    <img src="/icons/small_right_arrow.svg" alt={t.next} className="w-3 h-3" />
-                    </div>
+                    <button className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center" onClick={() => {
+                      const newPage = Math.max(1, usageCurrentPage - 1);
+                      setUsageCurrentPage(newPage);
+                      if (user) reloadUsageHistory(newPage);
+                    }} disabled={usageCurrentPage === 1 || loading}>
+                      <img src="/icons/small_left_arrow.svg" alt={t.back} className="w-3 h-3 opacity-70" />
+                    </button>
+                    {Array.from({ length: usageTotalPages }, (_, i) => (
+                      <button key={i} className={`w-7 px-2 py-1 rounded ${usageCurrentPage === i + 1 ? 'bg-gray-200 text-black' : 'outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400'} inline-flex flex-col justify-center items-center`} onClick={() => {
+                        setUsageCurrentPage(i + 1);
+                        if (user) reloadUsageHistory(i + 1);
+                      }} disabled={usageCurrentPage === i + 1 || loading}>
+                        <div className="justify-start text-sm font-medium font-['Manrope']">{i + 1}</div>
+                      </button>
+                    ))}
+                    <button className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center" onClick={() => {
+                      const newPage = Math.min(usageTotalPages, usageCurrentPage + 1);
+                      setUsageCurrentPage(newPage);
+                      if (user) reloadUsageHistory(newPage);
+                    }} disabled={usageCurrentPage === usageTotalPages || usageTotalPages === 0 || loading}>
+                      <img src="/icons/small_right_arrow.svg" alt={t.next} className="w-3 h-3 opacity-70" />
+                    </button>
                   </div>
                 </div>
               </div>
@@ -414,35 +455,49 @@ const Account = () => {
                       <div className="justify-start text-black text-sm font-medium font-['Manrope']">{t.date}</div>
                     </div>
                   </div>
-                  {paymentHistory.map((payment, i) => (
-                    <div key={i} className="self-stretch inline-flex justify-start items-center gap-px">
-                      <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                        <img src="/icons/visa_small.svg" alt="Visa" className="w-5 h-5" />
-                        <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{payment.method}</div>
+                  {paginatedPaymentHistory.length === 0 ? (
+                    <div className="w-full px-3 py-2 bg-white text-neutral-400 text-sm font-medium font-['Manrope']">Няма плащания.</div>
+                  ) : (
+                    paginatedPaymentHistory.map((payment, i) => (
+                      <div key={i} className="self-stretch inline-flex justify-start items-center gap-px">
+                        <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
+                          <img src="/icons/visa_small.svg" alt="Visa" className="w-5 h-5" />
+                          <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{payment.method}</div>
+                        </div>
+                        <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
+                          <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{payment.amount}</div>
+                        </div>
+                        <div className="w-48 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
+                          <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{payment.date}</div>
+                        </div>
                       </div>
-                      <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                        <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{payment.amount}</div>
-                      </div>
-                      <div className="w-48 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                        <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{payment.date}</div>
-                      </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
                 <div className="self-stretch inline-flex justify-center items-center gap-4">
                   <div className="flex justify-start items-center gap-2">
-                    <div className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center">
-                      <img src="/icons/small_left_arrow.svg" alt={t.back} className="w-3 h-3" />
-                    </div>
-                    <div className="w-7 px-2 py-1 bg-gray-200 rounded inline-flex flex-col justify-center items-center">
-                      <div className="justify-start text-black text-sm font-medium font-['Manrope']">1</div>
-                    </div>
-                    <div className="w-7 px-2 py-1 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-center items-center">
-                      <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">2</div>
-                    </div>
-                    <div className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center">
-                      <img src="/icons/small_right_arrow.svg" alt={t.next} className="w-3 h-3" />
-                    </div>
+                    <button className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center" onClick={() => {
+                      const newPage = Math.max(1, paymentCurrentPage - 1);
+                      setPaymentCurrentPage(newPage);
+                      if (user) reloadPaymentHistory(newPage);
+                    }} disabled={paymentCurrentPage === 1 || loading}>
+                      <img src="/icons/small_left_arrow.svg" alt={t.back} className="w-3 h-3 opacity-70" />
+                    </button>
+                    {Array.from({ length: paymentTotalPages }, (_, i) => (
+                      <button key={i} className={`w-7 px-2 py-1 rounded ${paymentCurrentPage === i + 1 ? 'bg-gray-200 text-black' : 'outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400'} inline-flex flex-col justify-center items-center`} onClick={() => {
+                        setPaymentCurrentPage(i + 1);
+                        if (user) reloadPaymentHistory(i + 1);
+                      }} disabled={paymentCurrentPage === i + 1 || loading}>
+                        <div className="justify-start text-sm font-medium font-['Manrope']">{i + 1}</div>
+                      </button>
+                    ))}
+                    <button className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center" onClick={() => {
+                      const newPage = Math.min(paymentTotalPages, paymentCurrentPage + 1);
+                      setPaymentCurrentPage(newPage);
+                      if (user) reloadPaymentHistory(newPage);
+                    }} disabled={paymentCurrentPage === paymentTotalPages || paymentTotalPages === 0 || loading}>
+                      <img src="/icons/small_right_arrow.svg" alt={t.next} className="w-3 h-3 opacity-70" />
+                    </button>
                   </div>
                 </div>
               </div>
