@@ -15,7 +15,9 @@ const Account = () => {
   // Function to refresh limits
   const refreshLimits = async () => {
     try {
+      console.log('Refreshing limits...');
       const limits = await CalculationService.checkLimits();
+      console.log('New limits:', limits);
       setCalculationLimits(limits);
     } catch (error) {
       console.log('Failed to refresh limits:', error);
@@ -26,8 +28,10 @@ const Account = () => {
   const reloadUsageHistory = async (page) => {
     if (!user) return;
     try {
+      console.log('Reloading usage history for page:', page);
       setLoading(true);
       const calculationData = await CalculationService.getCalculationHistory(page, usageItemsPerPage);
+      console.log('Calculation data received:', calculationData);
       setUsageHistory(calculationData.calculations.map(calc => ({
         tool: calc.toolDisplayName[t.language] || calc.toolDisplayName.bg,
         date: new Date(calc.createdAt).toLocaleString('bg-BG')
@@ -135,7 +139,7 @@ const Account = () => {
         
         // Load calculation history and limits from backend
         try {
-          const calculationData = await CalculationService.getCalculationHistory(usageCurrentPage, usageItemsPerPage);
+          const calculationData = await CalculationService.getCalculationHistory(1, usageItemsPerPage);
           setUsageHistory(calculationData.calculations.map(calc => ({
             tool: calc.toolDisplayName[t.language] || calc.toolDisplayName.bg,
             date: new Date(calc.createdAt).toLocaleString('bg-BG')
@@ -169,7 +173,7 @@ const Account = () => {
         
         // Load payment history (only if user is logged in)
         try {
-          const paymentData = await PaymentService.getPaymentHistory(paymentCurrentPage, paymentItemsPerPage);
+          const paymentData = await PaymentService.getPaymentHistory(1, paymentItemsPerPage);
           setPaymentHistory(paymentData.payments.map(payment => ({
             method: `**** ${payment.paymentMethod.last4}`,
             amount: `${payment.amount}${payment.currency}`,
@@ -220,10 +224,15 @@ const Account = () => {
   // Listen for calculation events to refresh limits and history
   useEffect(() => {
     const handleCalculationUpdate = () => {
+      console.log('Calculation completed event received!');
       refreshLimits();
-      // Also refresh usage history when new calculation is completed
+      // Also refresh usage history when new calculation is completed (always go to page 1)
       if (user) {
-        reloadUsageHistory(usageCurrentPage);
+        console.log('User is logged in, refreshing usage history...');
+        setUsageCurrentPage(1); // Reset to first page
+        reloadUsageHistory(1);
+      } else {
+        console.log('User is not logged in, skipping history refresh');
       }
     };
 
@@ -231,7 +240,7 @@ const Account = () => {
     return () => {
       window.removeEventListener('calculationCompleted', handleCalculationUpdate);
     };
-  }, [user, usageCurrentPage]);
+  }, [user]);
 
   // Reload usage history when page changes
   useEffect(() => {
