@@ -5,6 +5,20 @@ class PaymentService {
   static async getPaymentHistory(page = 1, limit = 10) {
     try {
       const token = localStorage.getItem('token');
+      
+      // If no token, return empty data
+      if (!token) {
+        return {
+          payments: [],
+          pagination: {
+            current: 1,
+            total: 0,
+            hasNext: false,
+            hasPrev: false
+          }
+        };
+      }
+      
       const response = await fetch(`${API_BASE_URL}/payments?page=${page}&limit=${limit}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -15,7 +29,16 @@ class PaymentService {
       return await response.json();
     } catch (error) {
       console.error('Error fetching payment history:', error);
-      throw error;
+      // Return empty data instead of throwing error
+      return {
+        payments: [],
+        pagination: {
+          current: 1,
+          total: 0,
+          hasNext: false,
+          hasPrev: false
+        }
+      };
     }
   }
 

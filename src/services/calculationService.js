@@ -39,6 +39,20 @@ class CalculationService {
       console.log('  - Token exists:', !!token);
       console.log('  - Token preview:', token ? token.substring(0, 20) + '...' : 'null');
       
+      // If no token, return empty data instead of failing
+      if (!token) {
+        console.log('  - No token found, returning empty data');
+        return {
+          calculations: [],
+          pagination: {
+            current: 1,
+            total: 0,
+            hasNext: false,
+            hasPrev: false
+          }
+        };
+      }
+      
       const response = await fetch(url, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -60,7 +74,16 @@ class CalculationService {
       return data;
     } catch (error) {
       console.error('❌ Error fetching calculation history:', error);
-      throw error;
+      // Return empty data instead of throwing error
+      return {
+        calculations: [],
+        pagination: {
+          current: 1,
+          total: 0,
+          hasNext: false,
+          hasPrev: false
+        }
+      };
     }
   }
 
@@ -94,11 +117,17 @@ class CalculationService {
       console.log('  - Token exists:', !!token);
       console.log('  - Token preview:', token ? token.substring(0, 20) + '...' : 'null');
       
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+      
+      // Only add Authorization header if token exists
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
       const response = await fetch(url, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+        headers
       });
       
       console.log('  - Response status:', response.status);
