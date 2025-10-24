@@ -33,6 +33,8 @@ import TeacherDashboard from './components/pages/TeacherDashboard/TeacherDashboa
 import TaskGenerator from './components/pages/TeacherDashboard/TaskGenerator';
 import StudentManagement from './components/pages/TeacherDashboard/StudentManagement';
 import ScanInterface from './components/pages/TeacherDashboard/ScanInterface';
+import CourseManagement from './components/pages/TeacherDashboard/CourseManagement';
+import TaskTemplateEditor from './components/pages/TeacherDashboard/TaskTemplateEditor';
 import CoordinateTransformation from './components/tasks/CoordinateTransformation';
 import AreaCalculation from './components/tasks/AreaCalculation';
 import DistanceBearing from './components/tasks/DistanceBearing';
@@ -115,6 +117,22 @@ function App() {
                 element={
                   <TeacherRoute>
                     <ScanInterface />
+                  </TeacherRoute>
+                }
+              />
+              <Route
+                path="/teacher/courses"
+                element={
+                  <TeacherRoute>
+                    <CourseManagement />
+                  </TeacherRoute>
+                }
+              />
+              <Route
+                path="/teacher/templates/editor"
+                element={
+                  <TeacherRoute>
+                    <TaskTemplateEditor />
                   </TeacherRoute>
                 }
               />
