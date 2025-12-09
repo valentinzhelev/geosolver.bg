@@ -13,7 +13,6 @@ import TeacherRoute from './components/auth/TeacherRoute';
 import { AuthProvider } from './components/auth/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { ThemeProvider } from './context/ThemeContext';
-// Helmet removed - using SEO component instead
 import ForgotPassword from './components/auth/ForgotPassword';
 import ResetPassword from './components/auth/ResetPassword';
 import CookieConsent from './components/shared/CookieConsent';

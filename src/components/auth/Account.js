@@ -418,7 +418,7 @@ const Account = () => {
                       </div>
                       <Link to="/prices" className="flex justify-start items-center gap-2">
                         <div className="justify-start text-black text-sm font-medium font-['Manrope']">{t.viewPlans}</div>
-                        <div className="w-[5.09px] h-2 bg-black" />
+                        <img src="/icons/small_right_arrow.svg" alt={t.next} className="w-3 h-3 opacity-70" />
                       </Link>
                     </div>
                     <div className="w-[723.99px] h-2 bg-gray-200 rounded-[30px] relative">
