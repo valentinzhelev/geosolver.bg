@@ -146,7 +146,9 @@ class CalculationService {
         canCalculate: result.canCalculate,
         used: result.used,
         limit: result.limit,
-        unlimited: result.unlimited
+        unlimited: result.unlimited,
+        periodStart: result.periodStart ? new Date(result.periodStart) : null,
+        periodEnd: result.periodEnd ? new Date(result.periodEnd) : null
       };
     } catch (error) {
       console.error('❌ Error checking limits:', error);

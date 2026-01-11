@@ -4,6 +4,8 @@ import Layout from '../layout/Layout';
 import { Link } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 import useTypewriter from '../../hooks/useTypewriter';
+import { calculatePolarIntersection as calculatePolarIntersectionDomain } from '../../domain/geodesy';
+import { roundTo } from '../../domain/math';
 
 // Helpers for localStorage history for each input
 const getInputHistory = (key) => {
@@ -137,51 +139,27 @@ Check - angle: ${result.calculatedAngle} gon
    * @param {number} distance - Разстояние в метри
    * @returns {Object} Резултати от изчисленията
    */
+  // Използва domain модула за изчисления
   const calculatePolarIntersection = (xA, yA, angle, distance) => {
-    // Валидация на входните данни
-    if (distance <= 0) {
-      throw new Error('Разстоянието трябва да е положително число');
-    }
-
-    // Преобразуване на ъгъла от гради в радиани
-    const angleRad = angle * Math.PI / 200;
+    const result = calculatePolarIntersectionDomain(xA, yA, angle, distance);
     
-    // Изчисляване на тригонометричните функции
-    const sinAlpha = Math.sin(angleRad);
-    const cosAlpha = Math.cos(angleRad);
-    
-    // Изчисляване на координатните разлики
-    const deltaX = distance * cosAlpha;
-    const deltaY = distance * sinAlpha;
-    
-    // Изчисляване на координатите на неизвестната точка
-    const xP = xA + deltaX;
-    const yP = yA + deltaY;
-
-    // Изчисляване на обратния ъгъл
-    const reverseAngle = angle >= 200 ? angle - 200 : angle + 200;
-
-    // Определяне на квадранта
-    let quadrant = '';
-    if (deltaX >= 0 && deltaY >= 0) quadrant = 'I';
-    else if (deltaX < 0 && deltaY >= 0) quadrant = 'II';
-    else if (deltaX < 0 && deltaY < 0) quadrant = 'III';
-    else if (deltaX >= 0 && deltaY < 0) quadrant = 'IV';
-
+    // Прилага закръгляване за съвместимост с UI
     return {
-      xA, yA, angle, distance,
-      angleRad,
-      sinAlpha: Math.round(sinAlpha * 1000000) / 1000000,
-      cosAlpha: Math.round(cosAlpha * 1000000) / 1000000,
-      deltaX: Math.round(deltaX * 1000) / 1000,
-      deltaY: Math.round(deltaY * 1000) / 1000,
-      xP: Math.round(xP * 1000) / 1000,
-      yP: Math.round(yP * 1000) / 1000,
-      reverseAngle: Math.round(reverseAngle * 1000) / 1000,
-      quadrant,
-      // Допълнителни изчисления за проверка
-      calculatedDistance: Math.round(Math.sqrt(deltaX * deltaX + deltaY * deltaY) * 1000) / 1000,
-      calculatedAngle: Math.round(Math.atan2(deltaY, deltaX) * 200 / Math.PI * 1000) / 1000
+      xA: result.xA,
+      yA: result.yA,
+      angle: result.angle,
+      distance: result.distance,
+      angleRad: roundTo(result.angleRad, 6),
+      sinAlpha: roundTo(result.sinAlpha, 6),
+      cosAlpha: roundTo(result.cosAlpha, 6),
+      deltaX: roundTo(result.deltaX, 3),
+      deltaY: roundTo(result.deltaY, 3),
+      xP: roundTo(result.xP, 3),
+      yP: roundTo(result.yP, 3),
+      reverseAngle: roundTo(result.reverseAngle, 3),
+      quadrant: result.quadrant,
+      calculatedDistance: roundTo(result.calculatedDistance, 3),
+      calculatedAngle: roundTo(result.calculatedAngle, 3)
     };
   };
 

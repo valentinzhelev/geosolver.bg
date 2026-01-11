@@ -4,6 +4,8 @@ import Layout from '../layout/Layout';
 import { Link } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 import useTypewriter from '../../hooks/useTypewriter';
+import { calculateDistanceBearing as calculateDistanceBearingDomain } from '../../domain/geodesy';
+import { roundTo } from '../../domain/math';
 
 // Helpers for localStorage history for each input
 const getInputHistory = (key) => {
@@ -120,61 +122,23 @@ Quadrant: ${result.quadrant}
     setHistory(getHistory());
   };
 
-  /**
-   * Разстояние и посока (Enhanced):
-   * Изчислява разстоянието и посоката между две точки
-   * 
-   * Формули:
-   * d = √((Y₂ - Y₁)² + (X₂ - X₁)²)
-   * α = arctan((X₂ - X₁) / (Y₂ - Y₁))
-   * 
-   * @param {number} x1 - X координата на първа точка
-   * @param {number} y1 - Y координата на първа точка
-   * @param {number} x2 - X координата на втора точка
-   * @param {number} y2 - Y координата на втора точка
-   * @returns {Object} Резултати от изчисленията
-   */
+  // Използва domain модула за изчисления
   const calculateDistanceBearing = (x1, y1, x2, y2) => {
-    // Координатни разлики
-    const deltaY = y2 - y1;
-    const deltaX = x2 - x1;
-
-    // Изчисляване на разстоянието
-    const distance = Math.sqrt(deltaY * deltaY + deltaX * deltaX);
-
-    // Изчисляване на посоката (азимут)
-    let bearingRad = Math.atan2(deltaX, deltaY);
+    const result = calculateDistanceBearingDomain(x1, y1, x2, y2);
     
-    // Нормализиране на ъгъла (0 до 2π)
-    if (bearingRad < 0) {
-      bearingRad += 2 * Math.PI;
-    }
-
-    // Преобразуване в гради и градуси
-    const bearingGon = bearingRad * 200 / Math.PI;
-    const bearingDeg = bearingRad * 180 / Math.PI;
-
-    // Определяне на квадранта
-    let quadrant = '';
-    if (deltaY >= 0 && deltaX >= 0) {
-      quadrant = 'I квадрант (0-100 gon)';
-    } else if (deltaY < 0 && deltaX >= 0) {
-      quadrant = 'II квадрант (100-200 gon)';
-    } else if (deltaY < 0 && deltaX < 0) {
-      quadrant = 'III квадрант (200-300 gon)';
-    } else {
-      quadrant = 'IV квадрант (300-400 gon)';
-    }
-
+    // Прилага закръгляване за съвместимост с UI
     return {
-      x1, y1, x2, y2,
-      deltaY: Math.round(deltaY * 1000) / 1000,
-      deltaX: Math.round(deltaX * 1000) / 1000,
-      distance: Math.round(distance * 1000) / 1000,
-      bearingRad: Math.round(bearingRad * 1000000) / 1000000,
-      bearingGon: Math.round(bearingGon * 100) / 100,
-      bearingDeg: Math.round(bearingDeg * 100) / 100,
-      quadrant
+      x1: result.x1,
+      y1: result.y1,
+      x2: result.x2,
+      y2: result.y2,
+      deltaY: roundTo(result.deltaY, 3),
+      deltaX: roundTo(result.deltaX, 3),
+      distance: roundTo(result.distance, 3),
+      bearingRad: roundTo(result.bearingRad, 6),
+      bearingGon: roundTo(result.bearingGon, 2),
+      bearingDeg: roundTo(result.bearingDeg, 2),
+      quadrant: result.quadrant
     };
   };
 

@@ -5,6 +5,8 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 import useTypewriter from '../../hooks/useTypewriter';
 import { useCalculationTracking } from '../../hooks/useCalculationTracking';
+import { calculateFirstTask as calculateFirstTaskDomain } from '../../domain/geodesy';
+import { roundTo } from '../../domain/math';
 
 // Helpers for localStorage history for each input
 const getInputHistory = (key) => {
@@ -174,50 +176,26 @@ Check - angle: ${result.calculatedAngle} gon
    * @param {number} s - дължина на отсечката (м)
    * @returns {Object} - координати на точка 2 и междинни изчисления
    */
+  // Използва domain модула за изчисления
   const purvaOsnovnaZadacha = (y1, x1, alphaGon, s) => {
-    // Валидация на входните данни
-    if (alphaGon < 0 || alphaGon >= 400) {
-      throw new Error('Посочният ъгъл трябва да бъде между 0 и 400 гради');
-    }
-    if (s <= 0) {
-      throw new Error('Дължината трябва да бъде положителна');
-    }
-
-    // Преобразуване от гради в радиани
-    const alphaRad = alphaGon * Math.PI / 200;
+    const result = calculateFirstTaskDomain(y1, x1, alphaGon, s);
     
-    // Изчисляване на тригонометричните функции
-    const sinAlpha = Math.sin(alphaRad);
-    const cosAlpha = Math.cos(alphaRad);
-    
-    // Изчисляване на координатните разлики
-    const deltaX = s * cosAlpha;
-    const deltaY = s * sinAlpha;
-    
-    // Изчисляване на координатите на точка 2
-    const x2 = x1 + deltaX;
-    const y2 = y1 + deltaY;
-
-    // Определяне на квадранта
-    let quadrant = '';
-    if (deltaX >= 0 && deltaY >= 0) quadrant = 'I';
-    else if (deltaX < 0 && deltaY >= 0) quadrant = 'II';
-    else if (deltaX < 0 && deltaY < 0) quadrant = 'III';
-    else if (deltaX >= 0 && deltaY < 0) quadrant = 'IV';
-
+    // Прилага закръгляване за съвместимост с UI
     return {
-      x1, y1, alphaGon, s,
-      alphaRad,
-      sinAlpha: Math.round(sinAlpha * 1000000) / 1000000,
-      cosAlpha: Math.round(cosAlpha * 1000000) / 1000000,
-      deltaX: Math.round(deltaX * 1000) / 1000,
-      deltaY: Math.round(deltaY * 1000) / 1000,
-      x2: Math.round(x2 * 1000) / 1000,
-      y2: Math.round(y2 * 1000) / 1000,
-      quadrant,
-      // Допълнителни изчисления за проверка
-      calculatedDistance: Math.round(Math.sqrt(deltaX * deltaX + deltaY * deltaY) * 1000) / 1000,
-      calculatedAngle: Math.round(Math.atan2(deltaY, deltaX) * 200 / Math.PI * 1000) / 1000
+      x1: result.x1,
+      y1: result.y1,
+      alphaGon: result.alphaGon,
+      s: result.s,
+      alphaRad: roundTo(result.alphaRad, 6),
+      sinAlpha: roundTo(result.sinAlpha, 6),
+      cosAlpha: roundTo(result.cosAlpha, 6),
+      deltaX: roundTo(result.deltaX, 3),
+      deltaY: roundTo(result.deltaY, 3),
+      x2: roundTo(result.x2, 3),
+      y2: roundTo(result.y2, 3),
+      quadrant: result.quadrant,
+      calculatedDistance: roundTo(result.calculatedDistance, 3),
+      calculatedAngle: roundTo(result.calculatedAngle, 3)
     };
   };
 

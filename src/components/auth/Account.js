@@ -7,6 +7,7 @@ import { useTranslation } from '../../hooks/useTranslation';
 import PlanService from '../../services/planService';
 import PaymentService from '../../services/paymentService';
 import CalculationService from '../../services/calculationService';
+import UserManagementService from '../../services/userManagementService';
 
 const Account = () => {
   const { user, logout } = useAuth();
@@ -28,8 +29,21 @@ const Account = () => {
   };
 
   // Function to reload usage history when page changes
+  // Only reloads if we're still in the current month period
   const reloadUsageHistory = async (page) => {
     if (!user) return;
+    
+    // Check if we're still in the current month period
+    const now = new Date();
+    const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const currentMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+    
+    // Only reload if we're in the current month or if planExpiryDate is not set
+    if (planExpiryDate && (now < currentMonthStart || now > currentMonthEnd)) {
+      console.log('Skipping history reload - outside current month period');
+      return;
+    }
+    
     try {
       console.log('Reloading usage history for page:', page);
       setLoading(true);
@@ -40,6 +54,11 @@ const Account = () => {
         date: new Date(calc.createdAt).toLocaleString('bg-BG')
       })));
       setTotalCalculations(calculationData.pagination.total);
+      
+      // Update planExpiryDate from backend response if available
+      if (calculationData.period?.end) {
+        setPlanExpiryDate(new Date(calculationData.period.end));
+      }
     } catch (error) {
       console.log('Failed to reload usage history:', error);
     } finally {
@@ -76,6 +95,15 @@ const Account = () => {
   const [planExpiryDate, setPlanExpiryDate] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // Admin panel state
+  const [adminUsers, setAdminUsers] = useState([]);
+  const [adminLoading, setAdminLoading] = useState(false);
+  const [adminSearch, setAdminSearch] = useState('');
+  const [adminRoleFilter, setAdminRoleFilter] = useState('');
+  const [adminCurrentPage, setAdminCurrentPage] = useState(1);
+  const [adminTotalPages, setAdminTotalPages] = useState(1);
+  const [adminTotalUsers, setAdminTotalUsers] = useState(0);
 
   // Pagination state for usage history
   const [usageCurrentPage, setUsageCurrentPage] = useState(1);
@@ -141,6 +169,7 @@ const Account = () => {
         }
         
         // Load calculation history and limits from backend
+        // History is automatically filtered to current month by backend
         try {
           console.log('Loading calculation history...');
           const calculationData = await CalculationService.getCalculationHistory(1, usageItemsPerPage);
@@ -151,19 +180,27 @@ const Account = () => {
           })));
           setTotalCalculations(calculationData.pagination.total);
           
+          // Update planExpiryDate from backend response if available
+          if (calculationData.period?.end) {
+            setPlanExpiryDate(new Date(calculationData.period.end));
+          }
+          
           // Load calculation limits
           console.log('Loading calculation limits...');
           const limits = await CalculationService.checkLimits();
           console.log('Limits received:', limits);
           setCalculationLimits(limits);
           
-          // Set plan expiry date
-          if (subscriptionData?.endDate) {
+          // Set plan expiry date based on backend response or subscription
+          if (limits.periodEnd) {
+            // Use period end from backend (end of current month)
+            setPlanExpiryDate(new Date(limits.periodEnd));
+          } else if (subscriptionData?.endDate) {
             setPlanExpiryDate(new Date(subscriptionData.endDate));
           } else {
             // For free plan, set to end of current month
             const now = new Date();
-            const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
             setPlanExpiryDate(endOfMonth);
           }
         } catch (calcError) {
@@ -172,9 +209,9 @@ const Account = () => {
           setTotalCalculations(0);
           setCalculationLimits({ used: 0, limit: 5, unlimited: false });
           
-          // Set fallback expiry date
+          // Set fallback expiry date (end of current month)
           const now = new Date();
-          const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+          const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
           setPlanExpiryDate(endOfMonth);
         }
         
@@ -229,43 +266,55 @@ const Account = () => {
   }, [plan]);
 
   // Listen for calculation events to refresh limits and history
+  // Only refresh if we're still in the same month period
   useEffect(() => {
     console.log('Setting up calculationCompleted event listener, user:', user);
     
     const handleCalculationUpdate = () => {
       console.log('Calculation completed event received!');
-      refreshLimits();
-      // Also refresh usage history when new calculation is completed (always go to page 1)
-      if (user) {
-        console.log('User is logged in, refreshing usage history...');
-        setUsageCurrentPage(1); // Reset to first page
-        reloadUsageHistory(1);
+      
+      // Check if we're still in the same month period
+      const now = new Date();
+      const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+      const currentMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+      
+      // Only refresh if we're still in the current month period
+      // or if planExpiryDate is not set (first load)
+      const shouldRefresh = !planExpiryDate || 
+        (now >= currentMonthStart && now <= currentMonthEnd);
+      
+      if (shouldRefresh) {
+        console.log('Refreshing limits and history (within current month period)');
+        refreshLimits();
+        // Also refresh usage history when new calculation is completed (always go to page 1)
+        if (user) {
+          console.log('User is logged in, refreshing usage history...');
+          setUsageCurrentPage(1); // Reset to first page
+          reloadUsageHistory(1);
+        } else {
+          console.log('User is not logged in, skipping history refresh');
+        }
       } else {
-        console.log('User is not logged in, skipping history refresh');
+        console.log('Skipping refresh - outside current month period');
       }
     };
 
     window.addEventListener('calculationCompleted', handleCalculationUpdate);
     console.log('Event listener added');
     
-    // Test: Manually trigger event after 2 seconds to test if listener works
-    setTimeout(() => {
-      console.log('Testing event listener...');
-      window.dispatchEvent(new CustomEvent('calculationCompleted'));
-    }, 2000);
-    
     return () => {
       window.removeEventListener('calculationCompleted', handleCalculationUpdate);
       console.log('Event listener removed');
     };
-  }, [user]);
+  }, [user, planExpiryDate]);
 
   // Reload usage history when page changes
   useEffect(() => {
     if (user && usageCurrentPage > 1) {
       reloadUsageHistory(usageCurrentPage);
     }
-  }, [usageCurrentPage, user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [usageCurrentPage, user, planExpiryDate]);
 
   // Reload payment history when page changes
   useEffect(() => {
@@ -273,6 +322,57 @@ const Account = () => {
       reloadPaymentHistory(paymentCurrentPage);
     }
   }, [paymentCurrentPage, user]);
+
+  // Load admin users list
+  const loadAdminUsers = async (page = 1) => {
+    if (!user || user.role !== 'admin') return;
+    
+    try {
+      setAdminLoading(true);
+      const data = await UserManagementService.getUsers(page, 20, adminSearch, adminRoleFilter);
+      setAdminUsers(data.users);
+      setAdminTotalPages(data.pagination.totalPages || data.pagination.total || 1);
+      setAdminTotalUsers(data.pagination.totalUsers || 0);
+    } catch (error) {
+      console.error('Error loading admin users:', error);
+      alert(error.message || 'Грешка при зареждане на потребителите');
+    } finally {
+      setAdminLoading(false);
+    }
+  };
+
+  // Load admin users when user is admin and search/filter changes
+  useEffect(() => {
+    if (user && user.role === 'admin') {
+      loadAdminUsers(1);
+      setAdminCurrentPage(1);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, adminSearch, adminRoleFilter]);
+
+  // Load admin users when page changes
+  useEffect(() => {
+    if (user && user.role === 'admin') {
+      loadAdminUsers(adminCurrentPage);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [adminCurrentPage]);
+
+  // Handle role change
+  const handleRoleChange = async (userId, newRole) => {
+    if (!window.confirm(`Сигурни ли сте, че искате да промените ролята на този потребител на "${newRole}"?`)) {
+      return;
+    }
+
+    try {
+      await UserManagementService.updateUserRole(userId, newRole);
+      alert('Ролята е променена успешно!');
+      loadAdminUsers(adminCurrentPage); // Refresh list
+    } catch (error) {
+      console.error('Error updating role:', error);
+      alert(error.message || 'Грешка при промяна на ролята');
+    }
+  };
 
   // Default plan if no subscription
   const defaultPlan = {
@@ -312,35 +412,6 @@ const Account = () => {
         <div className="w-[1180px] mt-8 mb-8 inline-flex flex-col justify-start items-start gap-10">
           <div className="self-stretch justify-start text-black text-3xl font-bold font-['Manrope']">{t.accountTitle}</div>
           
-          {/* Debug Test Buttons */}
-          <div className="flex gap-4">
-            <button 
-              onClick={async () => {
-                console.log('Testing API manually...');
-                try {
-                  const limits = await CalculationService.checkLimits();
-                  console.log('Manual limits test:', limits);
-                  const history = await CalculationService.getCalculationHistory(1, 5);
-                  console.log('Manual history test:', history);
-                } catch (error) {
-                  console.error('Manual test error:', error);
-                }
-              }}
-              className="px-4 py-2 bg-red-500 text-white rounded"
-            >
-              Test API Manually
-            </button>
-            
-            <button 
-              onClick={() => {
-                console.log('Manually triggering calculationCompleted event...');
-                window.dispatchEvent(new CustomEvent('calculationCompleted'));
-              }}
-              className="px-4 py-2 bg-blue-500 text-white rounded"
-            >
-              Test Event
-            </button>
-          </div>
           <div className="self-stretch inline-flex justify-start items-start gap-5">
             <div className="w-96 inline-flex flex-col justify-center items-center gap-5">
               <div className="self-stretch p-4 bg-white rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-0.50px] outline-gray-200 flex flex-col justify-start items-start gap-4 overflow-hidden">
@@ -560,6 +631,140 @@ const Account = () => {
               </div>
             </div>
           </div>
+
+          {/* Admin Panel Section - Only visible for admins */}
+          {user && user.role === 'admin' && (
+            <div className="self-stretch flex flex-col justify-start items-start gap-4">
+              <div className="self-stretch justify-start text-black text-2xl font-bold font-['Manrope']">Администраторски панел</div>
+              
+              {/* Search and Filter */}
+              <div className="self-stretch flex gap-4">
+                <input
+                  type="text"
+                  placeholder="Търси по име или имейл..."
+                  value={adminSearch}
+                  onChange={(e) => setAdminSearch(e.target.value)}
+                  className="flex-1 p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']"
+                />
+                <select
+                  value={adminRoleFilter}
+                  onChange={(e) => setAdminRoleFilter(e.target.value)}
+                  className="px-4 py-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']"
+                >
+                  <option value="">Всички роли</option>
+                  <option value="student">Студент</option>
+                  <option value="teacher">Учител</option>
+                  <option value="admin">Администратор</option>
+                </select>
+              </div>
+
+              {/* Users Table */}
+              <div className="self-stretch rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-start items-start gap-px overflow-hidden">
+                <div className="self-stretch shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] inline-flex justify-start items-start gap-px">
+                  <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5 border-r border-gray-200">
+                    <div className="text-black text-sm font-medium font-['Manrope']">Име</div>
+                  </div>
+                  <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5 border-r border-gray-200">
+                    <div className="text-black text-sm font-medium font-['Manrope']">Имейл</div>
+                  </div>
+                  <div className="w-32 px-3 py-2 bg-white flex justify-center items-center gap-2.5 border-r border-gray-200">
+                    <div className="text-black text-sm font-medium font-['Manrope']">Роля</div>
+                  </div>
+                  <div className="w-32 px-3 py-2 bg-white flex justify-center items-center gap-2.5 border-r border-gray-200">
+                    <div className="text-black text-sm font-medium font-['Manrope']">Регистрация</div>
+                  </div>
+                  <div className="w-48 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
+                    <div className="text-black text-sm font-medium font-['Manrope']">Действия</div>
+                  </div>
+                </div>
+                {adminLoading ? (
+                  <div className="w-full px-3 py-2 bg-white text-neutral-400 text-sm font-medium font-['Manrope']">Зареждане...</div>
+                ) : adminUsers.length === 0 ? (
+                  <div className="w-full px-3 py-2 bg-white text-neutral-400 text-sm font-medium font-['Manrope']">Няма потребители.</div>
+                ) : (
+                  adminUsers.map((adminUser) => (
+                    <div key={adminUser._id || adminUser.id} className="self-stretch inline-flex justify-start items-start gap-px">
+                      <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5 border-r border-gray-200">
+                        <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{adminUser.name}</div>
+                      </div>
+                      <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5 border-r border-gray-200">
+                        <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{adminUser.email}</div>
+                      </div>
+                      <div className="w-32 px-3 py-2 bg-white flex justify-center items-center gap-2.5 border-r border-gray-200">
+                        <div className={`justify-start text-sm font-medium font-['Manrope'] ${
+                          adminUser.role === 'admin' ? 'text-red-600' : 
+                          adminUser.role === 'teacher' ? 'text-blue-600' : 
+                          'text-neutral-400'
+                        }`}>
+                          {adminUser.role === 'admin' ? 'Администратор' : 
+                           adminUser.role === 'teacher' ? 'Учител' : 
+                           'Студент'}
+                        </div>
+                      </div>
+                      <div className="w-32 px-3 py-2 bg-white flex justify-center items-center gap-2.5 border-r border-gray-200">
+                        <div className="justify-start text-neutral-400 text-xs font-medium font-['Manrope']">
+                          {adminUser.createdAt ? new Date(adminUser.createdAt).toLocaleDateString('bg-BG') : '-'}
+                        </div>
+                      </div>
+                      <div className="w-48 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
+                        <select
+                          value={adminUser.role}
+                          onChange={(e) => handleRoleChange(adminUser._id || adminUser.id, e.target.value)}
+                          className="px-2 py-1 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']"
+                          disabled={adminUser._id === user.id || adminUser.id === user.id}
+                        >
+                          <option value="student">Студент</option>
+                          <option value="teacher">Учител</option>
+                          <option value="admin">Администратор</option>
+                        </select>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* Pagination */}
+              {adminTotalPages > 1 && (
+                <div className="self-stretch inline-flex justify-center items-center gap-4">
+                  <div className="flex justify-start items-center gap-2">
+                    <button
+                      className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center"
+                      onClick={() => setAdminCurrentPage(p => Math.max(1, p - 1))}
+                      disabled={adminCurrentPage === 1 || adminLoading}
+                    >
+                      <img src="/icons/small_left_arrow.svg" alt="Назад" className="w-3 h-3 opacity-70" />
+                    </button>
+                    {Array.from({ length: Math.min(adminTotalPages, 10) }, (_, i) => {
+                      const pageNum = i + 1;
+                      return (
+                        <button
+                          key={i}
+                          className={`w-7 px-2 py-1 rounded ${
+                            adminCurrentPage === pageNum ? 'bg-gray-200 text-black' : 'outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400'
+                          } inline-flex flex-col justify-center items-center`}
+                          onClick={() => setAdminCurrentPage(pageNum)}
+                          disabled={adminCurrentPage === pageNum || adminLoading}
+                        >
+                          <div className="justify-start text-sm font-medium font-['Manrope']">{pageNum}</div>
+                        </button>
+                      );
+                    })}
+                    <button
+                      className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center"
+                      onClick={() => setAdminCurrentPage(p => Math.min(adminTotalPages, p + 1))}
+                      disabled={adminCurrentPage === adminTotalPages || adminTotalPages === 0 || adminLoading}
+                    >
+                      <img src="/icons/small_right_arrow.svg" alt="Напред" className="w-3 h-3 opacity-70" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div className="self-stretch text-neutral-400 text-sm font-medium font-['Manrope']">
+                Общо потребители: {adminTotalUsers}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </Layout>

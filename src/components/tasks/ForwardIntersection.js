@@ -4,6 +4,8 @@ import Layout from '../layout/Layout';
 import { Link } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 import useTypewriter from '../../hooks/useTypewriter';
+import { calculateForwardIntersection as calculateForwardIntersectionDomain } from '../../domain/geodesy';
+import { roundTo } from '../../domain/math';
 
 // LocalStorage helpers
 const getHistory = () => {
@@ -40,138 +42,48 @@ const saveInputHistory = (key, value) => {
 const initialForm = { yA: '', xA: '', yB: '', xB: '', beta1: '', beta2: '' };
 
 /**
- * Изчислява координатите на точка P чрез права засечка (Enhanced)
- * 
- * Формули:
- * αAB = atan2(ΔY, ΔX) * 200/π
- * SAB = √(ΔX² + ΔY²)
- * αBA = αAB ± 200
- * αAP = αAB - β₁
- * αBP = αBA + β₂
- * SAP = SAB * sin(β₂) / sin(β₁ + β₂)
- * SBP = SAB * sin(β₁) / sin(β₁ + β₂)
- * XP = XA + SAP * cos(αAP)
- * YP = YA + SAP * sin(αAP)
- * 
- * @param {number} yA - Y координата на точка A
- * @param {number} xA - X координата на точка A
- * @param {number} yB - Y координата на точка B
- * @param {number} xB - X координата на точка B
- * @param {number} beta1 - Ъгъл β₁ в гради
- * @param {number} beta2 - Ъгъл β₂ в гради
- * @returns {Object} Резултати от изчисленията
+ * Wrapper функция, която извиква domain модула и прилага закръгляване
+ * Запазва същата структура на резултата за съвместимост с UI
  */
 function calculateForwardIntersection(yA, xA, yB, xB, beta1, beta2) {
-  // Валидация на входните данни
-  if (beta1 <= 0 || beta2 <= 0) {
-    throw new Error('Ъглите трябва да бъдат положителни');
-  }
-  if (beta1 + beta2 >= 200) {
-    throw new Error('Сумата от ъглите не може да бъде по-голяма от 200 гради');
-  }
-  if (xA === xB && yA === yB) {
-    throw new Error('Точките A и B не могат да съвпадат');
-  }
-
-  // Изчисляване на разликите в координатите
-  const deltaY = yB - yA;
-  const deltaX = xB - xA;
-
-  // Изчисляване на разстоянието SAB
-  const sAB = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-
-  // Изчисляване на αAB с atan2 за точност
-  const alphaABRad = Math.atan2(deltaY, deltaX);
-  let alphaAB = alphaABRad * 200 / Math.PI;
-  if (alphaAB < 0) alphaAB += 400;
-
-  // Изчисляване на αBA
-  const alphaBA = alphaAB >= 200 ? alphaAB - 200 : alphaAB + 200;
-
-  // Изчисляване на αAP и αBP
-  let alphaAP = alphaAB - beta1;
-  let alphaBP = alphaBA + beta2;
+  const result = calculateForwardIntersectionDomain(yA, xA, yB, xB, beta1, beta2);
   
-  // Нормализиране на ъглите (0-400 гради)
-  if (alphaAP < 0) alphaAP += 400;
-  if (alphaAP >= 400) alphaAP -= 400;
-  if (alphaBP < 0) alphaBP += 400;
-  if (alphaBP >= 400) alphaBP -= 400;
-
-  // Константа за преобразуване от гради в радиани
-  const gonToRad = Math.PI / 200;
-
-  // Изчисляване на ъглите в радиани
-  const beta1Rad = beta1 * gonToRad;
-  const beta2Rad = beta2 * gonToRad;
-  const beta3Rad = (beta1 + beta2) * gonToRad;
-  const alphaAPRad = alphaAP * gonToRad;
-  const alphaBPRad = alphaBP * gonToRad;
-
-  // Изчисляване на разстоянията SAP и SBP
-  const sAP = (sAB * Math.sin(beta2Rad)) / Math.sin(beta3Rad);
-  const sBP = (sAB * Math.sin(beta1Rad)) / Math.sin(beta3Rad);
-
-  // Изчисляване на разликите в координатите
-  const deltaX_AP = sAP * Math.cos(alphaAPRad);
-  const deltaY_AP = sAP * Math.sin(alphaAPRad);
-  const deltaX_BP = sBP * Math.cos(alphaBPRad);
-  const deltaY_BP = sBP * Math.sin(alphaBPRad);
-
-  // Изчисляване на координатите на точка P от двете посоки
-  const xPrimP = xA + deltaX_AP;
-  const yPrimP = yA + deltaY_AP;
-  const xSecondP = xB + deltaX_BP;
-  const ySecondP = yB + deltaY_BP;
-
-  // Финални координати на точка P (средно аритметично)
-  const xP = (xPrimP + xSecondP) / 2;
-  const yP = (yPrimP + ySecondP) / 2;
-
-  // Изчисляване на разликите за проверка
-  const diffX = Math.abs(xPrimP - xSecondP);
-  const diffY = Math.abs(yPrimP - ySecondP);
-  const maxDiff = Math.max(diffX, diffY);
-
-  // Проверка на изчисленията
-  const checkSAP = Math.sqrt((xP - xA) * (xP - xA) + (yP - yA) * (yP - yA));
-  const checkSBP = Math.sqrt((xP - xB) * (xP - xB) + (yP - yB) * (yP - yB));
-
+  // Прилага закръгляване към резултата (за запазване на съвместимост с UI)
   return {
     // Основни резултати
-    deltaX: Math.round(deltaX * 1000) / 1000,
-    deltaY: Math.round(deltaY * 1000) / 1000,
-    alphaAB: Math.round(alphaAB * 1000) / 1000,
-    alphaBA: Math.round(alphaBA * 1000) / 1000,
-    sAB: Math.round(sAB * 1000) / 1000,
-    alphaAP: Math.round(alphaAP * 1000) / 1000,
-    alphaBP: Math.round(alphaBP * 1000) / 1000,
-    sAP: Math.round(sAP * 1000) / 1000,
-    sBP: Math.round(sBP * 1000) / 1000,
-    xP: Math.round(xP * 1000) / 1000,
-    yP: Math.round(yP * 1000) / 1000,
+    deltaX: roundTo(result.deltaX, 3),
+    deltaY: roundTo(result.deltaY, 3),
+    alphaAB: roundTo(result.alphaAB, 3),
+    alphaBA: roundTo(result.alphaBA, 3),
+    sAB: roundTo(result.sAB, 3),
+    alphaAP: roundTo(result.alphaAP, 3),
+    alphaBP: roundTo(result.alphaBP, 3),
+    sAP: roundTo(result.sAP, 3),
+    sBP: roundTo(result.sBP, 3),
+    xP: roundTo(result.xP, 3),
+    yP: roundTo(result.yP, 3),
     
     // Междинни изчисления
-    deltaX_AP: Math.round(deltaX_AP * 1000) / 1000,
-    deltaY_AP: Math.round(deltaY_AP * 1000) / 1000,
-    deltaX_BP: Math.round(deltaX_BP * 1000) / 1000,
-    deltaY_BP: Math.round(deltaY_BP * 1000) / 1000,
-    xPrimP: Math.round(xPrimP * 1000) / 1000,
-    yPrimP: Math.round(yPrimP * 1000) / 1000,
-    xSecondP: Math.round(xSecondP * 1000) / 1000,
-    ySecondP: Math.round(ySecondP * 1000) / 1000,
+    deltaX_AP: roundTo(result.deltaX_AP, 3),
+    deltaY_AP: roundTo(result.deltaY_AP, 3),
+    deltaX_BP: roundTo(result.deltaX_BP, 3),
+    deltaY_BP: roundTo(result.deltaY_BP, 3),
+    xPrimP: roundTo(result.xPrimP, 3),
+    yPrimP: roundTo(result.yPrimP, 3),
+    xSecondP: roundTo(result.xSecondP, 3),
+    ySecondP: roundTo(result.ySecondP, 3),
     
     // Проверки
-    diffX: Math.round(diffX * 1000) / 1000,
-    diffY: Math.round(diffY * 1000) / 1000,
-    maxDiff: Math.round(maxDiff * 1000) / 1000,
-    checkSAP: Math.round(checkSAP * 1000) / 1000,
-    checkSBP: Math.round(checkSBP * 1000) / 1000,
+    diffX: roundTo(result.diffX, 3),
+    diffY: roundTo(result.diffY, 3),
+    maxDiff: roundTo(result.maxDiff, 3),
+    checkSAP: roundTo(result.checkSAP, 3),
+    checkSBP: roundTo(result.checkSBP, 3),
     
     // Ъгли в радиани за проверка
-    alphaABRad: Math.round(alphaABRad * 1000000) / 1000000,
-    alphaAPRad: Math.round(alphaAPRad * 1000000) / 1000000,
-    alphaBPRad: Math.round(alphaBPRad * 1000000) / 1000000
+    alphaABRad: roundTo(result.alphaABRad, 6),
+    alphaAPRad: roundTo(result.alphaAPRad, 6),
+    alphaBPRad: roundTo(result.alphaBPRad, 6)
   };
 }
 
