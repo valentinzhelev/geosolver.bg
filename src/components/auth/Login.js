@@ -1,35 +1,51 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import SEO from '../shared/SEO';
 import Layout from '../layout/Layout';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 
 const Login = () => {
-  const { login, loginWithGoogle, loading, error } = useAuth();
+  const { login, loginWithGoogle, loading, error, user } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [success, setSuccess] = useState(false);
+  const loginSuccessRef = useRef(false);
 
   const handleGoogleSignIn = useCallback(async (response) => {
     console.log('Login component: Google sign-in callback triggered', response);
+    
+    // Проверка дали response е валиден
+    if (!response || !response.credential) {
+      console.error('Login component: Invalid Google response', response);
+      // Грешката ще се покаже от AuthContext чрез error state
+      return;
+    }
+    
     try {
-      console.log('Login component: Calling loginWithGoogle...');
+      console.log('Login component: Calling loginWithGoogle with credential...');
+      
       const ok = await loginWithGoogle(response, rememberMe);
       console.log('Login component: loginWithGoogle result:', ok);
+      
       if (ok) {
         console.log('Login component: Login successful, setting success state');
         setSuccess(true);
+        loginSuccessRef.current = true;
+        // Навигиране след малко забавяне, за да се обнови state-ът
         setTimeout(() => {
           console.log('Login component: Navigating to account page');
-          navigate('/account');
-        }, 1000);
+          navigate('/account', { replace: true });
+        }, 500);
       } else {
         console.log('Login component: Login failed');
+        loginSuccessRef.current = false;
+        // Грешката вече е зададена в AuthContext
       }
     } catch (error) {
       console.error('Login component: Google sign-in error:', error);
+      // Грешката вече е зададена в AuthContext
     }
   }, [loginWithGoogle, rememberMe, navigate]);
 
@@ -54,43 +70,68 @@ const Login = () => {
 
   // Initialize Google OAuth button
   useEffect(() => {
+    let retryCount = 0;
+    const maxRetries = 50; // 5 секунди максимум
+    
     const initGoogleAuth = () => {
-      if (window.google) {
+      if (window.google && window.google.accounts && window.google.accounts.id) {
         // Clear any existing button
         const buttonContainer = document.getElementById('google-signin-button');
-        if (buttonContainer) {
-          buttonContainer.innerHTML = '';
+        if (!buttonContainer) {
+          console.warn('Google sign-in button container not found');
+          return;
         }
         
-        // Render the button with our callback
-        window.google.accounts.id.renderButton(
-          document.getElementById('google-signin-button'),
-          {
-            type: 'standard',
-            theme: 'outline',
-            size: 'large',
-            text: 'signin_with',
-            shape: 'rectangular',
-            logo_alignment: 'left',
-            callback: handleGoogleSignIn
-          }
-        );
-        console.log('Google Sign-In button rendered with callback');
+        buttonContainer.innerHTML = '';
+        
+        try {
+          // Render the button with our callback
+          window.google.accounts.id.renderButton(
+            buttonContainer,
+            {
+              type: 'standard',
+              theme: 'outline',
+              size: 'large',
+              text: 'signin_with',
+              shape: 'rectangular',
+              logo_alignment: 'left',
+              callback: handleGoogleSignIn
+            }
+          );
+          console.log('Google Sign-In button rendered successfully with callback');
+        } catch (error) {
+          console.error('Error rendering Google button:', error);
+        }
       } else {
-        // Retry if Google script hasn't loaded yet
-        setTimeout(initGoogleAuth, 100);
+        retryCount++;
+        if (retryCount < maxRetries) {
+          // Retry if Google script hasn't loaded yet
+          setTimeout(initGoogleAuth, 100);
+        } else {
+          console.error('Google script failed to load after maximum retries');
+        }
       }
     };
 
-    initGoogleAuth();
+    // Забавяне за да се уверя, че DOM е готов
+    setTimeout(initGoogleAuth, 100);
   }, [handleGoogleSignIn]);
+
+  // Навигиране след успешен вход (ако user state се обнови)
+  useEffect(() => {
+    if (user && loginSuccessRef.current) {
+      console.log('Login component: User state updated, navigating...');
+      loginSuccessRef.current = false;
+      navigate('/account', { replace: true });
+    }
+  }, [user, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const ok = await login(email, password, rememberMe);
     if (ok) {
       setSuccess(true);
-      setTimeout(() => navigate('/account'), 1000);
+      setTimeout(() => navigate('/account', { replace: true }), 1000);
     }
   };
 

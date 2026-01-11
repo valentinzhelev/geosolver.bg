@@ -28,16 +28,35 @@ class PlanService {
   // Вземане на текущ абонамент
   static async getCurrentSubscription() {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      if (!token) {
+        throw new Error('No token available');
+      }
+      
       const response = await fetch(`${API_BASE_URL}/subscriptions/current`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
-      if (!response.ok) throw new Error('Failed to fetch subscription');
+      
+      // If 404, user has no subscription (this is OK, not an error)
+      if (response.status === 404) {
+        return null;
+      }
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Failed to fetch subscription');
+      }
+      
       return await response.json();
     } catch (error) {
+      // Don't log as error if it's just "no subscription" case
+      if (error.message === 'No token available' || error.message.includes('404')) {
+        console.log('No subscription found (this is OK)');
+        return null;
+      }
       console.error('Error fetching subscription:', error);
       throw error;
     }

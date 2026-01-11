@@ -34,9 +34,30 @@ export function AuthProvider({ children }) {
       fetch(`${BASE_URL}/api/auth/account`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-        .then(res => res.ok ? res.json() : Promise.reject(res))
-        .then(data => setUser(data.user || data))
-        .catch(() => setUser(null))
+        .then(res => {
+          if (res.ok) {
+            return res.json();
+          } else {
+            // Token е невалиден, изчистваме го
+            console.warn('Invalid token, clearing auth state');
+            setToken(null);
+            setRefreshToken(null);
+            setUser(null);
+            localStorage.removeItem('token');
+            localStorage.removeItem('refreshToken');
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('refreshToken');
+            return Promise.reject(res);
+          }
+        })
+        .then(data => {
+          console.log('User data fetched:', data);
+          setUser(data.user || data);
+        })
+        .catch((error) => {
+          console.error('Error fetching user:', error);
+          setUser(null);
+        })
         .finally(() => setLoading(false));
     } else {
       setUser(null);
@@ -47,7 +68,16 @@ export function AuthProvider({ children }) {
   const loginWithGoogle = async (response, rememberMe = false) => {
     setLoading(true);
     setError(null);
+    
     try {
+      // Проверка за валиден response
+      if (!response || !response.credential) {
+        console.error('Invalid Google response:', response);
+        setError('Невалиден отговор от Google.');
+        return false;
+      }
+
+      console.log('Sending Google token to backend...');
       const result = await fetch(`${BASE_URL}/api/google-auth/login`, {
         method: 'POST',
         headers: {
@@ -56,32 +86,43 @@ export function AuthProvider({ children }) {
         body: JSON.stringify({ token: response.credential }),
       });
 
+      console.log('Backend response status:', result.status);
       const data = await result.json();
+      console.log('Backend response data:', data);
       
       if (result.ok && data.token) {
+        console.log('Google login successful, saving tokens...');
         setToken(data.token);
         setRefreshToken(data.refreshToken);
+        
         // Съхраняване според rememberMe
         if (rememberMe) {
           localStorage.setItem('token', data.token);
           if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
           sessionStorage.removeItem('token');
           sessionStorage.removeItem('refreshToken');
+          console.log('Tokens saved to localStorage');
         } else {
           sessionStorage.setItem('token', data.token);
           if (data.refreshToken) sessionStorage.setItem('refreshToken', data.refreshToken);
           localStorage.removeItem('token');
           localStorage.removeItem('refreshToken');
+          console.log('Tokens saved to sessionStorage');
         }
+        
         setUser(data.user);
         setError(null);
+        console.log('User state updated:', data.user);
         return true;
       } else {
-        setError(data.message || 'Грешка при Google вход.');
+        const errorMsg = data.message || data.error || 'Грешка при Google вход.';
+        console.error('Google login failed:', errorMsg);
+        setError(errorMsg);
         return false;
       }
     } catch (e) {
-      setError('Грешка при Google вход.');
+      console.error('Google login exception:', e);
+      setError(e.message || 'Грешка при връзка със сървъра.');
       return false;
     } finally {
       setLoading(false);

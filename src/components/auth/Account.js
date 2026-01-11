@@ -29,18 +29,9 @@ const Account = () => {
   };
 
   // Function to reload usage history when page changes
-  // Only reloads if we're still in the current month period
   const reloadUsageHistory = async (page) => {
-    if (!user) return;
-    
-    // Check if we're still in the current month period
-    const now = new Date();
-    const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    const currentMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
-    
-    // Only reload if we're in the current month or if planExpiryDate is not set
-    if (planExpiryDate && (now < currentMonthStart || now > currentMonthEnd)) {
-      console.log('Skipping history reload - outside current month period');
+    if (!user) {
+      console.log('No user, skipping history reload');
       return;
     }
     
@@ -49,18 +40,63 @@ const Account = () => {
       setLoading(true);
       const calculationData = await CalculationService.getCalculationHistory(page, usageItemsPerPage);
       console.log('Calculation data received:', calculationData);
-      setUsageHistory(calculationData.calculations.map(calc => ({
-        tool: calc.toolDisplayName[t.language] || calc.toolDisplayName.bg,
-        date: new Date(calc.createdAt).toLocaleString('bg-BG')
-      })));
-      setTotalCalculations(calculationData.pagination.total);
+      console.log('Calculations array:', calculationData.calculations);
+      console.log('Calculations array length:', calculationData.calculations?.length || 0);
+      
+      // Check if we have calculations
+      if (!calculationData.calculations || calculationData.calculations.length === 0) {
+        console.log('No calculations found in response');
+        setUsageHistory([]);
+        setTotalCalculations(0);
+        setUsageTotalPages(1);
+        return;
+      }
+      
+      // Map calculations to display format
+      const mappedHistory = calculationData.calculations.map(calc => {
+        console.log('Mapping calc:', calc);
+        console.log('calc.toolDisplayName:', calc.toolDisplayName);
+        console.log('t.language:', t.language);
+        
+        const toolName = calc.toolDisplayName?.[t.language] || 
+                         calc.toolDisplayName?.bg || 
+                         calc.toolDisplayName?.en ||
+                         calc.toolName || 
+                         'Неизвестен инструмент';
+        
+        console.log('Mapped toolName:', toolName);
+        
+        return {
+          tool: toolName,
+          date: new Date(calc.createdAt).toLocaleString('bg-BG')
+        };
+      });
+      
+      console.log('Mapped history:', mappedHistory);
+      console.log('Mapped history length:', mappedHistory.length);
+      
+      setUsageHistory(mappedHistory);
+      
+      // Backend returns pagination.total as total pages, pagination.totalItems as total count
+      const totalCount = calculationData.pagination?.totalItems || 
+                        (calculationData.pagination?.total ? calculationData.pagination.total * usageItemsPerPage : 0);
+      setTotalCalculations(totalCount);
+      setUsageTotalPages(calculationData.pagination?.total || 1);
+      
+      console.log('Set usageHistory to:', mappedHistory);
+      console.log('Set totalCalculations to:', totalCount);
+      console.log('Set usageTotalPages to:', calculationData.pagination?.total || 1);
       
       // Update planExpiryDate from backend response if available
       if (calculationData.period?.end) {
         setPlanExpiryDate(new Date(calculationData.period.end));
       }
     } catch (error) {
-      console.log('Failed to reload usage history:', error);
+      console.error('Failed to reload usage history:', error);
+      console.error('Error details:', error.message, error.stack);
+      setUsageHistory([]);
+      setTotalCalculations(0);
+      setUsageTotalPages(1);
     } finally {
       setLoading(false);
     }
@@ -107,9 +143,10 @@ const Account = () => {
 
   // Pagination state for usage history
   const [usageCurrentPage, setUsageCurrentPage] = useState(1);
+  const [usageTotalPages, setUsageTotalPages] = useState(1);
   const usageItemsPerPage = 5;
-  const usageTotalPages = Math.ceil(usageHistory.length / usageItemsPerPage);
-  const paginatedUsageHistory = usageHistory.slice((usageCurrentPage - 1) * usageItemsPerPage, usageCurrentPage * usageItemsPerPage);
+  // Don't paginate locally - we get paginated data from API
+  const paginatedUsageHistory = usageHistory;
 
   // Pagination state for payment history
   const [paymentCurrentPage, setPaymentCurrentPage] = useState(1);
@@ -137,22 +174,51 @@ const Account = () => {
           return;
         }
         
-        // Load current subscription and plan
+        // Load current subscription and plan (don't let errors block other data loading)
         let subscriptionData = null;
         try {
           subscriptionData = await PlanService.getCurrentSubscription();
-          setSubscription(subscriptionData);
-          if (subscriptionData?.planId) {
-            const planData = await PlanService.getPlan(subscriptionData.planId);
-            setPlan(planData);
+          if (subscriptionData) {
+            setSubscription(subscriptionData);
+            if (subscriptionData.planId) {
+              try {
+                const planData = await PlanService.getPlan(subscriptionData.planId);
+                setPlan(planData);
+              } catch (planError) {
+                console.log('Failed to load plan, using free plan');
+                const plans = await PlanService.getPlans().catch(() => []);
+                const freePlan = plans.find(p => p.name === 'free');
+                setPlan(freePlan || {
+                  name: 'free',
+                  displayName: { bg: 'Безплатен план (По подразбиране)', en: 'Free Plan (Default)' },
+                  limits: { calculationsPerMonth: 5, unlimited: false }
+                });
+              }
+            } else {
+              // If no planId, show free plan
+              const plans = await PlanService.getPlans().catch(() => []);
+              const freePlan = plans.find(p => p.name === 'free');
+              setPlan(freePlan || {
+                name: 'free',
+                displayName: { bg: 'Безплатен план (По подразбиране)', en: 'Free Plan (Default)' },
+                limits: { calculationsPerMonth: 5, unlimited: false }
+              });
+            }
           } else {
-            // If no subscription, show free plan
-            const plans = await PlanService.getPlans();
+            // No subscription, show free plan
+            setSubscription(null);
+            const plans = await PlanService.getPlans().catch(() => []);
             const freePlan = plans.find(p => p.name === 'free');
-            setPlan(freePlan);
+            setPlan(freePlan || {
+              name: 'free',
+              displayName: { bg: 'Безплатен план (По подразбиране)', en: 'Free Plan (Default)' },
+              limits: { calculationsPerMonth: 5, unlimited: false }
+            });
           }
         } catch (subError) {
-          console.log('No subscription found, using free plan');
+          console.log('Subscription loading error (non-blocking):', subError.message);
+          // Continue with free plan - don't block other data loading
+          setSubscription(null);
           try {
             const plans = await PlanService.getPlans();
             const freePlan = plans.find(p => p.name === 'free');
@@ -165,7 +231,6 @@ const Account = () => {
               limits: { calculationsPerMonth: 5, unlimited: false }
             });
           }
-          setSubscription(null);
         }
         
         // Load calculation history and limits from backend
@@ -174,11 +239,45 @@ const Account = () => {
           console.log('Loading calculation history...');
           const calculationData = await CalculationService.getCalculationHistory(1, usageItemsPerPage);
           console.log('Calculation history received:', calculationData);
-          setUsageHistory(calculationData.calculations.map(calc => ({
-            tool: calc.toolDisplayName[t.language] || calc.toolDisplayName.bg,
-            date: new Date(calc.createdAt).toLocaleString('bg-BG')
-          })));
-          setTotalCalculations(calculationData.pagination.total);
+          console.log('Calculations array:', calculationData.calculations);
+          console.log('Pagination:', calculationData.pagination);
+          
+          // Check if we have calculations
+          if (!calculationData.calculations || calculationData.calculations.length === 0) {
+            console.log('⚠️ No calculations found in initial load');
+            setUsageHistory([]);
+            setTotalCalculations(0);
+            setUsageTotalPages(1);
+          } else {
+            // Map calculations to display format
+            const mappedHistory = calculationData.calculations.map(calc => {
+              console.log('Mapping calc:', calc);
+              console.log('calc.toolDisplayName:', calc.toolDisplayName);
+              console.log('t.language:', t.language);
+              
+              const toolName = calc.toolDisplayName?.[t.language] || 
+                               calc.toolDisplayName?.bg || 
+                               calc.toolDisplayName?.en ||
+                               calc.toolName || 
+                               'Неизвестен инструмент';
+              
+              console.log('Mapped toolName:', toolName);
+              
+              return {
+                tool: toolName,
+                date: new Date(calc.createdAt).toLocaleString('bg-BG')
+              };
+            });
+            
+            console.log('✅ Mapped history:', mappedHistory);
+            console.log('✅ Mapped history length:', mappedHistory.length);
+            setUsageHistory(mappedHistory);
+          }
+          
+          // Backend returns pagination.total as total pages, pagination.totalItems as total count
+          const totalCount = calculationData.pagination.totalItems || (calculationData.pagination.total * usageItemsPerPage);
+          setTotalCalculations(totalCount);
+          setUsageTotalPages(calculationData.pagination.total || 1);
           
           // Update planExpiryDate from backend response if available
           if (calculationData.period?.end) {
@@ -217,22 +316,53 @@ const Account = () => {
         
         // Load payment history (only if user is logged in)
         try {
-          const paymentData = await PaymentService.getPaymentHistory(1, paymentItemsPerPage);
+          const paymentData = await PaymentService.getPaymentHistory(1, 100); // Get more payments to extract unique methods
           setPaymentHistory(paymentData.payments.map(payment => ({
             method: `**** ${payment.paymentMethod.last4}`,
             amount: `${payment.amount}${payment.currency}`,
             date: new Date(payment.createdAt).toLocaleString('bg-BG')
           })));
+          
+          // Extract unique payment methods from payment history
+          const uniqueMethods = new Map();
+          paymentData.payments.forEach(payment => {
+            if (payment.paymentMethod && payment.paymentMethod.last4) {
+              const last4 = payment.paymentMethod.last4;
+              if (!uniqueMethods.has(last4)) {
+                // Mark as active if it's the most recent payment method used
+                uniqueMethods.set(last4, {
+                  last4: last4,
+                  active: false, // Will be set to true for the most recent
+                  brand: payment.paymentMethod.brand || 'visa',
+                  createdAt: new Date(payment.createdAt)
+                });
+              } else {
+                // Update if this payment is more recent
+                const existing = uniqueMethods.get(last4);
+                if (new Date(payment.createdAt) > existing.createdAt) {
+                  existing.createdAt = new Date(payment.createdAt);
+                }
+              }
+            }
+          });
+          
+          // Convert to array and mark the most recent as active
+          const methodsArray = Array.from(uniqueMethods.values());
+          if (methodsArray.length > 0) {
+            // Sort by most recent
+            methodsArray.sort((a, b) => b.createdAt - a.createdAt);
+            // Mark the most recent as active
+            methodsArray[0].active = true;
+            // Remove createdAt as it's not needed in the UI
+            methodsArray.forEach(m => delete m.createdAt);
+          }
+          
+          setPaymentMethods(methodsArray);
         } catch (paymentError) {
           console.log('No payment history found');
           setPaymentHistory([]);
+          setPaymentMethods([]);
         }
-        
-        // Mock payment methods (would come from Stripe API)
-        setPaymentMethods([
-          { last4: '6225', active: true },
-          { last4: '4448', active: false },
-        ]);
         
       } catch (err) {
         console.error('Error loading account data:', err);
@@ -310,7 +440,8 @@ const Account = () => {
 
   // Reload usage history when page changes
   useEffect(() => {
-    if (user && usageCurrentPage > 1) {
+    if (user) {
+      console.log('Reloading usage history for page:', usageCurrentPage);
       reloadUsageHistory(usageCurrentPage);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -325,7 +456,14 @@ const Account = () => {
 
   // Load admin users list
   const loadAdminUsers = async (page = 1) => {
-    if (!user || user.role !== 'admin') return;
+    // Check if user is logged in and is admin
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    if (!user || user.role !== 'admin' || !token) {
+      setAdminUsers([]);
+      setAdminTotalPages(1);
+      setAdminTotalUsers(0);
+      return;
+    }
     
     try {
       setAdminLoading(true);
@@ -335,7 +473,13 @@ const Account = () => {
       setAdminTotalUsers(data.pagination.totalUsers || 0);
     } catch (error) {
       console.error('Error loading admin users:', error);
-      alert(error.message || 'Грешка при зареждане на потребителите');
+      // Don't show alert if user is not logged in - just silently fail
+      if (error.message !== 'Не сте влезли в системата') {
+        alert(error.message || 'Грешка при зареждане на потребителите');
+      }
+      setAdminUsers([]);
+      setAdminTotalPages(1);
+      setAdminTotalUsers(0);
     } finally {
       setAdminLoading(false);
     }
@@ -527,20 +671,37 @@ const Account = () => {
                       <div className="justify-start text-black text-sm font-medium font-['Manrope']">{t.date}</div>
                     </div>
                   </div>
-                  {paginatedUsageHistory.length === 0 ? (
-                    <div className="w-full px-3 py-2 bg-white text-neutral-400 text-sm font-medium font-['Manrope']">Няма изчисления.</div>
-                  ) : (
-                    paginatedUsageHistory.map((h, i) => (
-                      <div key={i} className="self-stretch inline-flex justify-start items-start gap-px">
-                        <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                          <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{h.tool}</div>
+                  {(() => {
+                    console.log('🔍 Rendering usage history:');
+                    console.log('  - paginatedUsageHistory:', paginatedUsageHistory);
+                    console.log('  - paginatedUsageHistory.length:', paginatedUsageHistory?.length || 0);
+                    console.log('  - usageHistory state:', usageHistory);
+                    console.log('  - usageHistory.length:', usageHistory?.length || 0);
+                    console.log('  - usageCurrentPage:', usageCurrentPage);
+                    console.log('  - usageTotalPages:', usageTotalPages);
+                    
+                    if (!paginatedUsageHistory || paginatedUsageHistory.length === 0) {
+                      console.log('  - No history to display, showing empty message');
+                      return (
+                        <div className="w-full px-3 py-2 bg-white text-neutral-400 text-sm font-medium font-['Manrope']">Няма изчисления.</div>
+                      );
+                    }
+                    
+                    console.log('  - Rendering', paginatedUsageHistory.length, 'items');
+                    return paginatedUsageHistory.map((h, i) => {
+                      console.log(`  - Rendering item ${i}:`, h);
+                      return (
+                        <div key={i} className="self-stretch inline-flex justify-start items-start gap-px">
+                          <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
+                            <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{h.tool || 'Неизвестен инструмент'}</div>
+                          </div>
+                          <div className="w-48 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
+                            <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{h.date || 'Няма дата'}</div>
+                          </div>
                         </div>
-                        <div className="w-48 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                          <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{h.date}</div>
-                        </div>
-                      </div>
-                    ))
-                  )}
+                      );
+                    });
+                  })()}
                 </div>
                 <div className="self-stretch inline-flex justify-center items-center gap-4">
                   <div className="flex justify-start items-center gap-2">

@@ -4,7 +4,7 @@ class UserManagementService {
   // GET /api/users - Списък на всички потребители (admin only)
   static async getUsers(page = 1, limit = 50, search = '', role = '') {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       if (!token) {
         throw new Error('Не сте влезли в системата');
       }
@@ -35,7 +35,7 @@ class UserManagementService {
   // GET /api/users/:id - Детайли за потребител (admin only)
   static async getUserById(userId) {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       if (!token) {
         throw new Error('Не сте влезли в системата');
       }
@@ -62,7 +62,7 @@ class UserManagementService {
   // PUT /api/users/:id/role - Промяна на роля (admin only)
   static async updateUserRole(userId, role) {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       if (!token) {
         throw new Error('Не сте влезли в системата');
       }
@@ -91,7 +91,7 @@ class UserManagementService {
   // DELETE /api/users/:id - Изтриване на потребител (admin only)
   static async deleteUser(userId) {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       if (!token) {
         throw new Error('Не сте влезли в системата');
       }
