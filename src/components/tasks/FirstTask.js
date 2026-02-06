@@ -44,8 +44,6 @@ const LOW_CONFIDENCE = 0.75;
 const PurvaZadacha = () => {
   const [form, setForm] = useState({ y1: '', x1: '', alpha: '', s: '' });
   const [lowConfFields, setLowConfFields] = useState({});
-  const [rawOcrText, setRawOcrText] = useState(null);
-  const [showRawOcr, setShowRawOcr] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
@@ -79,7 +77,6 @@ const PurvaZadacha = () => {
     if (!file || !file.type.startsWith('image/')) return;
     setIsScanning(true);
     setLowConfFields({});
-    setRawOcrText(null);
     try {
       const result = await extractTaskInputFromImage(file);
       if (result.success && result.inputData) {
@@ -102,15 +99,12 @@ const PurvaZadacha = () => {
           alpha: conf.alpha != null && conf.alpha < LOW_CONFIDENCE,
           s: conf.s != null && conf.s < LOW_CONFIDENCE
         });
-        if (result.rawText) setRawOcrText(result.rawText);
       } else {
         setLowConfFields({});
-        setRawOcrText(null);
         alert(language === 'bg' ? 'Не можахме да разпознаем данни. Опитайте с по-четлива снимка.' : 'Could not recognize data. Try a clearer image.');
       }
     } catch (err) {
       setLowConfFields({});
-      setRawOcrText(null);
       alert(language === 'bg' ? 'Грешка при сканиране. Уверете се, че backend-ът работи.' : 'Scan error. Ensure the backend is running.');
     } finally {
       setIsScanning(false);
@@ -258,8 +252,6 @@ Check - angle: ${result.calculatedAngle} gon
     setForm({ y1: '', x1: '', alpha: '', s: '' });
     setResultText(t.defaultResultText);
     setLowConfFields({});
-    setRawOcrText(null);
-    setShowRawOcr(false);
   };
 
   const inputClass = (fieldId) => {
@@ -429,14 +421,6 @@ Check - angle: ${result.calculatedAngle} gon
                         {getInputHistory('s').map((v, i) => <option value={v} key={i} />)}
                       </datalist>
                     </div>
-                    {rawOcrText && (
-                      <div className="self-stretch">
-                        <button type="button" onClick={() => setShowRawOcr(!showRawOcr)} className="text-xs text-neutral-500 hover:underline">
-                          {showRawOcr ? 'Скрий' : 'Покажи'} суров текст от OCR
-                        </button>
-                        {showRawOcr && <pre className="mt-2 p-2 bg-stone-100 rounded text-xs overflow-auto max-h-32 whitespace-pre-wrap">{rawOcrText}</pre>}
-                      </div>
-                    )}
                   </div>
                   <div className="inline-flex justify-end items-center gap-3 w-full">
                     <button
@@ -654,14 +638,6 @@ Check - angle: ${result.calculatedAngle} gon
                       {getInputHistory('s').map((v, i) => <option value={v} key={i} />)}
                     </datalist>
                   </div>
-                  {rawOcrText && (
-                    <div className="self-stretch">
-                      <button type="button" onClick={() => setShowRawOcr(!showRawOcr)} className="text-sm text-neutral-500 hover:underline">
-                        {showRawOcr ? 'Скрий' : 'Покажи'} суров текст от OCR
-                      </button>
-                      {showRawOcr && <pre className="mt-2 p-2 bg-stone-100 rounded text-sm overflow-auto max-h-40 whitespace-pre-wrap">{rawOcrText}</pre>}
-                    </div>
-                  )}
                 </div>
                 <div className="inline-flex justify-start items-start gap-3">
                   <button
