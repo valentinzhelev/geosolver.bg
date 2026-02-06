@@ -1,7 +1,7 @@
 import API_BASE_URL from '../config/api';
 
 class UserManagementService {
-  // GET /api/users - Списък на всички потребители (admin only)
+  // GET /api/users - List all users (admin only)
   static async getUsers(page = 1, limit = 50, search = '', role = '') {
     try {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
@@ -32,7 +32,7 @@ class UserManagementService {
     }
   }
 
-  // GET /api/users/:id - Детайли за потребител (admin only)
+  // GET /api/users/:id - User details (admin only)
   static async getUserById(userId) {
     try {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
@@ -59,7 +59,7 @@ class UserManagementService {
     }
   }
 
-  // PUT /api/users/:id/role - Промяна на роля (admin only)
+  // PUT /api/users/:id/role - Change role (admin only)
   static async updateUserRole(userId, role) {
     try {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
@@ -88,7 +88,7 @@ class UserManagementService {
     }
   }
 
-  // DELETE /api/users/:id - Изтриване на потребител (admin only)
+  // DELETE /api/users/:id - Delete user (admin only)
   static async deleteUser(userId) {
     try {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');

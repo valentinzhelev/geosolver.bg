@@ -1,7 +1,7 @@
 import API_BASE_URL from '../config/api';
 
 class CalculationService {
-  // Записване на изчисление
+  // Save calculation
   static async saveCalculation(calculationData) {
     try {
       const token = localStorage.getItem('token');
@@ -26,7 +26,7 @@ class CalculationService {
     }
   }
 
-  // Вземане на история на изчисленията
+  // Fetch calculation history
   static async getCalculationHistory(page = 1, limit = 10, toolName = null) {
     try {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
@@ -41,7 +41,7 @@ class CalculationService {
       
       // If no token, return empty data instead of failing
       if (!token) {
-        console.log('  - ⚠️ No token found, returning empty data');
+        console.log('  - No token found, returning empty data');
         return {
           calculations: [],
           pagination: {
@@ -66,22 +66,22 @@ class CalculationService {
       
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('  - ❌ Error response:', errorText);
+        console.error('  - Error response:', errorText);
         // If 401, token might be invalid
         if (response.status === 401) {
-          console.error('  - ⚠️ Unauthorized - token might be invalid');
+          console.error('  - Unauthorized - token might be invalid');
         }
         throw new Error(`Failed to fetch calculation history: ${response.status} ${errorText}`);
       }
       
       const data = await response.json();
-      console.log('  - ✅ Response data:', data);
-      console.log('  - ✅ Calculations count:', data.calculations?.length || 0);
-      console.log('  - ✅ Pagination:', data.pagination);
+      console.log('  - Response data:', data);
+      console.log('  - Calculations count:', data.calculations?.length || 0);
+      console.log('  - Pagination:', data.pagination);
       return data;
     } catch (error) {
-      console.error('❌ Error fetching calculation history:', error);
-      console.error('❌ Error details:', error.message);
+      console.error('Error fetching calculation history:', error);
+      console.error('Error details:', error.message);
       // Return empty data instead of throwing error
       return {
         calculations: [],
@@ -96,7 +96,7 @@ class CalculationService {
     }
   }
 
-  // Вземане на статистики за изчисления
+  // Fetch calculation statistics
   static async getCalculationStats() {
     try {
       const token = localStorage.getItem('token');
@@ -114,7 +114,7 @@ class CalculationService {
     }
   }
 
-  // Проверка на лимити преди изчисление (24-часови лимити)
+  // Check limits before calculation (24-hour limits)
   static async checkLimits() {
     try {
       const token = localStorage.getItem('token');
@@ -160,7 +160,7 @@ class CalculationService {
         periodEnd: result.periodEnd ? new Date(result.periodEnd) : null
       };
     } catch (error) {
-      console.error('❌ Error checking limits:', error);
+      console.error('Error checking limits:', error);
       return { canCalculate: false, used: 0, limit: 0, unlimited: false };
     }
   }

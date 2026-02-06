@@ -122,11 +122,11 @@ Quadrant: ${result.quadrant}
     setHistory(getHistory());
   };
 
-  // Използва domain модула за изчисления
+  // Uses domain module for calculations
   const calculateDistanceBearing = (x1, y1, x2, y2) => {
     const result = calculateDistanceBearingDomain(x1, y1, x2, y2);
     
-    // Прилага закръгляване за съвместимост с UI
+    // Apply rounding for UI compatibility
     return {
       x1: result.x1,
       y1: result.y1,
@@ -160,7 +160,7 @@ Quadrant: ${result.quadrant}
     URL.revokeObjectURL(url);
   };
 
-  // Проверка дали всички полета са попълнени
+  // Check if all fields are filled
   const isFormValid = () => {
     return (
       form.y1 !== '' &&

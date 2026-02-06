@@ -38,7 +38,7 @@ export function AuthProvider({ children }) {
           if (res.ok) {
             return res.json();
           } else {
-            // Token е невалиден, изчистваме го
+            // Token is invalid, clear it
             console.warn('Invalid token, clearing auth state');
             setToken(null);
             setRefreshToken(null);
@@ -70,7 +70,7 @@ export function AuthProvider({ children }) {
     setError(null);
     
     try {
-      // Проверка за валиден response
+      // Check for valid response
       if (!response || !response.credential) {
         console.error('Invalid Google response:', response);
         setError('Невалиден отговор от Google.');
@@ -95,7 +95,7 @@ export function AuthProvider({ children }) {
         setToken(data.token);
         setRefreshToken(data.refreshToken);
         
-        // Съхраняване според rememberMe
+        // Store according to rememberMe
         if (rememberMe) {
           localStorage.setItem('token', data.token);
           if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
@@ -143,7 +143,7 @@ export function AuthProvider({ children }) {
       if (res.ok && data.token) {
         setToken(data.token);
         setRefreshToken(data.refreshToken);
-        // Съхраняване според rememberMe
+        // Store according to rememberMe
         if (rememberMe) {
           localStorage.setItem('token', data.token);
           if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
@@ -198,7 +198,7 @@ export function AuthProvider({ children }) {
       if (res.ok && data.token) {
         setToken(data.token);
         setRefreshToken(data.refreshToken);
-        // По подразбиране регистрацията ще пази в localStorage
+        // By default registration will store in localStorage
         localStorage.setItem('token', data.token);
         if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
         sessionStorage.removeItem('token');

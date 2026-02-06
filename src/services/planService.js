@@ -1,7 +1,7 @@
 import API_BASE_URL from '../config/api';
 
 class PlanService {
-  // Вземане на всички планове
+  // Fetch all plans
   static async getPlans() {
     try {
       const response = await fetch(`${API_BASE_URL}/plans`);
@@ -13,7 +13,7 @@ class PlanService {
     }
   }
 
-  // Вземане на конкретен план
+  // Fetch specific plan
   static async getPlan(planId) {
     try {
       const response = await fetch(`${API_BASE_URL}/plans/${planId}`);
@@ -25,7 +25,7 @@ class PlanService {
     }
   }
 
-  // Вземане на текущ абонамент
+  // Fetch current subscription
   static async getCurrentSubscription() {
     try {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
@@ -62,7 +62,7 @@ class PlanService {
     }
   }
 
-  // Създаване на абонамент
+  // Create subscription
   static async createSubscription(planId, billingCycle) {
     try {
       const token = localStorage.getItem('token');
@@ -82,7 +82,7 @@ class PlanService {
     }
   }
 
-  // Отмяна на абонамент
+  // Cancel subscription
   static async cancelSubscription(subscriptionId) {
     try {
       const token = localStorage.getItem('token');

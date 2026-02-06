@@ -244,7 +244,7 @@ const Account = () => {
           
           // Check if we have calculations
           if (!calculationData.calculations || calculationData.calculations.length === 0) {
-            console.log('⚠️ No calculations found in initial load');
+            console.log('No calculations found in initial load');
             setUsageHistory([]);
             setTotalCalculations(0);
             setUsageTotalPages(1);
@@ -269,8 +269,8 @@ const Account = () => {
               };
             });
             
-            console.log('✅ Mapped history:', mappedHistory);
-            console.log('✅ Mapped history length:', mappedHistory.length);
+            console.log('Mapped history:', mappedHistory);
+            console.log('Mapped history length:', mappedHistory.length);
             setUsageHistory(mappedHistory);
           }
           

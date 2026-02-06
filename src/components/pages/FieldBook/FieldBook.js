@@ -54,7 +54,7 @@ const FieldBook = () => {
     setRows(updatedRows);
     saveDraft(updatedRows);
     
-    // Reset формата
+    // Reset form
     setForm({ station: '', target: '', distance: '', angle: '' });
   };
 

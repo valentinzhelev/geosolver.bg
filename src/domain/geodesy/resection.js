@@ -11,12 +11,12 @@ export function calculateResection(points, angles) {
   const { xA, yA, xB, yB, xC, yC } = points;
   const { beta1, beta2 } = angles;
 
-  // Проверка за валидност на входните данни
+  // Validate input data
   if (!xA || !yA || !xB || !yB || !xC || !yC || !beta1 || !beta2) {
     throw new Error('Всички координати и ъгли са задължителни');
   }
 
-  // Проверка за валидни числа
+  // Check for valid numbers
   if (typeof xA !== 'number' || isNaN(xA) || !isFinite(xA)) {
     throw new Error('XA трябва да е валидно число');
   }
@@ -42,31 +42,31 @@ export function calculateResection(points, angles) {
     throw new Error('β₂ трябва да е валидно число');
   }
 
-  // Конвертиране на ъгли от гради в радиани
+  // Convert angles from grads to radians
   const beta1Rad = (beta1 * Math.PI) / 200;
   const beta2Rad = (beta2 * Math.PI) / 200;
 
-  // Hansen Problem решение
-  // Използваме формулата за триангулация
+  // Hansen Problem solution
+  // Use triangulation formula
   const dxAB = xB - xA;
   const dyAB = yB - yA;
   const dxBC = xC - xB;
   const dyBC = yC - yB;
 
-  // Изчисляване на ъглите на триъгълника ABC
+  // Calculate triangle ABC angles
   const angleA = Math.atan2(dyAB, dxAB);
   const angleB = Math.atan2(dyBC, dxBC);
 
-  // Изчисляване на страните
+  // Calculate sides
   const sideAB = Math.sqrt(dxAB * dxAB + dyAB * dyAB);
   const sideBC = Math.sqrt(dxBC * dxBC + dyBC * dyBC);
 
-  // Решаване на триъгълника за точка P
-  // Използваме синусовата теорема
+  // Solve triangle for point P
+  // Use law of sines
   const angleAPB = Math.PI - beta1Rad;
   const angleBPC = Math.PI - beta2Rad;
 
-  // Изчисляване на разстоянията от P до A, B, C
+  // Calculate distances from P to A, B, C
   const sideAP = (sideAB * Math.sin(beta1Rad)) / Math.sin(angleAPB);
   const sideBP = (sideBC * Math.sin(beta2Rad)) / Math.sin(angleBPC);
 

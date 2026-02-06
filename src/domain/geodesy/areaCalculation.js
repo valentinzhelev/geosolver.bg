@@ -15,7 +15,7 @@ export function calculateArea(points, method = 'shoelace') {
     throw new Error('Необходими са поне 3 точки за изчисляване на площ');
   }
 
-  // Проверка за валидност на точките
+  // Validate points
   for (let i = 0; i < points.length; i++) {
     const point = points[i];
     if (!point || typeof point.x !== 'number' || typeof point.y !== 'number' ||
@@ -58,7 +58,7 @@ export function calculateArea(points, method = 'shoelace') {
       throw new Error('Неизвестен метод за изчисление');
   }
 
-  // Изчисляване на периметъра
+  // Calculate perimeter
   for (let i = 0; i < points.length; i++) {
     const j = (i + 1) % points.length;
     const dx = points[j].x - points[i].x;

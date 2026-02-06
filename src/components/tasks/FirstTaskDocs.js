@@ -151,7 +151,7 @@ const FirstTaskDocs = () => {
                     
                     {/* Scientific Calculator Link */}
                     <div className="bg-blue-50 border-l-4 border-blue-400 rounded p-4 flex flex-col gap-4">
-                      <h3 className="text-lg font-semibold text-black">💡 Използвайте нашия научен калкулатор</h3>
+                      <h3 className="text-lg font-semibold text-black">Използвайте нашия научен калкулатор</h3>
                       <p className="text-base text-black leading-relaxed">
                         За по-лесно решаване на тригонометричните изчисления, можете да използвате нашия вграден научен калкулатор с поддръжка за градианова система (GRAD режим).
                       </p>
@@ -160,10 +160,9 @@ const FirstTaskDocs = () => {
                           to="/scientific-calculator" 
                           className="inline-flex items-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 text-sm font-medium"
                         >
-                          🧮 Отвори научен калкулатор
+                          Отвори научен калкулатор
                         </Link>
                         <div className="text-sm text-gray-600 flex items-start gap-2">
-                          <span className="text-blue-500 mt-0.5">💡</span>
                           <span className="leading-relaxed">Препоръчваме да използвате GRAD режим за геодезически изчисления</span>
                         </div>
                       </div>
@@ -183,7 +182,7 @@ const FirstTaskDocs = () => {
                     </div>
                     <div className="bg-yellow-50 border-l-4 border-yellow-400 rounded p-4 flex flex-col gap-3">
                       <p className="text-sm text-gray-700 font-medium">
-                        <strong>💡 Практически съвет:</strong> Можете да проверите тези изчисления с нашия научен калкулатор:
+                        <strong>Практически съвет:</strong> Можете да проверите тези изчисления с нашия научен калкулатор:
                       </p>
                       <div className="bg-white rounded-lg p-3 border">
                         <div className="text-sm text-gray-600 space-y-2 font-mono">
@@ -197,7 +196,7 @@ const FirstTaskDocs = () => {
                         to="/scientific-calculator" 
                         className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors duration-200"
                       >
-                        🧮 Провери с калкулатора →
+                        Провери с калкулатора →
                       </Link>
                     </div>
                   </section>

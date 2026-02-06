@@ -139,11 +139,11 @@ Check - angle: ${result.calculatedAngle} gon
    * @param {number} distance - Разстояние в метри
    * @returns {Object} Резултати от изчисленията
    */
-  // Използва domain модула за изчисления
+  // Uses domain module for calculations
   const calculatePolarIntersection = (xA, yA, angle, distance) => {
     const result = calculatePolarIntersectionDomain(xA, yA, angle, distance);
     
-    // Прилага закръгляване за съвместимост с UI
+    // Apply rounding for UI compatibility
     return {
       xA: result.xA,
       yA: result.yA,
@@ -181,7 +181,7 @@ Check - angle: ${result.calculatedAngle} gon
     URL.revokeObjectURL(url);
   };
 
-  // Проверка дали всички полета са попълнени
+  // Check if all fields are filled
   const isFormValid = () => {
     return (
       form.yA !== '' &&

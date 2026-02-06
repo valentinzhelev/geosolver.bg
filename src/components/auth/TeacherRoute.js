@@ -23,7 +23,7 @@ const TeacherRoute = ({ children }) => {
     return (
       <div className="w-full min-h-screen bg-stone-50 flex items-center justify-center">
         <div className="text-center p-8 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 max-w-md">
-          <div className="text-6xl mb-4">🔒</div>
+          <div className="text-6xl mb-4 font-bold text-gray-400">Lock</div>
           <h2 className="text-xl font-semibold text-black mb-2">Нямате достъп</h2>
           <p className="text-neutral-600 mb-4">
             Тази страница е достъпна само за учители. Ако сте учител, моля свържете се с нас за активиране на вашия акаунт.

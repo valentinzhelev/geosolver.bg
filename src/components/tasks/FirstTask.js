@@ -50,7 +50,7 @@ const PurvaZadacha = () => {
   const { displayText, isTyping } = useTypewriter(resultText);
   const { trackCalculation, checkLimits } = useCalculationTracking();
 
-  // Debug: виж какво се сетва
+  // Debug: see what is being set
   useEffect(() => {
     console.log('setResultText value:', resultText);
   }, [resultText]);
@@ -74,7 +74,7 @@ const PurvaZadacha = () => {
       return;
     }
 
-    // Проверка на лимити преди изчисление
+    // Check limits before calculation
     const limits = await checkLimits();
     console.log('Limits check result:', limits);
     if (!limits.canCalculate) {
@@ -176,11 +176,11 @@ Check - angle: ${result.calculatedAngle} gon
    * @param {number} s - дължина на отсечката (м)
    * @returns {Object} - координати на точка 2 и междинни изчисления
    */
-  // Използва domain модула за изчисления
+  // Uses domain module for calculations
   const purvaOsnovnaZadacha = (y1, x1, alphaGon, s) => {
     const result = calculateFirstTaskDomain(y1, x1, alphaGon, s);
     
-    // Прилага закръгляване за съвместимост с UI
+    // Apply rounding for UI compatibility
     return {
       x1: result.x1,
       y1: result.y1,
@@ -217,7 +217,7 @@ Check - angle: ${result.calculatedAngle} gon
     URL.revokeObjectURL(url);
   };
 
-  // Проверка дали всички полета са попълнени
+  // Check if all fields are filled
   const isFormValid = () => {
     return (
       form.y1 !== '' &&

@@ -16,10 +16,10 @@ const Login = () => {
   const handleGoogleSignIn = useCallback(async (response) => {
     console.log('Login component: Google sign-in callback triggered', response);
     
-    // Проверка дали response е валиден
+    // Check if response is valid
     if (!response || !response.credential) {
       console.error('Login component: Invalid Google response', response);
-      // Грешката ще се покаже от AuthContext чрез error state
+      // Error will be shown by AuthContext through error state
       return;
     }
     
@@ -33,7 +33,7 @@ const Login = () => {
         console.log('Login component: Login successful, setting success state');
         setSuccess(true);
         loginSuccessRef.current = true;
-        // Навигиране след малко забавяне, за да се обнови state-ът
+        // Navigate after short delay so state updates
         setTimeout(() => {
           console.log('Login component: Navigating to account page');
           navigate('/account', { replace: true });
@@ -41,11 +41,11 @@ const Login = () => {
       } else {
         console.log('Login component: Login failed');
         loginSuccessRef.current = false;
-        // Грешката вече е зададена в AuthContext
+        // Error is already set in AuthContext
       }
     } catch (error) {
       console.error('Login component: Google sign-in error:', error);
-      // Грешката вече е зададена в AuthContext
+      // Error is already set in AuthContext
     }
   }, [loginWithGoogle, rememberMe, navigate]);
 
@@ -71,7 +71,7 @@ const Login = () => {
   // Initialize Google OAuth button
   useEffect(() => {
     let retryCount = 0;
-    const maxRetries = 50; // 5 секунди максимум
+    const maxRetries = 50; // 5 seconds max
     
     const initGoogleAuth = () => {
       if (window.google && window.google.accounts && window.google.accounts.id) {
@@ -113,11 +113,11 @@ const Login = () => {
       }
     };
 
-    // Забавяне за да се уверя, че DOM е готов
+    // Delay to ensure DOM is ready
     setTimeout(initGoogleAuth, 100);
   }, [handleGoogleSignIn]);
 
-  // Навигиране след успешен вход (ако user state се обнови)
+  // Navigate after successful login (if user state updates)
   useEffect(() => {
     if (user && loginSuccessRef.current) {
       console.log('Login component: User state updated, navigating...');

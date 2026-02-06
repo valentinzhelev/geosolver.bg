@@ -20,7 +20,7 @@ const saveHistory = (entry) => {
   localStorage.setItem('forwardIntersectionHistory', JSON.stringify(history.slice(0, 20)));
 };
 
-// Добавям helpers за input history:
+// Input history helpers
 const getInputHistory = (key) => {
   try {
     const data = localStorage.getItem('inputHistory_' + key);
@@ -48,9 +48,9 @@ const initialForm = { yA: '', xA: '', yB: '', xB: '', beta1: '', beta2: '' };
 function calculateForwardIntersection(yA, xA, yB, xB, beta1, beta2) {
   const result = calculateForwardIntersectionDomain(yA, xA, yB, xB, beta1, beta2);
   
-  // Прилага закръгляване към резултата (за запазване на съвместимост с UI)
+  // Apply rounding to result (for UI compatibility)
   return {
-    // Основни резултати
+    // Main results
     deltaX: roundTo(result.deltaX, 3),
     deltaY: roundTo(result.deltaY, 3),
     alphaAB: roundTo(result.alphaAB, 3),
@@ -63,7 +63,7 @@ function calculateForwardIntersection(yA, xA, yB, xB, beta1, beta2) {
     xP: roundTo(result.xP, 3),
     yP: roundTo(result.yP, 3),
     
-    // Междинни изчисления
+    // Intermediate calculations
     deltaX_AP: roundTo(result.deltaX_AP, 3),
     deltaY_AP: roundTo(result.deltaY_AP, 3),
     deltaX_BP: roundTo(result.deltaX_BP, 3),
@@ -73,14 +73,14 @@ function calculateForwardIntersection(yA, xA, yB, xB, beta1, beta2) {
     xSecondP: roundTo(result.xSecondP, 3),
     ySecondP: roundTo(result.ySecondP, 3),
     
-    // Проверки
+    // Checks
     diffX: roundTo(result.diffX, 3),
     diffY: roundTo(result.diffY, 3),
     maxDiff: roundTo(result.maxDiff, 3),
     checkSAP: roundTo(result.checkSAP, 3),
     checkSBP: roundTo(result.checkSBP, 3),
     
-    // Ъгли в радиани за проверка
+    // Angles in radians for verification
     alphaABRad: roundTo(result.alphaABRad, 6),
     alphaAPRad: roundTo(result.alphaAPRad, 6),
     alphaBPRad: roundTo(result.alphaBPRad, 6)
