@@ -3,8 +3,10 @@ import SEO from '../shared/SEO';
 import Layout from '../layout/Layout';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const Register = () => {
+  const { t } = useTranslation();
   const { register, loading, error } = useAuth();
   const navigate = useNavigate();
   const [name, setName] = useState('');
@@ -28,8 +30,8 @@ const Register = () => {
   return (
     <Layout>
       <SEO
-        title="Регистрация"
-        description="Създайте акаунт в GeoSolver за достъп до всички геодезически инструменти и изчисления."
+        title={t.registerTitle}
+        description={t.registerDescription}
         canonical="/register"
       />
       <div className="w-full min-h-screen bg-stone-50">
@@ -44,7 +46,7 @@ const Register = () => {
               />
               <div className="relative z-10 flex flex-row items-center justify-center w-full gap-3">
                 <span className="text-white text-lg md:text-2xl font-semibold font-['Manrope']">
-                  Добре дошли в
+                  {t.welcomeTo}
                 </span>
                 <span className="flex items-center gap-2.5">
                   <img
@@ -64,31 +66,31 @@ const Register = () => {
                 <div className="w-full flex flex-col justify-start items-start gap-4">
                   {/* Name */}
                   <div className="w-full flex flex-col justify-start items-start gap-2">
-                    <label className="text-black text-sm font-medium font-['Manrope']">Име и фамилия</label>
-                    <input type="text" placeholder="Въведете вашето име и фамилия" className="w-full p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']" value={name} onChange={e => setName(e.target.value)} required />
+                    <label className="text-black text-sm font-medium font-['Manrope']">{t.fullName}</label>
+                    <input type="text" placeholder={t.enterFullName} className="w-full p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']" value={name} onChange={e => setName(e.target.value)} required />
                   </div>
                   {/* Email */}
                   <div className="w-full flex flex-col justify-start items-start gap-2">
-                    <label className="text-black text-sm font-medium font-['Manrope']">Имейл</label>
-                    <input type="email" placeholder="Въведете вашият имейл" className="w-full p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']" value={email} onChange={e => setEmail(e.target.value)} required />
+                    <label className="text-black text-sm font-medium font-['Manrope']">{t.email}</label>
+                    <input type="email" placeholder={t.enterYourEmail} className="w-full p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']" value={email} onChange={e => setEmail(e.target.value)} required />
                   </div>
                   {/* Password */}
                   <div className="w-full flex flex-col justify-start items-start gap-2">
-                    <label className="text-black text-sm font-medium font-['Manrope']">Парола</label>
-                    <input type="password" placeholder="Въведете вашата парола" className="w-full p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']" value={password} onChange={e => setPassword(e.target.value)} required />
+                    <label className="text-black text-sm font-medium font-['Manrope']">{t.password}</label>
+                    <input type="password" placeholder={t.enterYourPassword} className="w-full p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']" value={password} onChange={e => setPassword(e.target.value)} required />
                   </div>
                   {/* Repeat Password */}
                   <div className="w-full flex flex-col justify-start items-start gap-2">
-                    <label className="text-black text-sm font-medium font-['Manrope']">Повтори паролата</label>
-                    <input type="password" placeholder="Повторете вашата парола" className="w-full p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']" value={repeatPassword} onChange={e => setRepeatPassword(e.target.value)} required />
+                    <label className="text-black text-sm font-medium font-['Manrope']">{t.repeatPassword}</label>
+                    <input type="password" placeholder={t.repeatYourPassword} className="w-full p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']" value={repeatPassword} onChange={e => setRepeatPassword(e.target.value)} required />
                   </div>
                   {/* Usage Purpose */}
                   <div className="w-full flex flex-col justify-start items-start gap-2">
-                    <label className="text-black text-sm font-medium font-['Manrope']">За какво ще използвате GeoSolver?</label>
+                    <label className="text-black text-sm font-medium font-['Manrope']">{t.purposeQuestion}</label>
                     <div className="p-1.5 bg-white rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-row justify-start items-center gap-2">
-                      <button type="button" className={`px-3 py-1 rounded flex justify-center items-center gap-2.5 text-base font-['Manrope'] ${purpose === 'student' ? 'bg-gray-200 text-black' : 'text-neutral-400'}`} onClick={() => setPurpose('student')}>За учебни цели</button>
-                      <button type="button" className={`px-3 py-1 rounded flex justify-center items-center gap-2.5 text-base font-['Manrope'] ${purpose === 'teacher' ? 'bg-gray-200 text-black' : 'text-neutral-400'}`} onClick={() => setPurpose('teacher')}>За преподаване</button>
-                      <button type="button" className={`px-3 py-1 rounded flex justify-center items-center gap-2.5 text-base font-['Manrope'] ${purpose === 'work' ? 'bg-gray-200 text-black' : 'text-neutral-400'}`} onClick={() => setPurpose('work')}>За работа</button>
+                      <button type="button" className={`px-3 py-1 rounded flex justify-center items-center gap-2.5 text-base font-['Manrope'] ${purpose === 'student' ? 'bg-gray-200 text-black' : 'text-neutral-400'}`} onClick={() => setPurpose('student')}>{t.purposeStudent}</button>
+                      <button type="button" className={`px-3 py-1 rounded flex justify-center items-center gap-2.5 text-base font-['Manrope'] ${purpose === 'teacher' ? 'bg-gray-200 text-black' : 'text-neutral-400'}`} onClick={() => setPurpose('teacher')}>{t.purposeTeacher}</button>
+                      <button type="button" className={`px-3 py-1 rounded flex justify-center items-center gap-2.5 text-base font-['Manrope'] ${purpose === 'work' ? 'bg-gray-200 text-black' : 'text-neutral-400'}`} onClick={() => setPurpose('work')}>{t.purposeWork}</button>
                     </div>
                   </div>
                 </div>
@@ -97,17 +99,17 @@ const Register = () => {
                   <div className="w-full flex flex-row justify-start items-center gap-3">
                     <input type="checkbox" className="w-6 h-6 bg-white rounded border border-gray-200" checked={agreed} onChange={e => setAgreed(e.target.checked)} required />
                     <div className="flex-1 text-black text-sm font-medium font-['Manrope']">
-                      Съгласен съм с <Link to="/terms" className="underline">общите условия</Link> и <Link to="/privacy" className="underline">политиката за поверителност</Link> на GeoSolver.
+                      {t.termsAgreementPrefix}<Link to="/terms" className="underline">{t.terms}</Link> {t.language === 'bg' ? 'и' : 'and'} <Link to="/privacy" className="underline">{t.privacyPolicy}</Link>{t.termsAgreementSuffix}
                     </div>
                   </div>
                   <button type="submit" className="w-full px-4 py-2 bg-black rounded-lg flex justify-center items-center gap-3 text-white text-base font-medium font-['Manrope']" disabled={loading || !agreed}>
-                    {loading ? 'Регистриране...' : 'Регистрация'}
+                    {loading ? t.registering : t.registerBtn}
                   </button>
                   {error && <div className="w-full text-red-500 text-sm font-medium font-['Manrope']">{error}</div>}
-                  {success && <div className="w-full text-green-600 text-sm font-medium font-['Manrope']">Успешна регистрация!</div>}
+                  {success && <div className="w-full text-green-600 text-sm font-medium font-['Manrope']">{t.successRegister}</div>}
                   <div className="w-full flex justify-center items-center mt-2">
-                    <span className="text-neutral-400 text-sm font-medium font-['Manrope']">Вече имате акаунт?</span>
-                    <Link to="/login" className="ml-2 text-black text-sm font-semibold font-['Manrope'] underline">Вход</Link>
+                    <span className="text-neutral-400 text-sm font-medium font-['Manrope']">{t.alreadyHaveAccount}</span>
+                    <Link to="/login" className="ml-2 text-black text-sm font-semibold font-['Manrope'] underline">{t.login}</Link>
                   </div>
                 </div>
               </div>

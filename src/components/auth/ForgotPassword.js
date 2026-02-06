@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import SEO from '../shared/SEO';
 import Layout from '../layout/Layout';
 import { useAuth } from './AuthContext';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const ForgotPassword = () => {
+  const { t } = useTranslation();
   const { forgotPassword, loading, error } = useAuth();
   const [email, setEmail] = useState('');
   const [success, setSuccess] = useState(false);
@@ -21,8 +23,8 @@ const ForgotPassword = () => {
   return (
     <Layout>
       <SEO
-        title="Забравена парола"
-        description="Възстановяване на забравена парола за GeoSolver акаунт"
+        title={t.forgotPasswordTitle}
+        description={t.forgotPasswordDescription}
         canonical="/forgot-password"
       />
       <div className="w-full min-h-screen bg-stone-50 flex flex-col items-center justify-center">
@@ -31,22 +33,22 @@ const ForgotPassword = () => {
             <div className="absolute inset-0 w-full h-full" style={{backgroundImage: 'url(/images/gradient_wallpaper.jpg)', backgroundSize: 'cover', backgroundPosition: 'left', transform: 'scaleX(-1)', zIndex: 0}} />
             <div className="absolute inset-0 bg-black opacity-30 pointer-events-none" style={{zIndex: 1}} />
             <div className="relative w-full flex justify-center items-center" style={{zIndex: 2}}>
-              <span className="text-center text-white text-2xl font-semibold font-['Manrope']">Всеки прави грешки...</span>
+              <span className="text-center text-white text-2xl font-semibold font-['Manrope']">{t.everyoneMakesMistakes}</span>
             </div>
           </div>
           <div className="self-stretch px-10 flex flex-col justify-center items-center gap-2.5">
             <div className="self-stretch p-4 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-center items-center gap-6">
-              <div className="justify-start text-black text-sm font-medium font-['Manrope']">Забравена парола</div>
+              <div className="justify-start text-black text-sm font-medium font-['Manrope']">{t.forgotPasswordTitle}</div>
               {success ? (
-                <div className="text-green-600 text-center">{message || 'Провери имейла си за инструкции.'}</div>
+                <div className="text-green-600 text-center">{message || t.checkEmail}</div>
               ) : (
                 <form className="self-stretch flex flex-col justify-start items-start gap-4" onSubmit={handleSubmit}>
                   <div className="self-stretch flex flex-col justify-start items-start gap-2">
-                    <div className="justify-start text-black text-sm font-medium font-['Manrope']">Имейл</div>
+                    <div className="justify-start text-black text-sm font-medium font-['Manrope']">{t.email}</div>
                     <input
                       type="email"
                       className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-start items-start text-sm font-medium font-['Manrope']"
-                      placeholder="Имена"
+                      placeholder={t.enterEmail}
                       value={email}
                       onChange={e => setEmail(e.target.value)}
                       required
@@ -58,7 +60,7 @@ const ForgotPassword = () => {
                     disabled={loading}
                   >
                     <div className="justify-start text-white text-base font-medium font-['Manrope']">
-                      {loading ? 'Изпращане...' : 'Изпрати код'}
+                      {loading ? t.sending : t.sendCode}
                     </div>
                     {loading && <div className="justify-start text-neutral-400 text-base font-medium font-['Manrope']">59</div>}
                   </button>

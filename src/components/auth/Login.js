@@ -3,8 +3,10 @@ import SEO from '../shared/SEO';
 import Layout from '../layout/Layout';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const Login = () => {
+  const { t } = useTranslation();
   const { login, loginWithGoogle, loading, error, user } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
@@ -138,8 +140,8 @@ const Login = () => {
   return (
     <Layout>
       <SEO
-        title="Вход"
-        description="Влезте в своя GeoSolver акаунт за достъп до геодезически инструменти и изчисления."
+        title={t.loginTitle}
+        description={t.loginDescription}
         canonical="/login"
       />
 
@@ -156,7 +158,7 @@ const Login = () => {
               <div className="relative z-10 flex flex-col items-center w-full">
                 <div className="flex flex-row items-center justify-center gap-3">
                   <span className="text-white text-lg md:text-2xl font-semibold font-['Manrope']">
-                    Добре дошли в
+                    {t.welcomeTo}
                   </span>
                   <span className="flex items-center gap-2.5">
                     <img
@@ -179,11 +181,11 @@ const Login = () => {
                   {/* Email Input */}
                   <div className="w-full flex flex-col justify-start items-start gap-2">
                     <label className="text-black text-sm font-medium font-['Manrope']">
-                      Имейл
+                      {t.email}
                     </label>
                     <input 
                       type="email"
-                      placeholder="Въведете имейла си"
+                      placeholder={t.enterEmail}
                       className="w-full p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']"
                       value={email}
                       onChange={e => setEmail(e.target.value)}
@@ -194,11 +196,11 @@ const Login = () => {
                   {/* Password Input */}
                   <div className="w-full flex flex-col justify-start items-start gap-2">
                     <label className="text-black text-sm font-medium font-['Manrope']">
-                      Парола
+                      {t.password}
                     </label>
                     <input 
                       type="password"
-                      placeholder="Въведете паролата си"
+                      placeholder={t.enterPassword}
                       className="w-full p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']"
                       value={password}
                       onChange={e => setPassword(e.target.value)}
@@ -217,32 +219,32 @@ const Login = () => {
                       onChange={e => setRememberMe(e.target.checked)}
                     />
                     <span className="text-black text-sm font-medium font-['Manrope']">
-                      Запомни ме
+                      {t.rememberMe}
                     </span>
                   </div>
                   <div className="flex justify-center items-center gap-3">
                     <a href="/forgot-password" className="text-neutral-400 text-sm font-medium font-['Manrope']">
-                      Забравена парола
+                      {t.forgotPassword}
                     </a>
                     <button type="submit" className="px-4 py-2 bg-black rounded-lg text-white text-sm md:text-base font-medium font-['Manrope']" disabled={loading}>
-                      {loading ? 'Вход...' : 'Вход'}
+                      {loading ? t.loggingIn : t.login}
                     </button>
                   </div>
                 </div>
                 {error && <div className="w-full text-red-500 text-sm font-medium font-['Manrope']">{error}</div>}
-                {success && <div className="w-full text-green-600 text-sm font-medium font-['Manrope']">Успешен вход!</div>}
+                {success && <div className="w-full text-green-600 text-sm font-medium font-['Manrope']">{t.successLogin}</div>}
               </div>
 
               {/* Divider */}
               <div className="text-neutral-400 text-sm font-medium font-['Manrope']">
-                или
+                {t.or}
               </div>
 
               {/* Social Login & Register */}
               <div className="w-full p-4 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col md:flex-row justify-center items-center gap-3">
                 <div id="google-signin-button" className="w-full md:flex-1"></div>
                 <Link to="/register" className="w-full md:flex-1 px-3 py-2 bg-black rounded-lg flex justify-center items-center gap-3 text-white text-sm md:text-base font-medium font-['Manrope']">
-                  Регистрация
+                  {t.register}
                 </Link>
               </div>
             </form>

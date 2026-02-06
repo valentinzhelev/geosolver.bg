@@ -62,7 +62,7 @@ const Account = () => {
                          calc.toolDisplayName?.bg || 
                          calc.toolDisplayName?.en ||
                          calc.toolName || 
-                         'Неизвестен инструмент';
+                         t.unknownTool;
         
         console.log('Mapped toolName:', toolName);
         
@@ -796,13 +796,13 @@ const Account = () => {
           {/* Admin Panel Section - Only visible for admins */}
           {user && user.role === 'admin' && (
             <div className="self-stretch flex flex-col justify-start items-start gap-4">
-              <div className="self-stretch justify-start text-black text-2xl font-bold font-['Manrope']">Администраторски панел</div>
+              <div className="self-stretch justify-start text-black text-2xl font-bold font-['Manrope']">{t.adminPanel}</div>
               
               {/* Search and Filter */}
               <div className="self-stretch flex gap-4">
                 <input
                   type="text"
-                  placeholder="Търси по име или имейл..."
+                  placeholder={t.searchByNameOrEmail}
                   value={adminSearch}
                   onChange={(e) => setAdminSearch(e.target.value)}
                   className="flex-1 p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']"
@@ -812,10 +812,10 @@ const Account = () => {
                   onChange={(e) => setAdminRoleFilter(e.target.value)}
                   className="px-4 py-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']"
                 >
-                  <option value="">Всички роли</option>
-                  <option value="student">Студент</option>
-                  <option value="teacher">Учител</option>
-                  <option value="admin">Администратор</option>
+                  <option value="">{t.allRoles}</option>
+                  <option value="student">{t.student}</option>
+                  <option value="teacher">{t.teacher}</option>
+                  <option value="admin">{t.administrator}</option>
                 </select>
               </div>
 
@@ -823,25 +823,25 @@ const Account = () => {
               <div className="self-stretch rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-start items-start gap-px overflow-hidden">
                 <div className="self-stretch shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] inline-flex justify-start items-start gap-px">
                   <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5 border-r border-gray-200">
-                    <div className="text-black text-sm font-medium font-['Manrope']">Име</div>
+                    <div className="text-black text-sm font-medium font-['Manrope']">{t.name}</div>
                   </div>
                   <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5 border-r border-gray-200">
-                    <div className="text-black text-sm font-medium font-['Manrope']">Имейл</div>
+                    <div className="text-black text-sm font-medium font-['Manrope']">{t.email}</div>
                   </div>
                   <div className="w-32 px-3 py-2 bg-white flex justify-center items-center gap-2.5 border-r border-gray-200">
-                    <div className="text-black text-sm font-medium font-['Manrope']">Роля</div>
+                    <div className="text-black text-sm font-medium font-['Manrope']">{t.role}</div>
                   </div>
                   <div className="w-32 px-3 py-2 bg-white flex justify-center items-center gap-2.5 border-r border-gray-200">
-                    <div className="text-black text-sm font-medium font-['Manrope']">Регистрация</div>
+                    <div className="text-black text-sm font-medium font-['Manrope']">{t.registration}</div>
                   </div>
                   <div className="w-48 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                    <div className="text-black text-sm font-medium font-['Manrope']">Действия</div>
+                    <div className="text-black text-sm font-medium font-['Manrope']">{t.actions}</div>
                   </div>
                 </div>
                 {adminLoading ? (
-                  <div className="w-full px-3 py-2 bg-white text-neutral-400 text-sm font-medium font-['Manrope']">Зареждане...</div>
+                  <div className="w-full px-3 py-2 bg-white text-neutral-400 text-sm font-medium font-['Manrope']">{t.loading}</div>
                 ) : adminUsers.length === 0 ? (
-                  <div className="w-full px-3 py-2 bg-white text-neutral-400 text-sm font-medium font-['Manrope']">Няма потребители.</div>
+                  <div className="w-full px-3 py-2 bg-white text-neutral-400 text-sm font-medium font-['Manrope']">{t.noUsers}</div>
                 ) : (
                   adminUsers.map((adminUser) => (
                     <div key={adminUser._id || adminUser.id} className="self-stretch inline-flex justify-start items-start gap-px">
@@ -857,9 +857,9 @@ const Account = () => {
                           adminUser.role === 'teacher' ? 'text-blue-600' : 
                           'text-neutral-400'
                         }`}>
-                          {adminUser.role === 'admin' ? 'Администратор' : 
-                           adminUser.role === 'teacher' ? 'Учител' : 
-                           'Студент'}
+                          {adminUser.role === 'admin' ? t.administrator : 
+                           adminUser.role === 'teacher' ? t.teacher : 
+                           t.student}
                         </div>
                       </div>
                       <div className="w-32 px-3 py-2 bg-white flex justify-center items-center gap-2.5 border-r border-gray-200">
@@ -874,9 +874,9 @@ const Account = () => {
                           className="px-2 py-1 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']"
                           disabled={adminUser._id === user.id || adminUser.id === user.id}
                         >
-                          <option value="student">Студент</option>
-                          <option value="teacher">Учител</option>
-                          <option value="admin">Администратор</option>
+                          <option value="student">{t.student}</option>
+                          <option value="teacher">{t.teacher}</option>
+                          <option value="admin">{t.administrator}</option>
                         </select>
                       </div>
                     </div>
@@ -893,7 +893,7 @@ const Account = () => {
                       onClick={() => setAdminCurrentPage(p => Math.max(1, p - 1))}
                       disabled={adminCurrentPage === 1 || adminLoading}
                     >
-                      <img src="/icons/small_left_arrow.svg" alt="Назад" className="w-3 h-3 opacity-70" />
+                      <img src="/icons/small_left_arrow.svg" alt={t.back} className="w-3 h-3 opacity-70" />
                     </button>
                     {Array.from({ length: Math.min(adminTotalPages, 10) }, (_, i) => {
                       const pageNum = i + 1;
@@ -915,14 +915,14 @@ const Account = () => {
                       onClick={() => setAdminCurrentPage(p => Math.min(adminTotalPages, p + 1))}
                       disabled={adminCurrentPage === adminTotalPages || adminTotalPages === 0 || adminLoading}
                     >
-                      <img src="/icons/small_right_arrow.svg" alt="Напред" className="w-3 h-3 opacity-70" />
+                      <img src="/icons/small_right_arrow.svg" alt={t.next} className="w-3 h-3 opacity-70" />
                     </button>
                   </div>
                 </div>
               )}
 
               <div className="self-stretch text-neutral-400 text-sm font-medium font-['Manrope']">
-                Общо потребители: {adminTotalUsers}
+                {t.totalUsers} {adminTotalUsers}
               </div>
             </div>
           )}

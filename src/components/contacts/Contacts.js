@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import SEO from '../shared/SEO';
 import Layout from '../layout/Layout';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const Contacts = () => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     email: '',
     title: '',
@@ -29,10 +31,10 @@ const Contacts = () => {
         setSuccess(data.message);
         setFormData({ email: '', title: '', content: '' });
       } else {
-        setError(data.message || 'Възникна грешка.');
+        setError(data.message || t.errorOccurred);
       }
     } catch {
-      setError('Възникна грешка при изпращане.');
+      setError(t.errorSending);
     }
     setLoading(false);
   };
@@ -45,38 +47,13 @@ const Contacts = () => {
     }));
   };
 
-  const faqs = [
-    {
-      question: "Как се изчисляват безплатните изчисления?",
-      answer: "Всеки регистриран потребител получава 5 безплатни изчисления за всяка задача на месец."
-    },
-    {
-      question: "Какви видове изчисления поддържа GeoSolver?",
-      answer: "GeoSolver предлага координатни трансформации, изчисления на площ, дължина и обем, GNSS анализ и други инструменти."
-    },
-    {
-      question: "Какви са начините за плащане?",
-      answer: "Приемаме плащания чрез кредитна/дебитна карта и PayPal."
-    },
-    {
-      question: "Сигурни ли са моите данни?",
-      answer: "Всички данни се съхраняват криптирано и не се споделят с трети страни."
-    },
-    {
-      question: "Как мога да се абонирам?",
-      answer: "Изберете професионален план и следвайте стъпките за плащане. След потвърждение ще имате неограничен достъп."
-    },
-    {
-      question: "Има ли мобилна версия на GeoSolver?",
-      answer: "GeoSolver е направен специално за да се използва на малки устройства."
-    }
-  ];
+  const faqs = t.faqQuestions || [];
 
   return (
     <Layout>
       <SEO
-        title="Контакти"
-        description="Свържете се с нас за всякакви въпроси относно GeoSolver - вашият надежден партньор за геодезически изчисления."
+        title={t.contactsTitle}
+        description={t.contactsDescription}
         canonical="/contacts"
       />
 
@@ -86,7 +63,7 @@ const Contacts = () => {
         <div className="w-full max-w-[1180px] mx-auto px-4 lg:px-6 pt-6 lg:pt-6 pb-6 flex flex-col gap-10 lg:gap-20">
           {/* Contact Form Section */}
           <div className="flex flex-col gap-6 lg:gap-10">
-            <div className="text-black text-2xl lg:text-3xl font-bold font-['Manrope']">Контакти</div>
+            <div className="text-black text-2xl lg:text-3xl font-bold font-['Manrope']">{t.contactsTitle}</div>
             
             {/* Contact Form Container */}
             <div className="w-full p-3 lg:p-4 bg-white rounded-xl lg:rounded-xl outline outline-1 outline-offset-[-0.50px] lg:outline-offset-[-1px] outline-gray-200 flex flex-col lg:flex-row gap-3 lg:gap-6">
@@ -110,7 +87,7 @@ const Contacts = () => {
                   }}
                 />
                 <div className="text-center text-neutral-400 text-xs lg:text-sm font-medium font-['Manrope']">
-                  <span className="block lg:inline">На среща сме за всякакви въпроси.</span>
+                  <span className="block lg:inline">{t.contactIntro}</span>
                   <span className="block lg:inline">help@geosolver.bg</span>
                 </div>
               </div>
@@ -118,37 +95,37 @@ const Contacts = () => {
               {/* Form Fields - Mobile: Below icons, Desktop: Left side */}
               <div className="flex flex-col gap-4 w-full lg:w-auto lg:order-1">
                 <div className="w-full lg:w-[464px] flex flex-col gap-2">
-                  <div className="text-black text-sm font-medium font-['Manrope']">Имейл</div>
+                  <div className="text-black text-sm font-medium font-['Manrope']">{t.emailLabel}</div>
                   <input
                     type="email"
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
                     className="w-full p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']"
-                    placeholder="Имейл"
+                    placeholder={t.emailLabel}
                     required
                   />
                 </div>
                 <div className="w-full lg:w-[464px] flex flex-col gap-2">
-                  <div className="text-black text-sm font-medium font-['Manrope']">Заглавие</div>
+                  <div className="text-black text-sm font-medium font-['Manrope']">{t.titleLabel}</div>
                   <input
                     type="text"
                     name="title"
                     value={formData.title}
                     onChange={handleChange}
                     className="w-full p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']"
-                    placeholder="Заглавие"
+                    placeholder={t.titleLabel}
                     required
                   />
                 </div>
                 <div className="w-full lg:w-[464px] flex flex-col gap-2">
-                  <div className="text-black text-sm font-medium font-['Manrope']">Съдържание</div>
+                  <div className="text-black text-sm font-medium font-['Manrope']">{t.contentLabel}</div>
                   <textarea
                     name="content"
                     value={formData.content}
                     onChange={handleChange}
                     className="w-full h-24 p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope'] resize-none"
-                    placeholder="Съдържание"
+                    placeholder={t.contentLabel}
                     required
                   />
                 </div>
@@ -159,7 +136,7 @@ const Contacts = () => {
                   className="px-4 py-2 bg-black rounded-lg inline-flex justify-start items-center gap-3 disabled:opacity-50 w-fit"
                 >
                   <div className="text-white text-base font-medium font-['Manrope']">
-                    {loading ? 'Изпращане...' : 'Изпрати'}
+                    {loading ? t.sending : t.send}
                   </div>
                 </button>
               </div>
@@ -173,7 +150,7 @@ const Contacts = () => {
           {/* FAQ Section */}
           <div className="flex flex-col gap-10">
             <div className="w-full p-3 lg:p-6 bg-white rounded-2xl lg:rounded-3xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col gap-3 lg:gap-6">
-              <div className="text-black text-lg lg:text-3xl font-bold font-['Manrope'] text-center lg:text-left">Често задавани въпроси</div>
+              <div className="text-black text-lg lg:text-3xl font-bold font-['Manrope'] text-center lg:text-left">{t.faqTitle}</div>
               
               {/* FAQ Grid - Mobile: Single column, Desktop: 3 columns */}
               <div className="w-full flex flex-col lg:flex-row justify-start items-start gap-3 lg:gap-5">

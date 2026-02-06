@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import Layout from '../../layout/Layout';
 import SEO from '../../shared/SEO';
 import { evaluate, format } from "mathjs";
+import { useTranslation } from '../../../hooks/useTranslation';
 
 const angleModes = [
   { label: "DEG", value: "deg" },
@@ -16,30 +17,6 @@ const scientificButtons = [
   ["1", "2", "3", "-", "sin", "cos", "tan", "cot", "sec"],
   ["0", ",", "=", "+", "sinh", "cosh", "tanh", "π", "e"],
   ["asin", "acos", "atan", "acot", "asec", "acsc", "log", "ln", "exp"]
-];
-
-const docRows = [
-  { buttons: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"], usage: "Въвеждане на цифри (0-9)" },
-  { buttons: ["+", "-", "*", "/"], usage: "Основни операции: събиране (+), изваждане (-), умножение (*), деление (/)" },
-  { buttons: ["="], usage: "Получаване на резултата от изчисление (Enter)" },
-  { buttons: ["C"], usage: "Изчистване на екрана на калкулатора (Escape или C)" },
-  { buttons: ["←"], usage: "Изтриване на последния въведен символ (Backspace)" },
-  { buttons: ["(", ")"], usage: "Скоби за групиране на изрази и приоритет на операциите" },
-  { buttons: ["."], usage: "Десетична точка за дробни числа" },
-  { buttons: ["+/-"], usage: "Промяна на знака на числото (позитивно/негативно)" },
-  { buttons: ["%"], usage: "Процент от число (например: 50% от 200 = 100)" },
-  { buttons: [","], usage: "Разделяне на аргументи на функции (например: log(10,2))" },
-  { buttons: ["x^2", "x^3", "x^y", "10^x"], usage: "Степенуване: квадрат, куб, произволна степен, 10 на степен x" },
-  { buttons: ["√x", "³√x", "y√x"], usage: "Коренуване: квадратен корен, кубичен корен, корен от произволна степен" },
-  { buttons: ["1/x"], usage: "Обратно число (реципрочно: 1/x)" },
-  { buttons: ["!"], usage: "Факториел (n! = 1×2×3×...×n)" },
-  { buttons: ["mod"], usage: "Остатък от деление (modulo: a mod b)" },
-  { buttons: ["nCr", "nPr"], usage: "Комбинаторика: комбинации (nCr) и пермутации (nPr)" },
-  { buttons: ["π", "e"], usage: "Математически константи: π ≈ 3.14159, e ≈ 2.71828" },
-  { buttons: ["sin", "cos", "tan", "cot", "sec", "csc"], usage: "Тригонометрични функции (според избрания режим: DEG/RAD/GRAD)" },
-  { buttons: ["sinh", "cosh", "tanh"], usage: "Хиперболични функции: хиперболичен синус, косинус, тангенс" },
-  { buttons: ["asin", "acos", "atan", "acot", "asec", "acsc"], usage: "Обратни тригонометрични функции (аркус функции)" },
-  { buttons: ["log", "ln", "exp"], usage: "Логаритми: log (десетичен), ln (натурален), exp (експонента)" }
 ];
 
 const functionButtons = [
@@ -80,6 +57,8 @@ function preprocess(expr, angleMode) {
 }
 
 const ScientificCalculator = () => {
+  const { t } = useTranslation();
+  const docRows = t.calcDocRows || [];
   const [angleMode, setAngleMode] = useState("deg");
   const [expression, setExpression] = useState("");
   const [result, setResult] = useState("0");
@@ -110,11 +89,11 @@ const ScientificCalculator = () => {
           setResult(formattedRes);
           setHistory([{ expr: expression, res: formattedRes }, ...history.slice(0, 9)]); // Keep only 10 items
         } else {
-          setResult("Грешка");
+          setResult(t.calcError);
         }
       } catch (error) {
         console.error('Calculation error:', error);
-        setResult("Грешка");
+        setResult(t.calcError);
       }
       return;
     }
@@ -130,7 +109,7 @@ const ScientificCalculator = () => {
       return;
     }
     setExpression(expression + btn);
-  }, [expression, angleMode, history]);
+  }, [expression, angleMode, history, t]);
 
   // Keyboard support
   useEffect(() => {
@@ -173,8 +152,8 @@ const ScientificCalculator = () => {
   return (
     <>
       <SEO
-        title="Научен калкулатор"
-        description="Мощен научен калкулатор за сложни математически изрази, тригонометрия, логаритми, степени и още. Безплатен онлайн калкулатор за ученици, студенти и професионалисти."
+        title={t.scientificCalculatorTitle}
+        description={t.scientificCalculatorDesc}
         keywords="научен калкулатор, калкулатор, математика, тригонометрия, логаритми, степени, изчисления, GeoSolver"
         canonical="/tools/scientific-calculator"
       />
@@ -182,7 +161,7 @@ const ScientificCalculator = () => {
         <div className="w-full min-h-screen bg-stone-50 flex flex-col items-center py-8 px-2 md:px-0">
           <div className="w-full max-w-[1180px] flex flex-col gap-10">
             <div className="flex flex-col gap-10 w-full">
-              <h1 className="text-black text-3xl font-bold font-['Manrope']">Научен калкулатор</h1>
+              <h1 className="text-black text-3xl font-bold font-['Manrope']">{t.scientificCalculatorTitle}</h1>
               <div className="w-full p-4 bg-white rounded-xl border border-gray-200 flex flex-col gap-4">
                 {/* Дисплей */}
                 <div className="flex flex-row items-center justify-between mb-2">
@@ -217,7 +196,7 @@ const ScientificCalculator = () => {
                 {/* История */}
                 {history.length > 0 && (
                   <div className="mt-4">
-                    <div className="text-sm text-neutral-500 mb-1">История:</div>
+                    <div className="text-sm text-neutral-500 mb-1">{t.calcHistory}</div>
                     <ul className="text-xs text-neutral-700 space-y-1">
                       {history.slice(0, 5).map((h, i) => (
                         <li key={i}>{h.expr} = <b>{h.res}</b></li>
@@ -230,14 +209,14 @@ const ScientificCalculator = () => {
             {/* Документация */}
             {/* Desktop version */}
             <div className="hidden md:flex w-full p-6 bg-white rounded-3xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-1px] outline-gray-200 flex-col gap-6">
-              <div className="justify-start text-black text-3xl font-bold font-['Manrope']">Документация</div>
+              <div className="justify-start text-black text-3xl font-bold font-['Manrope']">{t.calcDocumentation}</div>
               
               {/* Примери */}
               <div className="w-full bg-stone-50 rounded-xl p-4">
-                <div className="text-black text-lg font-semibold font-['Manrope'] mb-3">Примери за използване:</div>
+                <div className="text-black text-lg font-semibold font-['Manrope'] mb-3">{t.calcUsageExamples}</div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <div>
-                    <div className="font-medium text-black mb-2">Основни операции:</div>
+                    <div className="font-medium text-black mb-2">{t.calcBasicOps}</div>
                     <div className="text-neutral-600 space-y-1">
                       <div>• 2 + 3 * 4 = 14</div>
                       <div>• (2 + 3) * 4 = 20</div>
@@ -246,7 +225,7 @@ const ScientificCalculator = () => {
                     </div>
                   </div>
                   <div>
-                    <div className="font-medium text-black mb-2">Тригонометрия:</div>
+                    <div className="font-medium text-black mb-2">{t.calcTrigonometry}</div>
                     <div className="text-neutral-600 space-y-1">
                       <div>• sin(30) = 0.5 (в DEG режим)</div>
                       <div>• cos(π/3) = 0.5 (в RAD режим)</div>
@@ -255,7 +234,7 @@ const ScientificCalculator = () => {
                     </div>
                   </div>
                   <div>
-                    <div className="font-medium text-black mb-2">Логаритми и степени:</div>
+                    <div className="font-medium text-black mb-2">{t.calcLogsPowers}</div>
                     <div className="text-neutral-600 space-y-1">
                       <div>• log(100) = 2</div>
                       <div>• ln(e) = 1</div>
@@ -264,7 +243,7 @@ const ScientificCalculator = () => {
                     </div>
                   </div>
                   <div>
-                    <div className="font-medium text-black mb-2">Специални функции:</div>
+                    <div className="font-medium text-black mb-2">{t.calcSpecialFuncs}</div>
                     <div className="text-neutral-600 space-y-1">
                       <div>• 5! = 120</div>
                       <div>• 10 mod 3 = 1</div>
@@ -277,24 +256,24 @@ const ScientificCalculator = () => {
               
               {/* Клавиатурни съкращения */}
               <div className="w-full bg-stone-50 rounded-xl p-4">
-                <div className="text-black text-lg font-semibold font-['Manrope'] mb-3">Клавиатурни съкращения:</div>
+                <div className="text-black text-lg font-semibold font-['Manrope'] mb-3">{t.calcKeyboardShortcuts}</div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <div>
-                    <div className="font-medium text-black mb-2">Основни клавиши:</div>
+                    <div className="font-medium text-black mb-2">{t.calcBasicKeys}</div>
                     <div className="text-neutral-600 space-y-1">
-                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">0-9</span> - Цифри</div>
-                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">+ - * /</span> - Операции</div>
-                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">Enter</span> - Изчисли (=)</div>
-                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">Backspace</span> - Изтрий (←)</div>
-                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">Escape</span> - Изчисти (C)</div>
+                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">0-9</span> - {t.calcDigits}</div>
+                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">+ - * /</span> - {t.calcOperations}</div>
+                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">Enter</span> - {t.calcCalculate}</div>
+                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">Backspace</span> - {t.calcDelete}</div>
+                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">Escape</span> - {t.calcClear}</div>
                     </div>
                   </div>
                   <div>
-                    <div className="font-medium text-black mb-2">Специални клавиши:</div>
+                    <div className="font-medium text-black mb-2">{t.calcSpecialKeys}</div>
                     <div className="text-neutral-600 space-y-1">
-                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">( )</span> - Скоби</div>
-                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">.</span> - Десетична точка</div>
-                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">%</span> - Процент</div>
+                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">( )</span> - {t.calcParentheses}</div>
+                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">.</span> - {t.calcDecimalPoint}</div>
+                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">%</span> - {t.calcPercent}</div>
                       <div>• <span className="font-mono bg-gray-200 px-1 rounded">P</span> - π (пи)</div>
                       <div>• <span className="font-mono bg-gray-200 px-1 rounded">E</span> - e (експонента)</div>
                     </div>
@@ -329,14 +308,14 @@ const ScientificCalculator = () => {
             </div>
             {/* Mobile version */}
             <div className="flex md:hidden self-stretch inline-flex flex-col justify-start items-start gap-3">
-              <div className="justify-start text-black text-lg font-bold font-['Manrope']">Документация</div>
+              <div className="justify-start text-black text-lg font-bold font-['Manrope']">{t.calcDocumentation}</div>
               
               {/* Примери за мобилна версия */}
               <div className="w-full bg-stone-50 rounded-xl p-4">
-                <div className="text-black text-base font-semibold font-['Manrope'] mb-3">Примери за използване:</div>
+                <div className="text-black text-base font-semibold font-['Manrope'] mb-3">{t.calcUsageExamples}</div>
                 <div className="text-sm space-y-2">
                   <div>
-                    <div className="font-medium text-black mb-1">Основни операции:</div>
+                    <div className="font-medium text-black mb-1">{t.calcBasicOps}</div>
                     <div className="text-neutral-600 text-xs space-y-1">
                       <div>• 2 + 3 * 4 = 14</div>
                       <div>• (2 + 3) * 4 = 20</div>
@@ -344,7 +323,7 @@ const ScientificCalculator = () => {
                     </div>
                   </div>
                   <div>
-                    <div className="font-medium text-black mb-1">Тригонометрия:</div>
+                    <div className="font-medium text-black mb-1">{t.calcTrigonometry}</div>
                     <div className="text-neutral-600 text-xs space-y-1">
                       <div>• sin(30) = 0.5 (DEG режим)</div>
                       <div>• cos(π/3) = 0.5 (RAD режим)</div>
@@ -352,7 +331,7 @@ const ScientificCalculator = () => {
                     </div>
                   </div>
                   <div>
-                    <div className="font-medium text-black mb-1">Логаритми и степени:</div>
+                    <div className="font-medium text-black mb-1">{t.calcLogsPowers}</div>
                     <div className="text-neutral-600 text-xs space-y-1">
                       <div>• log(100) = 2</div>
                       <div>• ln(e) = 1</div>
@@ -365,21 +344,21 @@ const ScientificCalculator = () => {
               
               {/* Клавиатурни съкращения за мобилна версия */}
               <div className="w-full bg-stone-50 rounded-xl p-4">
-                <div className="text-black text-base font-semibold font-['Manrope'] mb-3">Клавиатурни съкращения:</div>
+                <div className="text-black text-base font-semibold font-['Manrope'] mb-3">{t.calcKeyboardShortcuts}</div>
                 <div className="text-sm space-y-2">
                   <div>
-                    <div className="font-medium text-black mb-1">Основни клавиши:</div>
+                    <div className="font-medium text-black mb-1">{t.calcBasicKeys}</div>
                     <div className="text-neutral-600 text-xs space-y-1">
-                      <div>• <span className="font-mono bg-gray-200 px-1 rounded text-xs">0-9</span> - Цифри</div>
-                      <div>• <span className="font-mono bg-gray-200 px-1 rounded text-xs">+ - * /</span> - Операции</div>
-                      <div>• <span className="font-mono bg-gray-200 px-1 rounded text-xs">Enter</span> - Изчисли</div>
-                      <div>• <span className="font-mono bg-gray-200 px-1 rounded text-xs">Backspace</span> - Изтрий</div>
+                      <div>• <span className="font-mono bg-gray-200 px-1 rounded text-xs">0-9</span> - {t.calcDigits}</div>
+                      <div>• <span className="font-mono bg-gray-200 px-1 rounded text-xs">+ - * /</span> - {t.calcOperations}</div>
+                      <div>• <span className="font-mono bg-gray-200 px-1 rounded text-xs">Enter</span> - {t.calcCalculate}</div>
+                      <div>• <span className="font-mono bg-gray-200 px-1 rounded text-xs">Backspace</span> - {t.calcDelete}</div>
                     </div>
                   </div>
                   <div>
-                    <div className="font-medium text-black mb-1">Специални клавиши:</div>
+                    <div className="font-medium text-black mb-1">{t.calcSpecialKeys}</div>
                     <div className="text-neutral-600 text-xs space-y-1">
-                      <div>• <span className="font-mono bg-gray-200 px-1 rounded text-xs">Escape</span> - Изчисти</div>
+                      <div>• <span className="font-mono bg-gray-200 px-1 rounded text-xs">Escape</span> - {t.calcClear}</div>
                       <div>• <span className="font-mono bg-gray-200 px-1 rounded text-xs">P</span> - π (пи)</div>
                       <div>• <span className="font-mono bg-gray-200 px-1 rounded text-xs">E</span> - e (експонента)</div>
                     </div>
@@ -391,10 +370,10 @@ const ScientificCalculator = () => {
                 <div className="bg-stone-50 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-start items-start gap-px overflow-hidden">
                   <div className="shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] inline-flex justify-start items-start gap-px">
                     <div className="w-72 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                      <div className="justify-start text-black text-sm font-medium font-['Manrope']">Бутон</div>
+                      <div className="justify-start text-black text-sm font-medium font-['Manrope']">{t.calcButton}</div>
                     </div>
                     <div className="w-72 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                      <div className="justify-start text-black text-sm font-medium font-['Manrope']">Употреба</div>
+                      <div className="justify-start text-black text-sm font-medium font-['Manrope']">{t.calcUsage}</div>
                     </div>
                   </div>
                   {docRows.map((row, idx) => (
