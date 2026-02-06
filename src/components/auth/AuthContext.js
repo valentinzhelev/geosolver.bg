@@ -24,6 +24,7 @@ export function AuthProvider({ children }) {
       setToken(savedToken);
       setRefreshToken(savedRefreshToken);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Fetch user info on mount if token exists
@@ -62,6 +63,7 @@ export function AuthProvider({ children }) {
     } else {
       setUser(null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
   // Google login function

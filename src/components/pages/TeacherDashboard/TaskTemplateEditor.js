@@ -259,6 +259,7 @@ return {
         solutionScript: getDefaultSolutionScript(formData.type)
       }));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData.type]);
 
   return (

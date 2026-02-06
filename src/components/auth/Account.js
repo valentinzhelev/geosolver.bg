@@ -436,6 +436,7 @@ const Account = () => {
       window.removeEventListener('calculationCompleted', handleCalculationUpdate);
       console.log('Event listener removed');
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, planExpiryDate]);
 
   // Reload usage history when page changes
