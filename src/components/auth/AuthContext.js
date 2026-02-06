@@ -280,6 +280,22 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // Refresh user (e.g. after billing update)
+  const refreshUser = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch(`${BASE_URL}/api/auth/account`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setUser(data.user || data);
+      }
+    } catch (e) {
+      console.error('Refresh user failed:', e);
+    }
+  };
+
   // Change password function
   const changePassword = async (oldPassword, newPassword) => {
     setLoading(true);
@@ -310,7 +326,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, error, login, loginWithGoogle, register, logout, forgotPassword, changePassword }}>
+    <AuthContext.Provider value={{ user, token, loading, error, login, loginWithGoogle, register, logout, forgotPassword, changePassword, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

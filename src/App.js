@@ -40,8 +40,9 @@ import DistanceBearing from './components/tasks/DistanceBearing';
 import Resection from './components/tasks/Resection';
 import PolarIntersection from './components/tasks/PolarIntersection';
 import HansenTask from './components/tasks/HansenTask';
-import Checkout from './components/pages/Checkout/Checkout';
 import FieldBook from './components/pages/FieldBook/FieldBook';
+import BillingSuccess from './components/pages/Billing/BillingSuccess';
+import BillingCancel from './components/pages/Billing/BillingCancel';
 
 function App() {
   return (
@@ -88,7 +89,8 @@ function App() {
               <Route path="/polar-intersection" element={<PolarIntersection />} />
               <Route path="/hansen-task" element={<HansenTask />} />
               <Route path="/fieldbook" element={<FieldBook />} />
-              <Route path="/checkout/:planId/:billingCycle" element={<Checkout />} />
+              <Route path="/billing/success" element={<BillingSuccess />} />
+              <Route path="/billing/cancel" element={<BillingCancel />} />
               <Route
                 path="/teacher/dashboard"
                 element={

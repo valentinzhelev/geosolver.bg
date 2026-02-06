@@ -244,7 +244,7 @@ cos(α) = ${result.cosAlpha}
     "offers": {
       "@type": "Offer",
       "price": "0",
-      "priceCurrency": "BGN"
+      "priceCurrency": "EUR"
     },
     "featureList": [
       "Изчисляване на ъгъл между точки",

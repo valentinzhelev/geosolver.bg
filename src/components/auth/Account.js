@@ -6,11 +6,12 @@ import { useAuth } from './AuthContext';
 import { useTranslation } from '../../hooks/useTranslation';
 import PlanService from '../../services/planService';
 import PaymentService from '../../services/paymentService';
+import BillingService from '../../services/billingService';
 import CalculationService from '../../services/calculationService';
 import UserManagementService from '../../services/userManagementService';
 
 const Account = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, refreshUser } = useAuth();
   const { t } = useTranslation();
   
   console.log('Account.js loaded, user:', user);
@@ -109,7 +110,7 @@ const Account = () => {
       setLoading(true);
       const paymentData = await PaymentService.getPaymentHistory(page, paymentItemsPerPage);
       setPaymentHistory(paymentData.payments.map(payment => ({
-        method: `**** ${payment.paymentMethod.last4}`,
+        method: payment.paymentMethod?.last4 ? `**** ${payment.paymentMethod.last4}` : (t.language === 'bg' ? 'Карта' : 'Card'),
         amount: `${payment.amount}${payment.currency}`,
         date: new Date(payment.createdAt).toLocaleString('bg-BG')
       })));
@@ -153,6 +154,11 @@ const Account = () => {
   const paymentItemsPerPage = 5;
   const paymentTotalPages = Math.ceil(paymentHistory.length / paymentItemsPerPage);
   const paginatedPaymentHistory = paymentHistory.slice((paymentCurrentPage - 1) * paymentItemsPerPage, paymentCurrentPage * paymentItemsPerPage);
+
+  // Refresh user on mount (ensures latest plan/subscription status after billing)
+  useEffect(() => {
+    if (refreshUser) refreshUser();
+  }, [refreshUser]);
 
   // Load account data
   useEffect(() => {
@@ -583,15 +589,31 @@ const Account = () => {
                     style={{ zIndex: 1 }}
                   />
                   <div className="text-center justify-start text-white text-lg font-semibold font-['Manrope'] z-10" style={{ opacity: 1 }}>
-                    {plan?.displayName?.[t.language] || (plan?.name === 'free' ? t.freePlan : plan?.name) || defaultPlan.name}
+                    {user?.plan === 'pro' ? (t.language === 'bg' ? 'Професионален план (Pro)' : 'Professional Plan (Pro)') : (plan?.displayName?.[t.language] || (plan?.name === 'free' ? t.freePlan : plan?.name) || defaultPlan.name)}
                   </div>
                 </div>
                 <div className="self-stretch p-4 bg-white rounded-tl rounded-tr rounded-bl-xl rounded-br-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-0.50px] outline-gray-200 flex flex-col justify-start items-start gap-4 overflow-hidden z-10 relative">
                   <div className="justify-start"><span className="text-black text-base font-medium font-['Manrope']">{subscription ? Math.floor((new Date() - new Date(subscription.startDate)) / (1000 * 60 * 60 * 24)) : 0} {t.daysFromStart}</span></div>
                   <div className="justify-start"><span className="text-black text-base font-medium font-['Manrope']">{subscription ? Math.floor((new Date(subscription.endDate) - new Date()) / (1000 * 60 * 60 * 24)) : (plan?.name === 'free' ? '0' : 0)} {t.daysToNext}</span></div>
-                  <Link to="/prices" className="px-4 py-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-3">
-                    <div className="justify-start text-black text-base font-medium font-['Manrope']">{t.changePlan}</div>
-                  </Link>
+                  {(user?.hasBillingCustomer || user?.plan === 'pro') ? (
+                    <button
+                      onClick={async () => {
+                        try {
+                          const { url } = await BillingService.createPortalSession();
+                          if (url) window.location.href = url;
+                        } catch (err) {
+                          alert(err.message);
+                        }
+                      }}
+                      className="px-4 py-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-3"
+                    >
+                      <div className="justify-start text-black text-base font-medium font-['Manrope']">{t.manageSubscription || 'Управление на абонамента'}</div>
+                    </button>
+                  ) : (
+                    <Link to="/prices" className="px-4 py-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-3">
+                      <div className="justify-start text-black text-base font-medium font-['Manrope']">{t.changePlan}</div>
+                    </Link>
+                  )}
                 </div>
               </div>
               <div className="self-stretch p-4 bg-white rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-0.50px] outline-gray-200 flex flex-col justify-start items-start gap-4 overflow-hidden">

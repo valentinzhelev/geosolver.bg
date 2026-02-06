@@ -20,7 +20,7 @@ export const translations = {
     socialNetworks: 'Социални мрежи',
     language: 'Български език',
     theme: 'Светъл режим',
-    copyright: '© GEOSOLVER, 2025.\nВсички права запазени.\nТекуща версия: v2.2.22-beta.2',
+    copyright: '© GEOSOLVER, 2025.\nВсички права запазени.\nТекуща версия: v2.2.23-beta.2',
     // FirstTask translations
     firstTaskTitle: 'Първа основна задача',
     firstTaskDescription: 'Изчисляване на координати по начална точка, ъгъл и дължина с онлайн геодезически калкулатор. Бързи и точни решения за геодезисти.',
@@ -119,6 +119,7 @@ export const translations = {
     daysFromStart: 'дни от началото на плана Ви',
     daysToNext: 'дни до следващото плащане',
     changePlan: 'Промяна на плана',
+    manageSubscription: 'Управление на абонамента',
     paymentMethods: 'Методи за плащане',
     remove: 'Премахни',
     addNewMethod: 'Добави нов метод',
@@ -140,7 +141,7 @@ export const translations = {
     
     // Checkout page translations
     checkoutTitle: 'Завършване на поръчката',
-    checkoutSubtitle: 'Попълнете данните си за плащане, за да активирате абонамента',
+    checkoutSubtitle: 'Ще бъдете пренасочени към защитената платформа на Stripe за плащане',
     orderSummary: 'Резюме на поръчката',
     yearlyBilling: 'Годишно плащане',
     monthlyBilling: 'Месечно плащане',
@@ -150,6 +151,7 @@ export const translations = {
     cardholderNamePlaceholder: 'Иван Иванов',
     expiryDate: 'Валидна до',
     completePayment: 'Завърши плащането',
+    payWithStripe: 'Платете със Stripe',
     processingPayment: 'Обработва се...',
     securePaymentNotice: 'Вашите данни са защитени с 256-bit SSL криптиране',
     freePlanDefault: 'Безплатен план (По подразбиране)',
@@ -324,7 +326,7 @@ export const translations = {
     socialNetworks: 'Social Networks',
     language: 'English',
     theme: 'Light Mode',
-    copyright: '© GEOSOLVER, 2025.\nAll rights reserved.\nCurrent version: v2.2.22-beta.2',
+    copyright: '© GEOSOLVER, 2025.\nAll rights reserved.\nCurrent version: v2.2.23-beta.2',
 
     // FirstTask translations
     firstTaskTitle: 'First Basic Task',
@@ -424,6 +426,7 @@ export const translations = {
     daysFromStart: 'days since the start of your plan',
     daysToNext: 'days until the next payment',
     changePlan: 'Change plan',
+    manageSubscription: 'Manage subscription',
     paymentMethods: 'Payment Methods',
     remove: 'Remove',
     addNewMethod: 'Add new method',
@@ -445,7 +448,7 @@ export const translations = {
     
     // Checkout page translations
     checkoutTitle: 'Complete Order',
-    checkoutSubtitle: 'Fill in your payment details to activate your subscription',
+    checkoutSubtitle: 'You will be redirected to Stripe\'s secure checkout to complete payment',
     orderSummary: 'Order Summary',
     yearlyBilling: 'Yearly billing',
     monthlyBilling: 'Monthly billing',
@@ -455,6 +458,7 @@ export const translations = {
     cardholderNamePlaceholder: 'John Doe',
     expiryDate: 'Expiry Date',
     completePayment: 'Complete Payment',
+    payWithStripe: 'Pay with Stripe',
     processingPayment: 'Processing...',
     securePaymentNotice: 'Your data is protected with 256-bit SSL encryption',
     freePlanDefault: 'Free Plan (Default)',

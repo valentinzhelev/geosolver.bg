@@ -303,7 +303,7 @@ Check - angle: ${result.calculatedAngle} gon
     "offers": {
       "@type": "Offer",
       "price": "0",
-      "priceCurrency": "BGN"
+      "priceCurrency": "EUR"
     },
     "featureList": [
       "Изчисляване на координати",

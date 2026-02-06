@@ -60,7 +60,7 @@ const HomePage = () => {
     "offers": {
       "@type": "Offer",
       "price": "0",
-      "priceCurrency": "BGN",
+      "priceCurrency": "EUR",
       "description": language === 'bg' ? "Безплатен план с 5 изчисления месечно" : "Free plan with 5 calculations per month"
     },
     "featureList": language === 'bg' ? [

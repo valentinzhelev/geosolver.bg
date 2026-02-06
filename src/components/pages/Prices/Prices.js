@@ -1,12 +1,31 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Layout from '../../layout/Layout';
+import BillingService from '../../../services/billingService';
 import SEO from '../../shared/SEO';
 import { useTranslation } from '../../../hooks/useTranslation';
 
 const Prices = () => {
   const [tab, setTab] = useState('month');
+  const [subscribing, setSubscribing] = useState(false);
   const { language } = useTranslation();
+  const navigate = useNavigate();
+
+  const handleSubscribePro = async () => {
+    setSubscribing(true);
+    try {
+      const { url } = await BillingService.createCheckoutSession();
+      if (url) window.location.href = url;
+    } catch (err) {
+      if (err.status === 401) {
+        navigate('/login');
+      } else {
+        alert(err.message);
+      }
+    } finally {
+      setSubscribing(false);
+    }
+  };
 
   const faqs = [
     {
@@ -51,15 +70,15 @@ const Prices = () => {
         "@type": "Offer",
         "name": language === 'bg' ? "Безплатен план" : "Free Plan",
         "price": "0",
-        "priceCurrency": "BGN",
+        "priceCurrency": "EUR",
         "description": language === 'bg' ? "5 изчисления месечно" : "5 calculations per month",
         "availability": "https://schema.org/InStock"
       },
       {
         "@type": "Offer", 
         "name": language === 'bg' ? "Професионален план" : "Professional Plan",
-        "price": "19.99",
-        "priceCurrency": "BGN",
+        "price": "9.99",
+        "priceCurrency": "EUR",
         "description": language === 'bg' ? "Неограничени изчисления" : "Unlimited calculations",
         "availability": "https://schema.org/InStock"
       }
@@ -145,7 +164,7 @@ const Prices = () => {
                     </div>
                   </div>
                   <div className="w-full flex justify-between items-center">
-                    <div className="text-black text-base lg:text-lg font-semibold font-['Manrope']">0.00{language === 'bg' ? 'лв' : 'BGN'}</div>
+                    <div className="text-black text-base lg:text-lg font-semibold font-['Manrope']">0.00{language === 'bg' ? '€' : 'EUR'}</div>
                     <Link to="/register" className="px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3">
                       <span className="text-white text-sm lg:text-base font-medium font-['Manrope']">
                         {language === 'bg' ? 'Регистрация' : 'Register'}
@@ -193,13 +212,17 @@ const Prices = () => {
                     </div>
                     <div className="w-full flex justify-between items-center">
                       <div className="text-black text-base lg:text-lg font-semibold font-['Manrope']">
-                        {tab === 'year' ? `191.90${language === 'bg' ? 'лв/г' : 'BGN/y'}` : `19.99${language === 'bg' ? 'лв/м' : 'BGN/m'}`}
+                        {tab === 'year' ? `95.90${language === 'bg' ? '€/г' : 'EUR/y'}` : `9.99${language === 'bg' ? '€/м' : 'EUR/m'}`}
                       </div>
-                      <Link to={`/checkout/professional/${tab}`} className="px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3">
+                      <button
+                        onClick={handleSubscribePro}
+                        disabled={subscribing}
+                        className="px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3 disabled:opacity-50"
+                      >
                         <span className="text-white text-sm lg:text-base font-medium font-['Manrope']">
-                          {language === 'bg' ? 'Абониране' : 'Subscribe'}
+                          {subscribing ? (language === 'bg' ? 'Зареждане...' : 'Loading...') : (language === 'bg' ? 'Абонирай се (Pro)' : 'Subscribe (Pro)')}
                         </span>
-                      </Link>
+                      </button>
                     </div>
                   </div>
                 </div>
