@@ -39,8 +39,13 @@ const saveHistory = (entry) => {
   localStorage.setItem('firstTaskHistory', JSON.stringify(history.slice(0, 20)));
 };
 
+const LOW_CONFIDENCE = 0.75;
+
 const PurvaZadacha = () => {
   const [form, setForm] = useState({ y1: '', x1: '', alpha: '', s: '' });
+  const [lowConfFields, setLowConfFields] = useState({});
+  const [rawOcrText, setRawOcrText] = useState(null);
+  const [showRawOcr, setShowRawOcr] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
@@ -64,13 +69,17 @@ const PurvaZadacha = () => {
   }, []);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.id]: e.target.value });
-    saveInputHistory(e.target.id, e.target.value);
+    const id = e.target.id;
+    setForm({ ...form, [id]: e.target.value });
+    saveInputHistory(id, e.target.value);
+    if (lowConfFields[id]) setLowConfFields((prev) => ({ ...prev, [id]: false }));
   };
 
   const handleScanFile = async (file) => {
     if (!file || !file.type.startsWith('image/')) return;
     setIsScanning(true);
+    setLowConfFields({});
+    setRawOcrText(null);
     try {
       const result = await extractTaskInputFromImage(file);
       if (result.success && result.inputData) {
@@ -86,10 +95,22 @@ const PurvaZadacha = () => {
         if (d.x1 != null) saveInputHistory('x1', String(d.x1));
         if (d.alpha != null) saveInputHistory('alpha', String(d.alpha));
         if (d.s != null) saveInputHistory('s', String(d.s));
+        const conf = result.confidence || {};
+        setLowConfFields({
+          y1: conf.y1 != null && conf.y1 < LOW_CONFIDENCE,
+          x1: conf.x1 != null && conf.x1 < LOW_CONFIDENCE,
+          alpha: conf.alpha != null && conf.alpha < LOW_CONFIDENCE,
+          s: conf.s != null && conf.s < LOW_CONFIDENCE
+        });
+        if (result.rawText) setRawOcrText(result.rawText);
       } else {
+        setLowConfFields({});
+        setRawOcrText(null);
         alert(language === 'bg' ? 'Не можахме да разпознаем данни. Опитайте с по-четлива снимка.' : 'Could not recognize data. Try a clearer image.');
       }
     } catch (err) {
+      setLowConfFields({});
+      setRawOcrText(null);
       alert(language === 'bg' ? 'Грешка при сканиране. Уверете се, че backend-ът работи.' : 'Scan error. Ensure the backend is running.');
     } finally {
       setIsScanning(false);
@@ -236,6 +257,21 @@ Check - angle: ${result.calculatedAngle} gon
   const resetForm = () => {
     setForm({ y1: '', x1: '', alpha: '', s: '' });
     setResultText(t.defaultResultText);
+    setLowConfFields({});
+    setRawOcrText(null);
+    setShowRawOcr(false);
+  };
+
+  const inputClass = (fieldId) => {
+    const base = "self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] text-neutral-400 text-xs font-medium font-['Manrope']";
+    const low = lowConfFields[fieldId] ? 'outline-amber-400 ring-1 ring-amber-200' : 'outline-gray-200';
+    return `${base} ${low}`;
+  };
+
+  const inputClassDesktop = (fieldId) => {
+    const base = "self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] text-neutral-400 text-sm font-medium font-['Manrope']";
+    const low = lowConfFields[fieldId] ? 'outline-amber-400 ring-1 ring-amber-200' : 'outline-gray-200';
+    return `${base} ${low}`;
   };
 
   const handleDownload = (entry) => {
@@ -334,7 +370,7 @@ Check - angle: ${result.calculatedAngle} gon
                         value={form.y1}
                         onChange={handleChange}
                         step="any"
-                        className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-xs font-medium font-['Manrope']"
+                        className={inputClass('y1')}
                         placeholder="Въведете координата Y1"
                         list="y1-history"
                       />
@@ -351,7 +387,7 @@ Check - angle: ${result.calculatedAngle} gon
                         value={form.x1}
                         onChange={handleChange}
                         step="any"
-                        className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-xs font-medium font-['Manrope']"
+                        className={inputClass('x1')}
                         placeholder="Въведете координата X1"
                         list="x1-history"
                       />
@@ -368,7 +404,7 @@ Check - angle: ${result.calculatedAngle} gon
                         value={form.alpha}
                         onChange={handleChange}
                         step="any"
-                        className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-xs font-medium font-['Manrope']"
+                        className={inputClass('alpha')}
                         placeholder="Въведете ъгъл α"
                         list="alpha-history"
                       />
@@ -385,7 +421,7 @@ Check - angle: ${result.calculatedAngle} gon
                         value={form.s}
                         onChange={handleChange}
                         step="any"
-                        className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-xs font-medium font-['Manrope']"
+                        className={inputClass('s')}
                         placeholder="Въведете дължина S"
                         list="s-history"
                       />
@@ -393,6 +429,14 @@ Check - angle: ${result.calculatedAngle} gon
                         {getInputHistory('s').map((v, i) => <option value={v} key={i} />)}
                       </datalist>
                     </div>
+                    {rawOcrText && (
+                      <div className="self-stretch">
+                        <button type="button" onClick={() => setShowRawOcr(!showRawOcr)} className="text-xs text-neutral-500 hover:underline">
+                          {showRawOcr ? 'Скрий' : 'Покажи'} суров текст от OCR
+                        </button>
+                        {showRawOcr && <pre className="mt-2 p-2 bg-stone-100 rounded text-xs overflow-auto max-h-32 whitespace-pre-wrap">{rawOcrText}</pre>}
+                      </div>
+                    )}
                   </div>
                   <div className="inline-flex justify-end items-center gap-3 w-full">
                     <button
@@ -551,7 +595,7 @@ Check - angle: ${result.calculatedAngle} gon
                       value={form.y1}
                       onChange={handleChange}
                       step="any"
-                      className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']"
+                      className={inputClassDesktop('y1')}
                       placeholder="Въведете координата Y1"
                       list="y1-history"
                     />
@@ -568,7 +612,7 @@ Check - angle: ${result.calculatedAngle} gon
                       value={form.x1}
                       onChange={handleChange}
                       step="any"
-                      className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']"
+                      className={inputClassDesktop('x1')}
                       placeholder="Въведете координата X1"
                       list="x1-history"
                     />
@@ -585,7 +629,7 @@ Check - angle: ${result.calculatedAngle} gon
                       value={form.alpha}
                       onChange={handleChange}
                       step="any"
-                      className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']"
+                      className={inputClassDesktop('alpha')}
                       placeholder="Въведете ъгъл α"
                       list="alpha-history"
                     />
@@ -602,7 +646,7 @@ Check - angle: ${result.calculatedAngle} gon
                       value={form.s}
                       onChange={handleChange}
                       step="any"
-                      className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']"
+                      className={inputClassDesktop('s')}
                       placeholder="Въведете дължина S"
                       list="s-history"
                     />
@@ -610,6 +654,14 @@ Check - angle: ${result.calculatedAngle} gon
                       {getInputHistory('s').map((v, i) => <option value={v} key={i} />)}
                     </datalist>
                   </div>
+                  {rawOcrText && (
+                    <div className="self-stretch">
+                      <button type="button" onClick={() => setShowRawOcr(!showRawOcr)} className="text-sm text-neutral-500 hover:underline">
+                        {showRawOcr ? 'Скрий' : 'Покажи'} суров текст от OCR
+                      </button>
+                      {showRawOcr && <pre className="mt-2 p-2 bg-stone-100 rounded text-sm overflow-auto max-h-40 whitespace-pre-wrap">{rawOcrText}</pre>}
+                    </div>
+                  )}
                 </div>
                 <div className="inline-flex justify-start items-start gap-3">
                   <button
