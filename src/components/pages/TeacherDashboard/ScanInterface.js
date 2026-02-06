@@ -60,7 +60,7 @@ const TrendingUpIcon = ({ className = "w-5 h-5" }) => (
 );
 
 const ScanInterface = () => {
-  const { t, language } = useTranslation();
+  const { language } = useTranslation();
   const [selectedFile, setSelectedFile] = useState(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState(null);

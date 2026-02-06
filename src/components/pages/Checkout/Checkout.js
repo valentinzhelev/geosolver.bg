@@ -11,7 +11,7 @@ const Checkout = () => {
   const { planId, billingCycle } = useParams();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { user } = useAuth();
+  useAuth(); // Required for auth context - Checkout is protected by route
   
   const [plan, setPlan] = useState(null);
   const [loading, setLoading] = useState(true);

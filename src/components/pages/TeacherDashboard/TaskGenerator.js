@@ -63,7 +63,7 @@ const CancelIcon = ({ className = "w-6 h-6" }) => (
 );
 
 const TaskGenerator = () => {
-  const { t, language } = useTranslation();
+  const { language } = useTranslation();
   const [selectedTaskType, setSelectedTaskType] = useState('');
   const [taskParameters, setTaskParameters] = useState({
     difficulty: 'medium',

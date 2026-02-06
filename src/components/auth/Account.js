@@ -452,6 +452,7 @@ const Account = () => {
     if (user && paymentCurrentPage > 1) {
       reloadPaymentHistory(paymentCurrentPage);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paymentCurrentPage, user]);
 
   // Load admin users list

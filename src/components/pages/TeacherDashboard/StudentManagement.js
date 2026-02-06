@@ -61,7 +61,7 @@ const CheckIcon = ({ className = "w-5 h-5" }) => (
 );
 
 const StudentManagement = () => {
-  const { t, language } = useTranslation();
+  const { language } = useTranslation();
   const [activeTab, setActiveTab] = useState('students');
   const [showAddStudent, setShowAddStudent] = useState(false);
   const [newStudent, setNewStudent] = useState({
