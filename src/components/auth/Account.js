@@ -674,7 +674,7 @@ const Account = () => {
                     </div>
                   </div>
                   {(() => {
-                    console.log('🔍 Rendering usage history:');
+                    console.log('Rendering usage history:');
                     console.log('  - paginatedUsageHistory:', paginatedUsageHistory);
                     console.log('  - paginatedUsageHistory.length:', paginatedUsageHistory?.length || 0);
                     console.log('  - usageHistory state:', usageHistory);

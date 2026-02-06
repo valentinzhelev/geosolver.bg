@@ -17,6 +17,14 @@ const UploadIcon = ({ className = "w-6 h-6" }) => (
   </svg>
 );
 
+const CameraIcon = ({ className = "w-6 h-6" }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 13v7a2 2 0 01-2 2H7a2 2 0 01-2-2v-7" />
+  </svg>
+);
+
 const AnalysisIcon = ({ className = "w-6 h-6" }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -66,6 +74,7 @@ const ScanInterface = () => {
   const [analysisResult, setAnalysisResult] = useState(null);
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef(null);
+  const cameraInputRef = useRef(null);
 
   // Mock analysis result - will be replaced with AI analysis
   const mockAnalysisResult = {
@@ -142,6 +151,14 @@ const ScanInterface = () => {
     if (e.target.files && e.target.files[0]) {
       handleFile(e.target.files[0]);
     }
+    e.target.value = '';
+  };
+
+  const handleCameraInput = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      handleFile(e.target.files[0]);
+    }
+    e.target.value = '';
   };
 
   const handleAnalyze = async () => {
@@ -261,13 +278,22 @@ const ScanInterface = () => {
                           {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                         </div>
                       </div>
-                      <button
-                        onClick={() => fileInputRef.current?.click()}
-                        className="px-4 py-2 bg-gray-200 text-black rounded-lg hover:bg-gray-300 transition-colors duration-200 text-sm font-medium flex items-center gap-2 mx-auto"
-                      >
-                        <UploadIcon className="w-4 h-4" />
-                        {language === 'bg' ? 'Избери друг файл' : 'Choose different file'}
-                      </button>
+                      <div className="flex flex-wrap justify-center gap-2">
+                        <button
+                          onClick={() => fileInputRef.current?.click()}
+                          className="px-4 py-2 bg-gray-200 text-black rounded-lg hover:bg-gray-300 transition-colors duration-200 text-sm font-medium flex items-center gap-2"
+                        >
+                          <UploadIcon className="w-4 h-4" />
+                          {language === 'bg' ? 'Избери друг файл' : 'Choose different file'}
+                        </button>
+                        <button
+                          onClick={() => cameraInputRef.current?.click()}
+                          className="px-4 py-2 bg-gray-200 text-black rounded-lg hover:bg-gray-300 transition-colors duration-200 text-sm font-medium flex items-center gap-2"
+                        >
+                          <CameraIcon className="w-4 h-4" />
+                          {language === 'bg' ? 'Направи нова снимка' : 'Take new photo'}
+                        </button>
+                      </div>
                     </div>
                   ) : (
                     <div className="space-y-4">
@@ -278,16 +304,25 @@ const ScanInterface = () => {
                         <div className="font-medium text-black mb-2">
                           {language === 'bg' ? 'Плъзнете файла тук или' : 'Drag file here or'}
                         </div>
-                        <button
-                          onClick={() => fileInputRef.current?.click()}
-                          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 text-sm font-medium flex items-center gap-2 mx-auto"
-                        >
-                          <UploadIcon className="w-4 h-4" />
-                          {language === 'bg' ? 'Избери файл' : 'Choose file'}
-                        </button>
+                        <div className="flex flex-wrap justify-center gap-2">
+                          <button
+                            onClick={() => fileInputRef.current?.click()}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 text-sm font-medium flex items-center gap-2"
+                          >
+                            <UploadIcon className="w-4 h-4" />
+                            {language === 'bg' ? 'Избери файл' : 'Choose file'}
+                          </button>
+                          <button
+                            onClick={() => cameraInputRef.current?.click()}
+                            className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200 text-sm font-medium flex items-center gap-2"
+                          >
+                            <CameraIcon className="w-4 h-4" />
+                            {language === 'bg' ? 'Направи снимка' : 'Take photo'}
+                          </button>
+                        </div>
                       </div>
                       <div className="text-xs text-neutral-500">
-                        {language === 'bg' ? 'Поддържани формати: JPG, PNG, PDF' : 'Supported formats: JPG, PNG, PDF'}
+                        {language === 'bg' ? 'Поддържани формати: JPG, PNG, PDF. На мобилни „Направи снимка" отваря камерата.' : 'Supported formats: JPG, PNG, PDF. On mobile, "Take photo" opens the camera.'}
                       </div>
                     </div>
                   )}
@@ -298,6 +333,14 @@ const ScanInterface = () => {
                   type="file"
                   accept="image/*,.pdf"
                   onChange={handleFileInput}
+                  className="hidden"
+                />
+                <input
+                  ref={cameraInputRef}
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={handleCameraInput}
                   className="hidden"
                 />
 

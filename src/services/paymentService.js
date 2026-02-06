@@ -1,7 +1,7 @@
 import API_BASE_URL from '../config/api';
 
 class PaymentService {
-  // Вземане на история на плащанията
+  // Fetch payment history
   static async getPaymentHistory(page = 1, limit = 10) {
     try {
       const token = localStorage.getItem('token');
@@ -42,7 +42,7 @@ class PaymentService {
     }
   }
 
-  // Вземане на статистики за плащания
+  // Fetch payment stats
   static async getPaymentStats() {
     try {
       const token = localStorage.getItem('token');
@@ -60,7 +60,7 @@ class PaymentService {
     }
   }
 
-  // Създаване на плащане
+  // Create payment
   static async createPayment(paymentData) {
     try {
       const token = localStorage.getItem('token');
@@ -80,7 +80,7 @@ class PaymentService {
     }
   }
 
-  // Обновяване на статус на плащане
+  // Update payment status
   static async updatePaymentStatus(paymentId, status, failureReason = null) {
     try {
       const token = localStorage.getItem('token');

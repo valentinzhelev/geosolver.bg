@@ -140,7 +140,7 @@ Differences:
 
     switch (transformationType) {
       case 'translation':
-        // Паралелно изместване
+        // Translation
         const dx = parameters.dx || 0;
         const dy = parameters.dy || 0;
         xNew = x + dx;
@@ -149,8 +149,8 @@ Differences:
         break;
 
       case 'rotation':
-        // Завъртане около началото на координатната система
-        const angle = (parameters.angle || 0) * Math.PI / 200; // гради в радиани
+        // Rotation
+        const angle = (parameters.angle || 0) * Math.PI / 200;
         const cosAngle = Math.cos(angle);
         const sinAngle = Math.sin(angle);
         xNew = x * cosAngle - y * sinAngle;
@@ -159,7 +159,7 @@ Differences:
         break;
 
       case 'scaling':
-        // Мащабиране
+        // Scaling
         const scaleX = parameters.scaleX || 1;
         const scaleY = parameters.scaleY || 1;
         xNew = x * scaleX;
@@ -202,7 +202,7 @@ Differences:
     URL.revokeObjectURL(url);
   };
 
-  // Проверка дали всички полета са попълнени
+  // Check all fields filled
   const isFormValid = () => {
     return (
       form.x !== '' &&

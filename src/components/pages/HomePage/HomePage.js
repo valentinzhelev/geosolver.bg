@@ -1,13 +1,51 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from 'react-router-dom';
 import Layout from '../../layout/Layout';
 import SEO from '../../shared/SEO';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { useTheme } from '../../../context/ThemeContext';
 
+const historyItems = [
+  {
+    id: '2023',
+    label: { bg: '2023', en: '2023' },
+    content: {
+      bg: 'Идеята за GeoSolver се заражда – необходимостта от уеб базирано приложение за геодезически изчисления.',
+      en: 'The idea for GeoSolver is born – the need for a web-based application for geodetic calculations.'
+    }
+  },
+  {
+    id: '2024',
+    label: { bg: '2024', en: '2024' },
+    content: {
+      bg: 'Започва разработката на платформата – първите инструменти и основен функционал.',
+      en: 'Platform development begins – first tools and core functionality.'
+    }
+  },
+  {
+    id: '2025',
+    label: { bg: '2025', en: '2025' },
+    content: {
+      bg: 'Пускане на продукта, разширение на инструментите и преподавателски панел.',
+      en: 'Product launch, tool expansion and teacher panel.'
+    }
+  },
+  {
+    id: 'future',
+    label: { bg: 'Планове за бъдещето', en: 'Future Plans' },
+    labelShort: { bg: 'Планове', en: 'Plans' },
+    content: {
+      bg: 'Сканиране на задачи от снимка, мобилно приложение и допълнителни геодезически модули.',
+      en: 'Task scanning from photo, mobile app and additional geodetic modules.'
+    }
+  }
+];
+
 const HomePage = () => {
   const { language } = useTranslation();
   const { isDark } = useTheme();
+  const [activeYear, setActiveYear] = useState('2023');
+  const activeItem = historyItems.find(item => item.id === activeYear) || historyItems[0];
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -61,7 +99,7 @@ const HomePage = () => {
       />
       <Layout>
         <div className="w-full min-h-screen bg-stone-50 dark:bg-neutral-950">
-          <div className="w-full max-w-[1180px] mx-auto px-4 lg:px-6 pt-6 lg:pt-20 pb-6 lg:pb-20 flex flex-col gap-6 lg:gap-10">
+          <div className="w-full max-w-[1180px] mx-auto px-4 lg:px-6 pt-6 lg:pt-20 pb-6 flex flex-col gap-6 lg:gap-10">
             {/* Top Buttons - Mobile: Vertical, Desktop: Horizontal */}
             <div className="flex flex-col lg:flex-row justify-start items-start gap-2 lg:gap-5">
               <Link
@@ -117,35 +155,59 @@ const HomePage = () => {
               <div className="text-black dark:text-white text-lg lg:text-2xl font-bold font-['Manrope']">
                 {language === 'bg' ? 'История на GeoSolver' : 'GeoSolver History'}
               </div>
-              <div className="w-full p-4 lg:p-10 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex flex-col justify-start items-start gap-10">
-                <div className="w-full flex flex-col justify-center items-center gap-2 lg:gap-3">
-                  <div className="text-black dark:text-white text-lg lg:text-2xl font-semibold font-['Manrope']">2023</div>
-                  <div className="text-center text-black dark:text-white text-sm lg:text-lg font-semibold font-['Manrope']">
-                    {language === 'bg' 
-                      ? 'Идеята за GeoSolver се заражда – необходимостта от уеб базирано приложение за геодезически изчисления.'
-                      : 'The idea for GeoSolver is born – the need for a web-based application for geodetic calculations.'
-                    }
+              <div className="w-full p-4 lg:p-10 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex flex-col justify-start items-start gap-6 lg:gap-10">
+                {/* Content - above buttons */}
+                <div className="w-full flex flex-col justify-center items-center gap-3 lg:gap-3">
+                  <div className="text-black dark:text-white text-lg lg:text-2xl font-semibold font-['Manrope']">
+                    {activeItem.label[language]}
+                  </div>
+                  <div className="text-center text-black dark:text-white text-sm lg:text-base font-medium font-['Manrope'] leading-relaxed px-1">
+                    {activeItem.content[language]}
                   </div>
                 </div>
-                {/* Timeline - Mobile: Horizontal scrollable, Desktop: Normal */}
-                <div className="w-full flex flex-row justify-start items-center gap-3 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0">
-                  <div className="px-3 py-1 bg-black dark:bg-white rounded-lg flex justify-center items-center gap-2.5 flex-shrink-0">
-                    <div className="text-white dark:text-black text-base lg:text-lg font-semibold font-['Manrope']">2023</div>
+                {/* Mobile: Year selector below content, 2x2 grid */}
+                <div className="w-full lg:hidden">
+                  <div className="grid grid-cols-2 gap-2">
+                    {historyItems.map((item) => (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => setActiveYear(item.id)}
+                        className={`py-3 px-4 rounded-xl flex justify-center items-center transition-all font-['Manrope'] font-semibold text-sm ${
+                          activeYear === item.id
+                            ? 'bg-black dark:bg-white text-white dark:text-black shadow-md'
+                            : 'bg-stone-100 dark:bg-zinc-800 text-stone-600 dark:text-zinc-400 active:bg-stone-200 dark:active:bg-zinc-700'
+                        }`}
+                      >
+                        {(item.labelShort || item.label)[language]}
+                      </button>
+                    ))}
                   </div>
-                  <div className="flex-1 h-0 outline outline-1 outline-offset-[-0.50px] outline-gray-200 dark:outline-zinc-800" />
-                  <div className="px-3 py-1 bg-gray-200 dark:bg-zinc-800 rounded-lg flex justify-center items-center gap-2.5 flex-shrink-0">
-                    <div className="text-black dark:text-white text-base lg:text-lg font-semibold font-['Manrope']">2024</div>
-                  </div>
-                  <div className="flex-1 h-0 outline outline-1 outline-offset-[-0.50px] outline-gray-200 dark:outline-zinc-800" />
-                  <div className="px-3 py-1 bg-gray-200 dark:bg-zinc-800 rounded-lg flex justify-center items-center gap-2.5 flex-shrink-0">
-                    <div className="text-black dark:text-white text-base lg:text-lg font-semibold font-['Manrope']">2025</div>
-                  </div>
-                  <div className="flex-1 h-0 outline outline-1 outline-offset-[-0.50px] outline-gray-200 dark:outline-zinc-800" />
-                  <div className="px-3 py-1 bg-gray-200 dark:bg-zinc-800 rounded-lg flex justify-center items-center gap-2.5 flex-shrink-0">
-                    <div className="text-black dark:text-white text-base lg:text-lg font-semibold font-['Manrope']">
-                      {language === 'bg' ? 'Планове за бъдещето' : 'Future Plans'}
-                    </div>
-                  </div>
+                </div>
+                {/* Desktop: Timeline with lines - below content */}
+                <div className="hidden lg:flex w-full flex-row justify-start items-center gap-3">
+                  {historyItems.map((item, index) => (
+                    <React.Fragment key={item.id}>
+                      {index > 0 && (
+                        <div className="flex-1 h-0 outline outline-1 outline-offset-[-0.50px] outline-gray-200 dark:outline-zinc-800" />
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setActiveYear(item.id)}
+                        className={`px-3 py-1 rounded-lg flex justify-center items-center gap-2.5 flex-shrink-0 transition-colors cursor-pointer ${
+                          activeYear === item.id
+                            ? 'bg-black dark:bg-white'
+                            : 'bg-gray-200 dark:bg-zinc-800 hover:bg-gray-300 dark:hover:bg-zinc-700'
+                        }`}
+                      >
+                        <div className={`text-base lg:text-lg font-semibold font-['Manrope'] ${
+                          activeYear === item.id ? 'text-white dark:text-black' : 'text-black dark:text-white'
+                        }`}>
+                          {item.label[language]}
+                        </div>
+                      </button>
+                    </React.Fragment>
+                  ))}
                 </div>
               </div>
             </div>

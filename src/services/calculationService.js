@@ -33,7 +33,7 @@ class CalculationService {
       let url = `${API_BASE_URL}/calculations?page=${page}&limit=${limit}`;
       if (toolName) url += `&toolName=${toolName}`;
       
-      console.log('🔍 API Debug - getCalculationHistory:');
+      console.log('API Debug - getCalculationHistory:');
       console.log('  - API_BASE_URL:', API_BASE_URL);
       console.log('  - Full URL:', url);
       console.log('  - Token exists:', !!token);
@@ -120,7 +120,7 @@ class CalculationService {
       const token = localStorage.getItem('token');
       const url = `${API_BASE_URL}/calculations/limits`;
       
-      console.log('🔍 API Debug - checkLimits:');
+      console.log('API Debug - checkLimits:');
       console.log('  - API_BASE_URL:', API_BASE_URL);
       console.log('  - Full URL:', url);
       console.log('  - Token exists:', !!token);

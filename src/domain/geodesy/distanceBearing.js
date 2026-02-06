@@ -11,7 +11,7 @@
  * @throws {Error} При невалидни входни данни
  */
 export function calculateDistanceBearing(x1, y1, x2, y2) {
-  // Валидация на входните данни
+  // Validate input data
   if (typeof x1 !== 'number' || isNaN(x1) || !isFinite(x1)) {
     throw new Error('X1 трябва да е валидно число');
   }
@@ -25,26 +25,26 @@ export function calculateDistanceBearing(x1, y1, x2, y2) {
     throw new Error('Y2 трябва да е валидно число');
   }
 
-  // Координатни разлики
+  // Coordinate differences
   const deltaY = y2 - y1;
   const deltaX = x2 - x1;
 
-  // Изчисляване на разстоянието
+  // Distance
   const distance = Math.sqrt(deltaY * deltaY + deltaX * deltaX);
 
-  // Изчисляване на посоката (азимут)
+  // Bearing (azimuth)
   let bearingRad = Math.atan2(deltaX, deltaY);
   
-  // Нормализиране на ъгъла (0 до 2π)
+  // Normalize angle (0 to 2pi)
   if (bearingRad < 0) {
     bearingRad += 2 * Math.PI;
   }
 
-  // Преобразуване в гради и градуси
+  // Convert to gon and degrees
   const bearingGon = (bearingRad * 200) / Math.PI;
   const bearingDeg = (bearingRad * 180) / Math.PI;
 
-  // Определяне на квадранта
+  // Determine quadrant
   let quadrant = '';
   if (deltaY >= 0 && deltaX >= 0) {
     quadrant = 'I квадрант (0-100 gon)';

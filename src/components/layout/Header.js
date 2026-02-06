@@ -7,21 +7,10 @@ import { useTheme } from '../../context/ThemeContext';
 const Header = () => {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { user, loading, logout } = useAuth();
+  const { user, loading } = useAuth();
   const { t, language } = useTranslation();
   const { isDark, toggleTheme } = useTheme();
 
-  // Debug: виж user в конзолата
-  console.log('user in Header:', user);
-
-  // Функция за показване на име или fallback
-  const getAccountLabel = () => {
-    if (!user) return t.login;
-    if (user.name && user.name.trim() !== '') return user.name;
-    return t.account;
-  };
-
-  // Loader компонент
   const Loader = () => (
     <div className="px-4 py-2 flex items-center gap-2">
       <span className="loader w-4 h-4 border-2 border-gray-300 dark:border-gray-600 border-t-black dark:border-t-white rounded-full animate-spin"></span>
@@ -181,16 +170,10 @@ const Header = () => {
               {loading ? (
                 <Loader />
               ) : user ? (
-                <div className="flex items-center gap-3">
-                                     <Link to="/account" onClick={() => setMobileMenuOpen(false)} className="px-4 py-2 bg-black dark:bg-white rounded-lg flex justify-start items-center gap-3">
-                     <div className="justify-start text-white dark:text-black text-sm font-medium font-['Manrope']">{getAccountLabel()}</div>
-                     <img src={isDark ? "/icons/homepage_login_icon.svg" : "/icons/account_icon.svg"} alt="Account Icon" className="w-4 h-4" />
-                   </Link>
-                  <button onClick={() => { logout(); setMobileMenuOpen(false); }} className="px-4 py-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-900 flex justify-start items-center gap-3">
-                    <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{t.logout}</div>
-                    <img src="/icons/logout_icon.svg" alt="Logout" className="w-4 h-4" />
-                  </button>
-                </div>
+                <Link to="/account" onClick={() => setMobileMenuOpen(false)} className="px-4 py-2 bg-black dark:bg-white rounded-lg flex justify-start items-center gap-3">
+                  <div className="justify-start text-white dark:text-black text-sm font-medium font-['Manrope']">{t.account}</div>
+                  <img src={isDark ? "/icons/homepage_login_icon.svg" : "/icons/login_icon.svg"} alt="Account Icon" className="w-4 h-4" />
+                </Link>
               ) : (
                 <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="justify-start text-white dark:text-black text-sm font-medium font-['Manrope'] px-4 py-2 bg-black dark:bg-white rounded-lg flex items-center gap-3">
                   {t.login}

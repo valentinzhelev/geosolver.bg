@@ -12,17 +12,17 @@ export const useTheme = () => {
 
 export const ThemeProvider = ({ children }) => {
   const [isDark, setIsDark] = useState(() => {
-    // Проверяваме дали има запазена предпочитана тема в localStorage
+    // Check saved theme in localStorage
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
       return savedTheme === 'dark';
     }
-    // Ако няма запазена тема, проверяваме системните предпочитания
+    // Fallback to system preference
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
 
   useEffect(() => {
-    // Прилагаме темата към HTML елемента
+    // Apply theme to HTML element
     const root = window.document.documentElement;
     if (isDark) {
       root.classList.add('dark');
@@ -30,7 +30,7 @@ export const ThemeProvider = ({ children }) => {
       root.classList.remove('dark');
     }
     
-    // Запазваме предпочитанието в localStorage
+    // Save preference to localStorage
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
   }, [isDark]);
 

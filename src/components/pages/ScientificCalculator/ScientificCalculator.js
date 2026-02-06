@@ -41,7 +41,7 @@ function preprocess(expr, angleMode) {
     .replace(/exp/g, "exp")
     .replace(/\^/g, "^");
 
-  // Преобразуване на аргумента на тригонометричните функции според режима
+  // Convert trig argument by mode
   if (angleMode !== "rad") {
     e = e.replace(/(sin|cos|tan|cot|sec|csc|asin|acos|atan|acot|asec|acsc)\(([^)]+)\)/g, (match, fn, arg) => {
       if (angleMode === "deg") {

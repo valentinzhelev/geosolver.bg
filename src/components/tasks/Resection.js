@@ -35,61 +35,58 @@ function calculateResection(points, angles) {
   const { xA, yA, xB, yB, xC, yC } = points;
   const { beta1, beta2 } = angles;
 
-  // Проверка за валидност на входните данни
+  // Validate input data
   if (!xA || !yA || !xB || !yB || !xC || !yC || !beta1 || !beta2) {
     throw new Error('Всички координати и ъгли са задължителни');
   }
 
-  // Конвертиране на ъгли от гради в радиани
+  // Gon to radians
   const beta1Rad = (beta1 * Math.PI) / 200;
   const beta2Rad = (beta2 * Math.PI) / 200;
 
-  // Hansen Problem решение
-  // Използваме формулата за триангулация
+  // Hansen Problem - triangulation
   const dxAB = xB - xA;
   const dyAB = yB - yA;
   const dxBC = xC - xB;
   const dyBC = yC - yB;
 
-  // Изчисляване на ъглите на триъгълника ABC
+  // Triangle ABC angles
   const angleA = Math.atan2(dyAB, dxAB);
   const angleB = Math.atan2(dyBC, dxBC);
 
-  // Изчисляване на страните
+  // Sides
   const sideAB = Math.sqrt(dxAB * dxAB + dyAB * dyAB);
   const sideBC = Math.sqrt(dxBC * dxBC + dyBC * dyBC);
 
-  // Решаване на триъгълника за точка P
-  // Използваме синусовата теорема
+  // Solve for point P (law of sines)
   const angleAPB = Math.PI - beta1Rad;
   const angleBPC = Math.PI - beta2Rad;
 
-  // Изчисляване на разстоянията от P до A, B, C
+  // Distances P to A, B, C
   const sideAP = (sideAB * Math.sin(beta1Rad)) / Math.sin(angleAPB);
   const sideBP = (sideBC * Math.sin(beta2Rad)) / Math.sin(angleBPC);
 
-  // Изчисляване на координатите на P
-  // Използваме полярна координатна система
+  // Point P coordinates (polar)
   const xP1 = xA + sideAP * Math.cos(angleA + beta1Rad);
   const yP1 = yA + sideAP * Math.sin(angleA + beta1Rad);
   
   const xP2 = xB + sideBP * Math.cos(angleB - beta2Rad);
   const yP2 = yB + sideBP * Math.sin(angleB - beta2Rad);
 
-  // Средно аритметично на двете решения
+  // Average of both solutions
   const xP = (xP1 + xP2) / 2;
   const yP = (yP1 + yP2) / 2;
 
-  // Изчисляване на разстоянията за проверка
+  // Distances for verification
   const distAP = Math.sqrt((xP - xA) * (xP - xA) + (yP - yA) * (yP - yA));
   const distBP = Math.sqrt((xP - xB) * (xP - xB) + (yP - yB) * (yP - yB));
   const distCP = Math.sqrt((xP - xC) * (xP - xC) + (yP - yC) * (yP - yC));
 
-  // Изчисляване на ъглите за проверка
+  // Angles for verification
   const calcBeta1 = Math.atan2(yB - yP, xB - xP) - Math.atan2(yA - yP, xA - xP);
   const calcBeta2 = Math.atan2(yC - yP, xC - xP) - Math.atan2(yB - yP, xB - xP);
 
-  // Нормализиране на ъглите
+  // Normalize angles
   const normalizedBeta1 = ((calcBeta1 * 200) / Math.PI + 400) % 400;
   const normalizedBeta2 = ((calcBeta2 * 200) / Math.PI + 400) % 400;
 

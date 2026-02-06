@@ -20,7 +20,7 @@
  * @throws {Error} При невалидни входни данни
  */
 export function calculateForwardIntersection(yA, xA, yB, xB, beta1, beta2) {
-  // Валидация на входните данни
+  // Validate input data
   if (typeof yA !== 'number' || isNaN(yA) || !isFinite(yA)) {
     throw new Error('YA трябва да е валидно число');
   }
@@ -49,72 +49,72 @@ export function calculateForwardIntersection(yA, xA, yB, xB, beta1, beta2) {
     throw new Error('Точките A и B не могат да съвпадат');
   }
 
-  // Изчисляване на разликите в координатите
+  // Coordinate differences
   const deltaY = yB - yA;
   const deltaX = xB - xA;
 
-  // Изчисляване на разстоянието SAB
+  // Distance SAB
   const sAB = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
-  // Изчисляване на αAB с atan2 за точност
+  // Alpha AB with atan2
   const alphaABRad = Math.atan2(deltaY, deltaX);
   let alphaAB = (alphaABRad * 200) / Math.PI;
   if (alphaAB < 0) alphaAB += 400;
 
-  // Изчисляване на αBA
+  // Alpha BA
   const alphaBA = alphaAB >= 200 ? alphaAB - 200 : alphaAB + 200;
 
-  // Изчисляване на αAP и αBP
+  // Alpha AP and BP
   let alphaAP = alphaAB - beta1;
   let alphaBP = alphaBA + beta2;
   
-  // Нормализиране на ъглите (0-400 гради)
+  // Normalize angles (0-400 gon)
   if (alphaAP < 0) alphaAP += 400;
   if (alphaAP >= 400) alphaAP -= 400;
   if (alphaBP < 0) alphaBP += 400;
   if (alphaBP >= 400) alphaBP -= 400;
 
-  // Константа за преобразуване от гради в радиани
+  // Gon to radians
   const gonToRad = Math.PI / 200;
 
-  // Изчисляване на ъглите в радиани
+  // Angles in radians
   const beta1Rad = beta1 * gonToRad;
   const beta2Rad = beta2 * gonToRad;
   const beta3Rad = (beta1 + beta2) * gonToRad;
   const alphaAPRad = alphaAP * gonToRad;
   const alphaBPRad = alphaBP * gonToRad;
 
-  // Изчисляване на разстоянията SAP и SBP
+  // Distances SAP and SBP
   const sAP = (sAB * Math.sin(beta2Rad)) / Math.sin(beta3Rad);
   const sBP = (sAB * Math.sin(beta1Rad)) / Math.sin(beta3Rad);
 
-  // Изчисляване на разликите в координатите
+  // Coordinate differences
   const deltaX_AP = sAP * Math.cos(alphaAPRad);
   const deltaY_AP = sAP * Math.sin(alphaAPRad);
   const deltaX_BP = sBP * Math.cos(alphaBPRad);
   const deltaY_BP = sBP * Math.sin(alphaBPRad);
 
-  // Изчисляване на координатите на точка P от двете посоки
+  // Point P from both directions
   const xPrimP = xA + deltaX_AP;
   const yPrimP = yA + deltaY_AP;
   const xSecondP = xB + deltaX_BP;
   const ySecondP = yB + deltaY_BP;
 
-  // Финални координати на точка P (средно аритметично)
+  // Final point P coordinates (average)
   const xP = (xPrimP + xSecondP) / 2;
   const yP = (yPrimP + ySecondP) / 2;
 
-  // Изчисляване на разликите за проверка
+  // Differences for verification
   const diffX = Math.abs(xPrimP - xSecondP);
   const diffY = Math.abs(yPrimP - ySecondP);
   const maxDiff = Math.max(diffX, diffY);
 
-  // Проверка на изчисленията
+  // Verification
   const checkSAP = Math.sqrt((xP - xA) * (xP - xA) + (yP - yA) * (yP - yA));
   const checkSBP = Math.sqrt((xP - xB) * (xP - xB) + (yP - yB) * (yP - yB));
 
   return {
-    // Основни резултати
+    // Main results
     deltaX,
     deltaY,
     alphaAB,
@@ -127,7 +127,7 @@ export function calculateForwardIntersection(yA, xA, yB, xB, beta1, beta2) {
     xP,
     yP,
     
-    // Междинни изчисления
+    // Intermediate calculations
     deltaX_AP,
     deltaY_AP,
     deltaX_BP,
@@ -137,14 +137,14 @@ export function calculateForwardIntersection(yA, xA, yB, xB, beta1, beta2) {
     xSecondP,
     ySecondP,
     
-    // Проверки
+    // Checks
     diffX,
     diffY,
     maxDiff,
     checkSAP,
     checkSBP,
     
-    // Ъгли в радиани за проверка
+    // Angles in radians for verification
     alphaABRad,
     alphaAPRad,
     alphaBPRad

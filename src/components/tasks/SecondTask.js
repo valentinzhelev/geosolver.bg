@@ -15,7 +15,7 @@ const saveHistory = (entry) => {
   localStorage.setItem('secondTaskHistory', JSON.stringify(history.slice(0, 20)));
 };
 
-// Добавям helpers за input history:
+// Input history helpers
 const getInputHistory = (key) => {
   try {
     const data = localStorage.getItem('inputHistory_' + key);
@@ -56,66 +56,66 @@ const saveInputHistory = (key, value) => {
  * @returns {Object} Резултати: ΔX, ΔY, тангенс, табличен ъгъл, квадрант, α (gon), S (m)
  */
 function vtoraOsnovnaZadacha(x1, y1, x2, y2) {
-  // Валидация на входните данни
+  // Validate input data
   if (x1 === x2 && y1 === y2) {
     throw new Error('Точките не могат да съвпадат');
   }
 
-  // Изчисляване на координатните разлики
+  // Coordinate differences
   const deltaX = x2 - x1;
   const deltaY = y2 - y1;
   
-  // Изчисляване на разстоянието
+  // Distance
   const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
   
-  // Изчисляване на тангенса (с проверка за деление на нула)
+  // Tangent (check division by zero)
   const tangens = deltaX !== 0 ? deltaY / deltaX : (deltaY > 0 ? Infinity : -Infinity);
   
-  // Изчисляване на табличния арктангенс (абсолютна стойност)
+  // Arctan (absolute value)
   const arctanTab = Math.atan(Math.abs(tangens)) * 200 / Math.PI;
   
-  // Определяне на квадранта и посочния ъгъл
+  // Quadrant and direction angle
   let quadrant, quadrantName, alpha;
   
   if (deltaX > 0 && deltaY >= 0) {
-    // Първи квадрант (0° - 100 gon)
+    // First quadrant
     quadrant = 1;
     quadrantName = 'I';
     alpha = arctanTab;
   } else if (deltaX <= 0 && deltaY > 0) {
-    // Втори квадрант (100° - 200 gon)
+    // Second quadrant
     quadrant = 2;
     quadrantName = 'II';
     alpha = 200 - arctanTab;
   } else if (deltaX < 0 && deltaY <= 0) {
-    // Трети квадрант (200° - 300 gon)
+    // Third quadrant
     quadrant = 3;
     quadrantName = 'III';
     alpha = 200 + arctanTab;
   } else if (deltaX >= 0 && deltaY < 0) {
-    // Четвърти квадрант (300° - 400 gon)
+    // Fourth quadrant
     quadrant = 4;
     quadrantName = 'IV';
     alpha = 400 - arctanTab;
   }
   
-  // Изчисляване на ъгъла в радиани
+  // Angle in radians
   const alphaRad = alpha * Math.PI / 200;
   
-  // Проверка с atan2 за точност
+  // atan2 for accuracy
   const alphaAtan2 = Math.atan2(deltaY, deltaX) * 200 / Math.PI;
   const alphaAtan2Normalized = alphaAtan2 < 0 ? alphaAtan2 + 400 : alphaAtan2;
   
-  // Изчисляване на sin и cos за проверка
+  // sin and cos for verification
   const sinAlpha = Math.sin(alphaRad);
   const cosAlpha = Math.cos(alphaRad);
   
-  // Проверка на изчисленията
+  // Verification
   const checkDeltaX = distance * cosAlpha;
   const checkDeltaY = distance * sinAlpha;
   
   return {
-    // Основни резултати
+    // Main results
     deltaX: Math.round(deltaX * 1000) / 1000,
     deltaY: Math.round(deltaY * 1000) / 1000,
     distance: Math.round(distance * 1000) / 1000,
@@ -125,13 +125,13 @@ function vtoraOsnovnaZadacha(x1, y1, x2, y2) {
     quadrantName,
     alpha: Math.round(alpha * 1000) / 1000,
     
-    // Допълнителни изчисления
+    // Additional calculations
     alphaRad: Math.round(alphaRad * 1000000) / 1000000,
     alphaAtan2: Math.round(alphaAtan2Normalized * 1000) / 1000,
     sinAlpha: Math.round(sinAlpha * 1000000) / 1000000,
     cosAlpha: Math.round(cosAlpha * 1000000) / 1000000,
     
-    // Проверки
+    // Checks
     checkDeltaX: Math.round(checkDeltaX * 1000) / 1000,
     checkDeltaY: Math.round(checkDeltaY * 1000) / 1000,
     differenceX: Math.round((deltaX - checkDeltaX) * 1000) / 1000,

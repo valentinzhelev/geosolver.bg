@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import SEO from '../shared/SEO';
 import Layout from '../layout/Layout';
 import { Link } from 'react-router-dom';
@@ -7,6 +7,7 @@ import useTypewriter from '../../hooks/useTypewriter';
 import { useCalculationTracking } from '../../hooks/useCalculationTracking';
 import { calculateFirstTask as calculateFirstTaskDomain } from '../../domain/geodesy';
 import { roundTo } from '../../domain/math';
+import { extractTaskInputFromImage } from '../../services/scanService';
 
 // Helpers for localStorage history for each input
 const getInputHistory = (key) => {
@@ -40,6 +41,9 @@ const saveHistory = (entry) => {
 
 const PurvaZadacha = () => {
   const [form, setForm] = useState({ y1: '', x1: '', alpha: '', s: '' });
+  const [isScanning, setIsScanning] = useState(false);
+  const fileInputRef = useRef(null);
+  const cameraInputRef = useRef(null);
   const { t, language } = useTranslation();
   const [resultText, setResultText] = useState(t.defaultResultText);
   const [history, setHistory] = useState([]);
@@ -62,6 +66,36 @@ const PurvaZadacha = () => {
   const handleChange = (e) => {
     setForm({ ...form, [e.target.id]: e.target.value });
     saveInputHistory(e.target.id, e.target.value);
+  };
+
+  const handleScanFile = async (file) => {
+    if (!file || !file.type.startsWith('image/')) return;
+    setIsScanning(true);
+    try {
+      const result = await extractTaskInputFromImage(file);
+      if (result.success && result.inputData) {
+        const d = result.inputData;
+        const newForm = {
+          y1: d.y1 != null ? String(d.y1) : form.y1,
+          x1: d.x1 != null ? String(d.x1) : form.x1,
+          alpha: d.alpha != null ? String(d.alpha) : form.alpha,
+          s: d.s != null ? String(d.s) : form.s
+        };
+        setForm(newForm);
+        if (d.y1 != null) saveInputHistory('y1', String(d.y1));
+        if (d.x1 != null) saveInputHistory('x1', String(d.x1));
+        if (d.alpha != null) saveInputHistory('alpha', String(d.alpha));
+        if (d.s != null) saveInputHistory('s', String(d.s));
+      } else {
+        alert(language === 'bg' ? 'Не можахме да разпознаем данни. Опитайте с по-четлива снимка.' : 'Could not recognize data. Try a clearer image.');
+      }
+    } catch (err) {
+      alert(language === 'bg' ? 'Грешка при сканиране. Уверете се, че backend-ът работи.' : 'Scan error. Ensure the backend is running.');
+    } finally {
+      setIsScanning(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      if (cameraInputRef.current) cameraInputRef.current.value = '';
+    }
   };
 
   const calculate = async () => {
@@ -253,6 +287,8 @@ Check - angle: ${result.calculatedAngle} gon
 
   return (
     <>
+      <input ref={fileInputRef} type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && handleScanFile(e.target.files[0])} className="hidden" aria-hidden="true" />
+      <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" onChange={(e) => e.target.files?.[0] && handleScanFile(e.target.files[0])} className="hidden" aria-hidden="true" />
       <SEO
         title="Първа основна задача – Изчисляване по начална точка, ъгъл и дължина"
         description="Изчисляване на координати по начална точка, ъгъл и дължина с онлайн геодезически калкулатор. Бързи и точни решения за геодезисти."
@@ -361,12 +397,16 @@ Check - angle: ${result.calculatedAngle} gon
                   <div className="inline-flex justify-end items-center gap-3 w-full">
                     <button
                       type="button"
-                      aria-disabled="true"
-                      title="Тази функция е в процес на разработка и интеграция."
-                      className="px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3 opacity-50 select-none cursor-not-allowed"
+                      onClick={() => cameraInputRef.current?.click()}
+                      disabled={isScanning}
+                      className="px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3 hover:bg-gray-300 disabled:opacity-50"
                     >
-                      <img src="/icons/scan_icon.svg" alt="Сканирай" className="w-4 h-4" />
-                      <span className="justify-start text-black text-sm font-medium font-['Manrope']">Сканирай</span>
+                      {isScanning ? (
+                        <span className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <img src="/icons/scan_icon.svg" alt={t.scan} className="w-4 h-4" />
+                      )}
+                      <span className="justify-start text-black text-sm font-medium font-['Manrope']">{t.scan}</span>
                     </button>
                     <button type="button" onClick={resetForm} className="px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3">
                       <div className="justify-start text-black text-sm font-medium font-['Manrope']">Нулирай</div>
@@ -572,15 +612,18 @@ Check - angle: ${result.calculatedAngle} gon
                   </div>
                 </div>
                 <div className="inline-flex justify-start items-start gap-3">
-                  {/* Scan button (inactive, with tooltip) */}
                   <button
                     type="button"
-                    aria-disabled="true"
-                    title="Тази функция е в процес на разработка и интеграция."
-                    className="px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3 opacity-50 select-none cursor-not-allowed"
+                    onClick={() => cameraInputRef.current?.click()}
+                    disabled={isScanning}
+                    className="px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3 hover:bg-gray-300 disabled:opacity-50"
                   >
-                    <img src="/icons/scan_icon.svg" alt="Сканирай" className="w-4 h-4" />
-                    <span className="justify-start text-black text-base font-medium font-['Manrope']">Сканирай</span>
+                    {isScanning ? (
+                      <span className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <img src="/icons/scan_icon.svg" alt={t.scan} className="w-4 h-4" />
+                    )}
+                    <span className="justify-start text-black text-base font-medium font-['Manrope']">{t.scan}</span>
                   </button>
                   {/* Reset button */}
                   <button type="button" onClick={resetForm} className="px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3">

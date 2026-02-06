@@ -173,7 +173,7 @@ Check - area (alternative method): ${result.alternativeArea?.toFixed(2) || 'N/A'
         throw new Error('Неизвестен метод за изчисление');
     }
 
-    // Изчисляване на периметъра
+    // Perimeter calculation
     for (let i = 0; i < points.length; i++) {
       const j = (i + 1) % points.length;
       const dx = points[j].x - points[i].x;
@@ -208,7 +208,7 @@ Check - area (alternative method): ${result.alternativeArea?.toFixed(2) || 'N/A'
     URL.revokeObjectURL(url);
   };
 
-  // Проверка дали всички полета са попълнени
+  // Check all fields filled
   const isFormValid = () => {
     return form.points.trim() !== '';
   };

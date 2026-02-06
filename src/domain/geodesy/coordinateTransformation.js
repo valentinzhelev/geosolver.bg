@@ -15,7 +15,7 @@
  * @throws {Error} При невалидни входни данни
  */
 export function calculateCoordinateTransformation(x, y, transformationType, parameters) {
-  // Валидация на входните данни
+  // Validate input data
   if (typeof x !== 'number' || isNaN(x) || !isFinite(x)) {
     throw new Error('X координатата трябва да е валидно число');
   }
@@ -31,7 +31,7 @@ export function calculateCoordinateTransformation(x, y, transformationType, para
 
   switch (transformationType) {
     case 'translation':
-      // Паралелно изместване
+      // Translation
       const dx = parameters?.dx || 0;
       const dy = parameters?.dy || 0;
       xNew = x + dx;
@@ -40,8 +40,8 @@ export function calculateCoordinateTransformation(x, y, transformationType, para
       break;
 
     case 'rotation':
-      // Завъртане около началото на координатната система
-      const angle = (parameters?.angle || 0) * Math.PI / 200; // гради в радиани
+      // Rotation
+      const angle = (parameters?.angle || 0) * Math.PI / 200;
       const cosAngle = Math.cos(angle);
       const sinAngle = Math.sin(angle);
       xNew = x * cosAngle - y * sinAngle;
@@ -50,7 +50,7 @@ export function calculateCoordinateTransformation(x, y, transformationType, para
       break;
 
     case 'scaling':
-      // Мащабиране
+      // Scaling
       const scaleX = parameters?.scaleX || 1;
       const scaleY = parameters?.scaleY || 1;
       xNew = x * scaleX;

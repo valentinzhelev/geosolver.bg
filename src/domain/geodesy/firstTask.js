@@ -16,7 +16,7 @@
  * @throws {Error} При невалидни входни данни
  */
 export function calculateFirstTask(y1, x1, alphaGon, s) {
-  // Валидация на входните данни
+  // Validate input data
   if (typeof y1 !== 'number' || isNaN(y1) || !isFinite(y1)) {
     throw new Error('Y1 трябва да е валидно число');
   }
@@ -36,29 +36,29 @@ export function calculateFirstTask(y1, x1, alphaGon, s) {
     throw new Error('Дължината трябва да бъде положителна');
   }
 
-  // Преобразуване от гради в радиани
+  // Convert gon to radians
   const alphaRad = (alphaGon * Math.PI) / 200;
   
-  // Изчисляване на тригонометричните функции
+  // Compute sin and cos
   const sinAlpha = Math.sin(alphaRad);
   const cosAlpha = Math.cos(alphaRad);
   
-  // Изчисляване на координатните разлики
+  // Coordinate differences
   const deltaX = s * cosAlpha;
   const deltaY = s * sinAlpha;
   
-  // Изчисляване на координатите на точка 2
+  // Point 2 coordinates
   const x2 = x1 + deltaX;
   const y2 = y1 + deltaY;
 
-  // Определяне на квадранта
+  // Determine quadrant
   let quadrant = '';
   if (deltaX >= 0 && deltaY >= 0) quadrant = 'I';
   else if (deltaX < 0 && deltaY >= 0) quadrant = 'II';
   else if (deltaX < 0 && deltaY < 0) quadrant = 'III';
   else if (deltaX >= 0 && deltaY < 0) quadrant = 'IV';
 
-  // Изчисляване на проверки
+  // Verification checks
   const calculatedDistance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
   let calculatedAngle = Math.atan2(deltaY, deltaX) * 200 / Math.PI;
   if (calculatedAngle < 0) calculatedAngle += 400;

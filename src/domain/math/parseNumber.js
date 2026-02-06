@@ -23,7 +23,7 @@ export function parseNumber(input) {
     throw new Error('Празен низ не може да бъде парснат');
   }
 
-  // Заменя запетая с точка за парсване
+  // Replace comma with dot for parsing
   const normalized = trimmed.replace(',', '.');
   
   const parsed = parseFloat(normalized);

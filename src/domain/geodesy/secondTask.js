@@ -16,7 +16,7 @@
  * @throws {Error} При невалидни входни данни
  */
 export function calculateSecondTask(x1, y1, x2, y2) {
-  // Валидация на входните данни
+  // Validate input data
   if (typeof x1 !== 'number' || isNaN(x1) || !isFinite(x1)) {
     throw new Error('X1 трябва да е валидно число');
   }
@@ -33,61 +33,61 @@ export function calculateSecondTask(x1, y1, x2, y2) {
     throw new Error('Точките не могат да съвпадат');
   }
 
-  // Изчисляване на координатните разлики
+  // Coordinate differences
   const deltaX = x2 - x1;
   const deltaY = y2 - y1;
   
-  // Изчисляване на разстоянието
+  // Distance calculation
   const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
   
-  // Изчисляване на тангенса (с проверка за деление на нула)
+  // Tangent (check for division by zero)
   const tangens = deltaX !== 0 ? deltaY / deltaX : (deltaY > 0 ? Infinity : -Infinity);
   
-  // Изчисляване на табличния арктангенс (абсолютна стойност)
+  // Arctan (absolute value)
   const arctanTab = Math.atan(Math.abs(tangens)) * 200 / Math.PI;
   
-  // Определяне на квадранта и посочния ъгъл
+  // Determine quadrant and direction angle
   let quadrant, quadrantName, alpha;
   
   if (deltaX > 0 && deltaY >= 0) {
-    // Първи квадрант (0° - 100 gon)
+    // First quadrant (0 - 100 gon)
     quadrant = 1;
     quadrantName = 'I';
     alpha = arctanTab;
   } else if (deltaX <= 0 && deltaY > 0) {
-    // Втори квадрант (100° - 200 gon)
+    // Second quadrant (100 - 200 gon)
     quadrant = 2;
     quadrantName = 'II';
     alpha = 200 - arctanTab;
   } else if (deltaX < 0 && deltaY <= 0) {
-    // Трети квадрант (200° - 300 gon)
+    // Third quadrant (200 - 300 gon)
     quadrant = 3;
     quadrantName = 'III';
     alpha = 200 + arctanTab;
   } else if (deltaX >= 0 && deltaY < 0) {
-    // Четвърти квадрант (300° - 400 gon)
+    // Fourth quadrant (300 - 400 gon)
     quadrant = 4;
     quadrantName = 'IV';
     alpha = 400 - arctanTab;
   }
   
-  // Изчисляване на ъгъла в радиани
+  // Angle in radians
   const alphaRad = (alpha * Math.PI) / 200;
   
-  // Проверка с atan2 за точност
+  // atan2 for accuracy
   let alphaAtan2 = Math.atan2(deltaY, deltaX) * 200 / Math.PI;
   if (alphaAtan2 < 0) alphaAtan2 += 400;
   
-  // Изчисляване на sin и cos за проверка
+  // sin and cos for verification
   const sinAlpha = Math.sin(alphaRad);
   const cosAlpha = Math.cos(alphaRad);
   
-  // Проверка на изчисленията
+  // Verification
   const checkDeltaX = distance * cosAlpha;
   const checkDeltaY = distance * sinAlpha;
   
   return {
-    // Основни резултати
+    // Main results
     deltaX,
     deltaY,
     distance,
@@ -97,13 +97,13 @@ export function calculateSecondTask(x1, y1, x2, y2) {
     quadrantName,
     alpha,
     
-    // Допълнителни изчисления
+    // Additional calculations
     alphaRad,
     alphaAtan2,
     sinAlpha,
     cosAlpha,
     
-    // Проверки
+    // Checks
     checkDeltaX,
     checkDeltaY,
     differenceX: deltaX - checkDeltaX,

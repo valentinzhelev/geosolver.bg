@@ -12,7 +12,7 @@
  * @throws {Error} При невалидни входни данни
  */
 export function calculateHansenTask(xA, yA, xB, yB, alpha, beta) {
-  // Валидация на входните данни
+  // Validate input data
   if (typeof xA !== 'number' || isNaN(xA) || !isFinite(xA)) {
     throw new Error('XA трябва да е валидно число');
   }
@@ -35,32 +35,32 @@ export function calculateHansenTask(xA, yA, xB, yB, alpha, beta) {
     throw new Error('β трябва да е валидно число');
   }
 
-  // Преобразуване на ъглите от гради в радиани
+  // Gon to radians
   const alphaRad = (alpha * Math.PI) / 200;
   const betaRad = (beta * Math.PI) / 200;
 
-  // Изчисляване на разстоянието между A и B
+  // Distance A-B
   const distanceAB = Math.sqrt((xB - xA) ** 2 + (yB - yA) ** 2);
 
-  // Изчисляване на ъгъла на правата AB
+  // Line AB angle
   const angleAB = Math.atan2(yB - yA, xB - xA);
 
-  // Изчисляване на тригонометричните функции
+  // Trig functions
   const sinAlpha = Math.sin(alphaRad);
   const sinAlphaBeta = Math.sin(alphaRad + betaRad);
 
-  // Изчисляване на коефициента
+  // Coefficient
   const coefficient = sinAlpha / sinAlphaBeta;
 
-  // Изчисляване на координатните разлики
+  // Coordinate differences
   const deltaX = (xB - xA) * coefficient;
   const deltaY = (yB - yA) * coefficient;
 
-  // Изчисляване на координатите на точка P
+  // Point P coordinates
   const xP = xA + deltaX;
   const yP = yA + deltaY;
 
-  // Проверка - изчисляване на разстоянията
+  // Verification - distances
   const distanceAP = Math.sqrt((xP - xA) ** 2 + (yP - yA) ** 2);
   const distanceBP = Math.sqrt((xP - xB) ** 2 + (yP - yB) ** 2);
 

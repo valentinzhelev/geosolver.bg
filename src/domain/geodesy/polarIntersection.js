@@ -16,7 +16,7 @@
  * @throws {Error} При невалидни входни данни
  */
 export function calculatePolarIntersection(xA, yA, angle, distance) {
-  // Валидация на входните данни
+  // Validate input data
   if (typeof xA !== 'number' || isNaN(xA) || !isFinite(xA)) {
     throw new Error('XA трябва да е валидно число');
   }
@@ -33,32 +33,32 @@ export function calculatePolarIntersection(xA, yA, angle, distance) {
     throw new Error('Разстоянието трябва да е положително число');
   }
 
-  // Преобразуване на ъгъла от гради в радиани
+  // Gon to radians
   const angleRad = (angle * Math.PI) / 200;
   
-  // Изчисляване на тригонометричните функции
+  // sin and cos
   const sinAlpha = Math.sin(angleRad);
   const cosAlpha = Math.cos(angleRad);
   
-  // Изчисляване на координатните разлики
+  // Coordinate differences
   const deltaX = distance * cosAlpha;
   const deltaY = distance * sinAlpha;
   
-  // Изчисляване на координатите на неизвестната точка
+  // Unknown point coordinates
   const xP = xA + deltaX;
   const yP = yA + deltaY;
 
-  // Изчисляване на обратния ъгъл
+  // Reverse angle
   const reverseAngle = angle >= 200 ? angle - 200 : angle + 200;
 
-  // Определяне на квадранта
+  // Determine quadrant
   let quadrant = '';
   if (deltaX >= 0 && deltaY >= 0) quadrant = 'I';
   else if (deltaX < 0 && deltaY >= 0) quadrant = 'II';
   else if (deltaX < 0 && deltaY < 0) quadrant = 'III';
   else if (deltaX >= 0 && deltaY < 0) quadrant = 'IV';
 
-  // Проверка - изчисляване на разстоянието и ъгъла
+  // Verification - distance and angle
   const calculatedDistance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
   let calculatedAngle = Math.atan2(deltaY, deltaX) * 200 / Math.PI;
   if (calculatedAngle < 0) calculatedAngle += 400;
