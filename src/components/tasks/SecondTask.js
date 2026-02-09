@@ -3,7 +3,6 @@ import Layout from '../layout/Layout';
 import SEO from '../shared/SEO';
 import { Link, useNavigate } from 'react-router-dom';
 import useTypewriter from '../../hooks/useTypewriter';
-import { useTranslation } from '../../hooks/useTranslation';
 import { useAuth } from '../auth/AuthContext';
 
 // LocalStorage helpers
@@ -143,7 +142,6 @@ function vtoraOsnovnaZadacha(x1, y1, x2, y2) {
 
 const SecondTask = () => {
   const [form, setForm] = useState({ x1: '', y1: '', x2: '', y2: '' });
-  const { language } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const isAuthenticated = !!user;
