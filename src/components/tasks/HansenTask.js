@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import SEO from '../shared/SEO';
 import Layout from '../layout/Layout';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 import useTypewriter from '../../hooks/useTypewriter';
 import { useAuth } from '../auth/AuthContext';
@@ -40,10 +40,8 @@ const HansenTask = () => {
   const [form, setForm] = useState({ yA: '', xA: '', yB: '', xB: '', alpha: '', beta: '' });
   const { t, language } = useTranslation();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const isAuthenticated = !!user;
-  const authRequiredMessage = language === 'bg'
-    ? 'Моля, влезте или се регистрирайте, за да използвате тази функция.'
-    : 'Please sign in or register to use this feature.';
   const [resultText, setResultText] = useState(t.defaultResultText);
   const [history, setHistory] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -63,7 +61,7 @@ const HansenTask = () => {
 
   const calculate = async () => {
     if (!isAuthenticated) {
-      alert(authRequiredMessage);
+      navigate('/login');
       return;
     }
     const yA = parseFloat(form.yA);
@@ -396,7 +394,7 @@ Check - distance BP: ${result.distanceBP.toFixed(3)} m
                     <button type="button" onClick={resetForm} className="px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3">
                       <div className="justify-start text-black text-sm font-medium font-['Manrope']">Нулирай</div>
                     </button>
-                    <button type="button" onClick={calculate} disabled={!isFormValid() || !isAuthenticated} className={`px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3${!isFormValid() || !isAuthenticated ? ' opacity-50 cursor-not-allowed' : ''}`}>
+                    <button type="button" onClick={calculate} disabled={isAuthenticated && !isFormValid()} className={`px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3${isAuthenticated && !isFormValid() ? ' opacity-50 cursor-not-allowed' : ''}`}>
                       <div className="justify-start text-white text-sm font-medium font-['Manrope']">Изчисли</div>
                       <img src="/icons/white_right_arrow.svg" alt="Изчисли" className="w-4 h-4" />
                     </button>
@@ -658,7 +656,7 @@ Check - distance BP: ${result.distanceBP.toFixed(3)} m
                     <div className="justify-start text-black text-base font-medium font-['Manrope']">Нулирай</div>
                   </button>
                   {/* Calculate button */}
-                  <button type="button" onClick={calculate} disabled={!isFormValid() || !isAuthenticated} className={`px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3${!isFormValid() || !isAuthenticated ? ' opacity-50 cursor-not-allowed' : ''}`}>
+                  <button type="button" onClick={calculate} disabled={isAuthenticated && !isFormValid()} className={`px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3${isAuthenticated && !isFormValid() ? ' opacity-50 cursor-not-allowed' : ''}`}>
                     <div className="justify-start text-white text-base font-medium font-['Manrope']">Изчисли</div>
                     <img src="/icons/white_right_arrow.svg" alt="Изчисли" className="w-4 h-4" />
                   </button>

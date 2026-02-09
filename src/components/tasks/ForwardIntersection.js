@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import SEO from '../shared/SEO';
 import Layout from '../layout/Layout';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 import useTypewriter from '../../hooks/useTypewriter';
 import { calculateForwardIntersection as calculateForwardIntersectionDomain } from '../../domain/geodesy';
@@ -92,10 +92,8 @@ const ForwardIntersection = () => {
   const [form, setForm] = useState(initialForm);
   const { language } = useTranslation();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const isAuthenticated = !!user;
-  const authRequiredMessage = language === 'bg'
-    ? 'Моля, влезте или се регистрирайте, за да използвате тази функция.'
-    : 'Please sign in or register to use this feature.';
   const [resultText, setResultText] = useState(language === 'bg' ? 'Въведете данни и натиснете "Изчисли", за да видите резултатите тук.' : 'Enter data and click "Calculate" to see the results here.');
   const [history, setHistory] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -115,7 +113,7 @@ const ForwardIntersection = () => {
 
   const calculate = () => {
     if (!isAuthenticated) {
-      alert(authRequiredMessage);
+      navigate('/login');
       return;
     }
     const vals = Object.values(form).map(Number);
@@ -295,7 +293,7 @@ Yₚ = (Yₚ' + Yₚ'') / 2 = (${results.yPrimP} + ${results.ySecondP}) / 2 = ${
                   <button type="button" onClick={resetForm} className="px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3">
                     <div className="justify-start text-black text-sm font-medium font-['Manrope']">Нулирай</div>
                   </button>
-                  <button type="button" onClick={calculate} disabled={!isFormValid() || !isAuthenticated} className={`px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3${!isFormValid() || !isAuthenticated ? ' opacity-50 cursor-not-allowed' : ''}`}>
+                  <button type="button" onClick={calculate} disabled={isAuthenticated && !isFormValid()} className={`px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3${isAuthenticated && !isFormValid() ? ' opacity-50 cursor-not-allowed' : ''}`}>
                     <div className="justify-start text-white text-sm font-medium font-['Manrope']">Изчисли</div>
                     <img src="/icons/white_right_arrow.svg" alt="Изчисли" className="w-4 h-4" />
                   </button>
@@ -464,7 +462,7 @@ Yₚ = (Yₚ' + Yₚ'') / 2 = (${results.yPrimP} + ${results.ySecondP}) / 2 = ${
                     <button type="button" onClick={resetForm} className="px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3">
                       <div className="justify-start text-black text-sm font-medium font-['Manrope']">Нулирай</div>
                     </button>
-                    <button type="button" onClick={calculate} disabled={!isFormValid() || !isAuthenticated} className={`px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3${!isFormValid() || !isAuthenticated ? ' opacity-50 cursor-not-allowed' : ''}`}>
+                    <button type="button" onClick={calculate} disabled={isAuthenticated && !isFormValid()} className={`px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3${isAuthenticated && !isFormValid() ? ' opacity-50 cursor-not-allowed' : ''}`}>
                       <div className="justify-start text-white text-sm font-medium font-['Manrope']">Изчисли</div>
                       <img src="/icons/white_right_arrow.svg" alt="Изчисли" className="w-4 h-4" />
                     </button>
