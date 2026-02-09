@@ -12,7 +12,7 @@ import { userPreferencesService } from '../../services/userPreferencesService';
 
 const Account = () => {
   const { user, logout, refreshUser, changePassword } = useAuth();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   
   console.log('Account.js loaded, user:', user);
   console.log('Token in localStorage:', localStorage.getItem('token'));
@@ -57,9 +57,9 @@ const Account = () => {
       const mappedHistory = calculationData.calculations.map(calc => {
         console.log('Mapping calc:', calc);
         console.log('calc.toolDisplayName:', calc.toolDisplayName);
-        console.log('t.language:', t.language);
+        console.log('t.language:', language);
         
-        const toolName = calc.toolDisplayName?.[t.language] || 
+        const toolName = calc.toolDisplayName?.[language] || 
                          calc.toolDisplayName?.bg || 
                          calc.toolDisplayName?.en ||
                          calc.toolName || 
@@ -111,7 +111,7 @@ const Account = () => {
       const billingSummary = await BillingService.getBillingSummary();
       const invoices = billingSummary?.invoices || [];
       setPaymentHistory(invoices.map(inv => ({
-        method: billingSummary?.paymentMethod?.last4 ? `**** ${billingSummary.paymentMethod.last4}` : (t.language === 'bg' ? 'Карта' : 'Card'),
+        method: billingSummary?.paymentMethod?.last4 ? `**** ${billingSummary.paymentMethod.last4}` : (language === 'bg' ? 'Карта' : 'Card'),
         brand: billingSummary?.paymentMethod?.brand || 'visa',
         amount: `${((inv.amountPaid ?? inv.amountDue ?? 0) / 100).toFixed(2)} ${String(inv.currency || '').toUpperCase()}`,
         date: inv.created ? new Date(inv.created * 1000).toLocaleString('bg-BG') : ''
@@ -222,23 +222,23 @@ const Account = () => {
     setPasswordError(null);
     setPasswordSuccess(null);
     if (!oldPassword || !newPassword || !confirmPassword) {
-      setPasswordError(t.language === 'bg' ? 'Моля, попълнете всички полета.' : 'Please fill in all fields.');
+      setPasswordError(language === 'bg' ? 'Моля, попълнете всички полета.' : 'Please fill in all fields.');
       return;
     }
     if (newPassword !== confirmPassword) {
-      setPasswordError(t.language === 'bg' ? 'Новите пароли не съвпадат.' : 'New passwords do not match.');
+      setPasswordError(language === 'bg' ? 'Новите пароли не съвпадат.' : 'New passwords do not match.');
       return;
     }
     setPasswordSaving(true);
     try {
       const ok = await changePassword(oldPassword, newPassword);
       if (ok) {
-        setPasswordSuccess(t.language === 'bg' ? 'Паролата е сменена успешно.' : 'Password updated successfully.');
+        setPasswordSuccess(language === 'bg' ? 'Паролата е сменена успешно.' : 'Password updated successfully.');
         setOldPassword('');
         setNewPassword('');
         setConfirmPassword('');
       } else {
-        setPasswordError(t.language === 'bg' ? 'Грешка при смяна на паролата.' : 'Failed to change password.');
+        setPasswordError(language === 'bg' ? 'Грешка при смяна на паролата.' : 'Failed to change password.');
       }
     } catch (err) {
       setPasswordError(err.message || 'Failed to change password');
@@ -355,9 +355,9 @@ const Account = () => {
             const mappedHistory = calculationData.calculations.map(calc => {
               console.log('Mapping calc:', calc);
               console.log('calc.toolDisplayName:', calc.toolDisplayName);
-              console.log('t.language:', t.language);
+              console.log('t.language:', language);
               
-              const toolName = calc.toolDisplayName?.[t.language] || 
+              const toolName = calc.toolDisplayName?.[language] || 
                                calc.toolDisplayName?.bg || 
                                calc.toolDisplayName?.en ||
                                calc.toolName || 
@@ -435,7 +435,7 @@ const Account = () => {
           
           const invoices = billingSummary?.invoices || [];
           setPaymentHistory(invoices.map(inv => ({
-            method: billingSummary?.paymentMethod?.last4 ? `**** ${billingSummary.paymentMethod.last4}` : (t.language === 'bg' ? 'Карта' : 'Card'),
+            method: billingSummary?.paymentMethod?.last4 ? `**** ${billingSummary.paymentMethod.last4}` : (language === 'bg' ? 'Карта' : 'Card'),
             brand: billingSummary?.paymentMethod?.brand || 'visa',
             amount: `${((inv.amountPaid ?? inv.amountDue ?? 0) / 100).toFixed(2)} ${String(inv.currency || '').toUpperCase()}`,
             date: inv.created ? new Date(inv.created * 1000).toLocaleString('bg-BG') : ''
@@ -458,7 +458,7 @@ const Account = () => {
     };
 
     loadAccountData();
-  }, [user, t.language]);
+  }, [user, language]);
 
   // Update limits when plan changes
   useEffect(() => {
@@ -672,8 +672,8 @@ const Account = () => {
                   />
                   <div className="text-center justify-start text-white text-lg font-semibold font-['Manrope'] z-10" style={{ opacity: 1 }}>
                     {user?.plan === 'pro'
-                      ? (t.language === 'en' ? 'Professional Plan (Pro)' : 'Професионален план (Pro)')
-                      : (plan?.displayName?.[t.language] || (plan?.name === 'free' ? t.freePlan : plan?.name) || defaultPlan.name)}
+                      ? (language === 'en' ? 'Professional Plan (Pro)' : 'Професионален план (Pro)')
+                      : (plan?.displayName?.[language] || (plan?.name === 'free' ? t.freePlan : plan?.name) || defaultPlan.name)}
                   </div>
                 </div>
                 <div className="self-stretch p-4 bg-white rounded-tl rounded-tr rounded-bl-xl rounded-br-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-0.50px] outline-gray-200 flex flex-col justify-start items-start gap-4 overflow-hidden z-10 relative">
@@ -1046,22 +1046,22 @@ const Account = () => {
           <div className="w-full max-w-md rounded-xl bg-white p-5 shadow-xl">
             <div className="flex items-center justify-between">
               <div className="text-black text-lg font-semibold font-['Manrope']">
-                {t.language === 'bg' ? 'Настройки на акаунта' : 'Account Settings'}
+                {language === 'bg' ? 'Настройки на акаунта' : 'Account Settings'}
               </div>
               <button
                 type="button"
                 onClick={() => setShowSettings(false)}
                 className="w-8 h-8 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 flex items-center justify-center"
-                aria-label={t.language === 'bg' ? 'Затвори' : 'Close'}
+                aria-label={language === 'bg' ? 'Затвори' : 'Close'}
               >
-                <img src="/icons/close_button.svg" alt={t.language === 'bg' ? 'Затвори' : 'Close'} className="w-4 h-4 opacity-70" />
+                <img src="/icons/close_button.svg" alt={language === 'bg' ? 'Затвори' : 'Close'} className="w-4 h-4 opacity-70" />
               </button>
             </div>
 
             <div className="mt-4 flex flex-col gap-4">
               <div className="rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 p-3">
                 <div className="text-black text-sm font-medium font-['Manrope']">
-                  {t.language === 'bg' ? 'Предпочитания' : 'Preferences'}
+                  {language === 'bg' ? 'Предпочитания' : 'Preferences'}
                 </div>
                 {preferencesError && (
                   <div className="mt-2 text-xs text-red-500">{preferencesError}</div>
@@ -1073,7 +1073,7 @@ const Account = () => {
                   className="mt-3 w-full inline-flex items-center justify-between rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 px-3 py-2"
                 >
                   <span className="text-sm text-black font-medium font-['Manrope']">
-                    {t.language === 'bg' ? 'Показвай инструменти в разработка' : 'Show tools in development'}
+                    {language === 'bg' ? 'Показвай инструменти в разработка' : 'Show tools in development'}
                   </span>
                   <span className={`w-10 h-5 rounded-full flex items-center ${preferences.showToolsInDevelopment ? 'bg-black justify-end' : 'bg-gray-200 justify-start'} p-0.5`}>
                     <span className="w-4 h-4 rounded-full bg-white" />
@@ -1083,7 +1083,7 @@ const Account = () => {
 
               <div className="rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 p-3">
                 <div className="text-black text-sm font-medium font-['Manrope']">
-                  {t.language === 'bg' ? 'Смяна на парола' : 'Change password'}
+                  {language === 'bg' ? 'Смяна на парола' : 'Change password'}
                 </div>
                 {passwordError && (
                   <div className="mt-2 text-xs text-red-500">{passwordError}</div>
@@ -1096,21 +1096,21 @@ const Account = () => {
                     type="password"
                     value={oldPassword}
                     onChange={(e) => setOldPassword(e.target.value)}
-                    placeholder={t.language === 'bg' ? 'Текуща парола' : 'Current password'}
+                    placeholder={language === 'bg' ? 'Текуща парола' : 'Current password'}
                     className="w-full p-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']"
                   />
                   <input
                     type="password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder={t.language === 'bg' ? 'Нова парола' : 'New password'}
+                    placeholder={language === 'bg' ? 'Нова парола' : 'New password'}
                     className="w-full p-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']"
                   />
                   <input
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder={t.language === 'bg' ? 'Повтори новата парола' : 'Confirm new password'}
+                    placeholder={language === 'bg' ? 'Повтори новата парола' : 'Confirm new password'}
                     className="w-full p-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']"
                   />
                   <button
@@ -1119,7 +1119,7 @@ const Account = () => {
                     disabled={passwordSaving}
                     className="mt-1 px-4 py-2 bg-black text-white rounded-lg text-sm font-medium font-['Manrope']"
                   >
-                    {passwordSaving ? (t.language === 'bg' ? 'Запис...' : 'Saving...') : (t.language === 'bg' ? 'Запази' : 'Save')}
+                    {passwordSaving ? (language === 'bg' ? 'Запис...' : 'Saving...') : (language === 'bg' ? 'Запази' : 'Save')}
                   </button>
                 </div>
               </div>
