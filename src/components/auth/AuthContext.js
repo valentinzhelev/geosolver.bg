@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { API_ORIGIN } from '../../config/api';
 
-const BASE_URL = process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:5000';
+const BASE_URL = API_ORIGIN;
 
 const AuthContext = createContext();
 
@@ -281,7 +282,7 @@ export function AuthProvider({ children }) {
   };
 
   // Refresh user (e.g. after billing update)
-  const refreshUser = async () => {
+  const refreshUser = useCallback(async () => {
     if (!token) return;
     try {
       const res = await fetch(`${BASE_URL}/api/auth/account`, {
@@ -294,7 +295,7 @@ export function AuthProvider({ children }) {
     } catch (e) {
       console.error('Refresh user failed:', e);
     }
-  };
+  }, [token]);
 
   // Change password function
   const changePassword = async (oldPassword, newPassword) => {

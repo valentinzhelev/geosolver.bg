@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import API_BASE_URL from '../../config/api';
 import SEO from '../shared/SEO';
 import Layout from '../layout/Layout';
 import { useTranslation } from '../../hooks/useTranslation';
@@ -21,7 +22,7 @@ const Contacts = () => {
     setError('');
     setSuccess('');
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/contact`, {
+      const res = await fetch(`${API_BASE_URL}/contact`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)

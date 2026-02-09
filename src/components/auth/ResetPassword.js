@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import API_BASE_URL from '../../config/api';
 import SEO from '../shared/SEO';
 import Layout from '../layout/Layout';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -31,7 +32,7 @@ const ResetPassword = () => {
     }
     setLoading(true);
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/auth/reset-password`, {
+      const res = await fetch(`${API_BASE_URL}/auth/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, newPassword }),

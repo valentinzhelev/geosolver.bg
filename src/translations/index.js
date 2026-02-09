@@ -20,7 +20,7 @@ export const translations = {
     socialNetworks: 'Социални мрежи',
     language: 'Български език',
     theme: 'Светъл режим',
-    copyright: '© GEOSOLVER, 2025.\nВсички права запазени.\nТекуща версия: v2.2.23-beta.2',
+    copyright: '© GEOSOLVER, 2025.\nВсички права запазени.\nТекуща версия: v2.2.24-beta.2',
     // FirstTask translations
     firstTaskTitle: 'Първа основна задача',
     firstTaskDescription: 'Изчисляване на координати по начална точка, ъгъл и дължина с онлайн геодезически калкулатор. Бързи и точни решения за геодезисти.',
@@ -326,9 +326,9 @@ export const translations = {
     socialNetworks: 'Social Networks',
     language: 'English',
     theme: 'Light Mode',
-    copyright: '© GEOSOLVER, 2025.\nAll rights reserved.\nCurrent version: v2.2.23-beta.2',
+    copyright: '© GEOSOLVER, 2025.\nAll rights reserved.\nCurrent version: v2.2.24-beta.2',
 
-    // FirstTask translations
+    // FirstTask translations11
     firstTaskTitle: 'First Basic Task',
     firstTaskDescription: 'Calculate coordinates using initial point, angle, and distance with online geodetic calculator. Fast and accurate solutions for surveyors.',
     firstTaskKeywords: 'geodesy, online calculator, first basic task, coordinates, angle, distance, transformation, geodetic calculations',

@@ -1,4 +1,6 @@
-const BASE_URL = process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:5000';
+import { API_ORIGIN } from '../config/api';
+
+const BASE_URL = API_ORIGIN;
 
 export const userPreferencesService = {
   // Get user preferences
