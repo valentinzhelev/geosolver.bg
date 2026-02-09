@@ -20,7 +20,7 @@ export const translations = {
     socialNetworks: 'Социални мрежи',
     language: 'Български език',
     theme: 'Светъл режим',
-    copyright: '© GEOSOLVER, 2025.\nВсички права запазени.\nТекуща версия: v2.2.26-beta.2',
+    copyright: '© GEOSOLVER, 2025.\nВсички права запазени.\nТекуща версия: v2.2.27-beta.2',
     // FirstTask translations
     firstTaskTitle: 'Първа основна задача',
     firstTaskDescription: 'Изчисляване на координати по начална точка, ъгъл и дължина с онлайн геодезически калкулатор. Бързи и точни решения за геодезисти.',
@@ -62,14 +62,14 @@ export const translations = {
 
     // Prices page translations
     pricesTitle: 'Цени и планове',
-    pricesDescription: 'Използвайте GeoSolver безплатно с до 5 изчисления на задача месечно или изберете професионален абонамент за неограничен достъп и допълнителни функции.',
+    pricesDescription: 'Използвайте GeoSolver безплатно с до 5 изчисления общо или изберете професионален абонамент за неограничен достъп и допълнителни функции.',
     month: 'Месец',
     year: 'Година (-20%)',
     freePlan: 'Безплатен план',
     proPlan: 'Професионален план',
     customPlan: 'Персонализиран план',
     basicAccess: 'Основен достъп до всички инструменти',
-    fiveCalcsPerMonth: '5 изчисления с всеки инструмент на месец',
+    fiveCalcsPerMonth: '5 изчисления общо',
     register: 'Регистрация',
     recommended: 'Препоръчано',
     unlimitedCalcs: 'Неограничени изчисления',
@@ -155,7 +155,7 @@ export const translations = {
     processingPayment: 'Обработва се...',
     securePaymentNotice: 'Вашите данни са защитени с 256-bit SSL криптиране',
     freePlanDefault: 'Безплатен план (По подразбиране)',
-    freeCalculationsUntil: 'безплатни изчисления до',
+    freeCalculationsUntil: 'безплатни изчисления общо',
     viewPlans: 'Виж плановете',
 
     // Contacts page
@@ -171,7 +171,7 @@ export const translations = {
     errorSending: 'Възникна грешка при изпращане.',
     faqTitle: 'Често задавани въпроси',
     faqQuestions: [
-      { question: 'Как се изчисляват безплатните изчисления?', answer: 'Всеки регистриран потребител получава 5 безплатни изчисления за всяка задача на месец.' },
+      { question: 'Как се изчисляват безплатните изчисления?', answer: 'Всеки регистриран потребител получава общо 5 безплатни изчисления.' },
       { question: 'Какви видове изчисления поддържа GeoSolver?', answer: 'GeoSolver предлага координатни трансформации, изчисления на площ, дължина и обем, GNSS анализ и други инструменти.' },
       { question: 'Какви са начините за плащане?', answer: 'Приемаме плащания чрез кредитна/дебитна карта и PayPal.' },
       { question: 'Сигурни ли са моите данни?', answer: 'Всички данни се съхраняват криптирано и не се споделят с трети страни.' },
@@ -326,7 +326,7 @@ export const translations = {
     socialNetworks: 'Social Networks',
     language: 'English',
     theme: 'Light Mode',
-    copyright: '© GEOSOLVER, 2025.\nAll rights reserved.\nCurrent version: v2.2.26-beta.2',
+    copyright: '© GEOSOLVER, 2025.\nAll rights reserved.\nCurrent version: v2.2.27-beta.2',
 
     // FirstTask translations11
     firstTaskTitle: 'First Basic Task',
@@ -369,14 +369,14 @@ export const translations = {
 
     // Prices page translations
     pricesTitle: 'Prices and Plans',
-    pricesDescription: 'Use GeoSolver for free with up to 5 calculations per task per month or choose a professional subscription for unlimited access and additional features.',
+    pricesDescription: 'Use GeoSolver for free with up to 5 calculations total or choose a professional subscription for unlimited access and additional features.',
     month: 'Month',
     year: 'Year (-20%)',
     freePlan: 'Free Plan',
     proPlan: 'Professional Plan',
     customPlan: 'Custom Plan',
     basicAccess: 'Basic access to all tools',
-    fiveCalcsPerMonth: '5 calculations with each tool per month',
+    fiveCalcsPerMonth: '5 calculations total',
     register: 'Register',
     recommended: 'Recommended',
     unlimitedCalcs: 'Unlimited calculations',
@@ -462,7 +462,7 @@ export const translations = {
     processingPayment: 'Processing...',
     securePaymentNotice: 'Your data is protected with 256-bit SSL encryption',
     freePlanDefault: 'Free Plan (Default)',
-    freeCalculationsUntil: 'free calculations until',
+    freeCalculationsUntil: 'free calculations total',
     viewPlans: 'View plans',
 
     // Contacts page
@@ -478,7 +478,7 @@ export const translations = {
     errorSending: 'An error occurred while sending.',
     faqTitle: 'Frequently Asked Questions',
     faqQuestions: [
-      { question: 'How are free calculations calculated?', answer: 'Each registered user gets 5 free calculations per task per month.' },
+      { question: 'How are free calculations calculated?', answer: 'Each registered user gets 5 free calculations total.' },
       { question: 'What types of calculations does GeoSolver support?', answer: 'GeoSolver offers coordinate transformations, area, length and volume calculations, GNSS analysis and other tools.' },
       { question: 'What payment methods are available?', answer: 'We accept credit/debit card and PayPal payments.' },
       { question: 'Is my data secure?', answer: 'All data is stored encrypted and is not shared with third parties.' },

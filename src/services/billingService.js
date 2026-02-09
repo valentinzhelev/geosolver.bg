@@ -35,6 +35,21 @@ class BillingService {
     }
     return response.json();
   }
+
+  static async getBillingSummary() {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    const response = await fetch(`${API_BASE_URL}/billing/summary`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
+      throw new Error(data.error || 'Failed to fetch billing summary');
+    }
+    return response.json();
+  }
 }
 
 export default BillingService;

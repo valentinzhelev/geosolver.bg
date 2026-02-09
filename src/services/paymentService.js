@@ -4,7 +4,7 @@ class PaymentService {
   // Fetch payment history
   static async getPaymentHistory(page = 1, limit = 10) {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       
       // If no token, return empty data
       if (!token) {
@@ -45,7 +45,7 @@ class PaymentService {
   // Fetch payment stats
   static async getPaymentStats() {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/payments/stats`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -63,7 +63,7 @@ class PaymentService {
   // Create payment
   static async createPayment(paymentData) {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/payments`, {
         method: 'POST',
         headers: {
@@ -83,7 +83,7 @@ class PaymentService {
   // Update payment status
   static async updatePaymentStatus(paymentId, status, failureReason = null) {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/payments/${paymentId}/status`, {
         method: 'PUT',
         headers: {

@@ -5,7 +5,6 @@ import Layout from '../layout/Layout';
 import { useAuth } from './AuthContext';
 import { useTranslation } from '../../hooks/useTranslation';
 import PlanService from '../../services/planService';
-import PaymentService from '../../services/paymentService';
 import BillingService from '../../services/billingService';
 import CalculationService from '../../services/calculationService';
 import UserManagementService from '../../services/userManagementService';
@@ -104,15 +103,16 @@ const Account = () => {
   };
 
   // Function to reload payment history when page changes
-  const reloadPaymentHistory = async (page) => {
+  const reloadPaymentHistory = async () => {
     if (!user) return;
     try {
       setLoading(true);
-      const paymentData = await PaymentService.getPaymentHistory(page, paymentItemsPerPage);
-      setPaymentHistory(paymentData.payments.map(payment => ({
-        method: payment.paymentMethod?.last4 ? `**** ${payment.paymentMethod.last4}` : (t.language === 'bg' ? 'Карта' : 'Card'),
-        amount: `${payment.amount}${payment.currency}`,
-        date: new Date(payment.createdAt).toLocaleString('bg-BG')
+      const billingSummary = await BillingService.getBillingSummary();
+      const invoices = billingSummary?.invoices || [];
+      setPaymentHistory(invoices.map(inv => ({
+        method: billingSummary?.paymentMethod?.last4 ? `**** ${billingSummary.paymentMethod.last4}` : (t.language === 'bg' ? 'Карта' : 'Card'),
+        amount: `${((inv.amountPaid ?? inv.amountDue ?? 0) / 100).toFixed(2)} ${String(inv.currency || '').toUpperCase()}`,
+        date: inv.created ? new Date(inv.created * 1000).toLocaleString('bg-BG') : ''
       })));
     } catch (error) {
       console.log('Failed to reload payment history:', error);
@@ -299,74 +299,53 @@ const Account = () => {
           
           // Set plan expiry date based on backend response or subscription
           if (limits.periodEnd) {
-            // Use period end from backend (end of current month)
             setPlanExpiryDate(new Date(limits.periodEnd));
           } else if (subscriptionData?.endDate) {
             setPlanExpiryDate(new Date(subscriptionData.endDate));
           } else {
-            // For free plan, set to end of current month
-            const now = new Date();
-            const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
-            setPlanExpiryDate(endOfMonth);
+            setPlanExpiryDate(null);
+          }
+          // Prefer limits.used for consistent counts
+          if (typeof limits.used === 'number') {
+            setTotalCalculations(limits.used);
           }
         } catch (calcError) {
           console.log('No calculation history found from database');
           setUsageHistory([]);
           setTotalCalculations(0);
           setCalculationLimits({ used: 0, limit: 5, unlimited: false });
-          
-          // Set fallback expiry date (end of current month)
-          const now = new Date();
-          const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
-          setPlanExpiryDate(endOfMonth);
+          setPlanExpiryDate(null);
         }
         
-        // Load payment history (only if user is logged in)
+        // Load billing data from Stripe (only if user is logged in)
         try {
-          const paymentData = await PaymentService.getPaymentHistory(1, 100); // Get more payments to extract unique methods
-          setPaymentHistory(paymentData.payments.map(payment => ({
-            method: `**** ${payment.paymentMethod.last4}`,
-            amount: `${payment.amount}${payment.currency}`,
-            date: new Date(payment.createdAt).toLocaleString('bg-BG')
-          })));
+          const billingSummary = await BillingService.getBillingSummary();
           
-          // Extract unique payment methods from payment history
-          const uniqueMethods = new Map();
-          paymentData.payments.forEach(payment => {
-            if (payment.paymentMethod && payment.paymentMethod.last4) {
-              const last4 = payment.paymentMethod.last4;
-              if (!uniqueMethods.has(last4)) {
-                // Mark as active if it's the most recent payment method used
-                uniqueMethods.set(last4, {
-                  last4: last4,
-                  active: false, // Will be set to true for the most recent
-                  brand: payment.paymentMethod.brand || 'visa',
-                  createdAt: new Date(payment.createdAt)
-                });
-              } else {
-                // Update if this payment is more recent
-                const existing = uniqueMethods.get(last4);
-                if (new Date(payment.createdAt) > existing.createdAt) {
-                  existing.createdAt = new Date(payment.createdAt);
-                }
-              }
-            }
-          });
-          
-          // Convert to array and mark the most recent as active
-          const methodsArray = Array.from(uniqueMethods.values());
-          if (methodsArray.length > 0) {
-            // Sort by most recent
-            methodsArray.sort((a, b) => b.createdAt - a.createdAt);
-            // Mark the most recent as active
-            methodsArray[0].active = true;
-            // Remove createdAt as it's not needed in the UI
-            methodsArray.forEach(m => delete m.createdAt);
+          if (billingSummary?.subscription && !subscriptionData) {
+            setSubscription({
+              startDate: billingSummary.subscription.currentPeriodStart,
+              endDate: billingSummary.subscription.currentPeriodEnd
+            });
           }
           
-          setPaymentMethods(methodsArray);
+          if (billingSummary?.paymentMethod?.last4) {
+            setPaymentMethods([{
+              last4: billingSummary.paymentMethod.last4,
+              active: true,
+              brand: billingSummary.paymentMethod.brand || 'visa'
+            }]);
+          } else {
+            setPaymentMethods([]);
+          }
+          
+          const invoices = billingSummary?.invoices || [];
+          setPaymentHistory(invoices.map(inv => ({
+            method: billingSummary?.paymentMethod?.last4 ? `**** ${billingSummary.paymentMethod.last4}` : (t.language === 'bg' ? 'Карта' : 'Card'),
+            amount: `${((inv.amountPaid ?? inv.amountDue ?? 0) / 100).toFixed(2)} ${String(inv.currency || '').toUpperCase()}`,
+            date: inv.created ? new Date(inv.created * 1000).toLocaleString('bg-BG') : ''
+          })));
         } catch (paymentError) {
-          console.log('No payment history found');
+          console.log('No billing history found');
           setPaymentHistory([]);
           setPaymentMethods([]);
         }
@@ -595,8 +574,8 @@ const Account = () => {
                   </div>
                 </div>
                 <div className="self-stretch p-4 bg-white rounded-tl rounded-tr rounded-bl-xl rounded-br-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-0.50px] outline-gray-200 flex flex-col justify-start items-start gap-4 overflow-hidden z-10 relative">
-                  <div className="justify-start"><span className="text-black text-base font-medium font-['Manrope']">{subscription ? Math.floor((new Date() - new Date(subscription.startDate)) / (1000 * 60 * 60 * 24)) : 0} {t.daysFromStart}</span></div>
-                  <div className="justify-start"><span className="text-black text-base font-medium font-['Manrope']">{subscription ? Math.floor((new Date(subscription.endDate) - new Date()) / (1000 * 60 * 60 * 24)) : (plan?.name === 'free' ? '0' : 0)} {t.daysToNext}</span></div>
+                  <div className="justify-start"><span className="text-black text-base font-medium font-['Manrope']">{subscription?.startDate ? Math.floor((new Date() - new Date(subscription.startDate)) / (1000 * 60 * 60 * 24)) : 0} {t.daysFromStart}</span></div>
+                  <div className="justify-start"><span className="text-black text-base font-medium font-['Manrope']">{subscription?.endDate ? Math.floor((new Date(subscription.endDate) - new Date()) / (1000 * 60 * 60 * 24)) : (plan?.name === 'free' ? '0' : 0)} {t.daysToNext}</span></div>
                   {(user?.hasBillingCustomer || user?.plan === 'pro') ? (
                     <button
                       onClick={async () => {
@@ -654,7 +633,7 @@ const Account = () => {
                           {calculationLimits.used}/{calculationLimits.limit}
                         </span>
                         <span className="text-neutral-400 text-sm font-medium font-['Manrope']">
-                          {' '}{t.freeCalculationsUntil} {planExpiryDate ? planExpiryDate.toLocaleDateString(t.language === 'bg' ? 'bg-BG' : 'en-US') : ''}
+                          {' '}{t.freeCalculationsUntil}
                         </span>
                       </div>
                       <Link to="/prices" className="flex justify-start items-center gap-2">

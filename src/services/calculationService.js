@@ -4,11 +4,11 @@ class CalculationService {
   // Save calculation
   static async saveCalculation(calculationData) {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/calculations`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(calculationData)
@@ -99,7 +99,7 @@ class CalculationService {
   // Fetch calculation statistics
   static async getCalculationStats() {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/calculations/stats`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -117,7 +117,7 @@ class CalculationService {
   // Check limits before calculation (24-hour limits)
   static async checkLimits() {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       const url = `${API_BASE_URL}/calculations/limits`;
       
       console.log('API Debug - checkLimits:');

@@ -3,6 +3,7 @@ import SEO from '../shared/SEO';
 import Layout from '../layout/Layout';
 import { Link } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
+import { useAuth } from '../auth/AuthContext';
 import useTypewriter from '../../hooks/useTypewriter';
 import { useCalculationTracking } from '../../hooks/useCalculationTracking';
 import { calculateFirstTask as calculateFirstTaskDomain } from '../../domain/geodesy';
@@ -48,6 +49,12 @@ const PurvaZadacha = () => {
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
   const { t, language } = useTranslation();
+  const { user } = useAuth();
+  const isProUser = user?.plan === 'pro' || ['active', 'trialing'].includes(user?.subscriptionStatus) || user?.role === 'admin';
+  const [showProHint, setShowProHint] = useState(false);
+  const proScanMessage = language === 'bg'
+    ? 'Сканирането е функция на Pro плана. Моля, абонирайте се.'
+    : 'Scanning is a Pro feature. Please subscribe.';
   const [resultText, setResultText] = useState(t.defaultResultText);
   const [history, setHistory] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -75,6 +82,10 @@ const PurvaZadacha = () => {
 
   const handleScanFile = async (file) => {
     if (!file || !file.type.startsWith('image/')) return;
+    if (!isProUser) {
+      alert(proScanMessage);
+      return;
+    }
     setIsScanning(true);
     setLowConfFields({});
     try {
@@ -116,6 +127,14 @@ const PurvaZadacha = () => {
       if (fileInputRef.current) fileInputRef.current.value = '';
       if (cameraInputRef.current) cameraInputRef.current.value = '';
     }
+  };
+
+  const handleScanClick = () => {
+    if (!isProUser) {
+      alert(proScanMessage);
+      return;
+    }
+    cameraInputRef.current?.click();
   };
 
   const calculate = async () => {
@@ -428,19 +447,34 @@ Check - angle: ${result.calculatedAngle} gon
                     </div>
                   </div>
                   <div className="inline-flex justify-end items-center gap-3 w-full">
-                    <button
-                      type="button"
-                      onClick={() => cameraInputRef.current?.click()}
-                      disabled={isScanning}
-                      className="px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3 hover:bg-gray-300 disabled:opacity-50"
+                    <div
+                      className="relative"
+                      onMouseEnter={() => !isProUser && setShowProHint(true)}
+                      onMouseLeave={() => setShowProHint(false)}
                     >
-                      {isScanning ? (
-                        <span className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
-                      ) : (
-                        <img src="/icons/scan_icon.svg" alt={t.scan} className="w-4 h-4" />
+                      {!isProUser && showProHint && (
+                        <div className="absolute -top-10 left-0 z-10 whitespace-nowrap rounded-md bg-black px-3 py-1 text-xs text-white shadow">
+                          {proScanMessage}
+                        </div>
                       )}
-                      <span className="justify-start text-black text-sm font-medium font-['Manrope']">{t.scan}</span>
-                    </button>
+                      <button
+                        type="button"
+                        onClick={handleScanClick}
+                        disabled={isScanning}
+                        title={!isProUser ? proScanMessage : undefined}
+                        className={`px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3 hover:bg-gray-300 disabled:opacity-50${!isProUser ? ' opacity-70' : ''}`}
+                      >
+                        {isScanning ? (
+                          <span className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <img src="/icons/scan_icon.svg" alt={t.scan} className="w-4 h-4" />
+                        )}
+                        <span className="justify-start text-black text-sm font-medium font-['Manrope']">{t.scan}</span>
+                        {!isProUser && (
+                          <span className="ml-1 rounded bg-black px-1.5 py-0.5 text-[10px] font-semibold text-white">PRO</span>
+                        )}
+                      </button>
+                    </div>
                     <button type="button" onClick={resetForm} className="px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3">
                       <div className="justify-start text-black text-sm font-medium font-['Manrope']">Нулирай</div>
                     </button>
@@ -645,19 +679,34 @@ Check - angle: ${result.calculatedAngle} gon
                   </div>
                 </div>
                 <div className="inline-flex justify-start items-start gap-3">
-                  <button
-                    type="button"
-                    onClick={() => cameraInputRef.current?.click()}
-                    disabled={isScanning}
-                    className="px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3 hover:bg-gray-300 disabled:opacity-50"
+                  <div
+                    className="relative"
+                    onMouseEnter={() => !isProUser && setShowProHint(true)}
+                    onMouseLeave={() => setShowProHint(false)}
                   >
-                    {isScanning ? (
-                      <span className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                      <img src="/icons/scan_icon.svg" alt={t.scan} className="w-4 h-4" />
+                    {!isProUser && showProHint && (
+                      <div className="absolute -top-10 left-0 z-10 whitespace-nowrap rounded-md bg-black px-3 py-1 text-xs text-white shadow">
+                        {proScanMessage}
+                      </div>
                     )}
-                    <span className="justify-start text-black text-base font-medium font-['Manrope']">{t.scan}</span>
-                  </button>
+                    <button
+                      type="button"
+                      onClick={handleScanClick}
+                      disabled={isScanning}
+                      title={!isProUser ? proScanMessage : undefined}
+                      className={`px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3 hover:bg-gray-300 disabled:opacity-50${!isProUser ? ' opacity-70' : ''}`}
+                    >
+                      {isScanning ? (
+                        <span className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <img src="/icons/scan_icon.svg" alt={t.scan} className="w-4 h-4" />
+                      )}
+                      <span className="justify-start text-black text-base font-medium font-['Manrope']">{t.scan}</span>
+                      {!isProUser && (
+                        <span className="ml-1 rounded bg-black px-1.5 py-0.5 text-[10px] font-semibold text-white">PRO</span>
+                      )}
+                    </button>
+                  </div>
                   {/* Reset button */}
                   <button type="button" onClick={resetForm} className="px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3">
                     <div className="justify-start text-black text-base font-medium font-['Manrope']">Нулирай</div>
