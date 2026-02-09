@@ -570,7 +570,9 @@ const Account = () => {
                     style={{ zIndex: 1 }}
                   />
                   <div className="text-center justify-start text-white text-lg font-semibold font-['Manrope'] z-10" style={{ opacity: 1 }}>
-                    {user?.plan === 'pro' ? (t.language === 'bg' ? 'Професионален план (Pro)' : 'Professional Plan (Pro)') : (plan?.displayName?.[t.language] || (plan?.name === 'free' ? t.freePlan : plan?.name) || defaultPlan.name)}
+                    {user?.plan === 'pro'
+                      ? (t.language === 'en' ? 'Professional Plan (Pro)' : 'Професионален план (Pro)')
+                      : (plan?.displayName?.[t.language] || (plan?.name === 'free' ? t.freePlan : plan?.name) || defaultPlan.name)}
                   </div>
                 </div>
                 <div className="self-stretch p-4 bg-white rounded-tl rounded-tr rounded-bl-xl rounded-br-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-0.50px] outline-gray-200 flex flex-col justify-start items-start gap-4 overflow-hidden z-10 relative">
@@ -651,20 +653,20 @@ const Account = () => {
                     </div>
                   </div>
                 ) : (
-                  // Paid Plan Progress Bar (Original)
+                  // Paid Plan Progress Bar (always full)
                   <div className="self-stretch p-3 bg-white rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-start items-start gap-3">
                     <div className="self-stretch inline-flex justify-between items-center">
                       <div className="justify-start text-black text-sm font-medium font-['Manrope']">{totalCalculations} {t.calculations}</div>
                       <img src="/icons/infinity.svg" alt="Infinity" className="w-3 h-2"/>
                     </div>
-                    <div className="w-[723.13px] h-2 origin-top-left rotate-180 rounded-[100px]">
-                      <img
-                        src="/images/account_gradient.png"
-                        alt="Прогрес"
-                        className="w-[723.13px] h-2 origin-top-left rotate-180 rounded-[100px]"
-                        style={{ objectFit: 'cover' }}
-                      />
-                    </div>
+                    <div
+                      className="w-full h-2 rounded-[100px]"
+                      style={{
+                        backgroundImage: 'url(/images/account_gradient.png)',
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center'
+                      }}
+                    />
                   </div>
                 )}
                 <div className="self-stretch bg-stone-50 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-start items-start gap-px overflow-hidden">
