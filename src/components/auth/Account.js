@@ -8,9 +8,10 @@ import PlanService from '../../services/planService';
 import BillingService from '../../services/billingService';
 import CalculationService from '../../services/calculationService';
 import UserManagementService from '../../services/userManagementService';
+import { userPreferencesService } from '../../services/userPreferencesService';
 
 const Account = () => {
-  const { user, logout, refreshUser } = useAuth();
+  const { user, logout, refreshUser, changePassword } = useAuth();
   const { t } = useTranslation();
   
   console.log('Account.js loaded, user:', user);
@@ -134,6 +135,16 @@ const Account = () => {
   const [loading, setLoading] = useState(true);
   const [initialLoadDone, setInitialLoadDone] = useState(false);
   const [error, setError] = useState(null);
+  const [showSettings, setShowSettings] = useState(false);
+  const [preferences, setPreferences] = useState({ showToolsInDevelopment: false });
+  const [preferencesLoading, setPreferencesLoading] = useState(false);
+  const [preferencesError, setPreferencesError] = useState(null);
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordSaving, setPasswordSaving] = useState(false);
+  const [passwordError, setPasswordError] = useState(null);
+  const [passwordSuccess, setPasswordSuccess] = useState(null);
   
   // Admin panel state
   const [adminUsers, setAdminUsers] = useState([]);
@@ -150,13 +161,18 @@ const Account = () => {
   const usageProgressPct = displayLimit ? Math.min((displayUsed / displayLimit) * 100, 100) : 0;
   const getCardBrandIcon = (brand, size = 'large') => {
     const normalized = (brand || '').toLowerCase();
+    const baseClass = size === 'small' ? 'w-5 h-5' : 'w-8 h-8';
     if (normalized.includes('mastercard') || normalized.includes('master')) {
-      return { src: '/icons/mastercard.png', alt: 'Mastercard' };
+      return {
+        src: '/icons/mastercard.png',
+        alt: 'Mastercard',
+        className: size === 'small' ? 'w-6 h-5' : 'w-9 h-8'
+      };
     }
     if (normalized.includes('visa')) {
-      return { src: size === 'small' ? '/icons/visa_small.svg' : '/icons/visa.svg', alt: 'Visa' };
+      return { src: size === 'small' ? '/icons/visa_small.svg' : '/icons/visa.svg', alt: 'Visa', className: baseClass };
     }
-    return { src: size === 'small' ? '/icons/visa_small.svg' : '/icons/visa.svg', alt: 'Card' };
+    return { src: size === 'small' ? '/icons/visa_small.svg' : '/icons/visa.svg', alt: 'Card', className: baseClass };
   };
 
   // Pagination state for usage history
@@ -176,6 +192,69 @@ const Account = () => {
   useEffect(() => {
     if (refreshUser) refreshUser();
   }, [refreshUser]);
+
+  // Load user preferences
+  useEffect(() => {
+    if (!user) return;
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    if (!token) return;
+    setPreferencesLoading(true);
+    setPreferencesError(null);
+    userPreferencesService.getUserPreferences(token)
+      .then((prefs) => setPreferences(prefs))
+      .catch((err) => setPreferencesError(err.message || 'Failed to load preferences'))
+      .finally(() => setPreferencesLoading(false));
+  }, [user]);
+
+  const handlePreferenceToggle = async (key) => {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    if (!token) return;
+    const next = { ...preferences, [key]: !preferences[key] };
+    setPreferences(next);
+    try {
+      await userPreferencesService.updateUserPreferences(token, next);
+    } catch (err) {
+      setPreferencesError(err.message || 'Failed to save preferences');
+    }
+  };
+
+  const handleChangePassword = async () => {
+    setPasswordError(null);
+    setPasswordSuccess(null);
+    if (!oldPassword || !newPassword || !confirmPassword) {
+      setPasswordError(t.language === 'bg' ? 'Моля, попълнете всички полета.' : 'Please fill in all fields.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordError(t.language === 'bg' ? 'Новите пароли не съвпадат.' : 'New passwords do not match.');
+      return;
+    }
+    setPasswordSaving(true);
+    try {
+      const ok = await changePassword(oldPassword, newPassword);
+      if (ok) {
+        setPasswordSuccess(t.language === 'bg' ? 'Паролата е сменена успешно.' : 'Password updated successfully.');
+        setOldPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+      } else {
+        setPasswordError(t.language === 'bg' ? 'Грешка при смяна на паролата.' : 'Failed to change password.');
+      }
+    } catch (err) {
+      setPasswordError(err.message || 'Failed to change password');
+    } finally {
+      setPasswordSaving(false);
+    }
+  };
+
+  const handleAddPaymentMethod = async () => {
+    try {
+      const { url } = await BillingService.createPortalSession();
+      if (url) window.location.href = url;
+    } catch (err) {
+      alert(err.message);
+    }
+  };
 
   // Load account data
   useEffect(() => {
@@ -573,9 +652,14 @@ const Account = () => {
                   <button onClick={logout} className="px-4 py-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 flex justify-start items-center gap-3">
                     <div className="justify-start text-black text-base font-medium font-['Manrope']">{t.logoutFromAccount}</div>
                   </button>
-                  <div className="w-9 h-9 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 flex justify-center items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowSettings(true)}
+                    className="w-9 h-9 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 flex justify-center items-center gap-3"
+                    aria-label={t.settings}
+                  >
                     <img src="/icons/account_settings.svg" alt={t.settings} className="w-5 h-5" />
-                  </div>
+                  </button>
                 </div>
               </div>
               <div className="self-stretch rounded-[20px] flex flex-col justify-center items-center gap-1 relative overflow-hidden">
@@ -625,7 +709,7 @@ const Account = () => {
                       <div className={`w-12 h-6 p-1 rounded-[30px] ${method.active ? 'bg-black' : 'outline outline-1 outline-offset-[-1px] outline-gray-200'} flex ${method.active ? 'justify-end' : 'justify-start'} items-center gap-2`}>
                         <div className={`w-4 h-4 ${method.active ? 'bg-white' : 'bg-black'} rounded-full`} />
                       </div>
-                      <img {...getCardBrandIcon(method.brand)} alt={getCardBrandIcon(method.brand).alt} className="w-8 h-8" />
+                      <img {...getCardBrandIcon(method.brand)} alt={getCardBrandIcon(method.brand).alt} />
                       <div className="justify-start text-neutral-400 text-base font-medium font-['Manrope']">**** {method.last4}</div>
                     </div>
                     <button className="w-5 h-5 flex items-center justify-center">
@@ -634,9 +718,13 @@ const Account = () => {
                   </div>
                 ))}
                 <div className="self-stretch h-0 outline outline-1 outline-offset-[-0.50px] outline-gray-200" />
-                <div className="px-4 py-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-3">
+                <button
+                  type="button"
+                  onClick={handleAddPaymentMethod}
+                  className="px-4 py-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-3"
+                >
                   <div className="justify-start text-black text-base font-medium font-['Manrope']">{t.addNewMethod}</div>
-                </div>
+                </button>
               </div>
             </div>
             <div className="flex-1 inline-flex flex-col justify-center items-start gap-5">
@@ -774,7 +862,7 @@ const Account = () => {
                     paginatedPaymentHistory.map((payment, i) => (
                       <div key={i} className="self-stretch inline-flex justify-start items-center gap-px">
                         <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                          <img {...getCardBrandIcon(payment.brand, 'small')} alt={getCardBrandIcon(payment.brand, 'small').alt} className="w-5 h-5" />
+                          <img {...getCardBrandIcon(payment.brand, 'small')} alt={getCardBrandIcon(payment.brand, 'small').alt} />
                           <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{payment.method}</div>
                         </div>
                         <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
@@ -952,6 +1040,93 @@ const Account = () => {
           )}
         </div>
       </div>
+
+      {showSettings && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-md rounded-xl bg-white p-5 shadow-xl">
+            <div className="flex items-center justify-between">
+              <div className="text-black text-lg font-semibold font-['Manrope']">
+                {t.language === 'bg' ? 'Настройки на акаунта' : 'Account Settings'}
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowSettings(false)}
+                className="w-8 h-8 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 flex items-center justify-center"
+                aria-label={t.language === 'bg' ? 'Затвори' : 'Close'}
+              >
+                <img src="/icons/close_button.svg" alt={t.language === 'bg' ? 'Затвори' : 'Close'} className="w-4 h-4 opacity-70" />
+              </button>
+            </div>
+
+            <div className="mt-4 flex flex-col gap-4">
+              <div className="rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 p-3">
+                <div className="text-black text-sm font-medium font-['Manrope']">
+                  {t.language === 'bg' ? 'Предпочитания' : 'Preferences'}
+                </div>
+                {preferencesError && (
+                  <div className="mt-2 text-xs text-red-500">{preferencesError}</div>
+                )}
+                <button
+                  type="button"
+                  onClick={() => handlePreferenceToggle('showToolsInDevelopment')}
+                  disabled={preferencesLoading}
+                  className="mt-3 w-full inline-flex items-center justify-between rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 px-3 py-2"
+                >
+                  <span className="text-sm text-black font-medium font-['Manrope']">
+                    {t.language === 'bg' ? 'Показвай инструменти в разработка' : 'Show tools in development'}
+                  </span>
+                  <span className={`w-10 h-5 rounded-full flex items-center ${preferences.showToolsInDevelopment ? 'bg-black justify-end' : 'bg-gray-200 justify-start'} p-0.5`}>
+                    <span className="w-4 h-4 rounded-full bg-white" />
+                  </span>
+                </button>
+              </div>
+
+              <div className="rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 p-3">
+                <div className="text-black text-sm font-medium font-['Manrope']">
+                  {t.language === 'bg' ? 'Смяна на парола' : 'Change password'}
+                </div>
+                {passwordError && (
+                  <div className="mt-2 text-xs text-red-500">{passwordError}</div>
+                )}
+                {passwordSuccess && (
+                  <div className="mt-2 text-xs text-green-600">{passwordSuccess}</div>
+                )}
+                <div className="mt-3 flex flex-col gap-2">
+                  <input
+                    type="password"
+                    value={oldPassword}
+                    onChange={(e) => setOldPassword(e.target.value)}
+                    placeholder={t.language === 'bg' ? 'Текуща парола' : 'Current password'}
+                    className="w-full p-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']"
+                  />
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder={t.language === 'bg' ? 'Нова парола' : 'New password'}
+                    className="w-full p-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']"
+                  />
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder={t.language === 'bg' ? 'Повтори новата парола' : 'Confirm new password'}
+                    className="w-full p-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleChangePassword}
+                    disabled={passwordSaving}
+                    className="mt-1 px-4 py-2 bg-black text-white rounded-lg text-sm font-medium font-['Manrope']"
+                  >
+                    {passwordSaving ? (t.language === 'bg' ? 'Запис...' : 'Saving...') : (t.language === 'bg' ? 'Запази' : 'Save')}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 };
