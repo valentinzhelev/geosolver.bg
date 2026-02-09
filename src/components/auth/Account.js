@@ -623,7 +623,7 @@ const Account = () => {
                       <div className={`w-12 h-6 p-1 rounded-[30px] ${method.active ? 'bg-black' : 'outline outline-1 outline-offset-[-1px] outline-gray-200'} flex ${method.active ? 'justify-end' : 'justify-start'} items-center gap-2`}>
                         <div className={`w-4 h-4 ${method.active ? 'bg-white' : 'bg-black'} rounded-full`} />
                       </div>
-                      <img {...getCardBrandIcon(method.brand)} className="w-8 h-8" />
+                      <img {...getCardBrandIcon(method.brand)} alt={getCardBrandIcon(method.brand).alt} className="w-8 h-8" />
                       <div className="justify-start text-neutral-400 text-base font-medium font-['Manrope']">**** {method.last4}</div>
                     </div>
                     <button className="w-5 h-5 flex items-center justify-center">
