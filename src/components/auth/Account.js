@@ -147,6 +147,16 @@ const Account = () => {
   const displayLimit = calculationLimits.limit > 0 ? calculationLimits.limit : 5;
   const displayUsed = Math.min(calculationLimits.used, displayLimit);
   const usageProgressPct = displayLimit ? Math.min((displayUsed / displayLimit) * 100, 100) : 0;
+  const getCardBrandIcon = (brand) => {
+    const normalized = (brand || '').toLowerCase();
+    if (normalized.includes('mastercard') || normalized.includes('master')) {
+      return { src: '/icons/mastercard.svg', alt: 'Mastercard' };
+    }
+    if (normalized.includes('visa')) {
+      return { src: '/icons/visa.svg', alt: 'Visa' };
+    }
+    return { src: '/icons/visa.svg', alt: 'Card' };
+  };
 
   // Pagination state for usage history
   const [usageCurrentPage, setUsageCurrentPage] = useState(1);
@@ -613,7 +623,7 @@ const Account = () => {
                       <div className={`w-12 h-6 p-1 rounded-[30px] ${method.active ? 'bg-black' : 'outline outline-1 outline-offset-[-1px] outline-gray-200'} flex ${method.active ? 'justify-end' : 'justify-start'} items-center gap-2`}>
                         <div className={`w-4 h-4 ${method.active ? 'bg-white' : 'bg-black'} rounded-full`} />
                       </div>
-                      <img src="/icons/visa.svg" alt="Visa" className="w-8 h-8" />
+                      <img {...getCardBrandIcon(method.brand)} className="w-8 h-8" />
                       <div className="justify-start text-neutral-400 text-base font-medium font-['Manrope']">**** {method.last4}</div>
                     </div>
                     <button className="w-5 h-5 flex items-center justify-center">
