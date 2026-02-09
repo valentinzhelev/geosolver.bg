@@ -131,6 +131,7 @@ const Account = () => {
   const [calculationLimits, setCalculationLimits] = useState({ used: 0, limit: 5, unlimited: false });
   const [planExpiryDate, setPlanExpiryDate] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [initialLoadDone, setInitialLoadDone] = useState(false);
   const [error, setError] = useState(null);
   
   // Admin panel state
@@ -377,6 +378,7 @@ const Account = () => {
         setError('Failed to connect to database. Please check your internet connection and try again.');
       } finally {
         setLoading(false);
+        setInitialLoadDone(true);
       }
     };
 
@@ -533,7 +535,7 @@ const Account = () => {
     daysToNext: 0,
   };
 
-  if (loading) {
+  if (loading && !initialLoadDone) {
     return (
       <Layout>
         <div className="w-full min-h-screen bg-stone-50 flex flex-col items-center justify-center">

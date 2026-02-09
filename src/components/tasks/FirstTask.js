@@ -105,7 +105,12 @@ const PurvaZadacha = () => {
       }
     } catch (err) {
       setLowConfFields({});
-      alert(language === 'bg' ? 'Грешка при сканиране. Уверете се, че backend-ът работи.' : 'Scan error. Ensure the backend is running.');
+      const backendMessage = err?.message;
+      if (backendMessage) {
+        alert(backendMessage);
+      } else {
+        alert(language === 'bg' ? 'Грешка при сканиране. Уверете се, че backend-ът работи.' : 'Scan error. Ensure the backend is running.');
+      }
     } finally {
       setIsScanning(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
