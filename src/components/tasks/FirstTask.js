@@ -173,10 +173,6 @@ const PurvaZadacha = () => {
       const fixed = Number(value).toFixed(decimals);
       return language === 'bg' ? fixed.replace('.', ',') : fixed;
     };
-    const formatInt = (value) => {
-      if (value == null || Number.isNaN(value)) return '';
-      return language === 'bg' ? String(value).replace('.', ',') : String(value);
-    };
     const output = language === 'bg' 
       ? `Входни данни:
 Y1 = ${formatNumber(result.y1, 2)}, X1 = ${formatNumber(result.x1, 2)}

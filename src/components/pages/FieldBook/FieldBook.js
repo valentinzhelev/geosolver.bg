@@ -116,7 +116,6 @@ const FieldBook = () => {
   const [showBookForm, setShowBookForm] = useState(false);
   const [bookForm, setBookForm] = useState({ name: '', date: '', crew: '', site: '', type: 'leveling' });
 
-  const selectedProject = projects.find((p) => p.id === selectedProjectId);
   const selectedBook = fieldBooks.find((b) => b.id === selectedBookId);
 
   const template = useMemo(() => {
