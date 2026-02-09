@@ -4,6 +4,7 @@ import SEO from '../shared/SEO';
 import { Link } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 import useTypewriter from '../../hooks/useTypewriter';
+import { useAuth } from '../auth/AuthContext';
 
 // LocalStorage helpers
 const getHistory = () => {
@@ -124,6 +125,11 @@ const Resection = () => {
   const paginatedHistory = history.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
   const { displayText, isTyping } = useTypewriter(resultText);
   const { language } = useTranslation();
+  const { user } = useAuth();
+  const isAuthenticated = !!user;
+  const authRequiredMessage = language === 'bg'
+    ? 'Моля, влезте или се регистрирайте, за да използвате тази функция.'
+    : 'Please sign in or register to use this feature.';
 
   useEffect(() => { setHistory(getHistory()); }, []);
 
@@ -136,6 +142,10 @@ const Resection = () => {
   };
 
   const handleCalculate = () => {
+    if (!isAuthenticated) {
+      alert(authRequiredMessage);
+      return;
+    }
     if (!isFormValid()) {
       alert(language === 'bg' ? 'Моля, попълнете всички полета.' : 'Please fill in all fields.');
       return;
@@ -397,7 +407,7 @@ Date: ${new Date().toLocaleString('en-US')}`;
                     <button type="button" onClick={resetForm} className="px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3">
                       <div className="justify-start text-black text-sm font-medium font-['Manrope']">Нулирай</div>
                     </button>
-                    <button type="button" onClick={handleCalculate} disabled={!isFormValid()} className={`px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3${!isFormValid() ? ' opacity-50 cursor-not-allowed' : ''}`}>
+                    <button type="button" onClick={handleCalculate} disabled={!isFormValid() || !isAuthenticated} className={`px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3${!isFormValid() || !isAuthenticated ? ' opacity-50 cursor-not-allowed' : ''}`}>
                       <div className="justify-start text-white text-sm font-medium font-['Manrope']">Изчисли</div>
                       <img src="/icons/white_right_arrow.svg" alt="Изчисли" className="w-4 h-4" />
                     </button>
@@ -677,7 +687,7 @@ Date: ${new Date().toLocaleString('en-US')}`;
                     <div className="justify-start text-black text-base font-medium font-['Manrope']">Нулирай</div>
                   </button>
                   {/* Calculate button */}
-                  <button type="button" onClick={handleCalculate} disabled={!isFormValid()} className={`px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3${!isFormValid() ? ' opacity-50 cursor-not-allowed' : ''}`}>
+                  <button type="button" onClick={handleCalculate} disabled={!isFormValid() || !isAuthenticated} className={`px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3${!isFormValid() || !isAuthenticated ? ' opacity-50 cursor-not-allowed' : ''}`}>
                     <div className="justify-start text-white text-base font-medium font-['Manrope']">Изчисли</div>
                     <img src="/icons/white_right_arrow.svg" alt="Изчисли" className="w-4 h-4" />
                   </button>

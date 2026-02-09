@@ -50,6 +50,10 @@ const PurvaZadacha = () => {
   const cameraInputRef = useRef(null);
   const { t, language } = useTranslation();
   const { user } = useAuth();
+  const isAuthenticated = !!user;
+  const authRequiredMessage = language === 'bg'
+    ? 'Моля, влезте или се регистрирайте, за да използвате тази функция.'
+    : 'Please sign in or register to use this feature.';
   const isProUser = user?.plan === 'pro' || ['active', 'trialing'].includes(user?.subscriptionStatus) || user?.role === 'admin';
   const [showProHint, setShowProHint] = useState(false);
   const proScanMessage = language === 'bg'
@@ -138,6 +142,10 @@ const PurvaZadacha = () => {
   };
 
   const calculate = async () => {
+    if (!isAuthenticated) {
+      alert(authRequiredMessage);
+      return;
+    }
     const y1 = parseFloat(form.y1);
     const x1 = parseFloat(form.x1);
     const alpha = parseFloat(form.alpha);
@@ -478,7 +486,7 @@ Check - angle: ${result.calculatedAngle} gon
                     <button type="button" onClick={resetForm} className="px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3">
                       <div className="justify-start text-black text-sm font-medium font-['Manrope']">Нулирай</div>
                     </button>
-                    <button type="button" onClick={calculate} disabled={!isFormValid()} className={`px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3${!isFormValid() ? ' opacity-50 cursor-not-allowed' : ''}`}>
+                    <button type="button" onClick={calculate} disabled={!isFormValid() || !isAuthenticated} className={`px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3${!isFormValid() || !isAuthenticated ? ' opacity-50 cursor-not-allowed' : ''}`}>
                       <div className="justify-start text-white text-sm font-medium font-['Manrope']">Изчисли</div>
                       <img src="/icons/white_right_arrow.svg" alt="Изчисли" className="w-4 h-4" />
                     </button>
@@ -712,7 +720,7 @@ Check - angle: ${result.calculatedAngle} gon
                     <div className="justify-start text-black text-base font-medium font-['Manrope']">Нулирай</div>
                   </button>
                   {/* Calculate button */}
-                  <button type="button" onClick={calculate} disabled={!isFormValid()} className={`px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3${!isFormValid() ? ' opacity-50 cursor-not-allowed' : ''}`}>
+                  <button type="button" onClick={calculate} disabled={!isFormValid() || !isAuthenticated} className={`px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3${!isFormValid() || !isAuthenticated ? ' opacity-50 cursor-not-allowed' : ''}`}>
                     <div className="justify-start text-white text-base font-medium font-['Manrope']">Изчисли</div>
                     <img src="/icons/white_right_arrow.svg" alt="Изчисли" className="w-4 h-4" />
                   </button>

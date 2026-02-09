@@ -143,6 +143,11 @@ const Account = () => {
   const [adminTotalPages, setAdminTotalPages] = useState(1);
   const [adminTotalUsers, setAdminTotalUsers] = useState(0);
 
+  const isProUser = user?.plan === 'pro' || ['active', 'trialing'].includes(user?.subscriptionStatus);
+  const displayLimit = calculationLimits.limit > 0 ? calculationLimits.limit : 5;
+  const displayUsed = Math.min(calculationLimits.used, displayLimit);
+  const usageProgressPct = displayLimit ? Math.min((displayUsed / displayLimit) * 100, 100) : 0;
+
   // Pagination state for usage history
   const [usageCurrentPage, setUsageCurrentPage] = useState(1);
   const [usageTotalPages, setUsageTotalPages] = useState(1);
@@ -626,13 +631,13 @@ const Account = () => {
               <div className="self-stretch p-4 bg-white rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-0.50px] outline-gray-200 flex flex-col justify-start items-start gap-4 overflow-hidden">
         <div className="justify-start text-black text-lg font-semibold font-['Manrope']">{t.usageHistory}</div>
                 {/* Progress Bar - Different design for free vs paid plans */}
-                {plan?.name === 'free' || !plan || calculationLimits.unlimited === false ? (
+                {!isProUser ? (
                   // Free Plan Progress Bar
                   <div className="w-[748px] p-3 bg-white rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-start items-start gap-3">
                     <div className="self-stretch inline-flex justify-between items-center">
                       <div className="justify-start">
                         <span className="text-black text-sm font-medium font-['Manrope']">
-                          {calculationLimits.used}/{calculationLimits.limit}
+                          {displayUsed}/{displayLimit}
                         </span>
                         <span className="text-neutral-400 text-sm font-medium font-['Manrope']">
                           {' '}{t.freeCalculationsUntil}
@@ -647,7 +652,7 @@ const Account = () => {
                       <div 
                         className="h-2 bg-gradient-to-r from-amber-600 to-gray-800 rounded-[30px] transition-all duration-300"
                         style={{ 
-                          width: `${Math.min((calculationLimits.used / calculationLimits.limit) * 100, 100)}%` 
+                          width: `${usageProgressPct}%` 
                         }}
                       />
                     </div>
