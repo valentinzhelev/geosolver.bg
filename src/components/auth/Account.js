@@ -111,6 +111,7 @@ const Account = () => {
       const invoices = billingSummary?.invoices || [];
       setPaymentHistory(invoices.map(inv => ({
         method: billingSummary?.paymentMethod?.last4 ? `**** ${billingSummary.paymentMethod.last4}` : (t.language === 'bg' ? 'Карта' : 'Card'),
+        brand: billingSummary?.paymentMethod?.brand || 'visa',
         amount: `${((inv.amountPaid ?? inv.amountDue ?? 0) / 100).toFixed(2)} ${String(inv.currency || '').toUpperCase()}`,
         date: inv.created ? new Date(inv.created * 1000).toLocaleString('bg-BG') : ''
       })));
@@ -147,15 +148,15 @@ const Account = () => {
   const displayLimit = calculationLimits.limit > 0 ? calculationLimits.limit : 5;
   const displayUsed = Math.min(calculationLimits.used, displayLimit);
   const usageProgressPct = displayLimit ? Math.min((displayUsed / displayLimit) * 100, 100) : 0;
-  const getCardBrandIcon = (brand) => {
+  const getCardBrandIcon = (brand, size = 'large') => {
     const normalized = (brand || '').toLowerCase();
     if (normalized.includes('mastercard') || normalized.includes('master')) {
-      return { src: '/icons/mastercard.svg', alt: 'Mastercard' };
+      return { src: '/icons/mastercard.png', alt: 'Mastercard' };
     }
     if (normalized.includes('visa')) {
-      return { src: '/icons/visa.svg', alt: 'Visa' };
+      return { src: size === 'small' ? '/icons/visa_small.svg' : '/icons/visa.svg', alt: 'Visa' };
     }
-    return { src: '/icons/visa.svg', alt: 'Card' };
+    return { src: size === 'small' ? '/icons/visa_small.svg' : '/icons/visa.svg', alt: 'Card' };
   };
 
   // Pagination state for usage history
@@ -356,6 +357,7 @@ const Account = () => {
           const invoices = billingSummary?.invoices || [];
           setPaymentHistory(invoices.map(inv => ({
             method: billingSummary?.paymentMethod?.last4 ? `**** ${billingSummary.paymentMethod.last4}` : (t.language === 'bg' ? 'Карта' : 'Card'),
+            brand: billingSummary?.paymentMethod?.brand || 'visa',
             amount: `${((inv.amountPaid ?? inv.amountDue ?? 0) / 100).toFixed(2)} ${String(inv.currency || '').toUpperCase()}`,
             date: inv.created ? new Date(inv.created * 1000).toLocaleString('bg-BG') : ''
           })));
@@ -772,7 +774,7 @@ const Account = () => {
                     paginatedPaymentHistory.map((payment, i) => (
                       <div key={i} className="self-stretch inline-flex justify-start items-center gap-px">
                         <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                          <img src="/icons/visa_small.svg" alt="Visa" className="w-5 h-5" />
+                          <img {...getCardBrandIcon(payment.brand, 'small')} alt={getCardBrandIcon(payment.brand, 'small').alt} className="w-5 h-5" />
                           <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{payment.method}</div>
                         </div>
                         <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
