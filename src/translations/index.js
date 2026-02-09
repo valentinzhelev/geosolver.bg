@@ -20,7 +20,7 @@ export const translations = {
     socialNetworks: 'Социални мрежи',
     language: 'Български език',
     theme: 'Светъл режим',
-    copyright: '© GEOSOLVER, 2025.\nВсички права запазени.\nТекуща версия: v3.0.9-beta.2',
+    copyright: '© GEOSOLVER, 2025.\nВсички права запазени.\nТекуща версия: v3.1.0-beta.2',
     // FirstTask translations
     firstTaskTitle: 'Първа основна задача',
     firstTaskDescription: 'Изчисляване на координати по начална точка, ъгъл и дължина с онлайн геодезически калкулатор. Бързи и точни решения за геодезисти.',
@@ -169,6 +169,7 @@ export const translations = {
     sending: 'Изпращане...',
     errorOccurred: 'Възникна грешка.',
     errorSending: 'Възникна грешка при изпращане.',
+    connectionTimeout: 'Възникна таймаут. Моля, опитайте отново или пишете на help@geosolver.bg.',
     faqTitle: 'Често задавани въпроси',
     faqQuestions: [
       { question: 'Как се изчисляват безплатните изчисления?', answer: 'Всеки регистриран потребител получава общо 5 безплатни изчисления.' },
@@ -326,7 +327,7 @@ export const translations = {
     socialNetworks: 'Social Networks',
     language: 'English',
     theme: 'Light Mode',
-    copyright: '© GEOSOLVER, 2025.\nAll rights reserved.\nCurrent version: v3.0.9-beta.2',
+    copyright: '© GEOSOLVER, 2025.\nAll rights reserved.\nCurrent version: v3.1.0-beta.2',
 
     // FirstTask translations11
     firstTaskTitle: 'First Basic Task',
@@ -476,6 +477,7 @@ export const translations = {
     sending: 'Sending...',
     errorOccurred: 'An error occurred.',
     errorSending: 'An error occurred while sending.',
+    connectionTimeout: 'Connection timed out. Please try again or email help@geosolver.bg.',
     faqTitle: 'Frequently Asked Questions',
     faqQuestions: [
       { question: 'How are free calculations calculated?', answer: 'Each registered user gets 5 free calculations total.' },

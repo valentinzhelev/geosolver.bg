@@ -22,22 +22,33 @@ const Contacts = () => {
     setError('');
     setSuccess('');
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
       const res = await fetch(`${API_BASE_URL}/contact`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
+        signal: controller.signal
       });
-      const data = await res.json();
+      clearTimeout(timeoutId);
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        throw new Error(res.ok ? 'Invalid response' : `HTTP ${res.status}`);
+      }
       if (res.ok) {
         setSuccess(data.message);
         setFormData({ email: '', title: '', content: '' });
       } else {
         setError(data.message || t.errorOccurred);
       }
-    } catch {
-      setError(t.errorSending);
+    } catch (err) {
+      const msg = err.name === 'AbortError' ? t.connectionTimeout : (err.message || t.errorSending);
+      setError(msg);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleChange = (e) => {
