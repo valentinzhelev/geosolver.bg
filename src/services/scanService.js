@@ -12,8 +12,20 @@ export async function extractTaskInputFromImage(file) {
   });
 
   if (!response.ok) {
-    const err = await response.json().catch(() => ({ error: response.statusText }));
-    throw new Error(err.error || 'Failed to extract data');
+    const text = await response.text().catch(() => '');
+    let payload = null;
+    try {
+      payload = text ? JSON.parse(text) : null;
+    } catch {
+      payload = null;
+    }
+    const message =
+      payload?.error ||
+      payload?.message ||
+      (text && text.trim()) ||
+      response.statusText ||
+      'Failed to extract data';
+    throw new Error(message);
   }
 
   return response.json();
