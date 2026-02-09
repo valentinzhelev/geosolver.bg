@@ -67,11 +67,20 @@ const TaskGenerator = () => {
   const [selectedTaskType, setSelectedTaskType] = useState('');
   const [taskParameters, setTaskParameters] = useState({
     difficulty: 'medium',
-    count: 1,
+    count: 5,
+    y1Min: 1000,
+    y1Max: 5000,
+    x1Min: 1000,
+    x1Max: 5000,
+    alphaMin: 0,
+    alphaMax: 400,
+    sMin: 50,
+    sMax: 500,
     dueDate: '',
     description: '',
     instructions: ''
   });
+  const [generatedTasks, setGeneratedTasks] = useState([]);
 
   const taskTypes = [
     {
@@ -121,12 +130,51 @@ const TaskGenerator = () => {
     }));
   };
 
+  const formatNumber = (value, decimals) => {
+    const fixed = Number(value).toFixed(decimals);
+    return language === 'bg' ? fixed.replace('.', ',') : fixed;
+  };
+
+  const toNumber = (value, fallback) => {
+    const num = Number(value);
+    return Number.isFinite(num) ? num : fallback;
+  };
+
+  const randomBetween = (min, max) => {
+    const lo = Math.min(min, max);
+    const hi = Math.max(min, max);
+    return lo + Math.random() * (hi - lo);
+  };
+
   const handleGenerateTask = () => {
-    // TODO: Implement task generation logic
-    console.log('Generating task:', {
-      type: selectedTaskType,
-      parameters: taskParameters
+    if (selectedTaskType !== 'first-task') {
+      setGeneratedTasks([]);
+      return;
+    }
+    const count = Math.max(1, Math.min(50, toNumber(taskParameters.count, 5)));
+    const y1Min = toNumber(taskParameters.y1Min, 1000);
+    const y1Max = toNumber(taskParameters.y1Max, 5000);
+    const x1Min = toNumber(taskParameters.x1Min, 1000);
+    const x1Max = toNumber(taskParameters.x1Max, 5000);
+    const alphaMin = toNumber(taskParameters.alphaMin, 0);
+    const alphaMax = toNumber(taskParameters.alphaMax, 400);
+    const sMin = toNumber(taskParameters.sMin, 50);
+    const sMax = toNumber(taskParameters.sMax, 500);
+
+    const tasks = Array.from({ length: count }, (_, i) => {
+      const y1 = randomBetween(y1Min, y1Max);
+      const x1 = randomBetween(x1Min, x1Max);
+      const alpha = randomBetween(alphaMin, alphaMax);
+      const s = randomBetween(sMin, sMax);
+      return {
+        id: i + 1,
+        y1: Number(y1.toFixed(2)),
+        x1: Number(x1.toFixed(2)),
+        alpha: Number(alpha.toFixed(4)),
+        s: Number(s.toFixed(2))
+      };
     });
+    setGeneratedTasks(tasks);
   };
 
   const selectedTask = taskTypes.find(task => task.id === selectedTaskType);
@@ -140,331 +188,189 @@ const TaskGenerator = () => {
       />
       <Layout>
         <div className="w-full min-h-screen bg-stone-50 flex flex-col items-center py-8 px-2 md:px-0">
-          <div className="w-full max-w-[1180px] flex flex-col gap-10">
-            {/* Header */}
-            <div className="flex flex-col gap-6">
-              <div className="flex items-center gap-4">
-                <Link 
-                  to="/teacher/dashboard" 
-                  className="px-3 py-2 bg-white rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 hover:bg-gray-50 transition-colors duration-200 flex items-center gap-2"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                  <span className="text-sm text-neutral-600">{language === 'bg' ? 'Назад' : 'Back'}</span>
-                </Link>
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-gray-100 rounded-lg">
-                    <TaskIcon className="w-8 h-8 text-gray-600" />
-                  </div>
-                  <h1 className="text-black text-3xl font-bold font-['Manrope']">
-                    {language === 'bg' ? 'Генератор на задачи' : 'Task Generator'}
-                  </h1>
-                </div>
-              </div>
-              <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <p className="text-gray-800 text-base font-medium">
-                  {language === 'bg' 
-                    ? 'Създайте персонализирани геодезически задачи за вашите ученици с автоматизирани параметри и настройки'
-                    : 'Create personalized geodesy tasks for your students with automated parameters and settings'
-                  }
-                </p>
-              </div>
+          <div className="w-full max-w-[1180px] flex flex-col gap-8">
+            <div className="flex items-center gap-4">
+              <Link to="/teacher/dashboard" className="px-3 py-2 bg-white rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 flex items-center gap-2">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                <span className="text-sm text-neutral-600">{language === 'bg' ? 'Назад' : 'Back'}</span>
+              </Link>
+              <h1 className="text-black text-3xl font-bold font-['Manrope']">
+                {language === 'bg' ? 'Генериране на задачи' : 'Task Generation'}
+              </h1>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Task Type Selection */}
-              <div className="p-6 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="p-2 bg-gray-100 rounded-lg">
-                    <SettingsIcon className="w-6 h-6 text-gray-600" />
+            <div className="self-stretch inline-flex justify-start items-start gap-5">
+              <div className="w-96 inline-flex flex-col justify-center items-center gap-5">
+                <div className="self-stretch p-4 bg-white rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-0.50px] outline-gray-200 flex flex-col justify-start items-start gap-4 overflow-hidden">
+                  <div className="self-stretch justify-start text-black text-lg font-semibold font-['Manrope']">
+                    {language === 'bg' ? 'Входни данни' : 'Input Data'}
                   </div>
-                  <h2 className="text-xl font-bold text-black">
-                    {language === 'bg' ? 'Тип задача' : 'Task Type'}
-                  </h2>
-                </div>
-                <div className="space-y-3">
-                  {taskTypes.map((task) => {
-                    const IconComponent = task.icon;
-                    const colorClasses = {
-                      blue: 'bg-gray-50 border-gray-200 hover:bg-gray-100 text-gray-800',
-                      green: 'bg-gray-50 border-gray-200 hover:bg-gray-100 text-gray-800',
-                      purple: 'bg-gray-50 border-gray-200 hover:bg-gray-100 text-gray-800',
-                      orange: 'bg-gray-50 border-gray-200 hover:bg-gray-100 text-gray-800'
-                    };
-                    const selectedColorClasses = {
-                      blue: 'bg-gray-100 border-gray-300 text-gray-900',
-                      green: 'bg-gray-100 border-gray-300 text-gray-900',
-                      purple: 'bg-gray-100 border-gray-300 text-gray-900',
-                      orange: 'bg-gray-100 border-gray-300 text-gray-900'
-                    };
-                    
-                    return (
-                      <button
-                        key={task.id}
-                        onClick={() => setSelectedTaskType(task.id)}
-                        className={`w-full p-4 rounded-lg text-left transition-all duration-200 border ${
-                          selectedTaskType === task.id
-                            ? selectedColorClasses[task.color]
-                            : colorClasses[task.color]
-                        } hover:shadow-md`}
+                  <div className="self-stretch flex flex-col gap-4">
+                    <div>
+                      <div className="text-black text-sm font-medium font-['Manrope'] mb-2">
+                        {language === 'bg' ? 'Тип задача' : 'Task type'}
+                      </div>
+                      <select
+                        value={selectedTaskType}
+                        onChange={(e) => setSelectedTaskType(e.target.value)}
+                        className="w-full p-3 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400"
                       >
-                        <div className="flex items-center gap-4">
-                          <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                            selectedTaskType === task.id 
-                              ? 'bg-white shadow-sm' 
-                              : 'bg-white/50'
-                          }`}>
-                            <IconComponent className="w-6 h-6" />
-                          </div>
-                          <div className="flex-1">
-                            <div className="text-base font-semibold">
-                              {task.name}
-                            </div>
-                            <div className="text-sm opacity-80">
-                              {task.description}
-                            </div>
-                          </div>
-                          {selectedTaskType === task.id && (
-                            <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
-                              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                              </svg>
-                            </div>
-                          )}
-                        </div>
-                      </button>
-                    );
-                  })}
+                        <option value="">{language === 'bg' ? 'Изберете' : 'Select'}</option>
+                        {taskTypes.map(task => (
+                          <option key={task.id} value={task.id}>
+                            {task.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <div className="text-black text-sm font-medium font-['Manrope'] mb-2">
+                        {language === 'bg' ? 'Брой задачи' : 'Number of tasks'}
+                      </div>
+                      <input
+                        type="number"
+                        min="1"
+                        max="50"
+                        value={taskParameters.count}
+                        onChange={(e) => handleParameterChange('count', e.target.value)}
+                        className="w-full p-3 bg-white border border-gray-200 rounded-lg"
+                      />
+                    </div>
+
+                    <div>
+                      <div className="text-black text-sm font-medium font-['Manrope'] mb-2">
+                        {language === 'bg' ? 'Y1 диапазон (м)' : 'Y1 range (m)'}
+                      </div>
+                      <div className="flex gap-2">
+                        <input
+                          type="number"
+                          value={taskParameters.y1Min}
+                          onChange={(e) => handleParameterChange('y1Min', e.target.value)}
+                          className="w-full p-3 bg-white border border-gray-200 rounded-lg"
+                        />
+                        <input
+                          type="number"
+                          value={taskParameters.y1Max}
+                          onChange={(e) => handleParameterChange('y1Max', e.target.value)}
+                          className="w-full p-3 bg-white border border-gray-200 rounded-lg"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="text-black text-sm font-medium font-['Manrope'] mb-2">
+                        {language === 'bg' ? 'X1 диапазон (м)' : 'X1 range (m)'}
+                      </div>
+                      <div className="flex gap-2">
+                        <input
+                          type="number"
+                          value={taskParameters.x1Min}
+                          onChange={(e) => handleParameterChange('x1Min', e.target.value)}
+                          className="w-full p-3 bg-white border border-gray-200 rounded-lg"
+                        />
+                        <input
+                          type="number"
+                          value={taskParameters.x1Max}
+                          onChange={(e) => handleParameterChange('x1Max', e.target.value)}
+                          className="w-full p-3 bg-white border border-gray-200 rounded-lg"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="text-black text-sm font-medium font-['Manrope'] mb-2">
+                        {language === 'bg' ? 'α диапазон (gon)' : 'α range (gon)'}
+                      </div>
+                      <div className="flex gap-2">
+                        <input
+                          type="number"
+                          value={taskParameters.alphaMin}
+                          onChange={(e) => handleParameterChange('alphaMin', e.target.value)}
+                          className="w-full p-3 bg-white border border-gray-200 rounded-lg"
+                        />
+                        <input
+                          type="number"
+                          value={taskParameters.alphaMax}
+                          onChange={(e) => handleParameterChange('alphaMax', e.target.value)}
+                          className="w-full p-3 bg-white border border-gray-200 rounded-lg"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="text-black text-sm font-medium font-['Manrope'] mb-2">
+                        {language === 'bg' ? 'S диапазон (м)' : 'S range (m)'}
+                      </div>
+                      <div className="flex gap-2">
+                        <input
+                          type="number"
+                          value={taskParameters.sMin}
+                          onChange={(e) => handleParameterChange('sMin', e.target.value)}
+                          className="w-full p-3 bg-white border border-gray-200 rounded-lg"
+                        />
+                        <input
+                          type="number"
+                          value={taskParameters.sMax}
+                          onChange={(e) => handleParameterChange('sMax', e.target.value)}
+                          className="w-full p-3 bg-white border border-gray-200 rounded-lg"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="inline-flex justify-end items-center gap-3 w-full">
+                    <button
+                      type="button"
+                      onClick={handleGenerateTask}
+                      className="px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3"
+                    >
+                      <div className="justify-start text-white text-sm font-medium font-['Manrope']">
+                        {language === 'bg' ? 'Генерирай' : 'Generate'}
+                      </div>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setGeneratedTasks([]);
+                        setTaskParameters(prev => ({ ...prev, count: 5 }));
+                      }}
+                      className="px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3"
+                    >
+                      <div className="justify-start text-black text-sm font-medium font-['Manrope']">
+                        {language === 'bg' ? 'Нулирай' : 'Reset'}
+                      </div>
+                    </button>
+                  </div>
                 </div>
               </div>
 
-              {/* Task Configuration */}
-              <div className="p-6 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="p-2 bg-gray-100 rounded-lg">
-                    <SettingsIcon className="w-6 h-6 text-gray-600" />
-                  </div>
-                  <h2 className="text-xl font-bold text-black">
-                    {language === 'bg' ? 'Конфигурация на задачата' : 'Task Configuration'}
-                  </h2>
+              <div className="flex-1 self-stretch p-4 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-center items-end gap-3">
+                <div className="self-stretch justify-start text-black text-lg font-semibold font-['Manrope']">
+                  {language === 'bg' ? 'Резултати' : 'Results'}
                 </div>
-                  
-                  {selectedTask ? (
-                    <div className="space-y-6">
-                      {/* Basic Settings */}
-                      <div className="space-y-4">
-                        <div>
-                          <label className="block text-sm font-medium text-black mb-2">
-                            {language === 'bg' ? 'Трудност' : 'Difficulty'}
-                          </label>
-                          <select
-                            value={taskParameters.difficulty}
-                            onChange={(e) => handleParameterChange('difficulty', e.target.value)}
-                            className="w-full p-3 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400"
-                          >
-                            {difficultyLevels.map((level) => (
-                              <option key={level.value} value={level.value}>
-                                {level.label}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-black mb-2">
-                            {language === 'bg' ? 'Брой задачи' : 'Number of Tasks'}
-                          </label>
-                          <input
-                            type="number"
-                            min="1"
-                            max="10"
-                            value={taskParameters.count}
-                            onChange={(e) => handleParameterChange('count', parseInt(e.target.value))}
-                            placeholder={language === 'bg' ? 'Въведете брой задачи' : 'Enter number of tasks'}
-                            className="w-full p-3 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-black mb-2">
-                            {language === 'bg' ? 'Краен срок' : 'Due Date'}
-                          </label>
-                          <input
-                            type="datetime-local"
-                            value={taskParameters.dueDate}
-                            onChange={(e) => handleParameterChange('dueDate', e.target.value)}
-                            className="w-full p-3 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-black mb-2">
-                            {language === 'bg' ? 'Описание' : 'Description'}
-                          </label>
-                          <textarea
-                            value={taskParameters.description}
-                            onChange={(e) => handleParameterChange('description', e.target.value)}
-                            placeholder={language === 'bg' ? 'Въведете описание на задачата' : 'Enter task description'}
-                            rows="3"
-                            className="w-full p-3 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-black mb-2">
-                            {language === 'bg' ? 'Инструкции' : 'Instructions'}
-                          </label>
-                          <textarea
-                            value={taskParameters.instructions}
-                            onChange={(e) => handleParameterChange('instructions', e.target.value)}
-                            placeholder={language === 'bg' ? 'Въведете инструкции за учениците' : 'Enter instructions for students'}
-                            rows="4"
-                            className="w-full p-3 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Task Preview */}
-                      <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                        <div className="flex items-center gap-3 mb-4">
-                          <div className="p-2 bg-gray-100 rounded-lg">
-                            <PreviewIcon className="w-5 h-5 text-gray-600" />
-                          </div>
-                          <h3 className="text-lg font-semibold text-gray-900">
-                            {language === 'bg' ? 'Преглед на задачата' : 'Task Preview'}
-                          </h3>
-                        </div>
-                        <div className="space-y-3 text-sm">
-                          <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-100">
-                            <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
-                              <TaskIcon className="w-4 h-4 text-gray-600" />
-                            </div>
-                            <div>
-                              <div className="font-medium text-gray-900">{language === 'bg' ? 'Тип:' : 'Type:'}</div>
-                              <div className="text-gray-700">{selectedTask.name}</div>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-100">
-                            <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
-                              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                              </svg>
-                            </div>
-                            <div>
-                              <div className="font-medium text-gray-900">{language === 'bg' ? 'Трудност:' : 'Difficulty:'}</div>
-                              <div className="text-gray-700">{difficultyLevels.find(d => d.value === taskParameters.difficulty)?.label}</div>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-100">
-                            <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
-                              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
-                              </svg>
-                            </div>
-                            <div>
-                              <div className="font-medium text-gray-900">{language === 'bg' ? 'Брой:' : 'Count:'}</div>
-                              <div className="text-gray-700">{taskParameters.count} {language === 'bg' ? 'задачи' : 'tasks'}</div>
-                            </div>
-                          </div>
-                          {taskParameters.dueDate && (
-                            <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-100">
-                              <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
-                                <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                              </div>
-                              <div>
-                                <div className="font-medium text-gray-900">{language === 'bg' ? 'Краен срок:' : 'Due:'}</div>
-                                <div className="text-gray-700">{new Date(taskParameters.dueDate).toLocaleString()}</div>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Action Buttons */}
-                      <div className="flex gap-3">
-                        <button
-                          onClick={handleGenerateTask}
-                          className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200 text-sm font-medium flex items-center gap-2 shadow-md hover:shadow-lg"
-                        >
-                          <GenerateIcon className="w-4 h-4" />
-                          {language === 'bg' ? 'Генерирай задачи' : 'Generate Tasks'}
-                        </button>
-                        <button
-                          onClick={() => {
-                            setSelectedTaskType('');
-                            setTaskParameters({
-                              difficulty: 'medium',
-                              count: 1,
-                              dueDate: '',
-                              description: '',
-                              instructions: ''
-                            });
-                          }}
-                          className="px-6 py-3 bg-gray-200 text-black rounded-lg hover:bg-gray-300 transition-colors duration-200 text-sm font-medium flex items-center gap-2"
-                        >
-                          <ResetIcon className="w-4 h-4" />
-                          {language === 'bg' ? 'Нулирай' : 'Reset'}
-                        </button>
-                        <Link
-                          to="/teacher/dashboard"
-                          className="px-6 py-3 bg-white text-black border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200 text-sm font-medium flex items-center gap-2"
-                        >
-                          <CancelIcon className="w-4 h-4" />
-                          {language === 'bg' ? 'Отказ' : 'Cancel'}
-                        </Link>
-                      </div>
+                <div className="self-stretch flex-1 p-3 bg-stone-50 rounded-lg flex flex-col justify-start items-start">
+                  {generatedTasks.length === 0 ? (
+                    <div className="text-neutral-400 text-sm font-medium font-['Manrope']">
+                      {language === 'bg' ? 'Натиснете "Генерирай", за да видите резултатите.' : 'Click "Generate" to see results.'}
                     </div>
                   ) : (
-                    <div className="text-center py-12">
-                      <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <TaskIcon className="w-10 h-10 text-gray-400" />
-                      </div>
-                      <h3 className="text-lg font-semibold text-black mb-3">
-                        {language === 'bg' ? 'Изберете тип задача' : 'Select a Task Type'}
-                      </h3>
-                      <p className="text-neutral-600 max-w-md mx-auto">
-                        {language === 'bg' 
-                          ? 'Изберете типа геодезическа задача, която искате да създадете от панела вляво'
-                          : 'Choose the type of geodesy task you want to create from the panel on the left'
-                        }
-                      </p>
+                    <div className="w-full text-neutral-700 text-sm font-medium font-['Manrope'] space-y-2">
+                      {generatedTasks.map((task) => (
+                        <div key={task.id} className="flex justify-between border-b border-gray-200 pb-2">
+                          <div>Y1={formatNumber(task.y1, 2)}, X1={formatNumber(task.x1, 2)}</div>
+                          <div>α={formatNumber(task.alpha, 4)} gon, S={formatNumber(task.s, 2)} m</div>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
               </div>
             </div>
-
-            {/* Generated Tasks Results */}
-            <div className="p-6 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </div>
-                <h2 className="text-xl font-bold text-black">
-                  {language === 'bg' ? 'Генерирани задачи' : 'Generated Tasks'}
-                </h2>
-              </div>
-              <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-8 border border-green-200 min-h-[200px] flex items-center justify-center">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-lg font-semibold text-green-900 mb-2">
-                    {language === 'bg' ? 'Готови за генериране' : 'Ready to Generate'}
-                  </h3>
-                  <p className="text-green-700 text-base max-w-md">
-                    {language === 'bg' 
-                      ? 'Изберете тип задача и натиснете "Генерирай задачи", за да видите резултатите тук.'
-                      : 'Select a task type and click "Generate Tasks" to see results here.'
-                    }
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
+        </div>
       </Layout>
     </>
   );

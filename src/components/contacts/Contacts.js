@@ -94,7 +94,7 @@ const Contacts = () => {
               </div>
 
               {/* Form Fields - Mobile: Below icons, Desktop: Left side */}
-              <div className="flex flex-col gap-4 w-full lg:w-auto lg:order-1">
+              <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full lg:w-auto lg:order-1">
                 <div className="w-full lg:w-[464px] flex flex-col gap-2">
                   <div className="text-black text-sm font-medium font-['Manrope']">{t.emailLabel}</div>
                   <input
@@ -132,15 +132,14 @@ const Contacts = () => {
                 </div>
                 <button
                   type="submit"
-                  onClick={handleSubmit}
                   disabled={loading}
                   className="px-4 py-2 bg-black rounded-lg inline-flex justify-start items-center gap-3 disabled:opacity-50 w-fit"
                 >
-                  <div className="text-white text-base font-medium font-['Manrope']">
+                  <span className="text-white text-base font-medium font-['Manrope']">
                     {loading ? t.sending : t.send}
-                  </div>
+                  </span>
                 </button>
-              </div>
+              </form>
             </div>
 
             {/* Status Messages */}

@@ -168,45 +168,36 @@ const PurvaZadacha = () => {
     const result = purvaOsnovnaZadacha(y1, x1, alpha, s);
     const endTime = performance.now();
     const calculationTime = endTime - startTime;
+    const formatNumber = (value, decimals) => {
+      if (value == null || Number.isNaN(value)) return '';
+      const fixed = Number(value).toFixed(decimals);
+      return language === 'bg' ? fixed.replace('.', ',') : fixed;
+    };
+    const formatInt = (value) => {
+      if (value == null || Number.isNaN(value)) return '';
+      return language === 'bg' ? String(value).replace('.', ',') : String(value);
+    };
     const output = language === 'bg' 
-      ? `--------- Първа основна геодезическа задача (Enhanced) ---------
-Y1 = ${result.y1}, X1 = ${result.x1}
-S₁,₂ = ${result.s}, α₁,₂ = ${result.alphaGon} gon
-------------------------------------------------------
-α в радиани = ${result.alphaRad.toFixed(6)} rad
-sin(α) = ${result.sinAlpha}
-cos(α) = ${result.cosAlpha}
-------------------------------------------------------
-Координатни разлики:
-ΔX = S·cos(α) = ${result.s}·${result.cosAlpha} = ${result.deltaX} м
-ΔY = S·sin(α) = ${result.s}·${result.sinAlpha} = ${result.deltaY} м
-------------------------------------------------------
-Y2 = Y1 + ΔY = ${result.y1} + ${result.deltaY} = ${result.y2} м
-X2 = X1 + ΔX = ${result.x1} + ${result.deltaX} = ${result.x2} м
-------------------------------------------------------
-Квадрант: ${result.quadrant}
-Проверка - разстояние: ${result.calculatedDistance} м
-Проверка - ъгъл: ${result.calculatedAngle} гради
-------------------------------------------------------`
-      : `--------- First Basic Geodetic Task (Enhanced) ---------
-Y1 = ${result.y1}, X1 = ${result.x1}
-S₁,₂ = ${result.s}, α₁,₂ = ${result.alphaGon} gon
-------------------------------------------------------
-α in radians = ${result.alphaRad.toFixed(6)} rad
-sin(α) = ${result.sinAlpha}
-cos(α) = ${result.cosAlpha}
-------------------------------------------------------
-Coordinate differences:
-ΔX = S·cos(α) = ${result.s}·${result.cosAlpha} = ${result.deltaX} m
-ΔY = S·sin(α) = ${result.s}·${result.sinAlpha} = ${result.deltaY} m
-------------------------------------------------------
-Y2 = Y1 + ΔY = ${result.y1} + ${result.deltaY} = ${result.y2} m
-X2 = X1 + ΔX = ${result.x1} + ${result.deltaX} = ${result.x2} m
-------------------------------------------------------
-Quadrant: ${result.quadrant}
-Check - distance: ${result.calculatedDistance} m
-Check - angle: ${result.calculatedAngle} gon
-------------------------------------------------------`;
+      ? `Входни данни:
+Y1 = ${formatNumber(result.y1, 2)}, X1 = ${formatNumber(result.x1, 2)}
+S₁,₂ = ${formatNumber(result.s, 2)}, α₁,₂ = ${formatNumber(result.alphaGon, 4)} gon
+
+Резултат:
+Y2 = Y1 + S₁,₂ * sin(α₁,₂)
+Y2 = ${formatNumber(result.y1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumber(result.sinAlpha, 4)} = ${formatNumber(result.y2, 2)} м
+
+X2 = X1 + S₁,₂ * cos(α₁,₂)
+X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumber(result.cosAlpha, 4)} = ${formatNumber(result.x2, 2)} м`
+      : `Input data:
+Y1 = ${formatNumber(result.y1, 2)}, X1 = ${formatNumber(result.x1, 2)}
+S₁,₂ = ${formatNumber(result.s, 2)}, α₁,₂ = ${formatNumber(result.alphaGon, 4)} gon
+
+Result:
+Y2 = Y1 + S₁,₂ * sin(α₁,₂)
+Y2 = ${formatNumber(result.y1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumber(result.sinAlpha, 4)} = ${formatNumber(result.y2, 2)} m
+
+X2 = X1 + S₁,₂ * cos(α₁,₂)
+X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumber(result.cosAlpha, 4)} = ${formatNumber(result.x2, 2)} m`;
     
     setResultText(output ? String(output) : "");
     
