@@ -9,10 +9,10 @@ const FirstTaskDocs = () => {
   return (
     <Layout>
       <div className="w-full min-h-screen bg-stone-50 flex flex-col items-center">
-        <div className="w-[1180px] mt-8 mb-8 flex flex-col items-center">
-          <div className="w-[1180px] inline-flex flex-col justify-start items-start gap-10">
+        <div className="w-full max-w-[1180px] mt-8 mb-8 px-4 sm:px-0 flex flex-col items-center">
+          <div className="w-full max-w-[1180px] inline-flex flex-col justify-start items-start gap-10">
             <div className="self-stretch flex flex-col justify-center items-start gap-10">
-              <div className="w-[580px] flex flex-col justify-start items-start gap-4">
+              <div className="w-full max-w-[580px] flex flex-col justify-start items-start gap-4">
                 <div className="flex flex-col justify-start items-start gap-1">
                   <div className="justify-start">
                     <span className="text-neutral-400 text-base font-medium font-['Manrope'] underline">

@@ -638,11 +638,11 @@ const Account = () => {
         canonical="/account"
       />
       <div className="w-full min-h-screen bg-stone-50 flex flex-col items-center">
-        <div className="w-[1180px] mt-8 mb-8 inline-flex flex-col justify-start items-start gap-10">
+        <div className="w-full max-w-[1180px] mt-8 mb-8 px-4 sm:px-0 inline-flex flex-col justify-start items-start gap-10">
           <div className="self-stretch justify-start text-black text-3xl font-bold font-['Manrope']">{t.accountTitle}</div>
           
-          <div className="self-stretch inline-flex justify-start items-start gap-5">
-            <div className="w-96 inline-flex flex-col justify-center items-center gap-5">
+          <div className="self-stretch flex flex-col lg:flex-row justify-start items-start gap-5">
+            <div className="w-full max-w-sm lg:w-96 inline-flex flex-col justify-center items-center gap-5">
               <div className="self-stretch p-4 bg-white rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-0.50px] outline-gray-200 flex flex-col justify-start items-start gap-4 overflow-hidden">
                 <div className="flex flex-col justify-start items-start gap-2">
                   <div className="justify-start text-black text-lg font-semibold font-['Manrope']">{user?.name || t.user}</div>
@@ -727,13 +727,13 @@ const Account = () => {
                 </button>
               </div>
             </div>
-            <div className="flex-1 inline-flex flex-col justify-center items-start gap-5">
+            <div className="flex-1 w-full inline-flex flex-col justify-center items-start gap-5">
               <div className="self-stretch p-4 bg-white rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-0.50px] outline-gray-200 flex flex-col justify-start items-start gap-4 overflow-hidden">
         <div className="justify-start text-black text-lg font-semibold font-['Manrope']">{t.usageHistory}</div>
                 {/* Progress Bar - Different design for free vs paid plans */}
                 {!isProUser ? (
                   // Free Plan Progress Bar
-                  <div className="w-[748px] p-3 bg-white rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-start items-start gap-3">
+                  <div className="w-full max-w-[748px] p-3 bg-white rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-start items-start gap-3">
                     <div className="self-stretch inline-flex justify-between items-center">
                       <div className="justify-start">
                         <span className="text-black text-sm font-medium font-['Manrope']">
@@ -748,7 +748,7 @@ const Account = () => {
                         <img src="/icons/small_right_arrow.svg" alt={t.next} className="w-3 h-3 opacity-70" />
                       </Link>
                     </div>
-                    <div className="w-[723.99px] h-2 bg-gray-200 rounded-[30px] relative">
+                    <div className="w-full lg:w-[723.99px] h-2 bg-gray-200 rounded-[30px] relative">
                       <div 
                         className="h-2 bg-gradient-to-r from-amber-600 to-gray-800 rounded-[30px] transition-all duration-300"
                         style={{ 
