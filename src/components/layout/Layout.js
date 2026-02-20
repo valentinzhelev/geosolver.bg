@@ -7,7 +7,7 @@ const Layout = ({ children }) => {
   return (
     <>
       <Header />
-      <main>{children}</main>
+      <main className="min-h-screen bg-stone-50 dark:bg-zinc-950 transition-colors duration-300">{children}</main>
       <Footer />
       <CookieConsent />
     </>

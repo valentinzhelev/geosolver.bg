@@ -154,7 +154,7 @@ const ToolsPage = () => {
         structuredData={structuredData}
       />
     <Layout>
-      <div className="min-h-[calc(100vh-300px)] bg-stone-50 dark:bg-neutral-950 w-full overflow-hidden py-6 md:py-10">
+      <div className="min-h-[calc(100vh-300px)] bg-stone-50 dark:bg-zinc-950 w-full overflow-hidden py-6 md:py-10">
         <div className="max-w-[400px] md:max-w-[1180px] w-full mx-auto flex flex-col justify-center items-start gap-6 md:gap-10 px-4 md:px-0">
           {/* Header Section */}
           <div className="w-full flex flex-col md:flex-row md:justify-between md:items-end gap-4 md:gap-0">
@@ -176,11 +176,11 @@ const ToolsPage = () => {
                  disabled={loading}
                  className={`w-10 h-5 md:w-12 md:h-6 p-[3.33px] md:p-1 rounded-3xl flex items-center gap-1.5 md:gap-2 transition-all duration-200 ${
                    showToolsInDevelopment 
-                     ? 'bg-gray-400 justify-start' 
-                     : 'bg-black justify-end'
+                     ? 'bg-gray-400 dark:bg-zinc-600 justify-start' 
+                     : 'bg-black dark:bg-white justify-end'
                  } ${loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                >
-                <div className="w-3.5 h-3.5 md:w-4 md:h-4 bg-white rounded-full" />
+                <div className="w-3.5 h-3.5 md:w-4 md:h-4 bg-white dark:bg-zinc-900 rounded-full" />
               </button>
             </div>
           </div>
@@ -195,8 +195,8 @@ const ToolsPage = () => {
                 <div className="flex-1 flex flex-col justify-start items-start gap-3">
                   <div className="w-full flex justify-between items-center">
                     <div className="flex justify-start items-center gap-2 flex-1 min-w-0">
-                      <div className="w-7 h-7 bg-black dark:bg-white rounded flex flex-col justify-center items-center flex-shrink-0">
-                        <img src={tool.icon} alt="Tool Icon" className="w-4 h-4" />
+                      <div className="w-7 h-7 bg-black dark:bg-zinc-700 rounded flex flex-col justify-center items-center flex-shrink-0">
+                        <img src={tool.icon} alt="Tool Icon" className="w-4 h-4 dark:invert" />
                       </div>
                       <div className="text-black dark:text-white text-sm md:text-base font-semibold font-['Manrope'] truncate">{tool.title}</div>
                     </div>

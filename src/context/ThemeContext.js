@@ -22,15 +22,18 @@ export const ThemeProvider = ({ children }) => {
   });
 
   useEffect(() => {
-    // Apply theme to HTML element
     const root = window.document.documentElement;
+    const body = window.document.body;
+    const metaTheme = document.getElementById('theme-color-meta') || document.querySelector('meta[name="theme-color"]');
     if (isDark) {
       root.classList.add('dark');
+      body.classList.add('dark');
+      if (metaTheme) metaTheme.setAttribute('content', '#09090b');
     } else {
       root.classList.remove('dark');
+      body.classList.remove('dark');
+      if (metaTheme) metaTheme.setAttribute('content', '#ffffff');
     }
-    
-    // Save preference to localStorage
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
   }, [isDark]);
 

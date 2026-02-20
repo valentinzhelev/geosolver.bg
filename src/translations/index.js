@@ -20,7 +20,9 @@ export const translations = {
     socialNetworks: 'Социални мрежи',
     language: 'Български език',
     theme: 'Светъл режим',
-    copyright: '© GEOSOLVER, 2025.\nВсички права запазени.\nТекуща версия: v3.1.1-beta.2',
+    copyright: '© GEOSOLVER, 2025.\nВсички права запазени.\nТекуща версия: v3.1.2-beta.2',
+    wortexaFooterBefore: 'е част от продуктовото семейство на ',
+    wortexaFooterAfter: '',
     // FirstTask translations
     firstTaskTitle: 'Първа основна задача',
     firstTaskDescription: 'Изчисляване на координати по начална точка, ъгъл и дължина с онлайн геодезически калкулатор. Бързи и точни решения за геодезисти.',
@@ -327,7 +329,9 @@ export const translations = {
     socialNetworks: 'Social Networks',
     language: 'English',
     theme: 'Light Mode',
-    copyright: '© GEOSOLVER, 2025.\nAll rights reserved.\nCurrent version: v3.1.1-beta.2',
+    copyright: '© GEOSOLVER, 2025.\nAll rights reserved.\nCurrent version: v3.1.2-beta.2',
+    wortexaFooterBefore: 'is part of the ',
+    wortexaFooterAfter: ' product family',
 
     // FirstTask translations11
     firstTaskTitle: 'First Basic Task',

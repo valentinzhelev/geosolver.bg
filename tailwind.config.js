@@ -11,6 +11,12 @@ module.exports = {
         sans: ['Montserrat', 'system-ui', 'sans-serif'],
         mono: ['source-code-pro', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
       },
+      backgroundColor: {
+        'dark': '#09090b',
+        'dark-elevated': '#18181b',
+        'dark-card': '#27272a',
+        'dark-input': '#3f3f46',
+      },
       colors: {
         black: "#000000",
         gray: {

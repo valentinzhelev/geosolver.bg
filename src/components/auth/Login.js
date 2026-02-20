@@ -145,11 +145,10 @@ const Login = () => {
         canonical="/login"
       />
 
-      <div className="w-full min-h-screen bg-stone-50">
+      <div className="w-full min-h-screen bg-stone-50 dark:bg-zinc-950 transition-colors">
         <div className="container mx-auto px-4 py-8 md:py-12">
           <div className="max-w-[580px] w-full mx-auto flex flex-col gap-5">
-            {/* Welcome Banner */}
-            <div className="w-full px-8 md:px-14 py-6 md:py-10 relative bg-black rounded-xl flex justify-center items-center gap-4 overflow-hidden">
+            <div className="w-full px-8 md:px-14 py-6 md:py-10 relative bg-black dark:bg-zinc-900 rounded-xl flex justify-center items-center gap-4 overflow-hidden border border-transparent dark:border-zinc-800">
               <img 
                 className="w-full h-96 absolute origin-center rotate-180 opacity-80" 
                 src="/images/gradient_wallpaper.jpg" 
@@ -176,17 +175,16 @@ const Login = () => {
 
             {/* Login Form */}
             <form className="w-full flex flex-col justify-center items-center gap-2.5" onSubmit={handleSubmit}>
-              <div className="w-full p-4 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-center items-center gap-6">
+              <div className="w-full p-4 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700 flex flex-col justify-center items-center gap-6 transition-colors">
                 <div className="w-full flex flex-col justify-start items-start gap-4">
-                  {/* Email Input */}
                   <div className="w-full flex flex-col justify-start items-start gap-2">
-                    <label className="text-black text-sm font-medium font-['Manrope']">
+                    <label className="text-black dark:text-white text-sm font-medium font-['Manrope']">
                       {t.email}
                     </label>
                     <input 
                       type="email"
                       placeholder={t.enterEmail}
-                      className="w-full p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']"
+                      className="w-full p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-600 bg-white dark:bg-zinc-800 text-black dark:text-zinc-100 placeholder-neutral-400 dark:placeholder-zinc-500 text-sm font-medium font-['Manrope']"
                       value={email}
                       onChange={e => setEmail(e.target.value)}
                       required
@@ -195,13 +193,13 @@ const Login = () => {
 
                   {/* Password Input */}
                   <div className="w-full flex flex-col justify-start items-start gap-2">
-                    <label className="text-black text-sm font-medium font-['Manrope']">
+                    <label className="text-black dark:text-white text-sm font-medium font-['Manrope']">
                       {t.password}
                     </label>
                     <input 
                       type="password"
                       placeholder={t.enterPassword}
-                      className="w-full p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']"
+                      className="w-full p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-600 bg-white dark:bg-zinc-800 text-black dark:text-zinc-100 placeholder-neutral-400 dark:placeholder-zinc-500 text-sm font-medium font-['Manrope']"
                       value={password}
                       onChange={e => setPassword(e.target.value)}
                       required
@@ -214,36 +212,35 @@ const Login = () => {
                   <div className="flex justify-start items-center gap-3">
                     <input 
                       type="checkbox"
-                      className="w-6 h-6 bg-white rounded border border-gray-200"
+                      className="w-6 h-6 bg-white dark:bg-zinc-800 rounded border border-gray-200 dark:border-zinc-600"
                       checked={rememberMe}
                       onChange={e => setRememberMe(e.target.checked)}
                     />
-                    <span className="text-black text-sm font-medium font-['Manrope']">
+                    <span className="text-black dark:text-white text-sm font-medium font-['Manrope']">
                       {t.rememberMe}
                     </span>
                   </div>
                   <div className="flex justify-center items-center gap-3">
-                    <a href="/forgot-password" className="text-neutral-400 text-sm font-medium font-['Manrope']">
+                    <a href="/forgot-password" className="text-neutral-400 dark:text-zinc-400 text-sm font-medium font-['Manrope'] hover:text-black dark:hover:text-white">
                       {t.forgotPassword}
                     </a>
-                    <button type="submit" className="px-4 py-2 bg-black rounded-lg text-white text-sm md:text-base font-medium font-['Manrope']" disabled={loading}>
+                    <button type="submit" className="px-4 py-2 bg-black dark:bg-white rounded-lg text-white dark:text-black text-sm md:text-base font-medium font-['Manrope'] hover:bg-gray-800 dark:hover:bg-zinc-200 transition-colors" disabled={loading}>
                       {loading ? t.loggingIn : t.login}
                     </button>
                   </div>
                 </div>
-                {error && <div className="w-full text-red-500 text-sm font-medium font-['Manrope']">{error}</div>}
-                {success && <div className="w-full text-green-600 text-sm font-medium font-['Manrope']">{t.successLogin}</div>}
+                {error && <div className="w-full text-red-500 dark:text-red-400 text-sm font-medium font-['Manrope']">{error}</div>}
+                {success && <div className="w-full text-green-600 dark:text-green-400 text-sm font-medium font-['Manrope']">{t.successLogin}</div>}
               </div>
 
               {/* Divider */}
-              <div className="text-neutral-400 text-sm font-medium font-['Manrope']">
+              <div className="text-neutral-400 dark:text-zinc-400 text-sm font-medium font-['Manrope']">
                 {t.or}
               </div>
 
-              {/* Social Login & Register */}
-              <div className="w-full p-4 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col md:flex-row justify-center items-center gap-3">
+              <div className="w-full p-4 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700 flex flex-col md:flex-row justify-center items-center gap-3 transition-colors">
                 <div id="google-signin-button" className="w-full md:flex-1"></div>
-                <Link to="/register" className="w-full md:flex-1 px-3 py-2 bg-black rounded-lg flex justify-center items-center gap-3 text-white text-sm md:text-base font-medium font-['Manrope']">
+                <Link to="/register" className="w-full md:flex-1 px-3 py-2 bg-black dark:bg-white rounded-lg flex justify-center items-center gap-3 text-white dark:text-black text-sm md:text-base font-medium font-['Manrope'] hover:bg-gray-800 dark:hover:bg-zinc-200 transition-colors">
                   {t.register}
                 </Link>
               </div>

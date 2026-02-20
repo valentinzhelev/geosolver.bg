@@ -3,14 +3,25 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    @apply transition-colors duration-300;
+  }
   body {
-    @apply m-0 font-sans antialiased bg-gray-50 dark:bg-neutral-950 overflow-x-hidden;
+    @apply m-0 font-sans antialiased bg-stone-50 dark:bg-zinc-950 overflow-x-hidden text-black dark:text-zinc-100;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+  body.dark {
+    color-scheme: dark;
   }
 
   code {
     @apply font-mono;
+  }
+
+  /* Selection */
+  ::selection {
+    @apply bg-black/10 dark:bg-white/10;
   }
 }
 
