@@ -63,7 +63,7 @@ const PurvaZadacha = () => {
   const { displayText, isTyping } = useTypewriter(resultText);
   const { runWithTracking, isAuthenticated } = useGuardedCalculation();
   const [lastCalcResult, setLastCalcResult] = useState(null);
-  const { eduCtx, applyResultToAssignment, dismissEduBanner } = useEduAssignmentBridge(
+  const { eduCtx, applyResultToAssignment, dismissEduBanner, canSaveToAssignment } = useEduAssignmentBridge(
     'first-basic-task',
     setForm
   );
@@ -324,7 +324,7 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
         <EduWorkBanner
           eduCtx={eduCtx}
           bg={language === 'bg'}
-          showApply={!!lastCalcResult}
+          showApply={!!lastCalcResult && canSaveToAssignment}
           onApply={() => applyResultToAssignment(lastCalcResult)}
           onDismiss={dismissEduBanner}
         />

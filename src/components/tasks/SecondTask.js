@@ -150,7 +150,7 @@ const SecondTask = () => {
   const [form, setForm] = useState({ x1: '', y1: '', x2: '', y2: '' });
   const { runWithTracking, isAuthenticated } = useGuardedCalculation();
   const [lastCalcResult, setLastCalcResult] = useState(null);
-  const { eduCtx, applyResultToAssignment, dismissEduBanner } = useEduAssignmentBridge(
+  const { eduCtx, applyResultToAssignment, dismissEduBanner, canSaveToAssignment } = useEduAssignmentBridge(
     'second-basic-task',
     setForm
   );
@@ -293,7 +293,7 @@ cos(α) = ${result.cosAlpha}
         <EduWorkBanner
           eduCtx={eduCtx}
           bg={language === 'bg'}
-          showApply={!!lastCalcResult}
+          showApply={!!lastCalcResult && canSaveToAssignment}
           onApply={() => applyResultToAssignment(lastCalcResult)}
           onDismiss={dismissEduBanner}
         />

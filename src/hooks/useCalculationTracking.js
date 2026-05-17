@@ -5,7 +5,8 @@ export const useCalculationTracking = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const trackCalculation = useCallback(async (toolName, toolDisplayName, inputData, resultData, calculationTime = 0) => {
+  const trackCalculation = useCallback(
+    async (toolName, toolDisplayName, inputData, resultData, calculationTime = 0, eduContext = null) => {
     setIsLoading(true);
     setError(null);
 
@@ -15,7 +16,8 @@ export const useCalculationTracking = () => {
         toolDisplayName,
         inputData,
         resultData,
-        calculationTime
+        calculationTime,
+        ...(eduContext?.assignmentId ? { eduContext: { assignmentId: eduContext.assignmentId } } : {}),
       };
 
       // Save to database only - no local storage fallback
@@ -33,7 +35,8 @@ export const useCalculationTracking = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  },
+  []);
 
   const checkLimits = useCallback(async () => {
     console.log('Checking limits from database...');

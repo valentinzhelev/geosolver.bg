@@ -4,6 +4,8 @@ import { useAuth } from '../components/auth/AuthContext';
 import { useTranslation } from './useTranslation';
 import { useCalculationTracking } from './useCalculationTracking';
 import { hasUnlimitedCalculations } from '../utils/calculationAccess';
+import { getEduWorkContext } from '../utils/eduCalculatorBridge';
+import { allowsCalculatorAccess } from '../config/eduCalculatorPolicy';
 
 /**
  * Auth gate + shared free-plan limit (5 total across all tools) + backend tracking.
@@ -14,6 +16,14 @@ export function useGuardedCalculation() {
   const { language } = useTranslation();
   const { trackCalculation, checkLimits } = useCalculationTracking();
 
+  const getActiveEduContext = useCallback(() => {
+    const ctx = getEduWorkContext();
+    if (ctx?.assignmentId && allowsCalculatorAccess(ctx.calculatorPolicy)) {
+      return { assignmentId: ctx.assignmentId };
+    }
+    return null;
+  }, []);
+
   const requireAuthAndLimits = useCallback(async () => {
     if (!user) {
       navigate('/login');
@@ -22,6 +32,11 @@ export function useGuardedCalculation() {
 
     if (hasUnlimitedCalculations(user)) {
       return { canCalculate: true, unlimited: true, used: 0, limit: -1 };
+    }
+
+    const eduContext = getActiveEduContext();
+    if (eduContext) {
+      return { canCalculate: true, unlimited: false, used: 0, limit: -1, eduContext };
     }
 
     const limits = await checkLimits();
@@ -37,7 +52,7 @@ export function useGuardedCalculation() {
     }
 
     return limits;
-  }, [user, navigate, checkLimits, language]);
+  }, [user, navigate, checkLimits, language, getActiveEduContext]);
 
   const runWithTracking = useCallback(
     async ({ toolName, toolDisplayName, inputData, resultData, getResultData, run }) => {
@@ -56,7 +71,8 @@ export function useGuardedCalculation() {
           toolDisplayName,
           inputData,
           savedResult,
-          calculationTime
+          calculationTime,
+          limits.eduContext
         );
       } catch (err) {
         const message = err?.message || '';

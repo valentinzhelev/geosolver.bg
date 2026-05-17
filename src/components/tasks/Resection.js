@@ -131,7 +131,7 @@ const Resection = () => {
   const { language } = useTranslation();
   const { runWithTracking, isAuthenticated } = useGuardedCalculation();
   const [lastCalcResult, setLastCalcResult] = useState(null);
-  const { eduCtx, applyResultToAssignment, dismissEduBanner } = useEduAssignmentBridge('resection', setForm);
+  const { eduCtx, applyResultToAssignment, dismissEduBanner, canSaveToAssignment } = useEduAssignmentBridge('resection', setForm);
 
   useEffect(() => { setHistory(getHistory()); }, []);
 
@@ -277,7 +277,7 @@ Date: ${new Date().toLocaleString('en-US')}`;
         <EduWorkBanner
           eduCtx={eduCtx}
           bg={language === 'bg'}
-          showApply={!!lastCalcResult}
+          showApply={!!lastCalcResult && canSaveToAssignment}
           onApply={() => applyResultToAssignment(lastCalcResult)}
           onDismiss={dismissEduBanner}
         />

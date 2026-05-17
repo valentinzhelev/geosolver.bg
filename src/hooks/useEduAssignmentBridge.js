@@ -7,6 +7,7 @@ import {
   mapResultToAnswers,
   saveEduAnswersForAssignment,
 } from '../utils/eduCalculatorBridge';
+import { allowsCalculatorAccess, allowsSaveToAssignment } from '../config/eduCalculatorPolicy';
 
 /**
  * Prefill tool form from Edu assignment context; offer to send answers back.
@@ -18,6 +19,11 @@ export function useEduAssignmentBridge(toolKey, setForm) {
   useEffect(() => {
     const ctx = getEduWorkContext();
     if (ctx && ctx.toolKey === toolKey) {
+      if (!allowsCalculatorAccess(ctx.calculatorPolicy)) {
+        clearEduWorkContext();
+        setEduCtx(null);
+        return;
+      }
       setEduCtx(ctx);
       const mapped = mapInputToForm(toolKey, ctx.inputData);
       if (Object.keys(mapped).length) {
@@ -42,5 +48,7 @@ export function useEduAssignmentBridge(toolKey, setForm) {
     setEduCtx(null);
   }, []);
 
-  return { eduCtx, applyResultToAssignment, dismissEduBanner };
+  const canSaveToAssignment = eduCtx ? allowsSaveToAssignment(eduCtx.calculatorPolicy) : false;
+
+  return { eduCtx, applyResultToAssignment, dismissEduBanner, canSaveToAssignment };
 }

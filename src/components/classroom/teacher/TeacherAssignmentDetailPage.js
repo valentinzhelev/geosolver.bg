@@ -8,6 +8,8 @@ import { ActionButton } from '../ui/ActionButton';
 import { classroomApi } from '../../../services/classroomApi';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { EDU_TOOLS, toolKeyFromTemplate } from '../../../config/eduTools';
+import { getCalculatorPolicyMeta, normalizeCalculatorPolicy } from '../../../config/eduCalculatorPolicy';
+import SubmissionReviewCard from '../ui/SubmissionReviewCard';
 
 function flattenInputData(inputData) {
   if (!inputData || typeof inputData !== 'object') return {};
@@ -26,6 +28,8 @@ const TeacherAssignmentDetailPage = () => {
   const [confirmArchive, setConfirmArchive] = useState(false);
   const [statusBusy, setStatusBusy] = useState(false);
   const [actionMsg, setActionMsg] = useState('');
+  const [submissions, setSubmissions] = useState([]);
+  const [submissionsLoading, setSubmissionsLoading] = useState(false);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -39,6 +43,16 @@ const TeacherAssignmentDetailPage = () => {
   useEffect(() => {
     load();
   }, [load]);
+
+  useEffect(() => {
+    if (!id || !assignment) return;
+    setSubmissionsLoading(true);
+    classroomApi
+      .getAssignmentSubmissions(id)
+      .then((res) => setSubmissions(res.data || []))
+      .catch(() => setSubmissions([]))
+      .finally(() => setSubmissionsLoading(false));
+  }, [id, assignment]);
 
   const isArchived = assignment?.status === 'archived';
   const isDraft = assignment?.status === 'draft';
@@ -119,6 +133,9 @@ const TeacherAssignmentDetailPage = () => {
   const toolKey = assignment ? toolKeyFromTemplate(assignment.taskTemplate) : null;
   const tool = EDU_TOOLS.find((t) => t.toolKey === toolKey);
   const courseId = assignment?.course?._id || assignment?.course;
+  const calculatorPolicyMeta = assignment
+    ? getCalculatorPolicyMeta(normalizeCalculatorPolicy(assignment.options?.calculatorPolicy), bg)
+    : null;
 
   const formatValue = (v) => {
     if (v == null || v === '') return '—';
@@ -201,7 +218,16 @@ const TeacherAssignmentDetailPage = () => {
                   <strong className="text-black dark:text-white">{bg ? 'Варианти' : 'Variants'}:</strong>{' '}
                   {assignment.variants?.length || 0}
                 </span>
+                {calculatorPolicyMeta && (
+                  <span className="block w-full">
+                    <strong className="text-black dark:text-white">{bg ? 'Калкулатор' : 'Calculator'}:</strong>{' '}
+                    {calculatorPolicyMeta.label}
+                  </span>
+                )}
               </div>
+              {calculatorPolicyMeta && (
+                <p className="text-xs text-neutral-500 font-['Manrope']">{calculatorPolicyMeta.teacherHint}</p>
+              )}
               {assignment.description && (
                 <p className="text-sm text-neutral-700 dark:text-zinc-300 font-['Manrope'] whitespace-pre-wrap pt-2 border-t border-stone-100 dark:border-zinc-800">
                   {assignment.description}
@@ -339,6 +365,35 @@ const TeacherAssignmentDetailPage = () => {
                 ? 'Всеки ученик получава един вариант (по ID). Броят варианти = брой различни задачи в групата.'
                 : 'Each student gets one variant (by ID). Variant count = number of distinct problems.'}
             </p>
+
+            <h2 className="text-lg font-bold font-['Manrope'] text-black dark:text-white pt-4">
+              {bg ? 'Предавания от ученици' : 'Student submissions'}
+            </h2>
+            {submissionsLoading && (
+              <Card className="p-6 text-sm text-neutral-500">{bg ? 'Зареждане...' : 'Loading...'}</Card>
+            )}
+            {!submissionsLoading && submissions.length === 0 && (
+              <Card className="p-6 text-sm text-neutral-500 font-['Manrope']">
+                {bg ? 'Все още няма предавания.' : 'No submissions yet.'}
+              </Card>
+            )}
+            <div className="flex flex-col gap-4">
+              {submissions.map((s) => (
+                <SubmissionReviewCard
+                  key={s._id}
+                  submission={{
+                    ...s,
+                    assignment: {
+                      _id: id,
+                      title: assignment.title,
+                      course: assignment.course,
+                      taskTemplate: assignment.taskTemplate,
+                    },
+                  }}
+                  bg={bg}
+                />
+              ))}
+            </div>
           </div>
         )}
       </ClassroomLayout>

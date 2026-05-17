@@ -22,6 +22,7 @@ import ForwardIntersectionDocs from './components/tasks/ForwardIntersectionDocs'
 import ResectionDocs from './components/tasks/ResectionDocs';
 import SecondTaskDocs from './components/tasks/SecondTaskDocs';
 import ForTeachers from './components/pages/ForTeachers/ForTeachers';
+import ForStudents from './components/pages/ForStudents/ForStudents';
 import ScientificCalculator from './components/pages/ScientificCalculator/ScientificCalculator';
 import ClassroomHub from './components/classroom/ClassroomHub';
 import ClassroomRoute from './components/auth/ClassroomRoute';
@@ -72,6 +73,7 @@ function App() {
               <Route path="/forward-intersection/docs" element={<ForwardIntersectionDocs />} />
               <Route path="/resection/docs" element={<ResectionDocs />} />
               <Route path="/for-teachers" element={<ForTeachers />} />
+              <Route path="/for-students" element={<ForStudents />} />
               <Route path="/scientific-calculator" element={<ScientificCalculator />} />
               <Route path="/fieldbook" element={<FieldBook />} />
               <Route path="/billing/success" element={<BillingSuccess />} />

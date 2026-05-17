@@ -22,6 +22,11 @@ import {
   loadAnswerDraft,
   clearAnswerDraft,
 } from '../../../utils/eduAnswerDraft';
+import {
+  normalizeCalculatorPolicy,
+  allowsCalculatorAccess,
+  getCalculatorPolicyMeta,
+} from '../../../config/eduCalculatorPolicy';
 
 const StudentAssignmentDetailPage = () => {
   const { id } = useParams();
@@ -80,6 +85,23 @@ const StudentAssignmentDetailPage = () => {
       : rawInput && typeof rawInput === 'object'
         ? rawInput
         : {};
+
+  const calculatorPolicy = normalizeCalculatorPolicy(assignment?.options?.calculatorPolicy);
+  const policyMeta = getCalculatorPolicyMeta(calculatorPolicy, bg);
+  const canOpenCalculator = allowsCalculatorAccess(calculatorPolicy);
+
+  const handleOpenCalculator = () => {
+    if (!canOpenCalculator || !tool) return;
+    setEduWorkContext({
+      assignmentId: id,
+      assignmentTitle: assignment.title,
+      toolKey,
+      inputData: variant?.inputData,
+      returnPath: `/classroom/assignments/${id}`,
+      calculatorPolicy,
+    });
+    navigate(tool.route);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -158,22 +180,22 @@ const StudentAssignmentDetailPage = () => {
                   </div>
                 ))}
               </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setEduWorkContext({
-                    assignmentId: id,
-                    assignmentTitle: assignment.title,
-                    toolKey,
-                    inputData: variant?.inputData,
-                    returnPath: `/classroom/assignments/${id}`,
-                  });
-                  navigate(tool.route);
-                }}
-                className="px-4 py-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700 text-sm font-medium font-['Manrope'] text-black dark:text-white w-fit hover:bg-stone-50 dark:hover:bg-zinc-800"
-              >
-                {bg ? 'Отвори в калкулатора' : 'Open in calculator'}
-              </button>
+              <p className="text-xs text-neutral-500 dark:text-zinc-400 font-['Manrope']">{policyMeta.studentHint}</p>
+              {canOpenCalculator ? (
+                <button
+                  type="button"
+                  onClick={handleOpenCalculator}
+                  className="px-4 py-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700 text-sm font-medium font-['Manrope'] text-black dark:text-white w-fit hover:bg-stone-50 dark:hover:bg-zinc-800"
+                >
+                  {bg ? 'Отвори в калкулатора' : 'Open in calculator'}
+                </button>
+              ) : (
+                <p className="text-sm text-amber-800 dark:text-amber-200 font-['Manrope']">
+                  {bg
+                    ? 'За това задание преподавателят е изключил калкулатора. Въведете отговорите ръчно вдясно.'
+                    : 'Your teacher disabled the calculator for this assignment. Enter answers manually on the right.'}
+                </p>
+              )}
               <div className="flex flex-wrap items-center gap-2">
                 <StudentStatusBadge status={assignment.studentStatus} language={language} />
                 <p className="text-xs text-neutral-400 font-['Manrope']">

@@ -75,6 +75,39 @@ const ForTeachers = () => {
                     {language === 'bg' ? 'Отвори класната стая' : 'Open classroom'}
                   </Link>
                 )}
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="p-5 rounded-xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800/80">
+                    <h3 className="font-bold font-['Manrope'] text-black dark:text-white mb-1">Edu Free</h3>
+                    <p className="text-2xl font-bold mb-2 text-black dark:text-white">0 лв</p>
+                    <ul className="text-sm text-neutral-600 dark:text-zinc-400 font-['Manrope'] list-disc pl-4 space-y-1">
+                      <li>{bg ? '1 група, до ~40 ученика' : '1 group, ~40 students'}</li>
+                      <li>{bg ? 'Автоматична проверка, код за група' : 'Auto-grade, group code'}</li>
+                      <li>{bg ? 'Калкулатор: изкл. / помощник / пълен — по задание' : 'Calculator: off / guided / full per task'}</li>
+                    </ul>
+                  </div>
+                  <div className="p-5 rounded-xl border-2 border-black dark:border-white">
+                    <h3 className="font-bold font-['Manrope'] text-black dark:text-white mb-1">Edu Pro</h3>
+                    <p className="text-sm text-neutral-500 mb-2">{bg ? 'пилот — свържете се с нас' : 'pilot — contact us'}</p>
+                    <ul className="text-sm text-neutral-600 dark:text-zinc-400 font-['Manrope'] list-disc pl-4 space-y-1">
+                      <li>{bg ? 'Неограничени групи и задания' : 'Unlimited groups & assignments'}</li>
+                      <li>{bg ? 'CSV, аналитика, шаблони' : 'CSV, analytics, templates'}</li>
+                    </ul>
+                    <a
+                      href="mailto:team@geosolver.bg?subject=GeoSolver%20Edu%20Pro"
+                      className="inline-block mt-3 px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg text-sm"
+                    >
+                      {bg ? 'Заяви пилот' : 'Request pilot'}
+                    </a>
+                  </div>
+                </div>
+
+                <p className="text-xs text-neutral-500 font-['Manrope']">
+                  {bg
+                    ? 'Учениците в клас не плащат Pro. Consumer калкулаторите (извън задание) остават с free лимит 5 изчисления — вижте /for-students.'
+                    : 'Students in class do not need Pro. Consumer tools (outside assignments) keep the 5-calculation free tier — see /for-students.'}
+                </p>
+
                 <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-400 dark:border-blue-500 rounded-xl flex flex-col gap-1 transition-colors">
                   <div className="text-base font-semibold text-blue-900 dark:text-blue-200 font-['Manrope']">{t.howToGetAccess}</div>
                   <div className="text-sm text-blue-900 dark:text-blue-200 font-['Manrope']">

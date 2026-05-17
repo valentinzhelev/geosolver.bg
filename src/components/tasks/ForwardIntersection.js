@@ -97,7 +97,7 @@ const ForwardIntersection = () => {
   const { language } = useTranslation();
   const { runWithTracking, isAuthenticated } = useGuardedCalculation();
   const [lastCalcResult, setLastCalcResult] = useState(null);
-  const { eduCtx, applyResultToAssignment, dismissEduBanner } = useEduAssignmentBridge(
+  const { eduCtx, applyResultToAssignment, dismissEduBanner, canSaveToAssignment } = useEduAssignmentBridge(
     'forward-intersection',
     setForm
   );
@@ -236,7 +236,7 @@ Yₚ = (Yₚ' + Yₚ'') / 2 = (${results.yPrimP} + ${results.ySecondP}) / 2 = ${
         <EduWorkBanner
           eduCtx={eduCtx}
           bg={language === 'bg'}
-          showApply={!!lastCalcResult}
+          showApply={!!lastCalcResult && canSaveToAssignment}
           onApply={() => applyResultToAssignment(lastCalcResult)}
           onDismiss={dismissEduBanner}
         />

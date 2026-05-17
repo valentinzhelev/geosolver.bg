@@ -6,6 +6,11 @@ import { Card } from '../ui/Card';
 import { classroomApi } from '../../../services/classroomApi';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { EDU_TOOLS } from '../../../config/eduTools';
+import {
+  CALCULATOR_POLICY_OPTIONS,
+  DEFAULT_CALCULATOR_POLICY,
+  getCalculatorPolicyMeta,
+} from '../../../config/eduCalculatorPolicy';
 
 const CreateAssignmentPage = () => {
   const { language } = useTranslation();
@@ -30,6 +35,7 @@ const CreateAssignmentPage = () => {
     customTolerance: 0.01,
     customToleranceType: 'absolute',
     publishAt: '',
+    calculatorPolicy: DEFAULT_CALCULATOR_POLICY,
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -84,6 +90,7 @@ const CreateAssignmentPage = () => {
       customTolerance: tpl.customTolerance ?? 0.01,
       customToleranceType: tpl.customToleranceType || 'absolute',
       dueDate: due.toISOString().slice(0, 16),
+      calculatorPolicy: tpl.calculatorPolicy || DEFAULT_CALCULATOR_POLICY,
     }));
   };
 
@@ -105,6 +112,7 @@ const CreateAssignmentPage = () => {
         daysUntilDue: 7,
         customTolerance: Number(form.customTolerance),
         customToleranceType: form.customToleranceType,
+        calculatorPolicy: form.calculatorPolicy,
       });
       setTemplateTitle('');
       loadMyTemplates();
@@ -148,9 +156,12 @@ const CreateAssignmentPage = () => {
         showFeedback: true,
         customTolerance: Number(form.customTolerance),
         customToleranceType: form.customToleranceType,
+        calculatorPolicy: form.calculatorPolicy,
       },
     };
   };
+
+  const policyMeta = getCalculatorPolicyMeta(form.calculatorPolicy, bg);
 
   const handleSubmit = async (e, asDraft = false) => {
     e.preventDefault();
@@ -352,6 +363,22 @@ const CreateAssignmentPage = () => {
                 </select>
               </label>
             </div>
+
+            <label className="flex flex-col gap-1">
+              <span className="text-sm font-medium font-['Manrope']">{bg ? 'Калкулатор за ученици' : 'Calculator for students'}</span>
+              <select
+                value={form.calculatorPolicy}
+                onChange={(e) => setForm({ ...form, calculatorPolicy: e.target.value })}
+                className="px-3 py-2 rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800"
+              >
+                {CALCULATOR_POLICY_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {bg ? opt.labelBg : opt.labelEn}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-neutral-500 font-['Manrope']">{policyMeta.teacherHint}</p>
+            </label>
 
             <label className="flex flex-col gap-1">
               <span className="text-sm font-medium font-['Manrope']">{bg ? 'Краен срок' : 'Due date'}</span>
