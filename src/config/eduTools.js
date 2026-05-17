@@ -92,10 +92,19 @@ export function getEduTool(toolKey) {
   return EDU_TOOLS.find((t) => t.toolKey === toolKey);
 }
 
+const TEMPLATE_TYPE_TO_TOOL_KEY = {
+  'forward-intersection': 'forward-intersection',
+  resection: 'resection',
+};
+
 export function toolKeyFromTemplate(template) {
   const tag = template?.tags?.find((t) => t.startsWith('tool:'));
   if (tag) return tag.replace('tool:', '');
-  return template?.paramsSchema?.toolKey || null;
+  if (template?.paramsSchema?.toolKey) return template.paramsSchema.toolKey;
+  if (template?.type && TEMPLATE_TYPE_TO_TOOL_KEY[template.type]) {
+    return TEMPLATE_TYPE_TO_TOOL_KEY[template.type];
+  }
+  return null;
 }
 
 export function variantIndexForStudent(userId, variantsCount) {

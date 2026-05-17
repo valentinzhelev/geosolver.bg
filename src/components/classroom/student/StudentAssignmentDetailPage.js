@@ -73,7 +73,13 @@ const StudentAssignmentDetailPage = () => {
     ? variantIndexForStudent(user?.id || user?._id, assignment.variants?.length || 1)
     : 0;
   const variant = assignment?.variants?.find((v) => v.variantIndex === variantIndex) || assignment?.variants?.[0];
-  const inputData = variant?.inputData?.input || variant?.inputData || {};
+  const rawInput = variant?.inputData;
+  const inputData =
+    rawInput && typeof rawInput === 'object' && rawInput.input && typeof rawInput.input === 'object'
+      ? rawInput.input
+      : rawInput && typeof rawInput === 'object'
+        ? rawInput
+        : {};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -112,7 +118,30 @@ const StudentAssignmentDetailPage = () => {
         {loading && <Card className="p-8 text-center text-neutral-500">{bg ? 'Зареждане...' : 'Loading...'}</Card>}
         {error && <Card className="p-4 text-sm text-red-600">{error}</Card>}
 
-        {assignment && tool && (
+        {assignment && !tool && !loading && (
+          <Card className="p-6 flex flex-col gap-3">
+            <p className="text-sm text-amber-800 dark:text-amber-200 font-['Manrope']">
+              {bg
+                ? 'Заданието е заредено, но типът на задачата не се разпознава. Презаредете страницата; ако остане — кажете на преподавателя.'
+                : 'The assignment loaded but the task type could not be resolved. Try refreshing or contact your teacher.'}
+            </p>
+            {assignment.description && (
+              <p className="text-sm text-neutral-600 dark:text-zinc-400 whitespace-pre-wrap">{assignment.description}</p>
+            )}
+          </Card>
+        )}
+
+        {assignment && tool && (!assignment.variants || assignment.variants.length === 0) && (
+          <Card className="p-6">
+            <p className="text-sm text-neutral-600 dark:text-zinc-400 font-['Manrope']">
+              {bg
+                ? 'Условието все още не е публикувано (няма генерирани варианти). Изчакайте преподавателя да публикува заданието.'
+                : 'Problem data is not ready yet. Wait until your teacher publishes the assignment.'}
+            </p>
+          </Card>
+        )}
+
+        {assignment && tool && assignment.variants?.length > 0 && (
           <div className="grid lg:grid-cols-2 gap-6">
             <Card className="p-6 flex flex-col gap-4">
               <h2 className="font-bold font-['Manrope'] text-black dark:text-white">{bg ? 'Условие' : 'Problem'}</h2>
