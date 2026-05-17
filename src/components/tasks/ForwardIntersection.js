@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import SEO from '../shared/SEO';
 import Layout from '../layout/Layout';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 import useTypewriter from '../../hooks/useTypewriter';
 import { calculateForwardIntersection as calculateForwardIntersectionDomain } from '../../domain/geodesy';
 import { roundTo } from '../../domain/math';
-import { useAuth } from '../auth/AuthContext';
+import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
 
 // LocalStorage helpers
 const getHistory = () => {
@@ -91,9 +91,7 @@ function calculateForwardIntersection(yA, xA, yB, xB, beta1, beta2) {
 const ForwardIntersection = () => {
   const [form, setForm] = useState(initialForm);
   const { language } = useTranslation();
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const isAuthenticated = !!user;
+  const { runWithTracking, isAuthenticated } = useGuardedCalculation();
   const [resultText, setResultText] = useState(language === 'bg' ? 'Въведете данни и натиснете "Изчисли", за да видите резултатите тук.' : 'Enter data and click "Calculate" to see the results here.');
   const [history, setHistory] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -111,25 +109,29 @@ const ForwardIntersection = () => {
 
   const isFormValid = () => Object.values(form).every(v => v !== '' && !isNaN(parseFloat(v)));
 
-  const calculate = () => {
-    if (!isAuthenticated) {
-      navigate('/login');
-      return;
-    }
+  const calculate = async () => {
     const vals = Object.values(form).map(Number);
     if (vals.some(isNaN)) {
       alert('Моля, попълнете всички полета.');
       return;
     }
     const { yA, xA, yB, xB, beta1, beta2 } = form;
-    const results = calculateForwardIntersection(
-      Number(yA),
-      Number(xA),
-      Number(yB),
-      Number(xB),
-      Number(beta1),
-      Number(beta2)
-    );
+    const results = await runWithTracking({
+      toolName: 'forward-intersection',
+      toolDisplayName: { bg: 'Права засечка', en: 'Forward Intersection' },
+      inputData: { yA, xA, yB, xB, beta1, beta2 },
+      getResultData: (r) => ({ xP: r.xP, yP: r.yP, sAP: r.sAP, sBP: r.sBP }),
+      run: () =>
+        calculateForwardIntersection(
+          Number(yA),
+          Number(xA),
+          Number(yB),
+          Number(xB),
+          Number(beta1),
+          Number(beta2)
+        ),
+    });
+    if (!results) return;
     
     const output = `--------- Права засечка (Enhanced) ---------
 Yₐ = ${yA}, Xₐ = ${xA}

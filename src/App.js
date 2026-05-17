@@ -1,15 +1,15 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import HomePage from './components/pages/HomePage/HomePage';
 import FirstTask from './components/tasks/FirstTask';
 import SecondTask from './components/tasks/SecondTask';
 import ForwardIntersection from './components/tasks/ForwardIntersection';
 import Prices from './components/pages/Prices/Prices';
 import ToolsPage from './components/pages/Tools/ToolsPage';
+import ToolComingSoon from './components/pages/Tools/ToolComingSoon';
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import Account from './components/auth/Account';
 import ProtectedRoute from './components/auth/ProtectedRoute';
-import TeacherRoute from './components/auth/TeacherRoute';
 import { AuthProvider } from './components/auth/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -20,26 +20,21 @@ import Contacts from './components/contacts/Contacts';
 import FirstTaskDocs from './components/tasks/FirstTaskDocs';
 import ForwardIntersectionDocs from './components/tasks/ForwardIntersectionDocs';
 import ResectionDocs from './components/tasks/ResectionDocs';
-import PolarIntersectionDocs from './components/tasks/PolarIntersectionDocs';
-import HansenTaskDocs from './components/tasks/HansenTaskDocs';
-import CoordinateTransformationDocs from './components/tasks/CoordinateTransformationDocs';
-import AreaCalculationDocs from './components/tasks/AreaCalculationDocs';
-import DistanceBearingDocs from './components/tasks/DistanceBearingDocs';
 import SecondTaskDocs from './components/tasks/SecondTaskDocs';
 import ForTeachers from './components/pages/ForTeachers/ForTeachers';
 import ScientificCalculator from './components/pages/ScientificCalculator/ScientificCalculator';
-import TeacherDashboard from './components/pages/TeacherDashboard/TeacherDashboard';
-import TaskGenerator from './components/pages/TeacherDashboard/TaskGenerator';
-import StudentManagement from './components/pages/TeacherDashboard/StudentManagement';
-import ScanInterface from './components/pages/TeacherDashboard/ScanInterface';
-import CourseManagement from './components/pages/TeacherDashboard/CourseManagement';
-import TaskTemplateEditor from './components/pages/TeacherDashboard/TaskTemplateEditor';
-import CoordinateTransformation from './components/tasks/CoordinateTransformation';
-import AreaCalculation from './components/tasks/AreaCalculation';
-import DistanceBearing from './components/tasks/DistanceBearing';
+import ClassroomHub from './components/classroom/ClassroomHub';
+import ClassroomRoute from './components/auth/ClassroomRoute';
+import ClassroomDashboard from './components/classroom/teacher/ClassroomDashboard';
+import GroupsPage from './components/classroom/teacher/GroupsPage';
+import GroupDetailPage from './components/classroom/teacher/GroupDetailPage';
+import CreateAssignmentPage from './components/classroom/teacher/CreateAssignmentPage';
+import TeacherAssignmentDetailPage from './components/classroom/teacher/TeacherAssignmentDetailPage';
+import ReviewQueuePage from './components/classroom/teacher/ReviewQueuePage';
+import StudentAssignmentsPage from './components/classroom/student/StudentAssignmentsPage';
+import StudentAssignmentDetailPage from './components/classroom/student/StudentAssignmentDetailPage';
+import JoinGroupPage from './components/classroom/student/JoinGroupPage';
 import Resection from './components/tasks/Resection';
-import PolarIntersection from './components/tasks/PolarIntersection';
-import HansenTask from './components/tasks/HansenTask';
 import FieldBook from './components/pages/FieldBook/FieldBook';
 import BillingSuccess from './components/pages/Billing/BillingSuccess';
 import BillingCancel from './components/pages/Billing/BillingCancel';
@@ -57,6 +52,7 @@ function App() {
               <Route path="/first-task" element={<FirstTask />} />
               <Route path="/second-task" element={<SecondTask />} />
               <Route path="/forward-intersection" element={<ForwardIntersection />} />
+              <Route path="/resection" element={<Resection />} />
               <Route path="/prices" element={<Prices />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
@@ -75,70 +71,103 @@ function App() {
               <Route path="/second-task/docs" element={<SecondTaskDocs />} />
               <Route path="/forward-intersection/docs" element={<ForwardIntersectionDocs />} />
               <Route path="/resection/docs" element={<ResectionDocs />} />
-              <Route path="/polar-intersection/docs" element={<PolarIntersectionDocs />} />
-              <Route path="/hansen-task/docs" element={<HansenTaskDocs />} />
-              <Route path="/coordinate-transformation/docs" element={<CoordinateTransformationDocs />} />
-              <Route path="/area-calculation/docs" element={<AreaCalculationDocs />} />
-              <Route path="/distance-bearing/docs" element={<DistanceBearingDocs />} />
               <Route path="/for-teachers" element={<ForTeachers />} />
               <Route path="/scientific-calculator" element={<ScientificCalculator />} />
-              <Route path="/coordinate-transformation" element={<CoordinateTransformation />} />
-              <Route path="/area-calculation" element={<AreaCalculation />} />
-              <Route path="/distance-bearing" element={<DistanceBearing />} />
-              <Route path="/resection" element={<Resection />} />
-              <Route path="/polar-intersection" element={<PolarIntersection />} />
-              <Route path="/hansen-task" element={<HansenTask />} />
               <Route path="/fieldbook" element={<FieldBook />} />
               <Route path="/billing/success" element={<BillingSuccess />} />
               <Route path="/billing/cancel" element={<BillingCancel />} />
+              {/* Post-MVP tools: code retained, routes show coming-soon */}
+              <Route path="/polar-intersection" element={<ToolComingSoon />} />
+              <Route path="/polar-intersection/docs" element={<ToolComingSoon />} />
+              <Route path="/hansen-task" element={<ToolComingSoon />} />
+              <Route path="/hansen-task/docs" element={<ToolComingSoon />} />
+              <Route path="/coordinate-transformation" element={<ToolComingSoon />} />
+              <Route path="/coordinate-transformation/docs" element={<ToolComingSoon />} />
+              <Route path="/area-calculation" element={<ToolComingSoon />} />
+              <Route path="/area-calculation/docs" element={<ToolComingSoon />} />
+              <Route path="/distance-bearing" element={<ToolComingSoon />} />
+              <Route path="/distance-bearing/docs" element={<ToolComingSoon />} />
+              {/* GeoSolver Edu — classroom */}
+              <Route path="/classroom" element={<ClassroomHub />} />
               <Route
-                path="/teacher/dashboard"
+                path="/classroom/dashboard"
                 element={
-                  <TeacherRoute>
-                    <TeacherDashboard />
-                  </TeacherRoute>
+                  <ClassroomRoute>
+                    <ClassroomDashboard />
+                  </ClassroomRoute>
                 }
               />
               <Route
-                path="/teacher/create-assignment"
+                path="/classroom/groups"
                 element={
-                  <TeacherRoute>
-                    <TaskGenerator />
-                  </TeacherRoute>
+                  <ClassroomRoute>
+                    <GroupsPage />
+                  </ClassroomRoute>
                 }
               />
               <Route
-                path="/teacher/students"
+                path="/classroom/groups/:id"
                 element={
-                  <TeacherRoute>
-                    <StudentManagement />
-                  </TeacherRoute>
+                  <ClassroomRoute>
+                    <GroupDetailPage />
+                  </ClassroomRoute>
                 }
               />
               <Route
-                path="/teacher/scan-submissions"
+                path="/classroom/assignments/new"
                 element={
-                  <TeacherRoute>
-                    <ScanInterface />
-                  </TeacherRoute>
+                  <ClassroomRoute>
+                    <CreateAssignmentPage />
+                  </ClassroomRoute>
                 }
               />
               <Route
-                path="/teacher/courses"
+                path="/classroom/teaching/assignments/:id"
                 element={
-                  <TeacherRoute>
-                    <CourseManagement />
-                  </TeacherRoute>
+                  <ClassroomRoute>
+                    <TeacherAssignmentDetailPage />
+                  </ClassroomRoute>
                 }
               />
               <Route
-                path="/teacher/templates/editor"
+                path="/classroom/review"
                 element={
-                  <TeacherRoute>
-                    <TaskTemplateEditor />
-                  </TeacherRoute>
+                  <ClassroomRoute>
+                    <ReviewQueuePage />
+                  </ClassroomRoute>
                 }
               />
+              <Route
+                path="/classroom/assignments"
+                element={
+                  <ProtectedRoute>
+                    <StudentAssignmentsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/classroom/assignments/:id"
+                element={
+                  <ProtectedRoute>
+                    <StudentAssignmentDetailPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/classroom/join"
+                element={
+                  <ProtectedRoute>
+                    <JoinGroupPage />
+                  </ProtectedRoute>
+                }
+              />
+              {/* Legacy teacher URLs */}
+              <Route path="/teacher/dashboard" element={<Navigate to="/classroom/dashboard" replace />} />
+              <Route path="/teacher/courses" element={<Navigate to="/classroom/groups" replace />} />
+              <Route path="/teacher/create-assignment" element={<Navigate to="/classroom/assignments/new" replace />} />
+              <Route path="/teacher/students" element={<Navigate to="/classroom/groups" replace />} />
+              <Route path="/teacher/scan-submissions" element={<Navigate to="/classroom/review" replace />} />
+              <Route path="/teacher/templates/editor" element={<Navigate to="/classroom/dashboard" replace />} />
             </Routes>
             <CookieConsent />
           </LanguageProvider>

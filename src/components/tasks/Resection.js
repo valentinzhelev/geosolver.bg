@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../layout/Layout';
 import SEO from '../shared/SEO';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 import useTypewriter from '../../hooks/useTypewriter';
-import { useAuth } from '../auth/AuthContext';
+import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
 
 // LocalStorage helpers
 const getHistory = () => {
@@ -125,9 +125,7 @@ const Resection = () => {
   const paginatedHistory = history.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
   const { displayText, isTyping } = useTypewriter(resultText);
   const { language } = useTranslation();
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const isAuthenticated = !!user;
+  const { runWithTracking, isAuthenticated } = useGuardedCalculation();
 
   useEffect(() => { setHistory(getHistory()); }, []);
 
@@ -139,11 +137,7 @@ const Resection = () => {
     return form.xA && form.yA && form.xB && form.yB && form.xC && form.yC && form.beta1 && form.beta2;
   };
 
-  const handleCalculate = () => {
-    if (!isAuthenticated) {
-      navigate('/login');
-      return;
-    }
+  const handleCalculate = async () => {
     if (!isFormValid()) {
       alert(language === 'bg' ? 'Моля, попълнете всички полета.' : 'Please fill in all fields.');
       return;
@@ -163,7 +157,14 @@ const Resection = () => {
         beta2: parseFloat(form.beta2)
       };
 
-      const result = calculateResection(points, angles);
+      const result = await runWithTracking({
+        toolName: 'resection',
+        toolDisplayName: { bg: 'Обратна засечка', en: 'Resection' },
+        inputData: { ...points, ...angles },
+        getResultData: (r) => ({ xP: r.xP, yP: r.yP, method: r.method }),
+        run: () => calculateResection(points, angles),
+      });
+      if (!result) return;
 
       const output = language === 'bg'
         ? `--------- Обратна засечка (Resection) ---------

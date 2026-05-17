@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import SEO from '../shared/SEO';
 import Layout from '../layout/Layout';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useAuth } from '../auth/AuthContext';
 import useTypewriter from '../../hooks/useTypewriter';
-import { useCalculationTracking } from '../../hooks/useCalculationTracking';
+import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
 import { calculateFirstTask as calculateFirstTaskDomain } from '../../domain/geodesy';
 import { roundTo } from '../../domain/math';
 import { extractTaskInputFromImage } from '../../services/scanService';
@@ -50,8 +50,6 @@ const PurvaZadacha = () => {
   const cameraInputRef = useRef(null);
   const { t, language } = useTranslation();
   const { user } = useAuth();
-  const navigate = useNavigate();
-  const isAuthenticated = !!user;
   const isProUser = user?.plan === 'pro' || ['active', 'trialing'].includes(user?.subscriptionStatus) || user?.role === 'admin';
   const [showProHint, setShowProHint] = useState(false);
   const proScanMessage = language === 'bg'
@@ -64,7 +62,7 @@ const PurvaZadacha = () => {
   const totalPages = Math.ceil(history.length / itemsPerPage);
   const paginatedHistory = history.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
   const { displayText, isTyping } = useTypewriter(resultText);
-  const { trackCalculation, checkLimits } = useCalculationTracking();
+  const { runWithTracking, isAuthenticated } = useGuardedCalculation();
 
   // Debug: see what is being set
   useEffect(() => {
@@ -140,10 +138,6 @@ const PurvaZadacha = () => {
   };
 
   const calculate = async () => {
-    if (!isAuthenticated) {
-      navigate('/login');
-      return;
-    }
     const y1 = parseFloat(form.y1);
     const x1 = parseFloat(form.x1);
     const alpha = parseFloat(form.alpha);
@@ -153,21 +147,19 @@ const PurvaZadacha = () => {
       return;
     }
 
-    // Check limits before calculation
-    const limits = await checkLimits();
-    console.log('Limits check result:', limits);
-    if (!limits.canCalculate) {
-      alert(language === 'bg' 
-        ? `Достигнахте лимита от ${limits.limit} изчисления. Моля, абонирайте се за професионален план.`
-        : `You have reached the limit of ${limits.limit} calculations. Please subscribe to a professional plan.`
-      );
-      return;
-    }
-
-    const startTime = performance.now();
-    const result = purvaOsnovnaZadacha(y1, x1, alpha, s);
-    const endTime = performance.now();
-    const calculationTime = endTime - startTime;
+    const result = await runWithTracking({
+      toolName: 'first-basic-task',
+      toolDisplayName: { bg: 'Първа основна задача', en: 'First Basic Task' },
+      inputData: { y1, x1, alpha, s },
+      getResultData: (r) => ({
+        y2: r.y2,
+        x2: r.x2,
+        deltaX: r.deltaX,
+        deltaY: r.deltaY,
+      }),
+      run: () => purvaOsnovnaZadacha(y1, x1, alpha, s),
+    });
+    if (!result) return;
     const formatNumber = (value, decimals) => {
       if (value == null || Number.isNaN(value)) return '';
       const fixed = Number(value).toFixed(decimals);
@@ -209,20 +201,6 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
     };
     saveHistory(entry);
     setHistory(getHistory());
-
-    // Track calculation in backend
-    try {
-      await trackCalculation(
-        'first-basic-task',
-        { bg: 'Първа основна задача', en: 'First Basic Task' },
-        { y1, x1, alpha, s },
-        { y2: result.y2, x2: result.x2, deltaX: result.deltaX, deltaY: result.deltaY },
-        calculationTime
-      );
-      
-    } catch (error) {
-      console.error('Failed to track calculation:', error);
-    }
   };
 
   /**

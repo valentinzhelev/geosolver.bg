@@ -8,7 +8,6 @@ import PlanService from '../../services/planService';
 import BillingService from '../../services/billingService';
 import CalculationService from '../../services/calculationService';
 import UserManagementService from '../../services/userManagementService';
-import { userPreferencesService } from '../../services/userPreferencesService';
 
 const Account = () => {
   const { user, logout, refreshUser, changePassword } = useAuth();
@@ -136,9 +135,6 @@ const Account = () => {
   const [initialLoadDone, setInitialLoadDone] = useState(false);
   const [error, setError] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
-  const [preferences, setPreferences] = useState({ showToolsInDevelopment: false });
-  const [preferencesLoading, setPreferencesLoading] = useState(false);
-  const [preferencesError, setPreferencesError] = useState(null);
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -192,31 +188,6 @@ const Account = () => {
   useEffect(() => {
     if (refreshUser) refreshUser();
   }, [refreshUser]);
-
-  // Load user preferences
-  useEffect(() => {
-    if (!user) return;
-    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-    if (!token) return;
-    setPreferencesLoading(true);
-    setPreferencesError(null);
-    userPreferencesService.getUserPreferences(token)
-      .then((prefs) => setPreferences(prefs))
-      .catch((err) => setPreferencesError(err.message || 'Failed to load preferences'))
-      .finally(() => setPreferencesLoading(false));
-  }, [user]);
-
-  const handlePreferenceToggle = async (key) => {
-    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-    if (!token) return;
-    const next = { ...preferences, [key]: !preferences[key] };
-    setPreferences(next);
-    try {
-      await userPreferencesService.updateUserPreferences(token, next);
-    } catch (err) {
-      setPreferencesError(err.message || 'Failed to save preferences');
-    }
-  };
 
   const handleChangePassword = async () => {
     setPasswordError(null);
@@ -1059,28 +1030,6 @@ const Account = () => {
             </div>
 
             <div className="mt-4 flex flex-col gap-4">
-              <div className="rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 p-3">
-                <div className="text-black text-sm font-medium font-['Manrope']">
-                  {language === 'bg' ? 'Предпочитания' : 'Preferences'}
-                </div>
-                {preferencesError && (
-                  <div className="mt-2 text-xs text-red-500">{preferencesError}</div>
-                )}
-                <button
-                  type="button"
-                  onClick={() => handlePreferenceToggle('showToolsInDevelopment')}
-                  disabled={preferencesLoading}
-                  className="mt-3 w-full inline-flex items-center justify-between rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 px-3 py-2"
-                >
-                  <span className="text-sm text-black font-medium font-['Manrope']">
-                    {language === 'bg' ? 'Показвай инструменти в разработка' : 'Show tools in development'}
-                  </span>
-                  <span className={`w-10 h-5 rounded-full flex items-center ${preferences.showToolsInDevelopment ? 'bg-black justify-end' : 'bg-gray-200 justify-start'} p-0.5`}>
-                    <span className="w-4 h-4 rounded-full bg-white" />
-                  </span>
-                </button>
-              </div>
-
               <div className="rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 p-3">
                 <div className="text-black text-sm font-medium font-['Manrope']">
                   {language === 'bg' ? 'Смяна на парола' : 'Change password'}

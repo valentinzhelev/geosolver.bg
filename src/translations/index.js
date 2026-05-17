@@ -59,7 +59,7 @@ export const translations = {
 
     // Tools page translations
     toolsTitle: 'Инструменти',
-    toolsDescription: 'Интерактивни инструменти за решаване на задачи в геодезията – от координатни трансформации до класически засечки.',
+    toolsDescription: 'Четири основни инструмента за координатни изчисления и класически засечки в геодезията.',
     toolsInDevelopment: 'Инструменти в разработка',
 
     // Prices page translations
@@ -369,7 +369,7 @@ export const translations = {
 
     // Tools page translations
     toolsTitle: 'Tools',
-    toolsDescription: 'Interactive tools for solving geodesy tasks - from coordinate transformations to classic intersections.',
+    toolsDescription: 'Four core tools for coordinate calculations and classic geodetic intersections.',
     toolsInDevelopment: 'Tools in Development',
 
     // Prices page translations

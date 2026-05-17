@@ -52,8 +52,8 @@ const HomePage = () => {
     "@type": "WebApplication",
     "name": "GeoSolver",
     "description": language === 'bg' 
-      ? "Онлайн геодезически калкулатори за професионални геодезисти. Координатни трансформации, засечки, изчисления на площ и дължина."
-      : "Online geodetic calculators for professional surveyors. Coordinate transformations, intersections, area and distance calculations.",
+      ? "Онлайн геодезически калкулатори за професионални геодезисти. Първа и втора основна задача, права и обратна засечка."
+      : "Online geodetic calculators for professional surveyors. First and second basic tasks, forward and resection intersection.",
     "url": "https://www.geosolver.bg",
     "applicationCategory": "BusinessApplication",
     "operatingSystem": "Web Browser",
@@ -64,20 +64,16 @@ const HomePage = () => {
       "description": language === 'bg' ? "Безплатен план с 5 изчисления месечно" : "Free plan with 5 calculations per month"
     },
     "featureList": language === 'bg' ? [
-      "Координатни трансформации",
-      "Права и обратна засечка", 
-      "Полярна засечка",
-      "Изчисления на площ",
-      "Изчисления на дължина",
-      "GNSS анализ",
+      "Първа основна задача",
+      "Втора основна задача",
+      "Права засечка",
+      "Обратна засечка",
       "Научен калкулатор"
     ] : [
-      "Coordinate transformations",
-      "Forward and reverse intersection",
-      "Polar intersection", 
-      "Area calculations",
-      "Distance calculations",
-      "GNSS analysis",
+      "First basic task",
+      "Second basic task",
+      "Forward intersection",
+      "Resection",
       "Scientific calculator"
     ]
   };
@@ -87,12 +83,12 @@ const HomePage = () => {
       <SEO
         title={language === 'bg' ? 'Онлайн калкулатор за геодезия и засечки' : 'Online Calculator for Geodesy and Intersections'}
         description={language === 'bg' 
-          ? "GeoSolver предлага онлайн калкулатори за геодезия, включително права засечка, обратна засечка, полярна засечка, координатни трансформации и други. Бързи и точни изчисления за геодезисти и инженери." 
-          : "GeoSolver offers online calculators for geodesy, including forward intersection, resection, polar intersection, coordinate transformations, and more. Fast and accurate calculations for surveyors and engineers."
+          ? "GeoSolver предлага четири основни онлайн калкулатора за геодезия: първа и втора основна задача, права и обратна засечка. Бързи и точни изчисления за геодезисти и инженери." 
+          : "GeoSolver offers four core online geodetic calculators: first and second basic tasks, forward and resection intersection. Fast, accurate calculations for surveyors and engineers."
         }
         keywords={language === 'bg'
-          ? "геодезия, онлайн калкулатори, права засечка, обратна засечка, полярна засечка, координатни трансформации, геодезически изчисления, GNSS, тахиметрия, координати, азимут, дължина, триангулация, Хелмерт, афинна трансформация, инженерна геодезия"
-          : "geodesy, online calculators, forward intersection, resection, polar intersection, coordinate transformations, geodetic calculations, GNSS, tacheometry, coordinates, azimuth, distance, triangulation, Helmert, affine transformation, engineering geodesy"
+          ? "геодезия, онлайн калкулатори, първа основна задача, втора основна задача, права засечка, обратна засечка, геодезически изчисления, координати, GNSS, тахиметрия"
+          : "geodesy, online calculators, first basic task, second basic task, forward intersection, resection, geodetic calculations, coordinates, GNSS, tacheometry"
         }
         canonical="/"
         structuredData={structuredData}
@@ -184,28 +180,27 @@ const HomePage = () => {
                     ))}
                   </div>
                 </div>
-                {/* Desktop: Timeline with lines - below content */}
-                <div className="hidden lg:flex w-full flex-row justify-start items-center gap-3">
+                {/* Desktop: сегменти само между хапчетата, с отстъп от ръбовете (без да се „пипат“) */}
+                <div className="hidden w-full min-h-[3.5rem] items-center lg:flex">
                   {historyItems.map((item, index) => (
                     <React.Fragment key={item.id}>
-                      {index > 0 && (
-                        <div className="flex-1 h-0 outline outline-1 outline-offset-[-0.50px] outline-gray-200 dark:outline-zinc-800" />
-                      )}
                       <button
                         type="button"
                         onClick={() => setActiveYear(item.id)}
-                        className={`px-3 py-1 rounded-lg flex justify-center items-center gap-2.5 flex-shrink-0 transition-colors cursor-pointer ${
+                        className={`shrink-0 rounded-full px-4 py-2 font-['Manrope'] text-base font-semibold transition-colors lg:text-lg ${
                           activeYear === item.id
-                            ? 'bg-black dark:bg-white'
-                            : 'bg-gray-200 dark:bg-zinc-800 hover:bg-gray-300 dark:hover:bg-zinc-700'
+                            ? 'bg-black text-white shadow-sm dark:bg-white dark:text-black'
+                            : 'bg-stone-200 text-black hover:bg-stone-300 dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700'
                         }`}
                       >
-                        <div className={`text-base lg:text-lg font-semibold font-['Manrope'] ${
-                          activeYear === item.id ? 'text-white dark:text-black' : 'text-black dark:text-white'
-                        }`}>
-                          {item.label[language]}
-                        </div>
+                        {item.label[language]}
                       </button>
+                      {index < historyItems.length - 1 && (
+                        <div
+                          aria-hidden
+                          className="mx-3 h-0.5 min-w-[0.5rem] flex-1 shrink self-center bg-stone-200 dark:bg-zinc-800"
+                        />
+                      )}
                     </React.Fragment>
                   ))}
                 </div>

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../layout/Layout';
 import SEO from '../shared/SEO';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import useTypewriter from '../../hooks/useTypewriter';
-import { useAuth } from '../auth/AuthContext';
+import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
 
 // LocalStorage helpers
 const getHistory = () => {
@@ -142,9 +142,7 @@ function vtoraOsnovnaZadacha(x1, y1, x2, y2) {
 
 const SecondTask = () => {
   const [form, setForm] = useState({ x1: '', y1: '', x2: '', y2: '' });
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const isAuthenticated = !!user;
+  const { runWithTracking, isAuthenticated } = useGuardedCalculation();
   const [resultText, setResultText] = useState('Въведете координати и натиснете "Изчисли", за да видите резултатите тук.');
   const [history, setHistory] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -167,11 +165,7 @@ const SecondTask = () => {
     );
   };
 
-  const calculate = () => {
-    if (!isAuthenticated) {
-      navigate('/login');
-      return;
-    }
+  const calculate = async () => {
     const { x1, y1, x2, y2 } = form;
     const vals = [x1, y1, x2, y2].map(Number);
     if (vals.some(isNaN)) {
@@ -179,7 +173,19 @@ const SecondTask = () => {
       return;
     }
     const [X1, Y1, X2, Y2] = vals;
-    const result = vtoraOsnovnaZadacha(X1, Y1, X2, Y2);
+    const result = await runWithTracking({
+      toolName: 'second-basic-task',
+      toolDisplayName: { bg: 'Втора основна задача', en: 'Second Basic Task' },
+      inputData: { x1: X1, y1: Y1, x2: X2, y2: Y2 },
+      getResultData: (r) => ({
+        alpha: r.alpha,
+        distance: r.distance,
+        deltaX: r.deltaX,
+        deltaY: r.deltaY,
+      }),
+      run: () => vtoraOsnovnaZadacha(X1, Y1, X2, Y2),
+    });
+    if (!result) return;
     const output = `--------- Втора основна геодезическа задача (Enhanced) ---------
 X1 = ${X1}, Y1 = ${Y1}
 X2 = ${X2}, Y2 = ${Y2}

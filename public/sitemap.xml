@@ -52,46 +52,6 @@
     <priority>0.8</priority>
   </url>
   
-  <!-- Polar Intersection -->
-  <url>
-    <loc>https://www.geosolver.bg/tools/polar-intersection</loc>
-    <lastmod>2024-01-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  <!-- Hansen Task -->
-  <url>
-    <loc>https://www.geosolver.bg/tools/hansen-task</loc>
-    <lastmod>2024-01-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  <!-- Area Calculation -->
-  <url>
-    <loc>https://www.geosolver.bg/tools/area-calculation</loc>
-    <lastmod>2024-01-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  <!-- Distance and Bearing -->
-  <url>
-    <loc>https://www.geosolver.bg/tools/distance-bearing</loc>
-    <lastmod>2024-01-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  <!-- Coordinate Transformation -->
-  <url>
-    <loc>https://www.geosolver.bg/tools/coordinate-transformation</loc>
-    <lastmod>2024-01-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
   <!-- Scientific Calculator -->
   <url>
     <loc>https://www.geosolver.bg/tools/scientific-calculator</loc>

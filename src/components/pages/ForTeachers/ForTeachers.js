@@ -1,11 +1,16 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import Layout from '../../layout/Layout';
 import SEO from '../../shared/SEO';
 import { useTranslation } from '../../../hooks/useTranslation';
+import { useAuth } from '../../auth/AuthContext';
+import { canAccessTeacherClassroom } from '../../../utils/eduRoles';
 
 const ForTeachers = () => {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
+  const { user, loading } = useAuth();
   const features = t.forTeachersFeatures || [];
+  const showClassroomLink = canAccessTeacherClassroom(user, { loading });
   return (
     <>
       <SEO
@@ -34,6 +39,14 @@ const ForTeachers = () => {
                     </div>
                   ))}
                 </div>
+                {showClassroomLink && (
+                  <Link
+                    to="/classroom/dashboard"
+                    className="inline-block px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg text-sm font-medium font-['Manrope']"
+                  >
+                    {language === 'bg' ? 'Отвори класната стая' : 'Open classroom'}
+                  </Link>
+                )}
                 <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-400 dark:border-blue-500 rounded-xl flex flex-col gap-1 transition-colors">
                   <div className="text-base font-semibold text-blue-900 dark:text-blue-200 font-['Manrope']">{t.howToGetAccess}</div>
                   <div className="text-sm text-blue-900 dark:text-blue-200 font-['Manrope']">

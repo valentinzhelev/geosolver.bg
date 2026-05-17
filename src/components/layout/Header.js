@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useTheme } from '../../context/ThemeContext';
+import { canAccessTeacherClassroom, canAccessStudentClassroom } from '../../utils/eduRoles';
 
 const Header = () => {
   const location = useLocation();
@@ -10,6 +11,8 @@ const Header = () => {
   const { user, loading } = useAuth();
   const { t, language } = useTranslation();
   const { isDark, toggleTheme } = useTheme();
+  const showTeacherClassroom = canAccessTeacherClassroom(user, { loading });
+  const showStudentClassroom = canAccessStudentClassroom(user, { loading });
 
   const Loader = () => (
     <div className="px-4 py-2 flex items-center gap-2">
@@ -72,11 +75,18 @@ const Header = () => {
           </Link>
         </div>
         <div className="flex-1 flex justify-end items-center gap-3">
-          {user && (user.role === 'teacher' || user.role === 'admin') && (
-            <Link to="/teacher/dashboard" className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg flex justify-start items-center gap-3 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200">
-              <img src="/icons/homepage_login_icon.svg" alt="Teacher Icon" className="w-5 h-5" />
+          {showTeacherClassroom && (
+            <Link to="/classroom/dashboard" className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg flex justify-start items-center gap-3 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200">
+              <img src="/icons/homepage_login_icon.svg" alt="Classroom Icon" className="w-5 h-5" />
               <div className="justify-start text-black dark:text-white text-base font-medium font-['Manrope']">
-                {language === 'bg' ? 'Панел' : 'Dashboard'}
+                {language === 'bg' ? 'Класна стая' : 'Classroom'}
+              </div>
+            </Link>
+          )}
+          {showStudentClassroom && (
+            <Link to="/classroom/assignments" className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg flex justify-start items-center gap-3 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200">
+              <div className="justify-start text-black dark:text-white text-base font-medium font-['Manrope']">
+                {language === 'bg' ? 'Задания' : 'Assignments'}
               </div>
             </Link>
           )}
@@ -159,9 +169,15 @@ const Header = () => {
                 <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{t.forTeachers}</div>
                 <img src="/icons/small_header_icon.svg" alt="Arrow" className="w-3 h-3" />
               </Link>
-              {user && (user.role === 'teacher' || user.role === 'admin') && (
-                <Link to="/teacher/dashboard" onClick={() => setMobileMenuOpen(false)} className="self-stretch p-3 bg-gray-200 dark:bg-gray-700 rounded-lg inline-flex justify-start items-center gap-3 transition-colors duration-200 hover:bg-gray-300 dark:hover:bg-gray-600">
-                  <div className="justify-start text-black dark:text-white text-sm font-semibold font-['Manrope']">{language === 'bg' ? 'Панел' : 'Dashboard'}</div>
+              {showTeacherClassroom && (
+                <Link to="/classroom/dashboard" onClick={() => setMobileMenuOpen(false)} className="self-stretch p-3 bg-gray-200 dark:bg-gray-700 rounded-lg inline-flex justify-start items-center gap-3 transition-colors duration-200 hover:bg-gray-300 dark:hover:bg-gray-600">
+                  <div className="justify-start text-black dark:text-white text-sm font-semibold font-['Manrope']">{language === 'bg' ? 'Класна стая' : 'Classroom'}</div>
+                  <img src="/icons/small_header_icon.svg" alt="Arrow" className="w-3 h-3" />
+                </Link>
+              )}
+              {showStudentClassroom && (
+                <Link to="/classroom/assignments" onClick={() => setMobileMenuOpen(false)} className="self-stretch p-3 bg-gray-200 dark:bg-gray-700 rounded-lg inline-flex justify-start items-center gap-3 transition-colors duration-200 hover:bg-gray-300 dark:hover:bg-gray-600">
+                  <div className="justify-start text-black dark:text-white text-sm font-semibold font-['Manrope']">{language === 'bg' ? 'Задания' : 'Assignments'}</div>
                   <img src="/icons/small_header_icon.svg" alt="Arrow" className="w-3 h-3" />
                 </Link>
               )}

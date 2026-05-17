@@ -30,11 +30,11 @@ const Prices = () => {
   const faqs = [
     {
       q: language === 'bg' ? 'Как се изчисляват безплатните изчисления?' : 'How are free calculations counted?',
-      a: language === 'bg' ? 'Всеки регистриран потребител получава 5 безплатни изчисления за всяка задача на месец.' : 'Each registered user gets 5 free calculations per task per month.'
+      a: language === 'bg' ? 'Всеки регистриран потребител с безплатен план получава общо 5 изчисления, които се сумират от всички инструменти (напр. 1-ва основна + права засечка + 2-ра основна = 3/5).' : 'Each registered user on the free plan gets 5 calculations total across all tools (e.g. first basic + forward intersection + second basic = 3/5).'
     },
     {
       q: language === 'bg' ? 'Какви видове изчисления поддържа GeoSolver?' : 'What types of calculations does GeoSolver support?',
-      a: language === 'bg' ? 'GeoSolver предлага координатни трансформации, изчисления на площ, дължина и обем, GNSS анализ и други инструменти.' : 'GeoSolver offers coordinate transformations, area, length and volume calculations, GNSS analysis, and other tools.'
+      a: language === 'bg' ? 'GeoSolver предлага четири основни инструмента: първа и втора основна задача, права и обратна засечка.' : 'GeoSolver offers four core tools: first and second basic tasks, forward and resection intersection.'
     },
     {
       q: language === 'bg' ? 'Какви са начините за плащане?' : 'What are the payment methods?',
@@ -115,8 +115,8 @@ const Prices = () => {
                   </div>
                   <div className="text-neutral-400 dark:text-zinc-400 text-xs lg:text-base font-semibold font-['Manrope']">
                     {language === 'bg'
-                      ? 'Използвайте GeoSolver безплатно с до 5 изчисления на задача месечно или изберете професионален абонамент за неограничен достъп и допълнителни функции.'
-                      : 'Use GeoSolver for free with up to 5 calculations per task per month or choose a professional subscription for unlimited access and additional features.'
+                      ? 'Използвайте GeoSolver безплатно с общо 5 изчисления (от всички инструменти) или изберете професионален абонамент за неограничен достъп и допълнителни функции.'
+                      : 'Use GeoSolver for free with 5 calculations total across all tools, or choose a professional subscription for unlimited access and additional features.'
                     }
                   </div>
                 </div>
@@ -159,7 +159,7 @@ const Prices = () => {
                     </div>
                     <div className="w-full px-3 py-2 lg:p-3 bg-stone-50 dark:bg-zinc-800 rounded-lg flex flex-col justify-center items-center transition-colors">
                       <div className="text-black dark:text-zinc-200 text-xs lg:text-sm font-medium font-['Manrope']">
-                        {language === 'bg' ? '5 изчисления с всеки инструмент на месец' : '5 calculations with each tool per month'}
+                        {language === 'bg' ? '5 изчисления общо (всички инструменти)' : '5 calculations total (all tools)'}
                       </div>
                     </div>
                   </div>

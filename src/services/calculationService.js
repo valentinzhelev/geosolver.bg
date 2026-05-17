@@ -15,8 +15,20 @@ class CalculationService {
       });
       
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to save calculation');
+        let errorData = {};
+        try {
+          errorData = await response.json();
+        } catch {
+          /* ignore */
+        }
+        const message = errorData.error || 'Failed to save calculation';
+        if (response.status === 401) {
+          throw new Error('Authentication required');
+        }
+        if (response.status === 403) {
+          throw new Error(message || 'Calculation limit reached');
+        }
+        throw new Error(message);
       }
       
       return await response.json();

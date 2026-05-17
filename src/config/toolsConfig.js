@@ -1,18 +1,34 @@
-// Configuration for tools in development
-export const TOOLS_IN_DEVELOPMENT = {
-  // Add tool routes that are currently in development
-  // These tools will only be shown when the toggle is enabled
-  '/coordinate-transformation': true,
-  '/hansen-task': true,
-  // Add more tools as needed
+/** MVP: four core geodetic calculators shipped publicly */
+export const MVP_TOOL_ROUTES = [
+  '/first-task',
+  '/second-task',
+  '/forward-intersection',
+  '/resection',
+];
+
+/** Hidden until post-MVP; routes show a coming-soon page */
+export const POST_MVP_TOOL_ROUTES = [
+  '/polar-intersection',
+  '/coordinate-transformation',
+  '/hansen-task',
+  '/area-calculation',
+  '/distance-bearing',
+];
+
+export const POST_MVP_TOOL_LABELS = {
+  '/polar-intersection': { bg: 'Полярна засечка', en: 'Polar Intersection' },
+  '/coordinate-transformation': { bg: 'Коорд. трансформация', en: 'Coordinate Transformation' },
+  '/hansen-task': { bg: 'Задача за ханзен', en: 'Hansen Task' },
+  '/area-calculation': { bg: 'Изчисляване на площ', en: 'Area Calculation' },
+  '/distance-bearing': { bg: 'Разстояние и посока', en: 'Distance & Bearing' },
 };
 
-// Helper function to check if a tool is in development
-export const isToolInDevelopment = (route) => {
-  return TOOLS_IN_DEVELOPMENT[route] || false;
-};
+export const isMvpToolRoute = (route) => MVP_TOOL_ROUTES.includes(route);
 
-// Get all tools that are in development
-export const getToolsInDevelopment = () => {
-  return Object.keys(TOOLS_IN_DEVELOPMENT);
+export const isPostMvpToolRoute = (route) => POST_MVP_TOOL_ROUTES.includes(route);
+
+/** Base path without /docs suffix */
+export const normalizeToolRoute = (pathname) => {
+  const base = pathname.replace(/\/docs\/?$/, '') || pathname;
+  return base.endsWith('/') && base.length > 1 ? base.slice(0, -1) : base;
 };

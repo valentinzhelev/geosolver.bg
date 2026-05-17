@@ -3,12 +3,9 @@ import Layout from '../../layout/Layout';
 import SEO from '../../shared/SEO';
 import { Link } from "react-router-dom";
 import { useTranslation } from '../../../hooks/useTranslation';
-import { useUserPreferences } from '../../../hooks/useUserPreferences';
-import { isToolInDevelopment } from '../../../config/toolsConfig';
 
 const ToolsPage = () => {
   const { t, language } = useTranslation();
-  const { showToolsInDevelopment, toggleToolsInDevelopment, loading } = useUserPreferences();
 
   const tools = [
     {
@@ -20,6 +17,7 @@ const ToolsPage = () => {
       type: language === 'bg' ? "Трансформация / полярен метод" : "Transformation / polar method",
       calculation: "< 0.05s",
       route: "/first-task",
+      docsRoute: "/first-task/docs",
       icon: "/icons/first_task_icon.svg"
     },
     {
@@ -31,6 +29,7 @@ const ToolsPage = () => {
       type: language === 'bg' ? "GNSS / координатна геодезия" : "GNSS / coordinate geodesy",
       calculation: "< 0.1s",
       route: "/second-task",
+      docsRoute: "/second-task/docs",
       icon: "/icons/second_task_icon.svg"    
     },
     {
@@ -42,6 +41,7 @@ const ToolsPage = () => {
       type: language === 'bg' ? "GNSS / тахиметрично измерване" : "GNSS / tacheometric measurement",
       calculation: "< 0.08s",
       route: "/forward-intersection",
+      docsRoute: "/forward-intersection/docs",
       icon: "/icons/forward_intersection_icon.svg"
     },
     {
@@ -53,80 +53,18 @@ const ToolsPage = () => {
       type: language === 'bg' ? "координатна геодезия / класика" : "coordinate geodesy / classic",
       calculation: "~ 0.1s",
       route: "/resection",
+      docsRoute: "/resection/docs",
       icon: "/icons/resection_icon.svg"
     },
-    {
-      title: language === 'bg' ? "Полярна засечка" : "Polar Intersection",
-      description: language === 'bg'
-        ? "Изчисления на непознати точки по мерки от база."
-        : "Calculate unknown points using measurements from base.",
-      parameters: language === 'bg' ? "2 точки база + мерки" : "2 base points + measurements",
-      type: language === 'bg' ? "полярни координати" : "polar coordinates",
-      calculation: "< 0.09s",
-      route: "/polar-intersection",
-      icon: "/icons/polar_intersection_icon.svg"
-    },
-    {
-      title: language === 'bg' ? "Коорд. трансформация" : "Coordinate Transformation",
-      description: language === 'bg'
-        ? "Преобразуване между локални и глобални координатни системи."
-        : "Convert between local and global coordinate systems.",
-      parameters: language === 'bg' ? "3+ точки / трансформационни" : "3+ points / transformational",
-      type: language === 'bg' ? "Хелмерт, афинна, 7 параметъра" : "Helmert, affine, 7 parameters",
-      calculation: "< 0.2s",
-      route: "/coordinate-transformation",
-      icon: "/icons/coordinate_transformation_icon.svg"
-    },
-    {
-      title: language === 'bg' ? "Задача за ханзен" : "Hansen Task",
-      description: language === 'bg'
-        ? "Изчисляване на координатите на точка чрез ъглово преместване от две известни точки (A и B)."
-        : "Calculate point coordinates using angular displacement from two known points (A and B).",
-      parameters: language === 'bg' ? "координати на A и B + ъгли α, β" : "coordinates of A and B + angles α, β",
-      type: language === 'bg' ? "аналитична триангулация" : "analytical triangulation",
-      calculation: "< 0.1s",
-      route: "/hansen-task",
-      icon: "/icons/hansen-task-icon.svg"
-    },
-    {
-      title: language === 'bg' ? "Изчисляване на площ" : "Area Calculation",
-      description: language === 'bg'
-        ? "Изчисляване на площта на многоъгълник по различни методи (Shoelace, Trapezoidal, Simpson)."
-        : "Calculate polygon area using different methods (Shoelace, Trapezoidal, Simpson).",
-      parameters: language === 'bg' ? "3+ точки с координати" : "3+ points with coordinates",
-      type: language === 'bg' ? "площни изчисления" : "area calculations",
-      calculation: "< 0.05s",
-      route: "/area-calculation",
-      icon: "/icons/homepage_night_icon.svg"
-    },
-    {
-      title: language === 'bg' ? "Разстояние и посока" : "Distance & Bearing",
-      description: language === 'bg'
-        ? "Изчисляване на разстоянието и посочния ъгъл между две точки по координати."
-        : "Calculate distance and bearing between two points using coordinates.",
-      parameters: language === 'bg' ? "2 точки с координати" : "2 points with coordinates",
-      type: language === 'bg' ? "полярни координати" : "polar coordinates",
-      calculation: "< 0.03s",
-      route: "/distance-bearing",
-      icon: "/icons/homepage_gray_arrow_icon.svg"
-    }
   ];
-
-  // Filter tools based on development status
-  const filteredTools = tools.filter(tool => {
-    if (isToolInDevelopment(tool.route)) {
-      return !showToolsInDevelopment; // Show when toggle is OFF (gray), hide when ON (dark)
-    }
-    return true; // Always show tools that are not in development
-  });
 
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "ItemList",
     "name": language === 'bg' ? "Геодезически инструменти" : "Geodetic Tools",
     "description": language === 'bg' 
-      ? "Всички геодезически инструменти на GeoSolver за професионални изчисления"
-      : "All geodetic tools in GeoSolver for professional calculations",
+      ? "Четири основни геодезически инструмента на GeoSolver за професионални изчисления"
+      : "Four core geodetic tools in GeoSolver for professional calculations",
     "url": "https://www.geosolver.bg/tools",
     "numberOfItems": tools.length,
     "itemListElement": tools.map((tool, index) => ({
@@ -134,7 +72,7 @@ const ToolsPage = () => {
       "position": index + 1,
       "name": tool.title,
       "description": tool.description,
-      "url": `https://www.geosolver.bg/tools${tool.route}`
+      "url": `https://www.geosolver.bg${tool.route}`
     }))
   };
 
@@ -143,50 +81,30 @@ const ToolsPage = () => {
       <SEO
         title={language === 'bg' ? 'Инструменти – Геодезически калкулатори и задачи' : 'Tools – Geodetic Calculators and Tasks'}
         description={language === 'bg'
-          ? "Интерактивни геодезически инструменти за координатни трансформации, засечки, изчисления на ъгли и разстояния. Всичко за геодезията на едно място – бързо, лесно и удобно."
-          : "Interactive geodetic tools for coordinate transformations, intersections, angle and distance calculations. Everything for geodesy in one place - fast, easy, and convenient."
+          ? "Четири основни геодезически инструмента: първа и втора основна задача, права и обратна засечка. Бързи и точни изчисления за геодезисти."
+          : "Four core geodetic tools: first and second basic tasks, forward and resection intersection. Fast, accurate calculations for surveyors."
         }
         keywords={language === 'bg'
-          ? "геодезия, инструменти, калкулатори, координатни трансформации, права засечка, обратна засечка, полярна засечка, Hansen, GNSS, онлайн изчисления"
-          : "geodesy, tools, calculators, coordinate transformations, forward intersection, resection, polar intersection, Hansen, GNSS, online calculations"
+          ? "геодезия, инструменти, калкулатори, първа основна задача, втора основна задача, права засечка, обратна засечка, координати, GNSS"
+          : "geodesy, tools, calculators, first basic task, second basic task, forward intersection, resection, coordinates, GNSS"
         }
         canonical="/tools"
         structuredData={structuredData}
       />
     <Layout>
-      <div className="min-h-[calc(100vh-300px)] bg-stone-50 dark:bg-zinc-950 w-full overflow-hidden py-6 md:py-10">
-        <div className="max-w-[400px] md:max-w-[1180px] w-full mx-auto flex flex-col justify-center items-start gap-6 md:gap-10 px-4 md:px-0">
-          {/* Header Section */}
-          <div className="w-full flex flex-col md:flex-row md:justify-between md:items-end gap-4 md:gap-0">
-            <div className="w-full md:w-[580px] flex flex-col justify-start items-start gap-1">
-              <div className="text-black dark:text-white text-2xl md:text-3xl font-bold font-['Manrope']">{t.toolsTitle}</div>
-              <div className="text-neutral-400 dark:text-neutral-400 text-xs md:text-base font-semibold font-['Manrope']">
-                {language === 'bg'
-                  ? "Интерактивни инструменти за решаване на задачи в геодезията – от координатни трансформации до класически засечки."
-                  : "Interactive tools for solving geodesy tasks - from coordinate transformations to classic intersections."
-                }
-              </div>
-            </div>
-            <div className="flex justify-start items-center gap-3">
-              <div className="text-black dark:text-white text-sm md:text-base font-semibold font-['Manrope']">
-                {language === 'bg' ? "Инструменти в разработка" : "Tools in development"}
-              </div>
-                             <button
-                 onClick={toggleToolsInDevelopment}
-                 disabled={loading}
-                 className={`w-10 h-5 md:w-12 md:h-6 p-[3.33px] md:p-1 rounded-3xl flex items-center gap-1.5 md:gap-2 transition-all duration-200 ${
-                   showToolsInDevelopment 
-                     ? 'bg-gray-400 dark:bg-zinc-600 justify-start' 
-                     : 'bg-black dark:bg-white justify-end'
-                 } ${loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-               >
-                <div className="w-3.5 h-3.5 md:w-4 md:h-4 bg-white dark:bg-zinc-900 rounded-full" />
-              </button>
+      <div className="w-full bg-stone-50 dark:bg-zinc-950 overflow-hidden py-6 md:py-10 pb-10 md:pb-14">
+        <div className="max-w-[400px] md:max-w-[1180px] w-full mx-auto flex flex-col justify-start items-start gap-6 md:gap-10 px-4 md:px-0">
+          <div className="w-full flex flex-col justify-start items-start gap-1">
+            <div className="text-black dark:text-white text-2xl md:text-3xl font-bold font-['Manrope']">{t.toolsTitle}</div>
+            <div className="text-neutral-400 dark:text-neutral-400 text-xs md:text-base font-semibold font-['Manrope']">
+              {language === 'bg'
+                ? "Четири основни инструмента за координатни изчисления и класически засечки в геодезията."
+                : "Four core tools for coordinate calculations and classic geodetic intersections."
+              }
             </div>
           </div>
-          {/* Tools Grid */}
-          <div className="w-full grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-5">
-            {filteredTools.map((tool) => (
+          <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
+            {tools.map((tool) => (
               <Link
                 to={tool.route}
                 key={tool.title}
@@ -200,9 +118,15 @@ const ToolsPage = () => {
                       </div>
                       <div className="text-black dark:text-white text-sm md:text-base font-semibold font-['Manrope'] truncate">{tool.title}</div>
                     </div>
-                    <div className="w-5 h-5 md:w-4 md:h-4 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex items-center justify-center">
-                      <img src="/icons/question_icon.svg" alt="?" className="w-2.5 h-2.5" />
-                    </div>
+                    <Link
+                      to={tool.docsRoute}
+                      onClick={(e) => e.stopPropagation()}
+                      className="w-5 h-5 md:w-4 md:h-4 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex items-center justify-center hover:bg-stone-100 dark:hover:bg-zinc-800"
+                      title={language === 'bg' ? 'Документация' : 'Documentation'}
+                      aria-label={language === 'bg' ? 'Документация' : 'Documentation'}
+                    >
+                      <img src="/icons/question_icon.svg" alt="" className="w-2.5 h-2.5" />
+                    </Link>
                   </div>
                   <div className="w-full h-0 outline outline-1 outline-offset-[-0.50px] outline-gray-200 dark:outline-zinc-800" />
                   <div className="text-neutral-400 dark:text-neutral-400 text-xs md:text-sm font-medium font-['Manrope']">{tool.description}</div>
@@ -237,4 +161,4 @@ const ToolsPage = () => {
   );
 };
 
-export default ToolsPage; 
+export default ToolsPage;
