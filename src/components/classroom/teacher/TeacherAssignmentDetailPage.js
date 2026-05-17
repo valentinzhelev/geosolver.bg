@@ -10,6 +10,7 @@ import { useTranslation } from '../../../hooks/useTranslation';
 import { EDU_TOOLS, toolKeyFromTemplate } from '../../../config/eduTools';
 import { getCalculatorPolicyMeta, normalizeCalculatorPolicy } from '../../../config/eduCalculatorPolicy';
 import SubmissionReviewCard from '../ui/SubmissionReviewCard';
+import GaiAssignmentAnalytics from '../ui/GaiAssignmentAnalytics';
 
 function flattenInputData(inputData) {
   if (!inputData || typeof inputData !== 'object') return {};
@@ -30,6 +31,8 @@ const TeacherAssignmentDetailPage = () => {
   const [actionMsg, setActionMsg] = useState('');
   const [submissions, setSubmissions] = useState([]);
   const [submissionsLoading, setSubmissionsLoading] = useState(false);
+  const [gaiAnalytics, setGaiAnalytics] = useState(null);
+  const [gaiLoading, setGaiLoading] = useState(false);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -52,6 +55,13 @@ const TeacherAssignmentDetailPage = () => {
       .then((res) => setSubmissions(res.data || []))
       .catch(() => setSubmissions([]))
       .finally(() => setSubmissionsLoading(false));
+
+    setGaiLoading(true);
+    classroomApi
+      .getAssignmentGaiAnalytics(id)
+      .then((res) => setGaiAnalytics(res.data || null))
+      .catch(() => setGaiAnalytics(null))
+      .finally(() => setGaiLoading(false));
   }, [id, assignment]);
 
   const isArchived = assignment?.status === 'archived';
@@ -365,6 +375,8 @@ const TeacherAssignmentDetailPage = () => {
                 ? 'Всеки ученик получава един вариант (по ID). Броят варианти = брой различни задачи в групата.'
                 : 'Each student gets one variant (by ID). Variant count = number of distinct problems.'}
             </p>
+
+            <GaiAssignmentAnalytics analytics={gaiAnalytics} bg={bg} loading={gaiLoading} />
 
             <h2 className="text-lg font-bold font-['Manrope'] text-black dark:text-white pt-4">
               {bg ? 'Предавания от ученици' : 'Student submissions'}

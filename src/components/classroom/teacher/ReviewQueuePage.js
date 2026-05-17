@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+﻿import React, { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import SEO from '../../shared/SEO';
 import ClassroomLayout from '../ClassroomLayout';
@@ -98,23 +98,23 @@ const ReviewQueuePage = () => {
 
   return (
     <>
-      <SEO title={bg ? 'РџСЂРµРіР»РµРґ' : 'Review'} canonical="/classroom/review" />
+      <SEO title={bg ? 'Преглед' : 'Review'} canonical="/classroom/review" />
       <ClassroomLayout
-        title={bg ? 'РћРїР°С€РєР° Р·Р° РїСЂРµРіР»РµРґ' : 'Review queue'}
+        title={bg ? 'Опашка за преглед' : 'Review queue'}
         subtitle={
           bg
-            ? 'Р’СЃРёС‡РєРё РїСЂРµРґР°РІР°РЅРёСЏ СЃ РѕС‚РіРѕРІРѕСЂРё вЂ” РІРєР»СЋС‡РёС‚РµР»РЅРѕ Р°РІС‚РѕРјР°С‚РёС‡РЅРѕ РѕС†РµРЅРµРЅРёС‚Рµ.'
-            : 'All submissions with answers вЂ” including auto-graded.'
+            ? 'Всички предавания с отговори — включително автоматично оценените.'
+            : 'All submissions with answers — including auto-graded.'
         }
       >
         <Card className="p-4 md:p-5 mb-2">
           <div className="flex flex-col gap-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400 dark:text-zinc-500 font-['Manrope']">
-                {bg ? 'Р¤РёР»С‚СЂРё' : 'Filters'}
+                {bg ? 'Филтри' : 'Filters'}
                 {hasActiveFilters && (
                   <span className="ml-2 normal-case font-medium text-neutral-600 dark:text-zinc-300">
-                    В· {activeFilterCount} {bg ? 'Р°РєС‚РёРІРЅРё' : 'active'}
+                    · {activeFilterCount} {bg ? 'активни' : 'active'}
                   </span>
                 )}
               </p>
@@ -124,7 +124,7 @@ const ReviewQueuePage = () => {
                   onClick={clearFilters}
                   className="text-xs font-medium font-['Manrope'] text-neutral-500 hover:text-black dark:hover:text-white underline-offset-2 hover:underline"
                 >
-                  {bg ? 'РР·С‡РёСЃС‚Рё РІСЃРёС‡РєРё' : 'Clear all'}
+                  {bg ? 'Изчисти всички' : 'Clear all'}
                 </button>
               )}
             </div>
@@ -132,14 +132,14 @@ const ReviewQueuePage = () => {
             <div className="flex flex-col lg:flex-row lg:items-end gap-4 lg:gap-6">
               <label className="flex flex-col gap-1.5 flex-1 min-w-0 lg:max-w-sm">
                 <span className="text-sm font-medium text-black dark:text-white font-['Manrope']">
-                  {bg ? 'Р“СЂСѓРїР°' : 'Group'}
+                  {bg ? 'Група' : 'Group'}
                 </span>
                 <select
                   value={courseFilter}
                   onChange={(e) => setCourseFilter(e.target.value)}
                   className="w-full px-3 py-2.5 rounded-lg border border-gray-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-sm font-['Manrope'] text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-black/10 dark:focus:ring-white/20"
                 >
-                  <option value="">{bg ? 'Р’СЃРёС‡РєРё РіСЂСѓРїРё' : 'All groups'}</option>
+                  <option value="">{bg ? 'Всички групи' : 'All groups'}</option>
                   {courses.map((c) => (
                     <option key={c._id} value={c._id}>
                       {c.name} ({c.code})
@@ -150,12 +150,12 @@ const ReviewQueuePage = () => {
 
               <div className="flex flex-col gap-1.5 flex-1 min-w-0">
                 <span className="text-sm font-medium text-black dark:text-white font-['Manrope']">
-                  {bg ? 'РџРѕРєР°Р¶Рё' : 'Show'}
+                  {bg ? 'Покажи' : 'Show'}
                 </span>
                 <div
                   className="inline-flex flex-wrap gap-1 p-1 rounded-xl bg-stone-100 dark:bg-zinc-800/80 outline outline-1 outline-offset-[-1px] outline-stone-200/80 dark:outline-zinc-700 w-fit max-w-full"
                   role="group"
-                  aria-label={bg ? 'Р¤РёР»С‚СЂРё Р·Р° РїСЂРµРґР°РІР°РЅРёСЏ' : 'Submission filters'}
+                  aria-label={bg ? 'Филтри за предавания' : 'Submission filters'}
                 >
                   <button
                     type="button"
@@ -163,7 +163,7 @@ const ReviewQueuePage = () => {
                     className={filterChipClass(lateOnly)}
                     aria-pressed={lateOnly}
                   >
-                    {bg ? 'РЎР°РјРѕ РєСЉСЃРЅРё' : 'Late only'}
+                    {bg ? 'Само късни' : 'Late only'}
                   </button>
                   <button
                     type="button"
@@ -174,7 +174,7 @@ const ReviewQueuePage = () => {
                     className={filterChipClass(manualOnly)}
                     aria-pressed={manualOnly}
                   >
-                    {bg ? 'РЎР°РјРѕ Р·Р° СЂСЉС‡РЅР° РѕС†РµРЅРєР°' : 'Manual review only'}
+                    {bg ? 'Само за ръчна оценка' : 'Manual review only'}
                   </button>
                 </div>
               </div>
@@ -182,31 +182,31 @@ const ReviewQueuePage = () => {
               {!manualOnly && (
                 <label className="flex flex-col gap-1.5 lg:max-w-[180px]">
                   <span className="text-sm font-medium text-black dark:text-white font-['Manrope']">
-                    {bg ? 'РЎС‚Р°С‚СѓСЃ' : 'Status'}
+                    {bg ? 'Статус' : 'Status'}
                   </span>
                   <select
                     value={scope}
                     onChange={(e) => setScope(e.target.value)}
                     className="px-3 py-2.5 rounded-lg border border-gray-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-sm font-['Manrope']"
                   >
-                    <option value="all">{bg ? 'Р’СЃРёС‡РєРё' : 'All'}</option>
-                    <option value="pending">{bg ? 'Р§Р°РєР°С‰Рё' : 'Pending'}</option>
-                    <option value="graded">{bg ? 'РћС†РµРЅРµРЅРё' : 'Graded'}</option>
+                    <option value="all">{bg ? 'Всички' : 'All'}</option>
+                    <option value="pending">{bg ? 'Чакащи' : 'Pending'}</option>
+                    <option value="graded">{bg ? 'Оценени' : 'Graded'}</option>
                   </select>
                 </label>
               )}
 
               <label className="flex flex-col gap-1.5 lg:max-w-[160px]">
                 <span className="text-sm font-medium text-black dark:text-white font-['Manrope']">
-                  {bg ? 'РџРѕРґСЂРµРґР±Р°' : 'Sort'}
+                  {bg ? 'Подредба' : 'Sort'}
                 </span>
                 <select
                   value={sortOrder}
                   onChange={(e) => setSortOrder(e.target.value)}
                   className="px-3 py-2.5 rounded-lg border border-gray-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-sm font-['Manrope']"
                 >
-                  <option value="newest">{bg ? 'РќР°Р№-РЅРѕРІРё' : 'Newest first'}</option>
-                  <option value="oldest">{bg ? 'РќР°Р№-СЃС‚Р°СЂРё' : 'Oldest first'}</option>
+                  <option value="newest">{bg ? 'Най-нови' : 'Newest first'}</option>
+                  <option value="oldest">{bg ? 'Най-стари' : 'Oldest first'}</option>
                 </select>
               </label>
 
@@ -215,8 +215,8 @@ const ReviewQueuePage = () => {
                   {items.length}{' '}
                   {bg
                     ? items.length === 1
-                      ? 'РїСЂРµРґР°РІР°РЅРµ'
-                      : 'РїСЂРµРґР°РІР°РЅРёСЏ'
+                      ? 'предаване'
+                      : 'предавания'
                     : items.length === 1
                       ? 'submission'
                       : 'submissions'}
@@ -227,14 +227,14 @@ const ReviewQueuePage = () => {
         </Card>
 
         {error && <Card className="p-4 text-sm text-red-600">{error}</Card>}
-        {loading && <Card className="p-8 text-center text-neutral-500">{bg ? 'Р—Р°СЂРµР¶РґР°РЅРµ...' : 'Loading...'}</Card>}
+        {loading && <Card className="p-8 text-center text-neutral-500">{bg ? 'Зареждане...' : 'Loading...'}</Card>}
         {!loading && items.length === 0 && (
           <EmptyState
-            title={bg ? 'РќСЏРјР° РїСЂРµРґР°РІР°РЅРёСЏ' : 'No submissions'}
+            title={bg ? 'Няма предавания' : 'No submissions'}
             description={
               bg
-                ? 'РћРїРёС‚Р°Р№С‚Рµ вЂћР’СЃРёС‡РєРёвЂњ РІСЉРІ С„РёР»С‚СЉСЂР° РЎС‚Р°С‚СѓСЃ РёР»Рё РїСЂРѕРІРµСЂРµС‚Рµ РґСЂСѓРіР° РіСЂСѓРїР°.'
-                : 'Try вЂњAllвЂќ in the Status filter or another group.'
+                ? 'Опитайте „Всички“ във филтъра Статус или проверете друга група.'
+                : 'Try "All" in the Status filter or another group.'
             }
           />
         )}
@@ -259,4 +259,3 @@ const ReviewQueuePage = () => {
 };
 
 export default ReviewQueuePage;
-

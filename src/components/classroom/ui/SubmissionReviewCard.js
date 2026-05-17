@@ -7,6 +7,8 @@ import {
   formatAnswerValue,
   getComparisonRows,
 } from '../../../utils/eduSubmissionDisplay';
+import GaiRadialWorkspace from './GaiRadialWorkspace';
+import { buildTeacherGaiCallouts } from '../../../utils/buildStudentGaiCallouts';
 
 const SubmissionReviewCard = ({
   submission: s,
@@ -28,8 +30,14 @@ const SubmissionReviewCard = ({
     return f ? (bg ? f.labelBg : f.labelEn) : key;
   };
 
-  return (
-    <Card className="p-5 flex flex-col gap-3">
+  const { left: leftCallouts, right: rightCallouts } = buildTeacherGaiCallouts({
+    bg,
+    gaiInsights: s.gaiInsights,
+    llmNarrative: s.llmNarrative || s.gaiLlm?.teacher,
+  });
+
+  const core = (
+    <Card className="p-5 flex flex-col gap-3 shadow-lg ring-1 ring-stone-200/80 dark:ring-zinc-700">
       <div className="flex flex-wrap justify-between gap-2">
         <div>
           <div className="font-bold font-['Manrope'] text-black dark:text-white">
@@ -146,6 +154,16 @@ const SubmissionReviewCard = ({
         </div>
       )}
     </Card>
+  );
+
+  if (leftCallouts.length === 0 && rightCallouts.length === 0) {
+    return core;
+  }
+
+  return (
+    <GaiRadialWorkspace leftCallouts={leftCallouts} rightCallouts={rightCallouts}>
+      {core}
+    </GaiRadialWorkspace>
   );
 };
 

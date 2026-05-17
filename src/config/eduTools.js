@@ -19,6 +19,18 @@ export const EDU_TOOLS = [
       { key: 'alpha', labelBg: 'α (гради)', labelEn: 'α (gon)' },
       { key: 's', labelBg: 'S (м)', labelEn: 'S (m)' },
     ],
+    workflowSteps: [
+      { labelBg: 'Прочети даденото', labelEn: 'Read the given data' },
+      { labelBg: 'Отвори калкулатора', labelEn: 'Open the calculator' },
+      { labelBg: 'Провери междинните стъпки', labelEn: 'Check intermediate steps' },
+      { labelBg: 'Предай координатите', labelEn: 'Submit your coordinates' },
+    ],
+    calculatorSteps: [
+      { key: 'inputs', labelBg: 'Въведи Y₁, X₁, α и S', labelEn: 'Enter Y₁, X₁, α and S' },
+      { key: 'compute', labelBg: 'Натисни „Изчисли“', labelEn: 'Press Calculate' },
+      { key: 'read', labelBg: 'Провери междинните стойности', labelEn: 'Check intermediate values' },
+      { key: 'copy', labelBg: 'Прехвърли X₂ и Y₂ в заданието', labelEn: 'Copy X₂ and Y₂ to the assignment' },
+    ],
   },
   {
     toolKey: 'second-basic-task',
@@ -38,6 +50,18 @@ export const EDU_TOOLS = [
       { key: 'y1', labelBg: 'Y₁', labelEn: 'Y₁' },
       { key: 'x2', labelBg: 'X₂', labelEn: 'X₂' },
       { key: 'y2', labelBg: 'Y₂', labelEn: 'Y₂' },
+    ],
+    workflowSteps: [
+      { labelBg: 'Запиши двете точки', labelEn: 'Note both points' },
+      { labelBg: 'Изчисли в калкулатора', labelEn: 'Calculate in the tool' },
+      { labelBg: 'Свери S и α', labelEn: 'Verify S and α' },
+      { labelBg: 'Предай отговора', labelEn: 'Submit your answer' },
+    ],
+    calculatorSteps: [
+      { key: 'points', labelBg: 'Въведи координатите на двете точки', labelEn: 'Enter both point coordinates' },
+      { key: 'compute', labelBg: 'Изчисли S и α', labelEn: 'Calculate S and α' },
+      { key: 'units', labelBg: 'Провери единиците (м, гради)', labelEn: 'Check units (m, gon)' },
+      { key: 'submit', labelBg: 'Предай S и α', labelEn: 'Submit S and α' },
     ],
   },
   {
@@ -60,6 +84,18 @@ export const EDU_TOOLS = [
       { key: 'xB', labelBg: 'Xᵦ', labelEn: 'Xᵦ' },
       { key: 'beta1', labelBg: 'β₁', labelEn: 'β₁' },
       { key: 'beta2', labelBg: 'β₂', labelEn: 'β₂' },
+    ],
+    workflowSteps: [
+      { labelBg: 'Постави A и B', labelEn: 'Set points A and B' },
+      { labelBg: 'Въведи ъглите β₁, β₂', labelEn: 'Enter angles β₁, β₂' },
+      { labelBg: 'Намери P в калкулатора', labelEn: 'Find P in the calculator' },
+      { labelBg: 'Предай Xₚ и Yₚ', labelEn: 'Submit Xₚ and Yₚ' },
+    ],
+    calculatorSteps: [
+      { key: 'ab', labelBg: 'Въведи точки A и B', labelEn: 'Enter points A and B' },
+      { key: 'angles', labelBg: 'Въведи β₁ и β₂', labelEn: 'Enter β₁ and β₂' },
+      { key: 'compute', labelBg: 'Изчисли P', labelEn: 'Calculate P' },
+      { key: 'submit', labelBg: 'Предай Xₚ, Yₚ', labelEn: 'Submit Xₚ, Yₚ' },
     ],
   },
   {
@@ -84,6 +120,18 @@ export const EDU_TOOLS = [
       { key: 'yC', labelBg: 'Yᶜ', labelEn: 'Yᶜ' },
       { key: 'beta1', labelBg: 'β₁', labelEn: 'β₁' },
       { key: 'beta2', labelBg: 'β₂', labelEn: 'β₂' },
+    ],
+    workflowSteps: [
+      { labelBg: 'Маркирай трите точки', labelEn: 'Mark the three points' },
+      { labelBg: 'Въведи ъглите от A, B, C', labelEn: 'Enter angles at A, B, C' },
+      { labelBg: 'Реши обратната засечка', labelEn: 'Solve resection' },
+      { labelBg: 'Предай координатите на P', labelEn: 'Submit P coordinates' },
+    ],
+    calculatorSteps: [
+      { key: 'abc', labelBg: 'Въведи A, B и C', labelEn: 'Enter A, B and C' },
+      { key: 'angles', labelBg: 'Въведи ъглите β₁, β₂', labelEn: 'Enter β₁, β₂' },
+      { key: 'compute', labelBg: 'Изчисли P', labelEn: 'Calculate P' },
+      { key: 'submit', labelBg: 'Предай координатите на P', labelEn: 'Submit P coordinates' },
     ],
   },
 ];

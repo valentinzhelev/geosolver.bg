@@ -130,6 +130,7 @@ export const classroomApi = {
     request('/teacher/assignments', { method: 'POST', body: JSON.stringify(body) }),
   getAssignment: (id) => request(`/teacher/assignments/${id}`),
   getAssignmentSubmissions: (id) => request(`/teacher/assignments/${id}/submissions`),
+  getAssignmentGaiAnalytics: (id) => request(`/teacher/assignments/${id}/gai-analytics`),
   getReviewQueue: (params = {}) => {
     const q = new URLSearchParams(params).toString();
     return request(`/teacher/assignments/review-queue/list${q ? `?${q}` : ''}`);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import SEO from '../../shared/SEO';
 import ClassroomLayout from '../ClassroomLayout';
@@ -23,10 +23,16 @@ import {
   clearAnswerDraft,
 } from '../../../utils/eduAnswerDraft';
 import {
+  
   normalizeCalculatorPolicy,
   allowsCalculatorAccess,
   getCalculatorPolicyMeta,
 } from '../../../config/eduCalculatorPolicy';
+import GaiRadialWorkspace from '../ui/GaiRadialWorkspace';
+import TaskDiagramSvg from '../ui/TaskDiagramSvg';
+import CalculatorStepChecklist from './CalculatorStepChecklist';
+import { buildStudentGaiCallouts } from '../../../utils/buildStudentGaiCallouts';
+import { getEduGamification, recordEduSubmission, badgeLabel } from '../../../utils/eduGamification';
 
 const StudentAssignmentDetailPage = () => {
   const { id } = useParams();
@@ -41,12 +47,21 @@ const StudentAssignmentDetailPage = () => {
   const [error, setError] = useState('');
   const [result, setResult] = useState(null);
   const [hasDraft, setHasDraft] = useState(false);
+  const [gaiFeedback, setGaiFeedback] = useState(null);
+  const [gaiContext, setGaiContext] = useState(null);
+  const [gaiStudyHint, setGaiStudyHint] = useState(null);
+  const [gamification, setGamification] = useState({ streak: 0, badges: [] });
+  const startedAtRef = useRef(Date.now());
 
   useEffect(() => {
     studentClassroomApi
       .getAssignment(id)
       .then((res) => {
         setAssignment(res.data);
+        setGaiFeedback(res.data.gaiFeedback || res.data.submission?.gaiFeedback || null);
+        setGaiContext(res.data.gaiContext || null);
+        setGaiStudyHint(res.data.gaiStudyHint || null);
+        setGamification(getEduGamification(user?.id || user?._id));
         const key = toolKeyFromTemplate(res.data.taskTemplate);
         const tool = EDU_TOOLS.find((t) => t.toolKey === key);
         if (tool) {
@@ -64,7 +79,7 @@ const StudentAssignmentDetailPage = () => {
       })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, user?.id, user?._id]);
 
   useEffect(() => {
     if (!id || !assignment?.canSubmit) return undefined;
@@ -89,6 +104,10 @@ const StudentAssignmentDetailPage = () => {
   const calculatorPolicy = normalizeCalculatorPolicy(assignment?.options?.calculatorPolicy);
   const policyMeta = getCalculatorPolicyMeta(calculatorPolicy, bg);
   const canOpenCalculator = allowsCalculatorAccess(calculatorPolicy);
+  const filledCount = tool
+    ? tool.answerKeys.filter((f) => answers[f.key] != null && String(answers[f.key]).trim() !== '').length
+    : 0;
+  const totalFields = tool?.answerKeys?.length || 0;
 
   const handleOpenCalculator = () => {
     if (!canOpenCalculator || !tool) return;
@@ -103,6 +122,18 @@ const StudentAssignmentDetailPage = () => {
     navigate(tool.route);
   };
 
+  const hasSubmitted = Boolean(assignment?.submission || result);
+  const { left: leftCallouts, right: rightCallouts } = buildStudentGaiCallouts({
+    bg,
+    tool,
+    gaiFeedback: gaiFeedback || assignment?.gaiFeedback,
+    gaiContext: gaiContext || assignment?.gaiContext,
+    gaiStudyHint: gaiStudyHint || assignment?.gaiStudyHint,
+    canOpenCalculator,
+    hasSubmitted,
+    gamification,
+  });
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
@@ -112,17 +143,35 @@ const StudentAssignmentDetailPage = () => {
       Object.entries(answers).forEach(([k, v]) => {
         numericAnswers[k] = parseFloat(String(v).replace(',', '.'));
       });
+      const minutesOnPage = Math.max(1, Math.round((Date.now() - startedAtRef.current) / 60000));
       const res = await studentClassroomApi.submitAssignment(id, {
         answers: numericAnswers,
         variantIndex: variant?.variantIndex ?? 0,
-        timeSpent: 0,
+        timeSpent: minutesOnPage,
       });
       setResult(res.data);
+      if (res.data?.gaiFeedback) setGaiFeedback(res.data.gaiFeedback);
+      if (res.data?.gaiContext) setGaiContext(res.data.gaiContext);
+      const uid = user?.id || user?._id;
+      setGamification(recordEduSubmission(uid, { onTime: !res.data?.isLate }));
       clearAnswerDraft(id);
       setHasDraft(false);
       const refreshed = await studentClassroomApi.getAssignment(id);
       setAssignment(refreshed.data);
     } catch (err) {
+      try {
+        const refreshed = await studentClassroomApi.getAssignment(id);
+        if (refreshed.data?.submission) {
+          setAssignment(refreshed.data);
+          setGaiFeedback(refreshed.data.gaiFeedback || refreshed.data.submission?.gaiFeedback);
+          setResult(refreshed.data.submission);
+          clearAnswerDraft(id);
+          setHasDraft(false);
+          return;
+        }
+      } catch {
+        /* ignore recovery fetch */
+      }
       setError(err.message);
     } finally {
       setSubmitting(false);
@@ -164,9 +213,27 @@ const StudentAssignmentDetailPage = () => {
         )}
 
         {assignment && tool && assignment.variants?.length > 0 && (
-          <div className="grid lg:grid-cols-2 gap-6">
-            <Card className="p-6 flex flex-col gap-4">
-              <h2 className="font-bold font-['Manrope'] text-black dark:text-white">{bg ? 'Условие' : 'Problem'}</h2>
+          <GaiRadialWorkspace leftCallouts={leftCallouts} rightCallouts={rightCallouts}>
+            <Card className="p-5 md:p-6 flex flex-col gap-4 shadow-xl ring-1 ring-stone-200/80 dark:ring-zinc-700 rounded-2xl">
+              <div className="flex items-start gap-3">
+                {tool.icon && (
+                  <img src={tool.icon} alt="" className="w-12 h-12 rounded-lg bg-stone-100 dark:bg-zinc-800 p-2" />
+                )}
+                <div>
+                  <h2 className="font-bold font-['Manrope'] text-black dark:text-white">
+                    {bg ? tool.titleBg : tool.titleEn}
+                  </h2>
+                  <p className="text-xs text-neutral-500 font-['Manrope'] mt-0.5">
+                    {bg ? tool.descBg : tool.descEn}
+                  </p>
+                </div>
+              </div>
+
+              <TaskDiagramSvg toolKey={tool.toolKey} inputData={inputData} answers={answers} bg={bg} />
+
+              <h3 className="text-sm font-semibold font-['Manrope'] text-neutral-500 uppercase tracking-wide">
+                {bg ? 'Входни данни' : 'Given data'}
+              </h3>
               {assignment.description && (
                 <p className="text-sm text-neutral-600 dark:text-zinc-400 font-['Manrope'] whitespace-pre-wrap">
                   {assignment.description}
@@ -180,38 +247,20 @@ const StudentAssignmentDetailPage = () => {
                   </div>
                 ))}
               </div>
-              <p className="text-xs text-neutral-500 dark:text-zinc-400 font-['Manrope']">{policyMeta.studentHint}</p>
-              {canOpenCalculator ? (
-                <button
-                  type="button"
-                  onClick={handleOpenCalculator}
-                  className="px-4 py-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700 text-sm font-medium font-['Manrope'] text-black dark:text-white w-fit hover:bg-stone-50 dark:hover:bg-zinc-800"
-                >
-                  {bg ? 'Отвори в калкулатора' : 'Open in calculator'}
-                </button>
-              ) : (
-                <p className="text-sm text-amber-800 dark:text-amber-200 font-['Manrope']">
-                  {bg
-                    ? 'За това задание преподавателят е изключил калкулатора. Въведете отговорите ръчно вдясно.'
-                    : 'Your teacher disabled the calculator for this assignment. Enter answers manually on the right.'}
-                </p>
-              )}
-              <div className="flex flex-wrap items-center gap-2">
-                <StudentStatusBadge status={assignment.studentStatus} language={language} />
-                <p className="text-xs text-neutral-400 font-['Manrope']">
-                  {bg ? 'Краен срок' : 'Due'}: {new Date(assignment.dueDate).toLocaleString(bg ? 'bg-BG' : 'en-US')}
-                  {assignment.submissionCount != null && (
-                    <>
-                      {' '}
-                      · {bg ? 'Опити' : 'Attempts'}: {assignment.submissionCount}/{assignment.maxAttempts}
-                    </>
-                  )}
-                </p>
-              </div>
-            </Card>
 
-            <Card className="p-6 flex flex-col gap-4">
-              <h2 className="font-bold font-['Manrope'] text-black dark:text-white">{bg ? 'Предай отговор' : 'Submit answer'}</h2>
+              {canOpenCalculator && tool.calculatorSteps && (
+                <CalculatorStepChecklist assignmentId={id} steps={tool.calculatorSteps} bg={bg} />
+              )}
+
+              <div className="border-t border-stone-100 dark:border-zinc-800 pt-4 flex flex-col gap-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h2 className="font-bold font-['Manrope'] text-black dark:text-white">{bg ? 'Вашият отговор' : 'Your answer'}</h2>
+                {totalFields > 0 && (
+                  <span className="text-xs font-['Manrope'] text-neutral-500">
+                    {filledCount}/{totalFields} {bg ? 'полета' : 'fields'}
+                  </span>
+                )}
+              </div>
               {assignment.canSubmit && hasDraft && (
                 <p className="text-xs text-neutral-500 font-['Manrope']">
                   {bg ? 'Има запазена чернова на отговорите.' : 'A saved answer draft is available.'}
@@ -254,26 +303,54 @@ const StudentAssignmentDetailPage = () => {
                         type="number"
                         step="any"
                         value={answers[f.key] ?? ''}
-                        onChange={(e) => setAnswers({ ...answers, [f.key]: e.target.value })}
+                        onChange={(e) => {
+                          setAnswers({ ...answers, [f.key]: e.target.value });
+                        }}
                         className="px-3 py-2 rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-black dark:text-white"
                       />
                     </label>
                   ))}
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg text-sm font-medium w-fit disabled:opacity-50"
-                  >
-                    {submitting ? (bg ? 'Изпращане...' : 'Submitting...') : bg ? 'Предай' : 'Submit'}
-                  </button>
+                  <div className="flex flex-wrap gap-2">
+                    {canOpenCalculator && (
+                      <button
+                        type="button"
+                        onClick={handleOpenCalculator}
+                        className="flex-1 min-w-[120px] px-4 py-2 rounded-lg bg-stone-100 dark:bg-zinc-800 text-sm font-medium font-['Manrope']"
+                      >
+                        {bg ? 'Калкулатор' : 'Calculator'}
+                      </button>
+                    )}
+                    <button
+                      type="submit"
+                      disabled={submitting}
+                      className="flex-1 min-w-[120px] px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg text-sm font-medium font-['Manrope'] disabled:opacity-50"
+                    >
+                      {submitting ? (bg ? 'Изпращане...' : 'Sending...') : bg ? 'Предай →' : 'Submit →'}
+                    </button>
+                  </div>
                 </form>
               ) : (
                 <p className="text-sm text-neutral-500 font-['Manrope']">
                   {bg ? 'Краен срокът е изтекъл.' : 'The deadline has passed.'}
                 </p>
               )}
+              </div>
+
+              {gamification?.badges?.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 justify-center">
+                  {gamification.badges.map((b) => (
+                    <span
+                      key={b}
+                      className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-900 font-['Manrope']"
+                    >
+                      {badgeLabel(b, bg)}
+                    </span>
+                  ))}
+                </div>
+              )}
+              <p className="text-[10px] text-neutral-400 font-['Manrope'] text-center">{policyMeta.studentHint}</p>
             </Card>
-          </div>
+          </GaiRadialWorkspace>
         )}
       </ClassroomLayout>
     </>
