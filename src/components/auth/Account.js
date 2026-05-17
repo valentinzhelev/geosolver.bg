@@ -8,6 +8,7 @@ import PlanService from '../../services/planService';
 import BillingService from '../../services/billingService';
 import CalculationService from '../../services/calculationService';
 import UserManagementService from '../../services/userManagementService';
+import { teacherAccessApi } from '../../services/classroomApi';
 
 const Account = () => {
   const { user, logout, refreshUser, changePassword } = useAuth();
@@ -150,6 +151,9 @@ const Account = () => {
   const [adminCurrentPage, setAdminCurrentPage] = useState(1);
   const [adminTotalPages, setAdminTotalPages] = useState(1);
   const [adminTotalUsers, setAdminTotalUsers] = useState(0);
+  const [teacherRequests, setTeacherRequests] = useState([]);
+  const [teacherRequestsLoading, setTeacherRequestsLoading] = useState(false);
+  const [teacherRequestFilter, setTeacherRequestFilter] = useState('pending');
 
   const isProUser =
     user?.role === 'admin' ||
@@ -548,14 +552,50 @@ const Account = () => {
     }
   };
 
+  const loadTeacherRequests = async () => {
+    if (!user || user.role !== 'admin') return;
+    setTeacherRequestsLoading(true);
+    try {
+      const res = await teacherAccessApi.listRequestsAdmin(
+        teacherRequestFilter ? { status: teacherRequestFilter } : {}
+      );
+      setTeacherRequests(res.data || []);
+    } catch (e) {
+      console.error(e);
+      setTeacherRequests([]);
+    } finally {
+      setTeacherRequestsLoading(false);
+    }
+  };
+
+  const handleTeacherRequestReview = async (requestId, status) => {
+    const note =
+      status === 'rejected'
+        ? window.prompt(language === 'bg' ? 'Причина (по избор):' : 'Reason (optional):') || ''
+        : '';
+    try {
+      await teacherAccessApi.reviewRequestAdmin(requestId, { status, adminNote: note });
+      alert(language === 'bg' ? 'Готово.' : 'Done.');
+      loadTeacherRequests();
+    } catch (e) {
+      alert(e.message);
+    }
+  };
+
   // Load admin users when user is admin and search/filter changes
   useEffect(() => {
     if (user && user.role === 'admin') {
       loadAdminUsers(1);
       setAdminCurrentPage(1);
+      loadTeacherRequests();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, adminSearch, adminRoleFilter]);
+
+  useEffect(() => {
+    if (user?.role === 'admin') loadTeacherRequests();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [teacherRequestFilter]);
 
   // Load admin users when page changes
   useEffect(() => {
@@ -1013,6 +1053,67 @@ const Account = () => {
 
               <div className="self-stretch text-neutral-400 text-sm font-medium font-['Manrope']">
                 {t.totalUsers} {adminTotalUsers}
+              </div>
+
+              <div className="self-stretch flex flex-col gap-4 mt-6 pt-6 border-t border-gray-200">
+                <div className="self-stretch text-black text-xl font-bold font-['Manrope']">
+                  {language === 'bg' ? 'Заявки за преподавател' : 'Teacher access requests'}
+                </div>
+                <select
+                  value={teacherRequestFilter}
+                  onChange={(e) => setTeacherRequestFilter(e.target.value)}
+                  className="w-fit px-4 py-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm"
+                >
+                  <option value="pending">{language === 'bg' ? 'Чакащи' : 'Pending'}</option>
+                  <option value="approved">{language === 'bg' ? 'Одобрени' : 'Approved'}</option>
+                  <option value="rejected">{language === 'bg' ? 'Отхвърлени' : 'Rejected'}</option>
+                  <option value="">{language === 'bg' ? 'Всички' : 'All'}</option>
+                </select>
+                {teacherRequestsLoading ? (
+                  <p className="text-sm text-neutral-500">{t.loading}</p>
+                ) : teacherRequests.length === 0 ? (
+                  <p className="text-sm text-neutral-500">
+                    {language === 'bg' ? 'Няма заявки.' : 'No requests.'}
+                  </p>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    {teacherRequests.map((req) => (
+                      <div
+                        key={req._id}
+                        className="p-4 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 bg-white flex flex-wrap justify-between gap-3"
+                      >
+                        <div>
+                          <div className="font-semibold text-sm font-['Manrope']">
+                            {req.user?.name || req.user?.email}
+                          </div>
+                          <div className="text-xs text-neutral-500">{req.user?.email}</div>
+                          {req.message && (
+                            <p className="text-sm mt-2 font-['Manrope'] text-neutral-700">{req.message}</p>
+                          )}
+                          <span className="text-xs text-neutral-400 mt-1 inline-block">{req.status}</span>
+                        </div>
+                        {req.status === 'pending' && (
+                          <div className="flex gap-2 items-center">
+                            <button
+                              type="button"
+                              onClick={() => handleTeacherRequestReview(req._id, 'approved')}
+                              className="px-3 py-1.5 bg-black text-white rounded-lg text-sm"
+                            >
+                              {language === 'bg' ? 'Одобри' : 'Approve'}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleTeacherRequestReview(req._id, 'rejected')}
+                              className="px-3 py-1.5 rounded-lg text-sm outline outline-1 outline-gray-200"
+                            >
+                              {language === 'bg' ? 'Отхвърли' : 'Reject'}
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}

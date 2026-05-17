@@ -3,10 +3,10 @@ import SEO from '../shared/SEO';
 import Layout from '../layout/Layout';
 import TaskActionBar from './TaskActionBar';
 import TaskMobileBackButton from './TaskMobileBackButton';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 import useTypewriter from '../../hooks/useTypewriter';
-import { useAuth } from '../auth/AuthContext';
+import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
 
 // Helpers for localStorage history for each input
 const getInputHistory = (key) => {
@@ -41,9 +41,7 @@ const saveHistory = (entry) => {
 const AreaCalculation = () => {
   const [form, setForm] = useState({ points: '', method: 'shoelace' });
   const { t, language } = useTranslation();
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const isAuthenticated = !!user;
+  const { runWithTracking, isAuthenticated } = useGuardedCalculation();
   const [resultText, setResultText] = useState(t.defaultResultText);
   const [history, setHistory] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -83,10 +81,6 @@ const AreaCalculation = () => {
   };
 
   const calculate = async () => {
-    if (!isAuthenticated) {
-      navigate('/login');
-      return;
-    }
     if (!form.points.trim()) {
       alert(language === 'bg' ? "Моля, въведете координатите на точките." : "Please enter point coordinates.");
       return;
@@ -98,7 +92,14 @@ const AreaCalculation = () => {
       return;
     }
 
-    const result = calculateArea(parsedPoints, form.method);
+    const result = await runWithTracking({
+      toolName: 'area-calculation',
+      toolDisplayName: { bg: 'Изчисляване на площ', en: 'Area calculation' },
+      inputData: { points: parsedPoints, method: form.method },
+      getResultData: (r) => ({ area: r.area }),
+      run: () => calculateArea(parsedPoints, form.method),
+    });
+    if (!result) return;
     const output = language === 'bg' 
       ? `--------- Изчисляване на площ (Enhanced) ---------
 Брой точки: ${parsedPoints.length}

@@ -25,6 +25,7 @@ const TeacherAssignmentDetailPage = () => {
   const [error, setError] = useState('');
   const [confirmArchive, setConfirmArchive] = useState(false);
   const [statusBusy, setStatusBusy] = useState(false);
+  const [actionMsg, setActionMsg] = useState('');
 
   const load = useCallback(() => {
     setLoading(true);
@@ -40,6 +41,48 @@ const TeacherAssignmentDetailPage = () => {
   }, [load]);
 
   const isArchived = assignment?.status === 'archived';
+  const isDraft = assignment?.status === 'draft';
+
+  const handlePublish = async () => {
+    setStatusBusy(true);
+    setActionMsg('');
+    try {
+      await classroomApi.publishAssignment(id);
+      setActionMsg(bg ? 'Заданието е публикувано.' : 'Assignment published.');
+      load();
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setStatusBusy(false);
+    }
+  };
+
+  const handleDuplicate = async () => {
+    setStatusBusy(true);
+    try {
+      const res = await classroomApi.duplicateAssignment(id);
+      const newId = res?.data?._id;
+      if (newId) navigate(`/classroom/teaching/assignments/${newId}`);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setStatusBusy(false);
+    }
+  };
+
+  const handleExportCsv = async () => {
+    try {
+      const blob = await classroomApi.exportAssignmentGrades(id);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `grades-${assignment?.title || id}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      setError(e.message);
+    }
+  };
 
   const handleArchive = async () => {
     setStatusBusy(true);
@@ -100,6 +143,7 @@ const TeacherAssignmentDetailPage = () => {
         )}
 
         {error && <Card className="p-4 text-sm text-red-600">{error}</Card>}
+        {actionMsg && <Card className="p-4 text-sm text-green-700 dark:text-green-300">{actionMsg}</Card>}
         {loading && <Card className="p-8 text-center text-neutral-500">{bg ? 'Зареждане...' : 'Loading...'}</Card>}
 
         <ConfirmDialog
@@ -164,6 +208,17 @@ const TeacherAssignmentDetailPage = () => {
                 </p>
               )}
               <div className="flex flex-wrap gap-2 pt-2">
+                {isDraft && (
+                  <ActionButton
+                    type="button"
+                    variant="primary"
+                    className="text-sm px-3 py-1.5"
+                    onClick={handlePublish}
+                    disabled={statusBusy}
+                  >
+                    {bg ? 'Публикувай' : 'Publish'}
+                  </ActionButton>
+                )}
                 {tool && (
                   <ActionButton
                     to={tool.route}
@@ -181,6 +236,23 @@ const TeacherAssignmentDetailPage = () => {
                   className="text-sm px-3 py-1.5"
                 >
                   {bg ? 'Предавания' : 'Submissions'}
+                </ActionButton>
+                <ActionButton
+                  type="button"
+                  variant="outline"
+                  className="text-sm px-3 py-1.5"
+                  onClick={handleExportCsv}
+                >
+                  {bg ? 'Експорт CSV' : 'Export CSV'}
+                </ActionButton>
+                <ActionButton
+                  type="button"
+                  variant="outline"
+                  className="text-sm px-3 py-1.5"
+                  onClick={handleDuplicate}
+                  disabled={statusBusy}
+                >
+                  {bg ? 'Дублирай' : 'Duplicate'}
                 </ActionButton>
                 {!isArchived && (
                   <ActionButton

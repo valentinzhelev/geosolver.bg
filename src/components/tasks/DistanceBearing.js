@@ -3,12 +3,12 @@ import SEO from '../shared/SEO';
 import Layout from '../layout/Layout';
 import TaskActionBar from './TaskActionBar';
 import TaskMobileBackButton from './TaskMobileBackButton';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 import useTypewriter from '../../hooks/useTypewriter';
 import { calculateDistanceBearing as calculateDistanceBearingDomain } from '../../domain/geodesy';
 import { roundTo } from '../../domain/math';
-import { useAuth } from '../auth/AuthContext';
+import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
 
 // Helpers for localStorage history for each input
 const getInputHistory = (key) => {
@@ -43,9 +43,7 @@ const saveHistory = (entry) => {
 const DistanceBearing = () => {
   const [form, setForm] = useState({ y1: '', x1: '', y2: '', x2: '' });
   const { t, language } = useTranslation();
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const isAuthenticated = !!user;
+  const { runWithTracking, isAuthenticated } = useGuardedCalculation();
   const [resultText, setResultText] = useState(t.defaultResultText);
   const [history, setHistory] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -64,10 +62,6 @@ const DistanceBearing = () => {
   };
 
   const calculate = async () => {
-    if (!isAuthenticated) {
-      navigate('/login');
-      return;
-    }
     const y1 = parseFloat(form.y1);
     const x1 = parseFloat(form.x1);
     const y2 = parseFloat(form.y2);
@@ -77,7 +71,14 @@ const DistanceBearing = () => {
       return;
     }
 
-    const result = calculateDistanceBearing(x1, y1, x2, y2);
+    const result = await runWithTracking({
+      toolName: 'distance-bearing',
+      toolDisplayName: { bg: 'Разстояние и посока', en: 'Distance and Bearing' },
+      inputData: { y1, x1, y2, x2 },
+      getResultData: (r) => ({ distance: r.distance, bearingGon: r.bearingGon }),
+      run: () => calculateDistanceBearing(x1, y1, x2, y2),
+    });
+    if (!result) return;
     const output = language === 'bg' 
       ? `--------- Разстояние и посока (Enhanced) ---------
 Y₁ = ${result.y1}, X₁ = ${result.x1}

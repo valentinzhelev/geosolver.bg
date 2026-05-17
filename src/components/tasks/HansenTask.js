@@ -3,10 +3,10 @@ import SEO from '../shared/SEO';
 import Layout from '../layout/Layout';
 import TaskActionBar from './TaskActionBar';
 import TaskMobileBackButton from './TaskMobileBackButton';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 import useTypewriter from '../../hooks/useTypewriter';
-import { useAuth } from '../auth/AuthContext';
+import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
 
 // Helpers for localStorage history for each input
 const getInputHistory = (key) => {
@@ -41,9 +41,7 @@ const saveHistory = (entry) => {
 const HansenTask = () => {
   const [form, setForm] = useState({ yA: '', xA: '', yB: '', xB: '', alpha: '', beta: '' });
   const { t, language } = useTranslation();
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const isAuthenticated = !!user;
+  const { runWithTracking, isAuthenticated } = useGuardedCalculation();
   const [resultText, setResultText] = useState(t.defaultResultText);
   const [history, setHistory] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -62,10 +60,6 @@ const HansenTask = () => {
   };
 
   const calculate = async () => {
-    if (!isAuthenticated) {
-      navigate('/login');
-      return;
-    }
     const yA = parseFloat(form.yA);
     const xA = parseFloat(form.xA);
     const yB = parseFloat(form.yB);
@@ -77,7 +71,14 @@ const HansenTask = () => {
       return;
     }
 
-    const result = calculateHansenTask(xA, yA, xB, yB, alpha, beta);
+    const result = await runWithTracking({
+      toolName: 'hansen-task',
+      toolDisplayName: { bg: 'Задача на Хансен', en: 'Hansen Task' },
+      inputData: { yA, xA, yB, xB, alpha, beta },
+      getResultData: (r) => ({ xP: r.xP, yP: r.yP }),
+      run: () => calculateHansenTask(xA, yA, xB, yB, alpha, beta),
+    });
+    if (!result) return;
     const output = language === 'bg' 
       ? `--------- Задача на Хансен (Enhanced) ---------
 YA = ${result.yA}, XA = ${result.xA}

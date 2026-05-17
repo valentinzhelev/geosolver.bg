@@ -5,7 +5,10 @@ import TaskMobileBackButton from './TaskMobileBackButton';
 import SEO from '../shared/SEO';
 import { Link } from 'react-router-dom';
 import useTypewriter from '../../hooks/useTypewriter';
+import { useTranslation } from '../../hooks/useTranslation';
 import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
+import { useEduAssignmentBridge } from '../../hooks/useEduAssignmentBridge';
+import EduWorkBanner from '../classroom/ui/EduWorkBanner';
 
 // LocalStorage helpers
 const getHistory = () => {
@@ -143,8 +146,14 @@ function vtoraOsnovnaZadacha(x1, y1, x2, y2) {
 }
 
 const SecondTask = () => {
+  const { language } = useTranslation();
   const [form, setForm] = useState({ x1: '', y1: '', x2: '', y2: '' });
   const { runWithTracking, isAuthenticated } = useGuardedCalculation();
+  const [lastCalcResult, setLastCalcResult] = useState(null);
+  const { eduCtx, applyResultToAssignment, dismissEduBanner } = useEduAssignmentBridge(
+    'second-basic-task',
+    setForm
+  );
   const [resultText, setResultText] = useState('Въведете координати и натиснете "Изчисли", за да видите резултатите тук.');
   const [history, setHistory] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -188,6 +197,7 @@ const SecondTask = () => {
       run: () => vtoraOsnovnaZadacha(X1, Y1, X2, Y2),
     });
     if (!result) return;
+    setLastCalcResult(result);
     const output = `--------- Втора основна геодезическа задача (Enhanced) ---------
 X1 = ${X1}, Y1 = ${Y1}
 X2 = ${X2}, Y2 = ${Y2}
@@ -280,6 +290,13 @@ cos(α) = ${result.cosAlpha}
         structuredData={structuredData}
       />
       <Layout>
+        <EduWorkBanner
+          eduCtx={eduCtx}
+          bg={language === 'bg'}
+          showApply={!!lastCalcResult}
+          onApply={() => applyResultToAssignment(lastCalcResult)}
+          onDismiss={dismissEduBanner}
+        />
         {/* MOBILE LAYOUT */}
         <div className="block md:hidden w-full max-w-md mx-auto min-h-screen bg-stone-50 relative px-4 py-4">
           <div className="flex flex-col justify-start items-start gap-6 w-full">

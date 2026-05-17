@@ -1,16 +1,44 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Layout from '../../layout/Layout';
 import SEO from '../../shared/SEO';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { useAuth } from '../../auth/AuthContext';
 import { canAccessTeacherClassroom } from '../../../utils/eduRoles';
+import { teacherAccessApi } from '../../../services/classroomApi';
 
 const ForTeachers = () => {
   const { t, language } = useTranslation();
   const { user, loading } = useAuth();
   const features = t.forTeachersFeatures || [];
   const showClassroomLink = canAccessTeacherClassroom(user, { loading });
+  const bg = language === 'bg';
+  const [requestMsg, setRequestMsg] = useState('');
+  const [requestNote, setRequestNote] = useState('');
+  const [requestStatus, setRequestStatus] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (user && user.role === 'student') {
+      teacherAccessApi.getMyRequest().then((r) => setRequestStatus(r.data)).catch(() => {});
+    }
+  }, [user]);
+
+  const handleTeacherRequest = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setRequestMsg('');
+    try {
+      const res = await teacherAccessApi.requestAccess(requestNote);
+      setRequestMsg(res.message || (bg ? 'Заявката е изпратена.' : 'Request sent.'));
+      setRequestStatus(res.data);
+    } catch (err) {
+      setRequestMsg(err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <>
       <SEO
@@ -53,6 +81,28 @@ const ForTeachers = () => {
                     {t.howToGetAccessText} <a href="mailto:team@geosolver.bg" className="text-blue-700 dark:text-blue-400 underline">team@geosolver.bg</a>.<br />
                     {t.howToGetAccessHelp}
                   </div>
+                  {user?.role === 'student' && !showClassroomLink && (
+                    <form onSubmit={handleTeacherRequest} className="flex flex-col gap-2 mt-2">
+                      {requestStatus?.status === 'pending' && (
+                        <p className="text-sm">{bg ? 'Заявката чака одобрение.' : 'Request pending.'}</p>
+                      )}
+                      {(!requestStatus || requestStatus.status === 'rejected') && (
+                        <>
+                          <textarea
+                            value={requestNote}
+                            onChange={(e) => setRequestNote(e.target.value)}
+                            rows={2}
+                            className="px-3 py-2 rounded-lg border text-sm bg-white dark:bg-zinc-900"
+                            placeholder={bg ? 'Съобщение' : 'Message'}
+                          />
+                          <button type="submit" disabled={submitting} className="px-4 py-2 bg-blue-700 text-white rounded-lg text-sm w-fit">
+                            {bg ? 'Заяви достъп' : 'Request access'}
+                          </button>
+                        </>
+                      )}
+                      {requestMsg && <p className="text-sm">{requestMsg}</p>}
+                    </form>
+                  )}
                 </div>
                 <div className="pt-3 text-center">
                   <span className="text-sm text-neutral-600 dark:text-zinc-400 font-['Manrope']">{t.thanksForSupport}</span>

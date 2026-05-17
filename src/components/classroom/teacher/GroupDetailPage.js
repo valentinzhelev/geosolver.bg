@@ -25,6 +25,8 @@ const GroupDetailPage = () => {
   const [archiveAssignmentTarget, setArchiveAssignmentTarget] = useState(null);
   const [confirmArchiveGroup, setConfirmArchiveGroup] = useState(false);
   const [statusBusy, setStatusBusy] = useState(false);
+  const [analytics, setAnalytics] = useState(null);
+  const [exportBusy, setExportBusy] = useState(false);
 
   const isGroupArchived = course?.isActive === false;
 
@@ -40,6 +42,7 @@ const GroupDetailPage = () => {
       ]);
       setCourse(cRes.data);
       setAssignments(aRes.data || []);
+      classroomApi.getCourseAnalytics(id).then((r) => setAnalytics(r.data)).catch(() => setAnalytics(null));
     } catch (e) {
       setError(e.message);
     } finally {
@@ -132,6 +135,25 @@ const GroupDetailPage = () => {
     const tool = EDU_TOOLS.find((t) => t.toolKey === key);
     if (!tool) return a.taskTemplate?.name || '—';
     return bg ? tool.titleBg : tool.titleEn;
+  };
+
+  const handleExportGrades = async () => {
+    setExportBusy(true);
+    setError('');
+    try {
+      const blob = await classroomApi.exportCourseGrades(id);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `grades-${course?.name || course?.code || id}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      setMessage(bg ? 'CSV файлът е изтеглен.' : 'CSV file downloaded.');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setExportBusy(false);
+    }
   };
 
   return (
@@ -364,6 +386,61 @@ const GroupDetailPage = () => {
               )}
             </Card>
           </div>
+
+          {analytics && (
+            <Card className="p-6 mt-6 flex flex-col gap-4">
+              <div className="flex flex-wrap justify-between items-center gap-2">
+              <h2 className="font-bold text-lg font-['Manrope'] text-black dark:text-white">
+                {bg ? 'Аналитика на групата' : 'Group analytics'}
+              </h2>
+              <ActionButton
+                type="button"
+                variant="outline"
+                className="text-sm px-3 py-1.5"
+                disabled={exportBusy}
+                onClick={handleExportGrades}
+              >
+                {exportBusy ? (bg ? 'Експорт...' : 'Exporting...') : bg ? 'Експорт CSV' : 'Export CSV'}
+              </ActionButton>
+              </div>
+              <div className="grid sm:grid-cols-3 gap-4 text-sm font-['Manrope']">
+                <div className="p-3 rounded-lg bg-stone-50 dark:bg-zinc-800">
+                  <div className="text-neutral-500">{bg ? 'Ученици' : 'Students'}</div>
+                  <div className="text-xl font-bold text-black dark:text-white">
+                    {analytics.course?.studentCount ?? 0}
+                  </div>
+                </div>
+                <div className="p-3 rounded-lg bg-stone-50 dark:bg-zinc-800">
+                  <div className="text-neutral-500">{bg ? 'Предавания' : 'Submissions'}</div>
+                  <div className="text-xl font-bold text-black dark:text-white">
+                    {analytics.totals?.submissions ?? 0}
+                  </div>
+                </div>
+                <div className="p-3 rounded-lg bg-stone-50 dark:bg-zinc-800">
+                  <div className="text-neutral-500">{bg ? 'Среден резултат' : 'Avg score'}</div>
+                  <div className="text-xl font-bold text-black dark:text-white">
+                    {analytics.totals?.averageScore ?? 0}%
+                  </div>
+                </div>
+              </div>
+              {(analytics.assignments || []).length > 0 && (
+                <ul className="flex flex-col gap-2 text-sm">
+                  {analytics.assignments.map((row) => (
+                    <li
+                      key={row.assignmentId}
+                      className="flex flex-wrap justify-between gap-2 py-2 border-b border-stone-100 dark:border-zinc-800"
+                    >
+                      <span className="font-medium text-black dark:text-white">{row.title}</span>
+                      <span className="text-neutral-500">
+                        {Math.round(row.completionRate)}% {bg ? 'предадени' : 'submitted'} · ø {row.averageScore}%
+                        {row.needsReview > 0 && ` · ${row.needsReview} ${bg ? 'за преглед' : 'review'}`}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </Card>
+          )}
           </>
         )}
       </ClassroomLayout>

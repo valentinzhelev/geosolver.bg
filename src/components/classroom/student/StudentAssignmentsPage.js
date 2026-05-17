@@ -7,6 +7,7 @@ import { studentClassroomApi } from '../../../services/classroomApi';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { toolKeyFromTemplate } from '../../../config/eduTools';
 import { EDU_TOOLS } from '../../../config/eduTools';
+import StudentStatusBadge from '../ui/StudentStatusBadge';
 
 const StudentAssignmentsPage = () => {
   const { language } = useTranslation();
@@ -64,12 +65,11 @@ const StudentAssignmentsPage = () => {
                     <div className="text-neutral-600 dark:text-zinc-400">
                       {bg ? 'Краен срок' : 'Due'}: {new Date(a.dueDate).toLocaleString(bg ? 'bg-BG' : 'en-US')}
                     </div>
-                    <div className="mt-1 font-medium text-black dark:text-white">
-                      {a.submissionStatus === 'not_submitted'
-                        ? bg
-                          ? 'Не е предадено'
-                          : 'Not submitted'
-                        : `${a.submissionScore != null ? Math.round(a.submissionScore) + '%' : ''} · ${a.submissionStatus}`}
+                    <div className="mt-1 flex flex-col items-end gap-1">
+                      <StudentStatusBadge status={a.studentStatus} language={language} />
+                      {a.submissionScore != null && (
+                        <span className="text-xs text-neutral-500">{Math.round(a.submissionScore)}%</span>
+                      )}
                     </div>
                   </div>
                 </div>

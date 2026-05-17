@@ -16,8 +16,8 @@ describe('calculateForwardIntersection', () => {
   test('граничен случай - малки ъгли', () => {
     const result = calculateForwardIntersection(100, 200, 300, 400, 10, 10);
     
-    expect(result.xP).toBeFinite();
-    expect(result.yP).toBeFinite();
+    expect(Number.isFinite(result.xP)).toBe(true);
+    expect(Number.isFinite(result.yP)).toBe(true);
   });
 
   test('невалиден вход - съвпадащи точки A и B', () => {

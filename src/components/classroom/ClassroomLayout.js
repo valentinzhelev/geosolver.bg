@@ -4,6 +4,7 @@ import Layout from '../layout/Layout';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useAuth } from '../auth/AuthContext';
 import { canAccessTeacherClassroom, canAccessStudentClassroom } from '../../utils/eduRoles';
+import NotificationBell from './ui/NotificationBell';
 
 const navTeacher = [
   { to: '/classroom/dashboard', labelBg: 'Днес', labelEn: 'Today', end: true },
@@ -62,18 +63,21 @@ const ClassroomLayout = ({ children, title, subtitle }) => {
                 </p>
               )}
             </div>
-            {nav.length > 0 && (
-              <nav className="flex flex-wrap gap-1.5 p-1 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 w-fit">
-                {nav.map((item) => (
-                  <NavLink
-                    key={item.to}
-                    to={item.to}
-                    end={item.end}
-                    label={language === 'bg' ? item.labelBg : item.labelEn}
-                  />
-                ))}
-              </nav>
-            )}
+            <div className="flex flex-wrap items-center gap-2">
+              {user && <NotificationBell />}
+              {nav.length > 0 && (
+                <nav className="flex flex-wrap gap-1.5 p-1 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 w-fit max-w-full overflow-x-auto">
+                  {nav.map((item) => (
+                    <NavLink
+                      key={item.to}
+                      to={item.to}
+                      end={item.end}
+                      label={language === 'bg' ? item.labelBg : item.labelEn}
+                    />
+                  ))}
+                </nav>
+              )}
+            </div>
           </div>
           {children}
         </div>

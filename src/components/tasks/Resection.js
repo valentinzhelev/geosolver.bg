@@ -7,6 +7,8 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 import useTypewriter from '../../hooks/useTypewriter';
 import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
+import { useEduAssignmentBridge } from '../../hooks/useEduAssignmentBridge';
+import EduWorkBanner from '../classroom/ui/EduWorkBanner';
 
 // LocalStorage helpers
 const getHistory = () => {
@@ -128,6 +130,8 @@ const Resection = () => {
   const { displayText, isTyping } = useTypewriter(resultText);
   const { language } = useTranslation();
   const { runWithTracking, isAuthenticated } = useGuardedCalculation();
+  const [lastCalcResult, setLastCalcResult] = useState(null);
+  const { eduCtx, applyResultToAssignment, dismissEduBanner } = useEduAssignmentBridge('resection', setForm);
 
   useEffect(() => { setHistory(getHistory()); }, []);
 
@@ -167,6 +171,7 @@ const Resection = () => {
         run: () => calculateResection(points, angles),
       });
       if (!result) return;
+      setLastCalcResult(result);
 
       const output = language === 'bg'
         ? `--------- Обратна засечка (Resection) ---------
@@ -269,6 +274,13 @@ Date: ${new Date().toLocaleString('en-US')}`;
         canonical="/tools/resection"
       />
       <Layout>
+        <EduWorkBanner
+          eduCtx={eduCtx}
+          bg={language === 'bg'}
+          showApply={!!lastCalcResult}
+          onApply={() => applyResultToAssignment(lastCalcResult)}
+          onDismiss={dismissEduBanner}
+        />
         {/* MOBILE LAYOUT */}
         <div className="block md:hidden w-full max-w-md mx-auto min-h-screen bg-stone-50 relative px-4 py-4">
           <div className="flex flex-col justify-start items-start gap-6 w-full">

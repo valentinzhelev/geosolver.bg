@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import SEO from '../../shared/SEO';
 import ClassroomLayout from '../ClassroomLayout';
 import { Card } from '../ui/Card';
@@ -11,9 +11,21 @@ import {
   toolKeyFromTemplate,
   variantIndexForStudent,
 } from '../../../config/eduTools';
+import StudentStatusBadge from '../ui/StudentStatusBadge';
+import {
+  setEduWorkContext,
+  loadEduAnswersForAssignment,
+  clearEduAnswersForAssignment,
+} from '../../../utils/eduCalculatorBridge';
+import {
+  saveAnswerDraft,
+  loadAnswerDraft,
+  clearAnswerDraft,
+} from '../../../utils/eduAnswerDraft';
 
 const StudentAssignmentDetailPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { language } = useTranslation();
   const bg = language === 'bg';
@@ -23,6 +35,7 @@ const StudentAssignmentDetailPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [result, setResult] = useState(null);
+  const [hasDraft, setHasDraft] = useState(false);
 
   useEffect(() => {
     studentClassroomApi
@@ -32,16 +45,27 @@ const StudentAssignmentDetailPage = () => {
         const key = toolKeyFromTemplate(res.data.taskTemplate);
         const tool = EDU_TOOLS.find((t) => t.toolKey === key);
         if (tool) {
+          const fromCalculator = loadEduAnswersForAssignment(id);
+          const draft = loadAnswerDraft(id);
+          const saved = fromCalculator || draft?.answers;
           const initial = {};
           tool.answerKeys.forEach((f) => {
-            initial[f.key] = '';
+            initial[f.key] = saved?.[f.key] != null ? String(saved[f.key]) : '';
           });
           setAnswers(initial);
+          if (fromCalculator) clearEduAnswersForAssignment(id);
+          setHasDraft(Boolean(loadAnswerDraft(id)));
         }
       })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, [id]);
+
+  useEffect(() => {
+    if (!id || !assignment?.canSubmit) return undefined;
+    const t = setTimeout(() => saveAnswerDraft(id, answers), 500);
+    return () => clearTimeout(t);
+  }, [id, answers, assignment?.canSubmit]);
 
   const toolKey = assignment ? toolKeyFromTemplate(assignment.taskTemplate) : null;
   const tool = EDU_TOOLS.find((t) => t.toolKey === toolKey);
@@ -66,6 +90,8 @@ const StudentAssignmentDetailPage = () => {
         timeSpent: 0,
       });
       setResult(res.data);
+      clearAnswerDraft(id);
+      setHasDraft(false);
       const refreshed = await studentClassroomApi.getAssignment(id);
       setAssignment(refreshed.data);
     } catch (err) {
@@ -103,24 +129,59 @@ const StudentAssignmentDetailPage = () => {
                   </div>
                 ))}
               </div>
-              <Link
-                to={tool.route}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                type="button"
+                onClick={() => {
+                  setEduWorkContext({
+                    assignmentId: id,
+                    assignmentTitle: assignment.title,
+                    toolKey,
+                    inputData: variant?.inputData,
+                    returnPath: `/classroom/assignments/${id}`,
+                  });
+                  navigate(tool.route);
+                }}
                 className="px-4 py-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700 text-sm font-medium font-['Manrope'] text-black dark:text-white w-fit hover:bg-stone-50 dark:hover:bg-zinc-800"
               >
-                {bg ? 'Отвори калкулатор ↗' : 'Open calculator ↗'}
-              </Link>
-              <p className="text-xs text-neutral-400 font-['Manrope']">
-                {bg ? 'Краен срок' : 'Due'}: {new Date(assignment.dueDate).toLocaleString(bg ? 'bg-BG' : 'en-US')}
-              </p>
+                {bg ? 'Отвори в калкулатора' : 'Open in calculator'}
+              </button>
+              <div className="flex flex-wrap items-center gap-2">
+                <StudentStatusBadge status={assignment.studentStatus} language={language} />
+                <p className="text-xs text-neutral-400 font-['Manrope']">
+                  {bg ? 'Краен срок' : 'Due'}: {new Date(assignment.dueDate).toLocaleString(bg ? 'bg-BG' : 'en-US')}
+                  {assignment.submissionCount != null && (
+                    <>
+                      {' '}
+                      · {bg ? 'Опити' : 'Attempts'}: {assignment.submissionCount}/{assignment.maxAttempts}
+                    </>
+                  )}
+                </p>
+              </div>
             </Card>
 
             <Card className="p-6 flex flex-col gap-4">
               <h2 className="font-bold font-['Manrope'] text-black dark:text-white">{bg ? 'Предай отговор' : 'Submit answer'}</h2>
+              {assignment.canSubmit && hasDraft && (
+                <p className="text-xs text-neutral-500 font-['Manrope']">
+                  {bg ? 'Има запазена чернова на отговорите.' : 'A saved answer draft is available.'}
+                </p>
+              )}
               {assignment.submission && (
                 <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-sm font-['Manrope'] text-blue-900 dark:text-blue-200">
-                  {bg ? 'Последно предаване' : 'Last submission'}: {assignment.submission.status}
+                  {bg ? 'Последно предаване' : 'Last submission'}:                   <StudentStatusBadge
+                    status={
+                      assignment.submission.status === 'graded'
+                        ? assignment.submission.isLate
+                          ? 'graded_late'
+                          : 'graded'
+                        : assignment.submission.status === 'needs_review'
+                          ? 'awaiting_review'
+                          : assignment.submission.isLate
+                            ? 'submitted_late'
+                            : 'submitted'
+                    }
+                    language={language}
+                  />
                   {assignment.submission.score != null && ` · ${Math.round(assignment.submission.score)}%`}
                   {assignment.submission.feedback && (
                     <p className="mt-1 text-neutral-700 dark:text-zinc-300">{assignment.submission.feedback}</p>

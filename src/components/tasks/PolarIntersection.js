@@ -3,10 +3,10 @@ import SEO from '../shared/SEO';
 import Layout from '../layout/Layout';
 import TaskActionBar from './TaskActionBar';
 import TaskMobileBackButton from './TaskMobileBackButton';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 import useTypewriter from '../../hooks/useTypewriter';
-import { useAuth } from '../auth/AuthContext';
+import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
 import { calculatePolarIntersection as calculatePolarIntersectionDomain } from '../../domain/geodesy';
 import { roundTo } from '../../domain/math';
 
@@ -43,9 +43,7 @@ const saveHistory = (entry) => {
 const PolarIntersection = () => {
   const [form, setForm] = useState({ yA: '', xA: '', angle: '', distance: '' });
   const { t, language } = useTranslation();
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const isAuthenticated = !!user;
+  const { runWithTracking, isAuthenticated } = useGuardedCalculation();
   const [resultText, setResultText] = useState(t.defaultResultText);
   const [history, setHistory] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -64,10 +62,6 @@ const PolarIntersection = () => {
   };
 
   const calculate = async () => {
-    if (!isAuthenticated) {
-      navigate('/login');
-      return;
-    }
     const yA = parseFloat(form.yA);
     const xA = parseFloat(form.xA);
     const angle = parseFloat(form.angle);
@@ -77,7 +71,14 @@ const PolarIntersection = () => {
       return;
     }
 
-    const result = calculatePolarIntersection(xA, yA, angle, distance);
+    const result = await runWithTracking({
+      toolName: 'polar-intersection',
+      toolDisplayName: { bg: 'Полярна засечка', en: 'Polar intersection' },
+      inputData: { yA, xA, angle, distance },
+      getResultData: (r) => ({ xP: r.xP, yP: r.yP }),
+      run: () => calculatePolarIntersection(xA, yA, angle, distance),
+    });
+    if (!result) return;
     const output = language === 'bg' 
       ? `--------- Полярна засечка (Enhanced) ---------
 YA = ${result.yA}, XA = ${result.xA}

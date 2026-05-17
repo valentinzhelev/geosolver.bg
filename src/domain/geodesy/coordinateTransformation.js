@@ -44,8 +44,9 @@ export function calculateCoordinateTransformation(x, y, transformationType, para
       const angle = (parameters?.angle || 0) * Math.PI / 200;
       const cosAngle = Math.cos(angle);
       const sinAngle = Math.sin(angle);
-      xNew = x * cosAngle - y * sinAngle;
-      yNew = x * sinAngle + y * cosAngle;
+      // Clockwise rotation (gon, surveying convention)
+      xNew = x * cosAngle + y * sinAngle;
+      yNew = -x * sinAngle + y * cosAngle;
       transformationDetails = `X' = X·cos(α) - Y·sin(α) = ${x}·${cosAngle.toFixed(6)} - ${y}·${sinAngle.toFixed(6)} = ${xNew}\nY' = X·sin(α) + Y·cos(α) = ${x}·${sinAngle.toFixed(6)} + ${y}·${cosAngle.toFixed(6)} = ${yNew}`;
       break;
 

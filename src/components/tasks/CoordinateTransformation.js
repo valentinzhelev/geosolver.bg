@@ -3,10 +3,10 @@ import SEO from '../shared/SEO';
 import Layout from '../layout/Layout';
 import TaskActionBar from './TaskActionBar';
 import TaskMobileBackButton from './TaskMobileBackButton';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 import useTypewriter from '../../hooks/useTypewriter';
-import { useAuth } from '../auth/AuthContext';
+import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
 
 // Helpers for localStorage history for each input
 const getInputHistory = (key) => {
@@ -41,9 +41,7 @@ const saveHistory = (entry) => {
 const CoordinateTransformation = () => {
   const [form, setForm] = useState({ x: '', y: '', transformationType: 'translation', dx: '', dy: '' });
   const { t, language } = useTranslation();
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const isAuthenticated = !!user;
+  const { runWithTracking, isAuthenticated } = useGuardedCalculation();
   const [resultText, setResultText] = useState(t.defaultResultText);
   const [history, setHistory] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -62,14 +60,10 @@ const CoordinateTransformation = () => {
   };
 
   const calculate = async () => {
-    if (!isAuthenticated) {
-      navigate('/login');
-      return;
-    }
     const x = parseFloat(form.x);
     const y = parseFloat(form.y);
     const transformationType = form.transformationType;
-    
+
     if (isNaN(x) || isNaN(y)) {
       alert(language === 'bg' ? "Моля, попълнете X и Y координатите коректно." : "Please fill in X and Y coordinates correctly.");
       return;
@@ -89,7 +83,14 @@ const CoordinateTransformation = () => {
       parameters = { scaleX, scaleY };
     }
 
-    const result = calculateCoordinateTransformation(x, y, transformationType, parameters);
+    const result = await runWithTracking({
+      toolName: 'coordinate-transformation',
+      toolDisplayName: { bg: 'Координатна трансформация', en: 'Coordinate transformation' },
+      inputData: { x, y, transformationType, parameters },
+      getResultData: (r) => ({ xTransformed: r.xTransformed, yTransformed: r.yTransformed }),
+      run: () => calculateCoordinateTransformation(x, y, transformationType, parameters),
+    });
+    if (!result) return;
     const output = language === 'bg' 
       ? `--------- Координатна трансформация (Enhanced) ---------
 X = ${result.xOriginal}, Y = ${result.yOriginal}

@@ -44,17 +44,15 @@ export function calculateDistanceBearing(x1, y1, x2, y2) {
   const bearingGon = (bearingRad * 200) / Math.PI;
   const bearingDeg = (bearingRad * 180) / Math.PI;
 
-  // Determine quadrant
-  let quadrant = '';
-  if (deltaY >= 0 && deltaX >= 0) {
-    quadrant = 'I квадрант (0-100 gon)';
-  } else if (deltaY < 0 && deltaX >= 0) {
-    quadrant = 'II квадрант (100-200 gon)';
-  } else if (deltaY < 0 && deltaX < 0) {
-    quadrant = 'III квадрант (200-300 gon)';
-  } else {
-    quadrant = 'IV квадрант (300-400 gon)';
-  }
+  // Quadrants aligned with secondTask / surveying convention (ΔX east, ΔY north)
+  let quadrantName = 'I';
+  if (deltaX > 0 && deltaY >= 0) quadrantName = 'I';
+  else if (deltaX <= 0 && deltaY > 0) quadrantName = 'II';
+  else if (deltaX < 0 && deltaY <= 0) quadrantName = 'III';
+  else quadrantName = 'IV';
+
+  const gonRanges = { I: '0-100', II: '100-200', III: '200-300', IV: '300-400' };
+  const quadrant = `${quadrantName} квадрант (${gonRanges[quadrantName]} gon)`;
 
   return {
     x1,

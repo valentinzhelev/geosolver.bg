@@ -5,6 +5,8 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 import useTypewriter from '../../hooks/useTypewriter';
 import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
+import { useEduAssignmentBridge } from '../../hooks/useEduAssignmentBridge';
+import EduWorkBanner from '../classroom/ui/EduWorkBanner';
 import TaskActionBar from './TaskActionBar';
 import TaskMobileBackButton from './TaskMobileBackButton';
 import { useProScan } from '../../hooks/useProScan';
@@ -60,6 +62,11 @@ const PurvaZadacha = () => {
   const paginatedHistory = history.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
   const { displayText, isTyping } = useTypewriter(resultText);
   const { runWithTracking, isAuthenticated } = useGuardedCalculation();
+  const [lastCalcResult, setLastCalcResult] = useState(null);
+  const { eduCtx, applyResultToAssignment, dismissEduBanner } = useEduAssignmentBridge(
+    'first-basic-task',
+    setForm
+  );
 
   // Debug: see what is being set
   useEffect(() => {
@@ -153,6 +160,7 @@ const PurvaZadacha = () => {
       run: () => purvaOsnovnaZadacha(y1, x1, alpha, s),
     });
     if (!result) return;
+    setLastCalcResult(result);
     const formatNumber = (value, decimals) => {
       if (value == null || Number.isNaN(value)) return '';
       const fixed = Number(value).toFixed(decimals);
@@ -313,6 +321,13 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
         structuredData={structuredData}
       />
       <Layout>
+        <EduWorkBanner
+          eduCtx={eduCtx}
+          bg={language === 'bg'}
+          showApply={!!lastCalcResult}
+          onApply={() => applyResultToAssignment(lastCalcResult)}
+          onDismiss={dismissEduBanner}
+        />
         {/* MOBILE LAYOUT */}
         <div className="block md:hidden w-full max-w-md mx-auto min-h-screen bg-stone-50 relative px-4 py-4">
           {/* Main Content */}

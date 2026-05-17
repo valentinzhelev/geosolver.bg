@@ -9,6 +9,8 @@ import useTypewriter from '../../hooks/useTypewriter';
 import { calculateForwardIntersection as calculateForwardIntersectionDomain } from '../../domain/geodesy';
 import { roundTo } from '../../domain/math';
 import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
+import { useEduAssignmentBridge } from '../../hooks/useEduAssignmentBridge';
+import EduWorkBanner from '../classroom/ui/EduWorkBanner';
 
 // LocalStorage helpers
 const getHistory = () => {
@@ -94,6 +96,11 @@ const ForwardIntersection = () => {
   const [form, setForm] = useState(initialForm);
   const { language } = useTranslation();
   const { runWithTracking, isAuthenticated } = useGuardedCalculation();
+  const [lastCalcResult, setLastCalcResult] = useState(null);
+  const { eduCtx, applyResultToAssignment, dismissEduBanner } = useEduAssignmentBridge(
+    'forward-intersection',
+    setForm
+  );
   const [resultText, setResultText] = useState(language === 'bg' ? 'Въведете данни и натиснете "Изчисли", за да видите резултатите тук.' : 'Enter data and click "Calculate" to see the results here.');
   const [history, setHistory] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -134,7 +141,8 @@ const ForwardIntersection = () => {
         ),
     });
     if (!results) return;
-    
+    setLastCalcResult(results);
+
     const output = `--------- Права засечка (Enhanced) ---------
 Yₐ = ${yA}, Xₐ = ${xA}
 Yᵦ = ${yB}, Xᵦ = ${xB}
@@ -225,6 +233,13 @@ Yₚ = (Yₚ' + Yₚ'') / 2 = (${results.yPrimP} + ${results.ySecondP}) / 2 = ${
         canonical="/tools/forward-intersection"
       />
       <Layout>
+        <EduWorkBanner
+          eduCtx={eduCtx}
+          bg={language === 'bg'}
+          showApply={!!lastCalcResult}
+          onApply={() => applyResultToAssignment(lastCalcResult)}
+          onDismiss={dismissEduBanner}
+        />
         {/* DESKTOP LAYOUT */}
         <div className="hidden md:flex w-[1180px] mx-auto my-10 flex-col gap-10">
           <div className="flex flex-col justify-center items-start gap-10">
