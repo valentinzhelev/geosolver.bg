@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import SEO from '../../shared/SEO';
 import ClassroomLayout from '../ClassroomLayout';
@@ -26,18 +26,18 @@ const TeacherAssignmentDetailPage = () => {
   const [confirmArchive, setConfirmArchive] = useState(false);
   const [statusBusy, setStatusBusy] = useState(false);
 
-  const load = () => {
+  const load = useCallback(() => {
     setLoading(true);
     classroomApi
       .getAssignment(id)
       .then((res) => setAssignment(res.data))
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
-  };
+  }, [id]);
 
   useEffect(() => {
     load();
-  }, [id]);
+  }, [load]);
 
   const isArchived = assignment?.status === 'archived';
 

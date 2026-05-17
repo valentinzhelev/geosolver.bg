@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import SEO from '../../shared/SEO';
 import ClassroomLayout from '../ClassroomLayout';
@@ -28,7 +28,7 @@ const GroupDetailPage = () => {
 
   const isGroupArchived = course?.isActive === false;
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
@@ -45,11 +45,11 @@ const GroupDetailPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, showArchivedAssignments]);
 
   useEffect(() => {
     load();
-  }, [id, showArchivedAssignments]);
+  }, [load]);
 
   const handleAddStudents = async (e) => {
     e.preventDefault();

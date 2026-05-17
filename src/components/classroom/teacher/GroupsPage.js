@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import SEO from '../../shared/SEO';
 import ClassroomLayout from '../ClassroomLayout';
@@ -20,7 +20,7 @@ const GroupsPage = () => {
   const [saving, setSaving] = useState(false);
   const [statusBusy, setStatusBusy] = useState(false);
 
-  const load = () => {
+  const load = useCallback(() => {
     setLoading(true);
     setError('');
     const params = showArchived ? { archived: 'true' } : {};
@@ -29,11 +29,11 @@ const GroupsPage = () => {
       .then((res) => setCourses(res.data || []))
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
-  };
+  }, [showArchived]);
 
   useEffect(() => {
     load();
-  }, [showArchived]);
+  }, [load]);
 
   const handleCreate = async (e) => {
     e.preventDefault();

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import SEO from '../../shared/SEO';
 import ClassroomLayout from '../ClassroomLayout';
@@ -18,7 +18,7 @@ const ReviewQueuePage = () => {
   const [score, setScore] = useState(100);
   const [feedback, setFeedback] = useState('');
 
-  const load = () => {
+  const load = useCallback(() => {
     setLoading(true);
     classroomApi
       .getReviewQueue()
@@ -31,11 +31,11 @@ const ReviewQueuePage = () => {
       })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
-  };
+  }, [filterAssignment]);
 
   useEffect(() => {
     load();
-  }, [filterAssignment]);
+  }, [load]);
 
   const handleGrade = async (submission) => {
     const assignmentId = submission.assignment?._id || submission.assignment;
