@@ -151,7 +151,10 @@ const Account = () => {
   const [adminTotalPages, setAdminTotalPages] = useState(1);
   const [adminTotalUsers, setAdminTotalUsers] = useState(0);
 
-  const isProUser = user?.plan === 'pro' || ['active', 'trialing'].includes(user?.subscriptionStatus);
+  const isProUser =
+    user?.role === 'admin' ||
+    user?.plan === 'pro' ||
+    ['active', 'trialing'].includes(user?.subscriptionStatus);
   const displayLimit = calculationLimits.limit > 0 ? calculationLimits.limit : 5;
   const displayUsed = Math.min(calculationLimits.used, displayLimit);
   const usageProgressPct = displayLimit ? Math.min((displayUsed / displayLimit) * 100, 100) : 0;
@@ -433,6 +436,10 @@ const Account = () => {
 
   // Update limits when plan changes
   useEffect(() => {
+    if (user?.role === 'admin') {
+      setCalculationLimits((prev) => ({ ...prev, unlimited: true, limit: -1 }));
+      return;
+    }
     if (plan) {
       if (plan.name === 'free') {
         setCalculationLimits(prev => ({
@@ -447,7 +454,7 @@ const Account = () => {
         }));
       }
     }
-  }, [plan]);
+  }, [plan, user?.role]);
 
   // Listen for calculation events to refresh limits and history
   // Only refresh if we're still in the same month period

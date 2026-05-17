@@ -3,9 +3,11 @@ import SEO from '../shared/SEO';
 import Layout from '../layout/Layout';
 import { Link } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
-import { useAuth } from '../auth/AuthContext';
 import useTypewriter from '../../hooks/useTypewriter';
 import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
+import TaskActionBar from './TaskActionBar';
+import TaskMobileBackButton from './TaskMobileBackButton';
+import { useProScan } from '../../hooks/useProScan';
 import { calculateFirstTask as calculateFirstTaskDomain } from '../../domain/geodesy';
 import { roundTo } from '../../domain/math';
 import { extractTaskInputFromImage } from '../../services/scanService';
@@ -49,12 +51,7 @@ const PurvaZadacha = () => {
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
   const { t, language } = useTranslation();
-  const { user } = useAuth();
-  const isProUser = user?.plan === 'pro' || ['active', 'trialing'].includes(user?.subscriptionStatus) || user?.role === 'admin';
-  const [showProHint, setShowProHint] = useState(false);
-  const proScanMessage = language === 'bg'
-    ? 'Сканирането е функция на Pro плана. Моля, абонирайте се.'
-    : 'Scanning is a Pro feature. Please subscribe.';
+  const { isProUser, proScanMessage } = useProScan(language);
   const [resultText, setResultText] = useState(t.defaultResultText);
   const [history, setHistory] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -130,10 +127,6 @@ const PurvaZadacha = () => {
   };
 
   const handleScanClick = () => {
-    if (!isProUser) {
-      alert(proScanMessage);
-      return;
-    }
     cameraInputRef.current?.click();
   };
 
@@ -326,10 +319,7 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
           <div className="flex flex-col justify-start items-start gap-6 w-full">
             <div className="self-stretch flex flex-col justify-start items-start gap-1">
               <div className="inline-flex items-center gap-3 w-full">
-                {/* Back button */}
-                <button className="w-8 h-8 flex items-center justify-center rounded-xl bg-gray-200 text-black focus:outline-none">
-                  <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><path d="M13 15l-5-5 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                </button>
+                <TaskMobileBackButton />
                 <span className="text-black text-2xl font-bold font-['Manrope']">Първа основна задача</span>
               </div>
             </div>
@@ -345,7 +335,7 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
             <div className="self-stretch flex flex-col justify-start items-start gap-10 w-full">
               <div className="self-stretch flex flex-col justify-start items-start gap-5 w-full">
                 {/* Form Card */}
-                <div className="self-stretch p-3 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-center items-end gap-3 w-full">
+                <div className="self-stretch p-3 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-center items-end gap-3 w-full min-w-0 overflow-hidden">
                   <div className="self-stretch justify-start text-black text-base font-semibold font-['Manrope']">Входни данни</div>
                   <div className="self-stretch flex flex-col justify-start items-start gap-4 w-full">
                     {/* Y1 */}
@@ -417,46 +407,17 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
                       </datalist>
                     </div>
                   </div>
-                  <div className="inline-flex justify-end items-center gap-3 w-full">
-                    <div
-                      className="relative"
-                      onMouseEnter={() => !isProUser && setShowProHint(true)}
-                      onMouseLeave={() => setShowProHint(false)}
-                    >
-                      {!isProUser && showProHint && (
-                        <div className="absolute -top-10 left-0 z-10 whitespace-nowrap rounded-md bg-black px-3 py-1 text-xs text-white shadow">
-                          {proScanMessage}
-                        </div>
-                      )}
-                      <button
-                        type="button"
-                        onClick={handleScanClick}
-                        disabled={isScanning}
-                        title={!isProUser ? proScanMessage : undefined}
-                        className={`px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3 hover:bg-gray-300 disabled:opacity-50${!isProUser ? ' opacity-70' : ''}`}
-                      >
-                        {isScanning ? (
-                          <span className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
-                        ) : (
-                          <img src="/icons/scan_icon.svg" alt={t.scan} className="w-4 h-4" />
-                        )}
-                        <span className="justify-start text-black text-sm font-medium font-['Manrope']">{t.scan}</span>
-                        {!isProUser && (
-                          <span className="ml-1 rounded bg-black px-1.5 py-0.5 text-[10px] font-semibold text-white">PRO</span>
-                        )}
-                      </button>
-                    </div>
-                    <button type="button" onClick={resetForm} className="px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3">
-                      <div className="justify-start text-black text-sm font-medium font-['Manrope']">Нулирай</div>
-                    </button>
-                    <button type="button" onClick={calculate} disabled={isAuthenticated && !isFormValid()} className={`px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3${isAuthenticated && !isFormValid() ? ' opacity-50 cursor-not-allowed' : ''}`}>
-                      <div className="justify-start text-white text-sm font-medium font-['Manrope']">Изчисли</div>
-                      <img src="/icons/white_right_arrow.svg" alt="Изчисли" className="w-4 h-4" />
-                    </button>
-                  </div>
+                                    <TaskActionBar
+                    onReset={resetForm}
+                    onCalculate={calculate}
+                    calculateDisabled={isAuthenticated && !isFormValid()}
+                    scanOnClick={handleScanClick}
+                    scanIsScanning={isScanning}
+                  />
+
                 </div>
                 {/* Results Card */}
-                <div className="self-stretch p-3 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-center items-end gap-3 w-full">
+                <div className="self-stretch p-3 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-center items-end gap-3 w-full min-w-0 overflow-hidden">
                   <div className="self-stretch justify-start text-black text-base font-semibold font-['Manrope']">Резултати</div>
                   <div className="self-stretch p-3 bg-stone-50 rounded-lg flex flex-col justify-start items-start w-full">
                     <div className="self-stretch justify-start text-neutral-400 text-sm font-medium font-['Manrope'] whitespace-pre-line">
@@ -649,45 +610,15 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
                     </datalist>
                   </div>
                 </div>
-                <div className="inline-flex justify-start items-start gap-3">
-                  <div
-                    className="relative"
-                    onMouseEnter={() => !isProUser && setShowProHint(true)}
-                    onMouseLeave={() => setShowProHint(false)}
-                  >
-                    {!isProUser && showProHint && (
-                      <div className="absolute -top-10 left-0 z-10 whitespace-nowrap rounded-md bg-black px-3 py-1 text-xs text-white shadow">
-                        {proScanMessage}
-                      </div>
-                    )}
-                    <button
-                      type="button"
-                      onClick={handleScanClick}
-                      disabled={isScanning}
-                      title={!isProUser ? proScanMessage : undefined}
-                      className={`px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3 hover:bg-gray-300 disabled:opacity-50${!isProUser ? ' opacity-70' : ''}`}
-                    >
-                      {isScanning ? (
-                        <span className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
-                      ) : (
-                        <img src="/icons/scan_icon.svg" alt={t.scan} className="w-4 h-4" />
-                      )}
-                      <span className="justify-start text-black text-base font-medium font-['Manrope']">{t.scan}</span>
-                      {!isProUser && (
-                        <span className="ml-1 rounded bg-black px-1.5 py-0.5 text-[10px] font-semibold text-white">PRO</span>
-                      )}
-                    </button>
-                  </div>
-                  {/* Reset button */}
-                  <button type="button" onClick={resetForm} className="px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3">
-                    <div className="justify-start text-black text-base font-medium font-['Manrope']">Нулирай</div>
-                  </button>
-                  {/* Calculate button */}
-                  <button type="button" onClick={calculate} disabled={isAuthenticated && !isFormValid()} className={`px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3${isAuthenticated && !isFormValid() ? ' opacity-50 cursor-not-allowed' : ''}`}>
-                    <div className="justify-start text-white text-base font-medium font-['Manrope']">Изчисли</div>
-                    <img src="/icons/white_right_arrow.svg" alt="Изчисли" className="w-4 h-4" />
-                  </button>
-                </div>
+                                <TaskActionBar
+                  layout="flex"
+                  onReset={resetForm}
+                  onCalculate={calculate}
+                  calculateDisabled={isAuthenticated && !isFormValid()}
+                  scanOnClick={handleScanClick}
+                  scanIsScanning={isScanning}
+                />
+
               </div>
               {/* Results Card */}
               <div className="flex-1 self-stretch p-4 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-center items-end gap-3">

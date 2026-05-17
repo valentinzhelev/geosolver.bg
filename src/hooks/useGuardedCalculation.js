@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../components/auth/AuthContext';
 import { useTranslation } from './useTranslation';
 import { useCalculationTracking } from './useCalculationTracking';
+import { hasUnlimitedCalculations } from '../utils/calculationAccess';
 
 /**
  * Auth gate + shared free-plan limit (5 total across all tools) + backend tracking.
@@ -17,6 +18,10 @@ export function useGuardedCalculation() {
     if (!user) {
       navigate('/login');
       return null;
+    }
+
+    if (hasUnlimitedCalculations(user)) {
+      return { canCalculate: true, unlimited: true, used: 0, limit: -1 };
     }
 
     const limits = await checkLimits();

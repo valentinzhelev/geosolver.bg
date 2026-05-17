@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../layout/Layout';
+import TaskActionBar from './TaskActionBar';
+import TaskMobileBackButton from './TaskMobileBackButton';
 import SEO from '../shared/SEO';
 import { Link } from 'react-router-dom';
 import useTypewriter from '../../hooks/useTypewriter';
@@ -283,9 +285,7 @@ cos(α) = ${result.cosAlpha}
           <div className="flex flex-col justify-start items-start gap-6 w-full">
             <div className="self-stretch flex flex-col justify-start items-start gap-1">
               <div className="inline-flex items-center gap-3 w-full">
-                <button className="w-8 h-8 flex items-center justify-center rounded-xl bg-gray-200 text-black focus:outline-none">
-                  <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><path d="M13 15l-5-5 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                </button>
+                <TaskMobileBackButton />
                 <span className="text-black text-2xl font-bold font-['Manrope']">Втора основна задача</span>
               </div>
             </div>
@@ -300,7 +300,7 @@ cos(α) = ${result.cosAlpha}
             <div className="self-stretch flex flex-col justify-start items-start gap-10 w-full">
               <div className="self-stretch flex flex-col justify-start items-start gap-5 w-full">
                 {/* Form Card */}
-                <div className="self-stretch p-3 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-center items-end gap-3 w-full">
+                <div className="self-stretch p-3 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-center items-end gap-3 w-full min-w-0 overflow-hidden">
                   <div className="self-stretch justify-start text-black text-base font-semibold font-['Manrope']">Входни данни</div>
                   <div className="self-stretch flex flex-col justify-start items-start gap-4 w-full">
                     {/* X1 */}
@@ -328,22 +328,15 @@ cos(α) = ${result.cosAlpha}
                       <datalist id="y2-history">{getInputHistory('y2').map((v, i) => <option value={v} key={i} />)}</datalist>
                     </div>
                   </div>
-                  <div className="inline-flex justify-end items-center gap-3 w-full">
-                    <button type="button" aria-disabled="true" title="Тази функция е в процес на разработка и интеграция." className="px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3 opacity-50 select-none cursor-not-allowed">
-                      <img src="/icons/scan_icon.svg" alt="Сканирай" className="w-4 h-4" />
-                      <span className="justify-start text-black text-sm font-medium font-['Manrope']">Сканирай</span>
-                    </button>
-                    <button type="button" onClick={resetForm} className="px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3">
-                      <div className="justify-start text-black text-sm font-medium font-['Manrope']">Нулирай</div>
-                    </button>
-                    <button type="button" onClick={calculate} disabled={isAuthenticated && !isFormValid()} className={`px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3${isAuthenticated && !isFormValid() ? ' opacity-50 cursor-not-allowed' : ''}`}>
-                      <div className="justify-start text-white text-sm font-medium font-['Manrope']">Изчисли</div>
-                      <img src="/icons/white_right_arrow.svg" alt="Изчисли" className="w-4 h-4" />
-                    </button>
-                  </div>
+                                    <TaskActionBar
+                    onReset={resetForm}
+                    onCalculate={calculate}
+                    calculateDisabled={isAuthenticated && !isFormValid()}
+                  />
+
                 </div>
                 {/* Results Card */}
-                <div className="self-stretch p-3 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-center items-end gap-3 w-full">
+                <div className="self-stretch p-3 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-center items-end gap-3 w-full min-w-0 overflow-hidden">
                   <div className="self-stretch justify-start text-black text-base font-semibold font-['Manrope']">Резултати</div>
                   <div className="self-stretch p-3 bg-stone-50 rounded-lg flex flex-col justify-start items-start w-full">
                     <div className="self-stretch justify-start text-neutral-400 text-sm font-medium font-['Manrope'] whitespace-pre-line">
@@ -483,19 +476,13 @@ cos(α) = ${result.cosAlpha}
                     <datalist id="y2-history">{getInputHistory('y2').map((v, i) => <option value={v} key={i} />)}</datalist>
                   </div>
                 </div>
-                <div className="inline-flex justify-start items-start gap-3">
-                  <button type="button" aria-disabled="true" title="Тази функция е в процес на разработка и интеграция." className="px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3 opacity-50 select-none cursor-not-allowed">
-                    <img src="/icons/scan_icon.svg" alt="Сканирай" className="w-4 h-4" />
-                    <span className="justify-start text-black text-base font-medium font-['Manrope']">Сканирай</span>
-                  </button>
-                  <button type="button" onClick={resetForm} className="px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3">
-                    <div className="justify-start text-black text-base font-medium font-['Manrope']">Нулирай</div>
-                  </button>
-                  <button type="button" onClick={calculate} disabled={isAuthenticated && !isFormValid()} className={`px-4 py-2 bg-black rounded-lg flex justify-start items-center gap-3${isAuthenticated && !isFormValid() ? ' opacity-50 cursor-not-allowed' : ''}`}>
-                    <div className="justify-start text-white text-base font-medium font-['Manrope']">Изчисли</div>
-                    <img src="/icons/white_right_arrow.svg" alt="Изчисли" className="w-4 h-4" />
-                  </button>
-                </div>
+                                <TaskActionBar
+                  layout="flex"
+                  onReset={resetForm}
+                  onCalculate={calculate}
+                  calculateDisabled={isAuthenticated && !isFormValid()}
+                />
+
               </div>
               {/* Results Card */}
               <div className="flex-1 self-stretch p-4 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-center items-end gap-3">
