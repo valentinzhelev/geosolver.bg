@@ -34,27 +34,27 @@ const Register = () => {
         description={t.registerDescription}
         canonical="/register"
       />
-      <div className="w-full min-h-screen bg-stone-50">
-        <div className="container mx-auto px-4 py-8 md:py-12">
-          <div className="max-w-[580px] w-full mx-auto flex flex-col gap-5">
+      <div className="w-full min-h-screen bg-stone-50 dark:bg-zinc-950 transition-colors">
+        <div className="container mx-auto px-4 py-8 md:py-10">
+          <div className="max-w-[480px] sm:max-w-[540px] w-full mx-auto flex flex-col gap-4 md:gap-5">
             {/* Welcome Banner */}
-            <div className="w-full px-8 md:px-14 py-6 md:py-10 relative bg-black rounded-xl flex justify-center items-center gap-4 overflow-hidden">
+            <div className="w-full px-6 md:px-10 py-5 md:py-7 relative bg-black rounded-xl flex justify-center items-center overflow-hidden min-h-[4.5rem] md:min-h-[5.25rem]">
               <img
-                className="w-full h-96 absolute origin-center rotate-180 opacity-80"
+                className="absolute inset-0 w-full h-full object-cover rotate-180 opacity-80"
                 src="/images/gradient_wallpaper.jpg"
                 alt="Background"
               />
-              <div className="relative z-10 flex flex-row items-center justify-center w-full gap-3">
-                <span className="text-white text-lg md:text-2xl font-semibold font-['Manrope']">
+              <div className="relative z-10 flex flex-row items-center justify-center gap-2.5 md:gap-3">
+                <span className="text-white text-base md:text-lg font-semibold font-['Manrope']">
                   {t.welcomeTo}
                 </span>
-                <span className="flex items-center gap-2.5">
+                <span className="flex items-center gap-2">
                   <img
                     src="/icons/white_logo.svg"
                     alt="GeoSolver Logo"
-                    className="w-9 md:w-10 h-9 md:h-10"
+                    className="w-8 h-8 md:w-9 md:h-9"
                   />
-                  <span className="text-white text-lg md:text-xl font-bold font-['Manrope']">
+                  <span className="text-white text-base md:text-lg font-bold font-['Manrope']">
                     GeoSolver
                   </span>
                 </span>
@@ -62,54 +62,54 @@ const Register = () => {
             </div>
             {/* Register Form */}
             <form className="w-full flex flex-col justify-center items-center gap-2.5" onSubmit={handleSubmit}>
-              <div className="w-full p-4 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-center items-center gap-6">
-                <div className="w-full flex flex-col justify-start items-start gap-4">
+              <div className="w-full p-4 md:p-5 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex flex-col justify-center items-center gap-5">
+                <div className="w-full flex flex-col justify-start items-start gap-3.5">
                   {/* Name */}
-                  <div className="w-full flex flex-col justify-start items-start gap-2">
-                    <label className="text-black text-sm font-medium font-['Manrope']">{t.fullName}</label>
-                    <input type="text" placeholder={t.enterFullName} className="w-full p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']" value={name} onChange={e => setName(e.target.value)} required />
+                  <div className="w-full flex flex-col justify-start items-start gap-1.5">
+                    <label className="text-black dark:text-white text-sm font-medium font-['Manrope']">{t.fullName}</label>
+                    <input type="text" placeholder={t.enterFullName} className="w-full p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-600 bg-white dark:bg-zinc-800 text-black dark:text-zinc-100 placeholder-neutral-400 dark:placeholder-zinc-500 text-sm font-medium font-['Manrope']" value={name} onChange={e => setName(e.target.value)} required />
                   </div>
                   {/* Email */}
-                  <div className="w-full flex flex-col justify-start items-start gap-2">
-                    <label className="text-black text-sm font-medium font-['Manrope']">{t.email}</label>
-                    <input type="email" placeholder={t.enterYourEmail} className="w-full p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']" value={email} onChange={e => setEmail(e.target.value)} required />
+                  <div className="w-full flex flex-col justify-start items-start gap-1.5">
+                    <label className="text-black dark:text-white text-sm font-medium font-['Manrope']">{t.email}</label>
+                    <input type="email" placeholder={t.enterYourEmail} className="w-full p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-600 bg-white dark:bg-zinc-800 text-black dark:text-zinc-100 placeholder-neutral-400 dark:placeholder-zinc-500 text-sm font-medium font-['Manrope']" value={email} onChange={e => setEmail(e.target.value)} required />
                   </div>
                   {/* Password */}
-                  <div className="w-full flex flex-col justify-start items-start gap-2">
-                    <label className="text-black text-sm font-medium font-['Manrope']">{t.password}</label>
-                    <input type="password" placeholder={t.enterYourPassword} className="w-full p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']" value={password} onChange={e => setPassword(e.target.value)} required />
+                  <div className="w-full flex flex-col justify-start items-start gap-1.5">
+                    <label className="text-black dark:text-white text-sm font-medium font-['Manrope']">{t.password}</label>
+                    <input type="password" placeholder={t.enterYourPassword} className="w-full p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-600 bg-white dark:bg-zinc-800 text-black dark:text-zinc-100 placeholder-neutral-400 dark:placeholder-zinc-500 text-sm font-medium font-['Manrope']" value={password} onChange={e => setPassword(e.target.value)} required />
                   </div>
                   {/* Repeat Password */}
-                  <div className="w-full flex flex-col justify-start items-start gap-2">
-                    <label className="text-black text-sm font-medium font-['Manrope']">{t.repeatPassword}</label>
-                    <input type="password" placeholder={t.repeatYourPassword} className="w-full p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']" value={repeatPassword} onChange={e => setRepeatPassword(e.target.value)} required />
+                  <div className="w-full flex flex-col justify-start items-start gap-1.5">
+                    <label className="text-black dark:text-white text-sm font-medium font-['Manrope']">{t.repeatPassword}</label>
+                    <input type="password" placeholder={t.repeatYourPassword} className="w-full p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-600 bg-white dark:bg-zinc-800 text-black dark:text-zinc-100 placeholder-neutral-400 dark:placeholder-zinc-500 text-sm font-medium font-['Manrope']" value={repeatPassword} onChange={e => setRepeatPassword(e.target.value)} required />
                   </div>
                   {/* Usage Purpose */}
                   <div className="w-full flex flex-col justify-start items-start gap-2">
-                    <label className="text-black text-sm font-medium font-['Manrope']">{t.purposeQuestion}</label>
-                    <div className="p-1.5 bg-white rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-row justify-start items-center gap-2">
-                      <button type="button" className={`px-3 py-1 rounded flex justify-center items-center gap-2.5 text-base font-['Manrope'] ${purpose === 'student' ? 'bg-gray-200 text-black' : 'text-neutral-400'}`} onClick={() => setPurpose('student')}>{t.purposeStudent}</button>
-                      <button type="button" className={`px-3 py-1 rounded flex justify-center items-center gap-2.5 text-base font-['Manrope'] ${purpose === 'teacher' ? 'bg-gray-200 text-black' : 'text-neutral-400'}`} onClick={() => setPurpose('teacher')}>{t.purposeTeacher}</button>
-                      <button type="button" className={`px-3 py-1 rounded flex justify-center items-center gap-2.5 text-base font-['Manrope'] ${purpose === 'work' ? 'bg-gray-200 text-black' : 'text-neutral-400'}`} onClick={() => setPurpose('work')}>{t.purposeWork}</button>
+                    <label className="text-black dark:text-white text-sm font-medium font-['Manrope']">{t.purposeQuestion}</label>
+                    <div className="p-1.5 bg-white dark:bg-zinc-900 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex flex-row justify-start items-center gap-2">
+                      <button type="button" className={`px-3 py-1 rounded flex justify-center items-center gap-2.5 text-base font-['Manrope'] ${purpose === 'student' ? 'bg-gray-200 dark:bg-zinc-700 text-black dark:text-white' : 'text-neutral-400 dark:text-zinc-400'}`} onClick={() => setPurpose('student')}>{t.purposeStudent}</button>
+                      <button type="button" className={`px-3 py-1 rounded flex justify-center items-center gap-2.5 text-base font-['Manrope'] ${purpose === 'teacher' ? 'bg-gray-200 dark:bg-zinc-700 text-black dark:text-white' : 'text-neutral-400 dark:text-zinc-400'}`} onClick={() => setPurpose('teacher')}>{t.purposeTeacher}</button>
+                      <button type="button" className={`px-3 py-1 rounded flex justify-center items-center gap-2.5 text-base font-['Manrope'] ${purpose === 'work' ? 'bg-gray-200 dark:bg-zinc-700 text-black dark:text-white' : 'text-neutral-400 dark:text-zinc-400'}`} onClick={() => setPurpose('work')}>{t.purposeWork}</button>
                     </div>
                   </div>
                 </div>
                 {/* Terms and Register Button */}
                 <div className="w-full flex flex-col justify-start items-start gap-4">
                   <div className="w-full flex flex-row justify-start items-center gap-3">
-                    <input type="checkbox" className="w-6 h-6 bg-white rounded border border-gray-200" checked={agreed} onChange={e => setAgreed(e.target.checked)} required />
-                    <div className="flex-1 text-black text-sm font-medium font-['Manrope']">
+                    <input type="checkbox" className="w-6 h-6 bg-white dark:bg-zinc-900 rounded border border-gray-200" checked={agreed} onChange={e => setAgreed(e.target.checked)} required />
+                    <div className="flex-1 text-black dark:text-white text-sm font-medium font-['Manrope']">
                       {t.termsAgreementPrefix}<Link to="/terms" className="underline">{t.terms}</Link> {t.language === 'bg' ? 'и' : 'and'} <Link to="/privacy" className="underline">{t.privacyPolicy}</Link>{t.termsAgreementSuffix}
                     </div>
                   </div>
-                  <button type="submit" className="w-full px-4 py-2 bg-black rounded-lg flex justify-center items-center gap-3 text-white text-base font-medium font-['Manrope']" disabled={loading || !agreed}>
+                  <button type="submit" className="w-full px-4 py-2 bg-black dark:bg-white rounded-lg flex justify-center items-center gap-3 text-white dark:text-black text-sm font-medium font-['Manrope'] hover:opacity-90 transition-opacity disabled:opacity-50" disabled={loading || !agreed}>
                     {loading ? t.registering : t.registerBtn}
                   </button>
-                  {error && <div className="w-full text-red-500 text-sm font-medium font-['Manrope']">{error}</div>}
-                  {success && <div className="w-full text-green-600 text-sm font-medium font-['Manrope']">{t.successRegister}</div>}
+                  {error && <div className="w-full text-red-500 dark:text-red-400 text-sm font-medium font-['Manrope']">{error}</div>}
+                  {success && <div className="w-full text-green-600 dark:text-green-400 text-sm font-medium font-['Manrope']">{t.successRegister}</div>}
                   <div className="w-full flex justify-center items-center mt-2">
-                    <span className="text-neutral-400 text-sm font-medium font-['Manrope']">{t.alreadyHaveAccount}</span>
-                    <Link to="/login" className="ml-2 text-black text-sm font-semibold font-['Manrope'] underline">{t.login}</Link>
+                    <span className="text-neutral-400 dark:text-zinc-400 text-sm font-medium font-['Manrope']">{t.alreadyHaveAccount}</span>
+                    <Link to="/login" className="ml-2 text-black dark:text-white text-sm font-semibold font-['Manrope'] underline">{t.login}</Link>
                   </div>
                 </div>
               </div>

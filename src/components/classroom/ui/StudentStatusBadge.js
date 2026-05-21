@@ -2,7 +2,7 @@ import React from 'react';
 import { getStudentStatusLabel, studentStatusTone } from '../../../utils/eduStudentStatus';
 
 const toneClasses = {
-  neutral: 'bg-stone-100 text-stone-700 dark:bg-zinc-800 dark:text-zinc-300',
+  neutral: 'bg-stone-100 dark:bg-zinc-800 text-stone-700 dark:bg-zinc-800 dark:text-zinc-300',
   blue: 'bg-blue-50 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200',
   green: 'bg-green-50 text-green-800 dark:bg-green-900/30 dark:text-green-200',
   amber: 'bg-amber-50 text-amber-900 dark:bg-amber-900/30 dark:text-amber-200',

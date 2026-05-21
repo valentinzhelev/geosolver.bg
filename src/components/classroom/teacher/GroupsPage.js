@@ -159,7 +159,7 @@ const GroupsPage = () => {
         )}
 
         {loading && (
-          <Card className="p-8 text-center text-neutral-500 font-['Manrope']">{bg ? 'Зареждане...' : 'Loading...'}</Card>
+          <Card className="p-8 text-center text-neutral-500 dark:text-zinc-400 font-['Manrope']">{bg ? 'Зареждане...' : 'Loading...'}</Card>
         )}
 
         {!loading && courses.length === 0 && !showForm && (
@@ -193,7 +193,7 @@ const GroupsPage = () => {
                   {c.description}
                 </p>
               )}
-              <p className="text-xs text-neutral-400 font-['Manrope']">
+              <p className="text-xs text-neutral-400 dark:text-zinc-400 font-['Manrope']">
                 {c.students?.length || 0} {bg ? 'ученици' : 'students'}
               </p>
               <div className="flex flex-wrap gap-2 mt-auto pt-1">

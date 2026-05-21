@@ -35,7 +35,7 @@ const GaiInsightPanel = ({ gaiInsights, bg, compact = false }) => {
               {bg ? 'GeoSolver AI анализ' : 'GeoSolver AI insight'}
             </p>
             {!compact && gaiInsights.toolName && (
-              <p className="text-xs text-neutral-500 font-['Manrope']">
+              <p className="text-xs text-neutral-500 dark:text-zinc-400 font-['Manrope']">
                 {bg ? gaiInsights.toolName.bg : gaiInsights.toolName.en}
               </p>
             )}
@@ -57,7 +57,7 @@ const GaiInsightPanel = ({ gaiInsights, bg, compact = false }) => {
           {fieldInsights.map((f) => (
             <li
               key={f.key}
-              className="flex flex-col gap-1 text-sm font-['Manrope'] bg-white/60 dark:bg-zinc-900/40 rounded-lg px-3 py-2"
+              className="flex flex-col gap-1 text-sm font-['Manrope'] bg-white dark:bg-zinc-900/60 dark:bg-zinc-900/40 rounded-lg px-3 py-2"
             >
               <div className="flex flex-wrap items-center gap-2">
                 <span
@@ -70,7 +70,7 @@ const GaiInsightPanel = ({ gaiInsights, bg, compact = false }) => {
                   {formatAnswerValue(f.studentValue)}
                 </span>
                 {!f.isCorrect && f.correctValue != null && (
-                  <span className="text-neutral-400 text-xs">
+                  <span className="text-neutral-400 dark:text-zinc-400 text-xs">
                     → {formatAnswerValue(f.correctValue)}
                     {f.relativeErrorPct != null && ` (${f.relativeErrorPct.toFixed(1)}%)`}
                   </span>
@@ -86,13 +86,13 @@ const GaiInsightPanel = ({ gaiInsights, bg, compact = false }) => {
 
       {recommendations.length > 0 && !compact && (
         <div className="border-t border-black/5 dark:border-white/10 pt-3">
-          <p className="text-xs font-semibold uppercase text-neutral-500 mb-2 font-['Manrope']">
+          <p className="text-xs font-semibold uppercase text-neutral-500 dark:text-zinc-400 mb-2 font-['Manrope']">
             {bg ? 'Препоръки за преподавателя' : 'Teacher recommendations'}
           </p>
           <ul className="flex flex-col gap-1.5">
             {recommendations.map((r, i) => (
               <li key={i} className="text-sm text-neutral-700 dark:text-zinc-300 font-['Manrope'] flex gap-2">
-                <span className="text-neutral-400">•</span>
+                <span className="text-neutral-400 dark:text-zinc-400">•</span>
                 {bg ? r.bg : r.en}
               </li>
             ))}

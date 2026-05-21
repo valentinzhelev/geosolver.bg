@@ -1,4 +1,5 @@
 import API_BASE_URL from '../config/api';
+import { getApiLanguageHeaders } from '../utils/apiLanguage';
 
 class PlanService {
   // Fetch all plans
@@ -34,10 +35,10 @@ class PlanService {
       }
       
       const response = await fetch(`${API_BASE_URL}/subscriptions/current`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+        headers: getApiLanguageHeaders({
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        })
       });
       
       // If 404, user has no subscription (this is OK, not an error)
@@ -68,10 +69,10 @@ class PlanService {
       const token = localStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/subscriptions`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
+        headers: getApiLanguageHeaders({
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        }),
         body: JSON.stringify({ planId, billingCycle })
       });
       if (!response.ok) throw new Error('Failed to create subscription');
@@ -88,10 +89,10 @@ class PlanService {
       const token = localStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/subscriptions/${subscriptionId}/cancel`, {
         method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+        headers: getApiLanguageHeaders({
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        })
       });
       if (!response.ok) throw new Error('Failed to cancel subscription');
       return await response.json();

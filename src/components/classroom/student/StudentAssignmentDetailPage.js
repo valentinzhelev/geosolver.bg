@@ -182,11 +182,11 @@ const StudentAssignmentDetailPage = () => {
     <>
       <SEO title={assignment?.title || 'Assignment'} canonical={`/classroom/assignments/${id}`} />
       <ClassroomLayout title={assignment?.title || (bg ? 'Задание' : 'Assignment')} subtitle={assignment?.description}>
-        <Link to="/classroom/assignments" className="text-sm text-neutral-500 font-['Manrope'] w-fit hover:text-black dark:hover:text-white">
+        <Link to="/classroom/assignments" className="text-sm text-neutral-500 dark:text-zinc-400 font-['Manrope'] w-fit hover:text-black dark:hover:text-white">
           ← {bg ? 'Моите задания' : 'My assignments'}
         </Link>
 
-        {loading && <Card className="p-8 text-center text-neutral-500">{bg ? 'Зареждане...' : 'Loading...'}</Card>}
+        {loading && <Card className="p-8 text-center text-neutral-500 dark:text-zinc-400">{bg ? 'Зареждане...' : 'Loading...'}</Card>}
         {error && <Card className="p-4 text-sm text-red-600">{error}</Card>}
 
         {assignment && !tool && !loading && (
@@ -223,7 +223,7 @@ const StudentAssignmentDetailPage = () => {
                   <h2 className="font-bold font-['Manrope'] text-black dark:text-white">
                     {bg ? tool.titleBg : tool.titleEn}
                   </h2>
-                  <p className="text-xs text-neutral-500 font-['Manrope'] mt-0.5">
+                  <p className="text-xs text-neutral-500 dark:text-zinc-400 font-['Manrope'] mt-0.5">
                     {bg ? tool.descBg : tool.descEn}
                   </p>
                 </div>
@@ -231,7 +231,7 @@ const StudentAssignmentDetailPage = () => {
 
               <TaskDiagramSvg toolKey={tool.toolKey} inputData={inputData} answers={answers} bg={bg} />
 
-              <h3 className="text-sm font-semibold font-['Manrope'] text-neutral-500 uppercase tracking-wide">
+              <h3 className="text-sm font-semibold font-['Manrope'] text-neutral-500 dark:text-zinc-400 uppercase tracking-wide">
                 {bg ? 'Входни данни' : 'Given data'}
               </h3>
               {assignment.description && (
@@ -242,7 +242,7 @@ const StudentAssignmentDetailPage = () => {
               <div className="grid grid-cols-2 gap-2">
                 {tool.inputDisplay.map((f) => (
                   <div key={f.key} className="px-3 py-2 bg-stone-50 dark:bg-zinc-800 rounded-lg text-sm font-['Manrope']">
-                    <span className="text-neutral-500">{bg ? f.labelBg : f.labelEn}: </span>
+                    <span className="text-neutral-500 dark:text-zinc-400">{bg ? f.labelBg : f.labelEn}: </span>
                     <span className="font-mono text-black dark:text-white">{inputData[f.key] ?? '—'}</span>
                   </div>
                 ))}
@@ -256,13 +256,13 @@ const StudentAssignmentDetailPage = () => {
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h2 className="font-bold font-['Manrope'] text-black dark:text-white">{bg ? 'Вашият отговор' : 'Your answer'}</h2>
                 {totalFields > 0 && (
-                  <span className="text-xs font-['Manrope'] text-neutral-500">
+                  <span className="text-xs font-['Manrope'] text-neutral-500 dark:text-zinc-400">
                     {filledCount}/{totalFields} {bg ? 'полета' : 'fields'}
                   </span>
                 )}
               </div>
               {assignment.canSubmit && hasDraft && (
-                <p className="text-xs text-neutral-500 font-['Manrope']">
+                <p className="text-xs text-neutral-500 dark:text-zinc-400 font-['Manrope']">
                   {bg ? 'Има запазена чернова на отговорите.' : 'A saved answer draft is available.'}
                 </p>
               )}
@@ -330,7 +330,7 @@ const StudentAssignmentDetailPage = () => {
                   </div>
                 </form>
               ) : (
-                <p className="text-sm text-neutral-500 font-['Manrope']">
+                <p className="text-sm text-neutral-500 dark:text-zinc-400 font-['Manrope']">
                   {bg ? 'Краен срокът е изтекъл.' : 'The deadline has passed.'}
                 </p>
               )}
@@ -348,7 +348,7 @@ const StudentAssignmentDetailPage = () => {
                   ))}
                 </div>
               )}
-              <p className="text-[10px] text-neutral-400 font-['Manrope'] text-center">{policyMeta.studentHint}</p>
+              <p className="text-[10px] text-neutral-400 dark:text-zinc-400 font-['Manrope'] text-center">{policyMeta.studentHint}</p>
             </Card>
           </GaiRadialWorkspace>
         )}

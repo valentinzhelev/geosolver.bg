@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import Layout from '../../layout/Layout';
 import SEO from '../../shared/SEO';
 import { useTranslation } from '../../../hooks/useTranslation';
@@ -11,10 +11,13 @@ const ForTeachers = () => {
   const { t, language } = useTranslation();
   const { user, loading } = useAuth();
   const features = t.forTeachersFeatures || [];
+  const steps = t.forTeachersSteps || [];
+  const planFreeFeatures = t.forTeachersPlanFreeFeatures || [];
+  const planProFeatures = t.forTeachersPlanProFeatures || [];
   const showClassroomLink = canAccessTeacherClassroom(user, { loading });
   const bg = language === 'bg';
-  const [requestMsg, setRequestMsg] = useState('');
   const [requestNote, setRequestNote] = useState('');
+  const [requestMsg, setRequestMsg] = useState('');
   const [requestStatus, setRequestStatus] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -44,104 +47,233 @@ const ForTeachers = () => {
       <SEO
         title={t.forTeachersTitle}
         description={t.forTeachersDescription}
-        keywords="геодезия, образование, учители, преподаватели, безплатно, GeoSolver, дигитални инструменти, проверка на задачи, сканиране, класна стая, обучение"
+        keywords="геодезия, преподаватели, класна стая, задания, автоматична проверка, GeoSolver, образование"
         canonical="/for-teachers"
       />
       <Layout>
-        <div className="w-full flex justify-center bg-stone-50 dark:bg-zinc-950 min-h-screen py-8 px-2 md:px-0 transition-colors">
-          <div className="w-full max-w-[900px] flex flex-col gap-8">
-            <div className="flex flex-col gap-4">
-              <h1 className="text-black dark:text-white text-xl md:text-2xl font-bold font-['Manrope'] mb-1">{t.forTeachersTitle}</h1>
-              <div className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-700 p-6 md:p-8 flex flex-col gap-8 shadow-sm dark:shadow-none transition-colors">
-                <div className="flex flex-col gap-3">
-                <h2 className="text-base md:text-lg font-bold text-black dark:text-white font-['Manrope'] mb-2 text-center">{t.forTeachersHeadline}</h2>
-                  <p className="text-base text-black dark:text-zinc-200 font-['Manrope'] leading-relaxed">
-                    {t.forTeachersIntro}
+        <div className="w-full min-h-screen bg-stone-50 dark:bg-zinc-950 transition-colors">
+          <div className="w-full max-w-[1180px] mx-auto px-4 lg:px-6 pt-6 lg:pt-16 pb-12 flex flex-col gap-10 lg:gap-14">
+            {/* Hero */}
+            <div className="max-w-[640px] flex flex-col gap-2">
+              <h1 className="text-black dark:text-white text-2xl lg:text-3xl font-bold font-['Manrope']">
+                {t.forTeachersTitle}
+              </h1>
+              <p className="text-neutral-500 dark:text-zinc-400 text-sm lg:text-base font-semibold font-['Manrope']">
+                {t.forTeachersHeadline}
+              </p>
+              <p className="text-neutral-700 dark:text-zinc-300 text-sm lg:text-base font-['Manrope'] leading-relaxed mt-1">
+                {t.forTeachersIntro}
+              </p>
+            </div>
+
+            {/* Features */}
+            <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {features.map((f, i) => (
+                <div
+                  key={i}
+                  className="p-4 lg:p-5 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700 flex flex-col gap-2 transition-colors"
+                >
+                  <h2 className="text-black dark:text-white text-base font-semibold font-['Manrope']">
+                    {f.title}
+                  </h2>
+                  <p className="text-neutral-600 dark:text-zinc-400 text-sm font-['Manrope'] leading-relaxed">
+                    {f.desc}
                   </p>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {features.map((f, i) => (
-                    <div key={i} className="flex flex-col gap-1 bg-stone-50 dark:bg-zinc-800 rounded-lg p-4 border border-stone-100 dark:border-zinc-700 shadow-sm transition-colors">
-                      <div className="text-base font-bold text-black dark:text-white font-['Manrope'] mb-0.5">{f.title}</div>
-                      <div className="text-sm text-neutral-700 dark:text-zinc-400 font-['Manrope']">{f.desc}</div>
-                    </div>
-                  ))}
-                </div>
-                {showClassroomLink && (
-                  <Link
-                    to="/classroom/dashboard"
-                    className="inline-block px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg text-sm font-medium font-['Manrope']"
+              ))}
+            </section>
+
+            {/* How to start */}
+            <section className="flex flex-col gap-4">
+              <h2 className="text-black dark:text-white text-lg font-bold font-['Manrope']">
+                {t.forTeachersHowTitle}
+              </h2>
+              <ol className="grid grid-cols-1 md:grid-cols-2 gap-3 list-none p-0 m-0">
+                {steps.map((step, i) => (
+                  <li
+                    key={i}
+                    className="flex gap-3 p-4 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700 transition-colors"
                   >
-                    {language === 'bg' ? 'Отвори класната стая' : 'Open classroom'}
-                  </Link>
-                )}
+                    <span className="shrink-0 w-7 h-7 rounded-full bg-stone-100 dark:bg-zinc-800 flex items-center justify-center text-sm font-bold font-['Manrope'] text-black dark:text-white">
+                      {i + 1}
+                    </span>
+                    <span className="text-sm text-neutral-700 dark:text-zinc-300 font-['Manrope'] leading-relaxed pt-0.5">
+                      {step}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </section>
 
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="p-5 rounded-xl border border-stone-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800/80">
-                    <h3 className="font-bold font-['Manrope'] text-black dark:text-white mb-1">Edu Free</h3>
-                    <p className="text-2xl font-bold mb-2 text-black dark:text-white">0 лв</p>
-                    <ul className="text-sm text-neutral-600 dark:text-zinc-400 font-['Manrope'] list-disc pl-4 space-y-1">
-                      <li>{bg ? '1 група, до ~40 ученика' : '1 group, ~40 students'}</li>
-                      <li>{bg ? 'Автоматична проверка, код за група' : 'Auto-grade, group code'}</li>
-                      <li>{bg ? 'Калкулатор: изкл. / помощник / пълен — по задание' : 'Calculator: off / guided / full per task'}</li>
-                    </ul>
+            {/* Plans */}
+            <section className="flex flex-col gap-4">
+              <div className="flex flex-col sm:flex-row gap-4 lg:gap-5">
+                <div className="flex-1 p-4 lg:p-5 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700 flex flex-col gap-4 transition-colors">
+                  <div className="flex flex-col gap-0.5">
+                    <h3 className="text-black dark:text-white text-lg font-semibold font-['Manrope']">
+                      {t.forTeachersPlanFreeTitle}
+                    </h3>
+                    <p className="text-xs text-neutral-500 dark:text-zinc-500 font-['Manrope']">
+                      {t.forTeachersPlanFreeNote}
+                    </p>
                   </div>
-                  <div className="p-5 rounded-xl border-2 border-black dark:border-white">
-                    <h3 className="font-bold font-['Manrope'] text-black dark:text-white mb-1">Edu Pro</h3>
-                    <p className="text-sm text-neutral-500 mb-2">{bg ? 'пилот — свържете се с нас' : 'pilot — contact us'}</p>
-                    <ul className="text-sm text-neutral-600 dark:text-zinc-400 font-['Manrope'] list-disc pl-4 space-y-1">
-                      <li>{bg ? 'Неограничени групи и задания' : 'Unlimited groups & assignments'}</li>
-                      <li>{bg ? 'CSV, аналитика, шаблони' : 'CSV, analytics, templates'}</li>
-                    </ul>
-                    <a
-                      href="mailto:team@geosolver.bg?subject=GeoSolver%20Edu%20Pro"
-                      className="inline-block mt-3 px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg text-sm"
-                    >
-                      {bg ? 'Заяви пилот' : 'Request pilot'}
-                    </a>
+                  <div className="text-2xl font-bold font-['Manrope'] text-black dark:text-white">
+                    {t.forTeachersPlanFreePrice}
                   </div>
+                  <ul className="flex flex-col gap-2">
+                    {planFreeFeatures.map((item, i) => (
+                      <li
+                        key={i}
+                        className="px-3 py-2 bg-stone-50 dark:bg-zinc-800 rounded-lg text-xs lg:text-sm font-medium font-['Manrope'] text-black dark:text-zinc-200"
+                      >
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
 
-                <p className="text-xs text-neutral-500 font-['Manrope']">
-                  {bg
-                    ? 'Учениците в клас не плащат Pro. Consumer калкулаторите (извън задание) остават с free лимит 5 изчисления — вижте /for-students.'
-                    : 'Students in class do not need Pro. Consumer tools (outside assignments) keep the 5-calculation free tier — see /for-students.'}
-                </p>
-
-                <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-400 dark:border-blue-500 rounded-xl flex flex-col gap-1 transition-colors">
-                  <div className="text-base font-semibold text-blue-900 dark:text-blue-200 font-['Manrope']">{t.howToGetAccess}</div>
-                  <div className="text-sm text-blue-900 dark:text-blue-200 font-['Manrope']">
-                    {t.howToGetAccessText} <a href="mailto:team@geosolver.bg" className="text-blue-700 dark:text-blue-400 underline">team@geosolver.bg</a>.<br />
-                    {t.howToGetAccessHelp}
+                <div className="flex-1 p-4 lg:p-5 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700 flex flex-col gap-4 transition-colors">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="text-black dark:text-white text-lg font-semibold font-['Manrope']">
+                      {t.forTeachersPlanProTitle}
+                    </h3>
+                    <span className="px-2 py-0.5 rounded text-xs font-semibold font-['Manrope'] bg-stone-100 dark:bg-zinc-800 text-neutral-700 dark:text-zinc-300">
+                      {t.forTeachersPlanProBadge}
+                    </span>
                   </div>
-                  {user?.role === 'student' && !showClassroomLink && (
-                    <form onSubmit={handleTeacherRequest} className="flex flex-col gap-2 mt-2">
-                      {requestStatus?.status === 'pending' && (
-                        <p className="text-sm">{bg ? 'Заявката чака одобрение.' : 'Request pending.'}</p>
-                      )}
-                      {(!requestStatus || requestStatus.status === 'rejected') && (
-                        <>
-                          <textarea
-                            value={requestNote}
-                            onChange={(e) => setRequestNote(e.target.value)}
-                            rows={2}
-                            className="px-3 py-2 rounded-lg border text-sm bg-white dark:bg-zinc-900"
-                            placeholder={bg ? 'Съобщение' : 'Message'}
-                          />
-                          <button type="submit" disabled={submitting} className="px-4 py-2 bg-blue-700 text-white rounded-lg text-sm w-fit">
-                            {bg ? 'Заяви достъп' : 'Request access'}
-                          </button>
-                        </>
-                      )}
-                      {requestMsg && <p className="text-sm">{requestMsg}</p>}
-                    </form>
-                  )}
-                </div>
-                <div className="pt-3 text-center">
-                  <span className="text-sm text-neutral-600 dark:text-zinc-400 font-['Manrope']">{t.thanksForSupport}</span>
+                  <p className="text-sm text-neutral-600 dark:text-zinc-400 font-['Manrope'] -mt-2">
+                    {t.forTeachersPlanProNote}
+                  </p>
+                  <ul className="flex flex-col gap-2">
+                    {planProFeatures.map((item, i) => (
+                      <li
+                        key={i}
+                        className="px-3 py-2 bg-stone-50 dark:bg-zinc-800 rounded-lg text-xs lg:text-sm font-medium font-['Manrope'] text-black dark:text-zinc-200"
+                      >
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                  <a
+                    href="mailto:team@geosolver.bg?subject=GeoSolver%20Classroom%20Pro"
+                    className="mt-auto w-fit px-4 py-2 bg-black dark:bg-white rounded-lg text-sm font-medium font-['Manrope'] text-white dark:text-black hover:opacity-90 transition-opacity"
+                  >
+                    {t.forTeachersPlanProCta}
+                  </a>
                 </div>
               </div>
-            </div>
+
+              <p className="text-center text-xs text-neutral-500 dark:text-zinc-500 font-['Manrope'] max-w-[720px] mx-auto leading-relaxed">
+                {t.forTeachersStudentsNote}{' '}
+                <Link
+                  to="/for-students"
+                  className="text-black dark:text-white underline underline-offset-2 hover:opacity-80"
+                >
+                  {t.forTeachersStudentsLink}
+                </Link>
+                .
+              </p>
+            </section>
+
+            {/* Teacher access */}
+            <section className="p-5 lg:p-6 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700 flex flex-col gap-4 transition-colors">
+              <h2 className="text-black dark:text-white text-base font-bold font-['Manrope']">
+                {t.howToGetAccess}
+              </h2>
+              <p className="text-sm text-neutral-700 dark:text-zinc-300 font-['Manrope'] leading-relaxed">
+                {t.howToGetAccessText}{' '}
+                <a
+                  href="mailto:team@geosolver.bg"
+                  className="text-black dark:text-white font-medium underline underline-offset-2"
+                >
+                  team@geosolver.bg
+                </a>
+                . {t.howToGetAccessHelp}
+              </p>
+              <Link
+                to="/contacts"
+                className="text-sm font-medium font-['Manrope'] text-neutral-600 dark:text-zinc-400 underline underline-offset-2 w-fit hover:text-black dark:hover:text-white transition-colors"
+              >
+                {t.howToGetAccessContact}
+              </Link>
+
+              {user?.role === 'student' && !showClassroomLink && (
+                <div className="pt-2 border-t border-gray-100 dark:border-zinc-800 flex flex-col gap-3">
+                  {requestStatus?.status === 'pending' && (
+                    <p className="text-sm text-neutral-600 dark:text-zinc-400 font-['Manrope']">
+                      {bg ? 'Заявката чака одобрение от администратор.' : 'Your request is pending admin review.'}
+                    </p>
+                  )}
+                  {requestStatus?.status === 'rejected' && (
+                    <div className="rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 p-3 text-sm font-['Manrope']">
+                      <p className="font-semibold text-red-900 dark:text-red-200">
+                        {bg ? 'Заявката е отхвърлена' : 'Your request was rejected'}
+                      </p>
+                      {requestStatus.adminNote?.trim() ? (
+                        <p className="mt-1 text-red-800 dark:text-red-300">{requestStatus.adminNote.trim()}</p>
+                      ) : null}
+                      <p className="mt-2 text-neutral-600 dark:text-zinc-400">
+                        {bg ? 'Можете да подадете нова заявка по-долу.' : 'You can submit a new request below.'}
+                      </p>
+                    </div>
+                  )}
+                  {(!requestStatus || requestStatus.status === 'rejected') && (
+                    <form onSubmit={handleTeacherRequest} className="flex flex-col gap-2 max-w-md">
+                      <textarea
+                        value={requestNote}
+                        onChange={(e) => setRequestNote(e.target.value)}
+                        rows={3}
+                        className="px-3 py-2 rounded-lg border border-gray-200 dark:border-zinc-600 text-sm bg-stone-50 dark:bg-zinc-800 text-black dark:text-white font-['Manrope'] placeholder:text-neutral-400 dark:placeholder:text-zinc-500"
+                        placeholder={t.teacherRequestPlaceholder}
+                      />
+                      <button
+                        type="submit"
+                        disabled={submitting}
+                        className="px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg text-sm font-medium font-['Manrope'] w-fit hover:opacity-90 disabled:opacity-50 transition-opacity"
+                      >
+                        {submitting
+                          ? bg
+                            ? 'Изпращане...'
+                            : 'Sending...'
+                          : requestStatus?.status === 'rejected'
+                            ? bg
+                              ? 'Подай нова заявка'
+                              : 'Submit new request'
+                            : bg
+                              ? 'Заяви достъп'
+                              : 'Request access'}
+                      </button>
+                    </form>
+                  )}
+                  {requestMsg && (
+                    <p className="text-sm font-['Manrope'] text-neutral-700 dark:text-zinc-300">{requestMsg}</p>
+                  )}
+                </div>
+              )}
+            </section>
+
+            <section className="p-5 lg:p-6 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700 flex flex-col gap-4 transition-colors">
+              <h2 className="text-black dark:text-white text-base font-bold font-['Manrope']">
+                {t.forTeachersThanksTitle}
+              </h2>
+              <p className="text-sm text-neutral-700 dark:text-zinc-300 font-['Manrope'] leading-relaxed">
+                {t.forTeachersThanksP1}
+              </p>
+              <p className="text-sm text-neutral-700 dark:text-zinc-300 font-['Manrope'] leading-relaxed">
+                {t.forTeachersThanksP2}
+              </p>
+              <p className="text-sm text-neutral-700 dark:text-zinc-300 font-['Manrope'] leading-relaxed">
+                {t.forTeachersThanksP3}{' '}
+                {t.forTeachersThanksContactBefore}{' '}
+                <Link
+                  to="/contacts"
+                  className="text-black dark:text-white font-medium underline underline-offset-2 hover:opacity-80"
+                >
+                  {t.howToGetAccessContact}
+                </Link>{' '}
+                {t.forTeachersThanksContactAfter}
+              </p>
+            </section>
           </div>
         </div>
       </Layout>
@@ -149,4 +281,4 @@ const ForTeachers = () => {
   );
 };
 
-export default ForTeachers; 
+export default ForTeachers;

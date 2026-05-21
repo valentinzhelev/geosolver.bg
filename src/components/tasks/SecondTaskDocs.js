@@ -5,16 +5,16 @@ import TaskDocsLayout, {
   DocCallout,
   DocFormulaBlock,
   DocList,
+  DocTable,
   CalculatorLink,
 } from './docs/TaskDocsLayout';
 
 const SecondTaskDocs = () => {
-  const { language } = useTranslation();
+  const { language, t } = useTranslation();
   const isBg = language === 'bg';
-  const title = isBg ? 'Втора основна задача' : 'Second Basic Task';
 
   return (
-    <TaskDocsLayout title={title} toolPath="/second-task">
+    <TaskDocsLayout title={t.secondTaskTitle} toolPath="/second-task">
       <DocSection title={isBg ? 'Теория' : 'Theory'}>
         <p className="text-lg text-neutral-800 dark:text-neutral-200">
           {isBg
@@ -44,24 +44,15 @@ const SecondTaskDocs = () => {
       </DocSection>
 
       <DocSection title={isBg ? 'Квадранти' : 'Quadrants'}>
-        <div className="overflow-x-auto">
-          <table className="min-w-[320px] w-full text-center border border-gray-300 dark:border-zinc-600 rounded text-sm">
-            <thead className="bg-gray-100 dark:bg-zinc-800">
-              <tr>
-                <th className="border px-2 py-2">{isBg ? 'Квадрант' : 'Quadrant'}</th>
-                <th className="border px-2 py-2">ΔX</th>
-                <th className="border px-2 py-2">ΔY</th>
-                <th className="border px-2 py-2">α (gon)</th>
-              </tr>
-            </thead>
-            <tbody className="text-black dark:text-white">
-              <tr><td className="border px-2 py-1">I</td><td className="border px-2 py-1">+</td><td className="border px-2 py-1">+</td><td className="border px-2 py-1">0 – 100</td></tr>
-              <tr><td className="border px-2 py-1">II</td><td className="border px-2 py-1">−</td><td className="border px-2 py-1">+</td><td className="border px-2 py-1">100 – 200</td></tr>
-              <tr><td className="border px-2 py-1">III</td><td className="border px-2 py-1">−</td><td className="border px-2 py-1">−</td><td className="border px-2 py-1">200 – 300</td></tr>
-              <tr><td className="border px-2 py-1">IV</td><td className="border px-2 py-1">+</td><td className="border px-2 py-1">−</td><td className="border px-2 py-1">300 – 400</td></tr>
-            </tbody>
-          </table>
-        </div>
+        <DocTable
+          headers={[isBg ? 'Квадрант' : 'Quadrant', 'ΔX', 'ΔY', 'α (gon)']}
+          rows={[
+            ['I', '+', '+', '0 – 100'],
+            ['II', '−', '+', '100 – 200'],
+            ['III', '−', '−', '200 – 300'],
+            ['IV', '+', '−', '300 – 400'],
+          ]}
+        />
       </DocSection>
 
       <DocSection title={isBg ? 'Проверка в GeoSolver' : 'Verification in GeoSolver'}>
@@ -81,7 +72,7 @@ const SecondTaskDocs = () => {
             <p className="pt-2 font-sans font-semibold">
               {isBg ? 'Резултат:' : 'Result:'} S ≈ 185.28 m, α ≈ 28.45 gon
             </p>
-            <p className="font-sans text-neutral-600 dark:text-neutral-400 text-xs">
+            <p className="font-sans text-neutral-600 dark:text-zinc-400 text-xs">
               {isBg
                 ? '(обратна проверка на примера от първата основна задача)'
                 : '(inverse check of the first basic task example)'}

@@ -163,7 +163,7 @@ const GroupDetailPage = () => {
         title={course?.name || (bg ? 'Група' : 'Group')}
         subtitle={course ? `${bg ? 'Код' : 'Code'}: ${course.code}` : ''}
       >
-        <Link to="/classroom/groups" className="text-sm text-neutral-500 hover:text-black dark:hover:text-white font-['Manrope'] w-fit">
+        <Link to="/classroom/groups" className="text-sm text-neutral-500 dark:text-zinc-400 hover:text-black dark:hover:text-white font-['Manrope'] w-fit">
           ← {bg ? 'Към групите' : 'Back to groups'}
         </Link>
 
@@ -204,7 +204,7 @@ const GroupDetailPage = () => {
           onCancel={() => setConfirmArchiveGroup(false)}
         />
 
-        {loading && <Card className="p-8 text-center text-neutral-500">{bg ? 'Зареждане...' : 'Loading...'}</Card>}
+        {loading && <Card className="p-8 text-center text-neutral-500 dark:text-zinc-400">{bg ? 'Зареждане...' : 'Loading...'}</Card>}
 
         {course && (
           <>
@@ -242,13 +242,13 @@ const GroupDetailPage = () => {
                 </button>
               </form>
               ) : (
-                <p className="text-sm text-neutral-500 font-['Manrope']">
+                <p className="text-sm text-neutral-500 dark:text-zinc-400 font-['Manrope']">
                   {bg ? 'Възстановете групата, за да добавяте ученици.' : 'Restore the group to add students.'}
                 </p>
               )}
               <ul className="mt-2 flex flex-col gap-1 max-h-48 overflow-auto">
                 {(course.students || []).length === 0 ? (
-                  <li className="text-sm text-neutral-400 font-['Manrope']">
+                  <li className="text-sm text-neutral-400 dark:text-zinc-400 font-['Manrope']">
                     {bg ? 'Няма добавени ученици.' : 'No students added yet.'}
                   </li>
                 ) : (
@@ -324,7 +324,7 @@ const GroupDetailPage = () => {
                 </div>
               </div>
               {assignments.length === 0 ? (
-                <p className="text-sm text-neutral-500 font-['Manrope']">
+                <p className="text-sm text-neutral-500 dark:text-zinc-400 font-['Manrope']">
                   {showArchivedAssignments
                     ? bg
                       ? 'Няма архивирани задания.'
@@ -405,19 +405,19 @@ const GroupDetailPage = () => {
               </div>
               <div className="grid sm:grid-cols-3 gap-4 text-sm font-['Manrope']">
                 <div className="p-3 rounded-lg bg-stone-50 dark:bg-zinc-800">
-                  <div className="text-neutral-500">{bg ? 'Ученици' : 'Students'}</div>
+                  <div className="text-neutral-500 dark:text-zinc-400">{bg ? 'Ученици' : 'Students'}</div>
                   <div className="text-xl font-bold text-black dark:text-white">
                     {analytics.course?.studentCount ?? 0}
                   </div>
                 </div>
                 <div className="p-3 rounded-lg bg-stone-50 dark:bg-zinc-800">
-                  <div className="text-neutral-500">{bg ? 'Предавания' : 'Submissions'}</div>
+                  <div className="text-neutral-500 dark:text-zinc-400">{bg ? 'Предавания' : 'Submissions'}</div>
                   <div className="text-xl font-bold text-black dark:text-white">
                     {analytics.totals?.submissions ?? 0}
                   </div>
                 </div>
                 <div className="p-3 rounded-lg bg-stone-50 dark:bg-zinc-800">
-                  <div className="text-neutral-500">{bg ? 'Среден резултат' : 'Avg score'}</div>
+                  <div className="text-neutral-500 dark:text-zinc-400">{bg ? 'Среден резултат' : 'Avg score'}</div>
                   <div className="text-xl font-bold text-black dark:text-white">
                     {analytics.totals?.averageScore ?? 0}%
                   </div>
@@ -431,7 +431,7 @@ const GroupDetailPage = () => {
                       className="flex flex-wrap justify-between gap-2 py-2 border-b border-stone-100 dark:border-zinc-800"
                     >
                       <span className="font-medium text-black dark:text-white">{row.title}</span>
-                      <span className="text-neutral-500">
+                      <span className="text-neutral-500 dark:text-zinc-400">
                         {Math.round(row.completionRate)}% {bg ? 'предадени' : 'submitted'} · ø {row.averageScore}%
                         {row.needsReview > 0 && ` · ${row.needsReview} ${bg ? 'за преглед' : 'review'}`}
                       </span>

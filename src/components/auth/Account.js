@@ -10,8 +10,480 @@ import CalculationService from '../../services/calculationService';
 import UserManagementService from '../../services/userManagementService';
 import { teacherAccessApi } from '../../services/classroomApi';
 
+const TEACHER_REQUEST_FILTERS = [
+  { value: 'pending', labelBg: 'Чакащи', labelEn: 'Pending' },
+  { value: 'approved', labelBg: 'Одобрени', labelEn: 'Approved' },
+  { value: 'rejected', labelBg: 'Отхвърлени', labelEn: 'Rejected' },
+  { value: '', labelBg: 'Всички', labelEn: 'All' },
+  { value: 'archived', labelBg: 'Архивирани', labelEn: 'Archived' },
+];
+
+const REQUEST_STATUS_META = {
+  pending: {
+    labelBg: 'Чакаща',
+    labelEn: 'Pending',
+    badge:
+      'bg-amber-50 text-amber-900 ring-amber-200/80 dark:bg-amber-950/50 dark:text-amber-200 dark:ring-amber-800/60',
+  },
+  approved: {
+    labelBg: 'Одобрена',
+    labelEn: 'Approved',
+    badge:
+      'bg-emerald-50 text-emerald-800 ring-emerald-200/80 dark:bg-emerald-950/50 dark:text-emerald-200 dark:ring-emerald-800/60',
+  },
+  rejected: {
+    labelBg: 'Отхвърлена',
+    labelEn: 'Rejected',
+    badge:
+      'bg-stone-100 text-stone-600 ring-stone-200/80 dark:bg-zinc-800 dark:text-zinc-300 dark:ring-zinc-600/80',
+  },
+};
+
+const ADMIN_INPUT_CLASS =
+  "w-full rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-4 py-3 text-sm font-medium font-['Manrope'] text-black dark:text-zinc-100 placeholder:text-neutral-400 dark:placeholder:text-zinc-500 focus:border-gray-400 dark:focus:border-zinc-500 focus:outline-none focus:ring-2 focus:ring-black/5 dark:focus:ring-white/10 transition-colors";
+
+const ADMIN_SECTION_CLASS =
+  'rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-5 sm:p-6 shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] flex flex-col gap-5';
+
+const ADMIN_TABLE_WRAP_CLASS =
+  'rounded-xl border border-gray-200 dark:border-zinc-700 overflow-hidden bg-white dark:bg-zinc-900';
+
+const formatRequestDate = (dateStr, language) => {
+  if (!dateStr) return '—';
+  try {
+    return new Date(dateStr).toLocaleDateString(language === 'bg' ? 'bg-BG' : 'en-GB', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    });
+  } catch {
+    return '—';
+  }
+};
+
+const SelectChevron = ({ className = '' }) => (
+  <svg
+    className={`pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400 dark:text-zinc-400 ${className}`}
+    viewBox="0 0 20 20"
+    fill="none"
+    aria-hidden
+  >
+    <path
+      d="M5 7.5L10 12.5L15 7.5"
+      stroke="currentColor"
+      strokeWidth="1.15"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+const ADMIN_ROLE_FILTERS = [
+  { value: '', labelKey: 'allRoles' },
+  { value: 'student', labelKey: 'student' },
+  { value: 'teacher', labelKey: 'teacher' },
+  { value: 'admin', labelKey: 'administratorShort' },
+];
+
+const USER_ROLE_META = {
+  student: {
+    badge:
+      'bg-stone-100 text-stone-700 ring-stone-200/80 dark:bg-zinc-800 dark:text-zinc-300 dark:ring-zinc-600/80',
+  },
+  teacher: {
+    badge:
+      'bg-sky-50 text-sky-800 ring-sky-200/80 dark:bg-sky-950/50 dark:text-sky-200 dark:ring-sky-800/60',
+  },
+  admin: {
+    badge:
+      'bg-black text-white ring-black/20 dark:bg-white dark:text-black dark:ring-zinc-500',
+  },
+};
+
+const AdminRoleFilterBar = ({ value, onChange, t }) => (
+  <div
+    className="inline-flex flex-wrap gap-1 rounded-xl bg-stone-100 dark:bg-zinc-800 p-1 shrink-0"
+    role="tablist"
+    aria-label={t.allRoles}
+  >
+    {ADMIN_ROLE_FILTERS.map((opt) => {
+      const active = value === opt.value;
+      return (
+        <button
+          key={opt.value || 'all'}
+          type="button"
+          role="tab"
+          aria-selected={active}
+          onClick={() => onChange(opt.value)}
+          className={`rounded-lg px-3 py-2 text-sm font-medium font-['Manrope'] transition-colors whitespace-nowrap ${
+            active
+              ? 'bg-white dark:bg-zinc-700 text-black dark:text-white shadow-sm ring-1 ring-gray-200/80 dark:ring-zinc-600'
+              : 'text-neutral-500 dark:text-zinc-400 hover:text-black dark:hover:text-white'
+          }`}
+        >
+          {t[opt.labelKey]}
+        </button>
+      );
+    })}
+  </div>
+);
+
+const AdminRoleBadge = ({ role, t }) => {
+  const meta = USER_ROLE_META[role] || USER_ROLE_META.student;
+  const label =
+    role === 'admin' ? t.administrator : role === 'teacher' ? t.teacher : t.student;
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold font-['Manrope'] ring-1 ring-inset ${meta.badge}`}
+    >
+      {label}
+    </span>
+  );
+};
+
+const AdminRoleSelect = ({ value, onChange, disabled, t, language }) => {
+  const adminOptionLabel =
+    language === 'bg' ? t.administratorShort || 'Админ' : t.administratorShort || 'Admin';
+
+  return (
+    <div className="relative w-full min-w-[10.5rem] sm:min-w-[11.5rem]">
+      <select
+        value={value}
+        onChange={onChange}
+        disabled={disabled}
+        title={value === 'admin' ? t.administrator : undefined}
+        className="w-full min-w-[10.5rem] cursor-pointer appearance-none rounded-lg border border-gray-200 dark:border-zinc-600 bg-white dark:bg-zinc-800 py-2 pl-3 pr-10 text-sm font-medium font-['Manrope'] text-black dark:text-zinc-100 whitespace-nowrap transition-colors hover:border-gray-300 dark:hover:border-zinc-500 focus:border-gray-400 dark:focus:border-zinc-500 focus:outline-none focus:ring-2 focus:ring-black/5 dark:focus:ring-white/10 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        <option value="student">{t.student}</option>
+        <option value="teacher">{t.teacher}</option>
+        <option value="admin">{adminOptionLabel}</option>
+      </select>
+      <SelectChevron />
+    </div>
+  );
+};
+
+const AdminPagination = ({ currentPage, totalPages, loading, onPageChange, t }) => {
+  if (totalPages <= 1) return null;
+  const pages = Array.from({ length: Math.min(totalPages, 10) }, (_, i) => i + 1);
+
+  return (
+    <div className="flex justify-center items-center gap-2 pt-1">
+      <button
+        type="button"
+        className="w-8 h-8 rounded-lg border border-gray-200 dark:border-zinc-700 flex items-center justify-center hover:bg-stone-50 dark:hover:bg-zinc-800 disabled:opacity-40"
+        onClick={() => onPageChange(Math.max(1, currentPage - 1))}
+        disabled={currentPage === 1 || loading}
+        aria-label={t.back}
+      >
+        <img src="/icons/small_left_arrow.svg" alt="" className="w-3 h-3 opacity-70 dark:invert" />
+      </button>
+      {pages.map((pageNum) => (
+        <button
+          key={pageNum}
+          type="button"
+          className={`min-w-[2rem] h-8 px-2 rounded-lg text-sm font-medium font-['Manrope'] transition-colors ${
+            currentPage === pageNum
+              ? 'bg-black dark:bg-white text-white dark:text-black'
+              : 'border border-gray-200 dark:border-zinc-600 text-neutral-600 dark:text-zinc-400 hover:bg-stone-50 dark:hover:bg-zinc-800'
+          }`}
+          onClick={() => onPageChange(pageNum)}
+          disabled={currentPage === pageNum || loading}
+        >
+          {pageNum}
+        </button>
+      ))}
+      <button
+        type="button"
+        className="w-8 h-8 rounded-lg border border-gray-200 dark:border-zinc-700 flex items-center justify-center hover:bg-stone-50 dark:hover:bg-zinc-800 disabled:opacity-40"
+        onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
+        disabled={currentPage === totalPages || loading}
+        aria-label={t.next}
+      >
+        <img src="/icons/small_right_arrow.svg" alt="" className="w-3 h-3 opacity-70 dark:invert" />
+      </button>
+    </div>
+  );
+};
+
+const AdminUsersTable = ({ users, loading, currentUserId, language, t, onRoleChange }) => {
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '—';
+    try {
+      return new Date(dateStr).toLocaleDateString(language === 'bg' ? 'bg-BG' : 'en-GB', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      });
+    } catch {
+      return '—';
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="px-4 py-10 text-center text-sm text-neutral-500 dark:text-zinc-400 font-['Manrope']">{t.loading}</div>
+    );
+  }
+
+  if (!users.length) {
+    return (
+      <div className="px-4 py-10 text-center text-sm text-neutral-500 dark:text-zinc-400 font-['Manrope'] border-t border-gray-100 dark:border-zinc-800">
+        {t.noUsers}
+      </div>
+    );
+  }
+
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full min-w-[640px] text-left text-sm font-['Manrope']">
+        <thead>
+          <tr className="border-b border-gray-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800/90">
+            <th className="px-4 py-3 font-semibold text-black dark:text-white">{t.name}</th>
+            <th className="px-4 py-3 font-semibold text-black dark:text-white">{t.email}</th>
+            <th className="px-4 py-3 font-semibold text-black dark:text-white w-36">{t.role}</th>
+            <th className="px-4 py-3 font-semibold text-black dark:text-white w-32">{t.registration}</th>
+            <th className="px-4 py-3 font-semibold text-black dark:text-white min-w-[11.5rem] w-52">{t.actions}</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-100 dark:divide-zinc-800">
+          {users.map((adminUser) => {
+            const userId = adminUser._id || adminUser.id;
+            const isSelf = userId === currentUserId;
+            return (
+              <tr key={userId} className="bg-white dark:bg-zinc-900 hover:bg-stone-50/80 dark:hover:bg-zinc-800/70 transition-colors">
+                <td className="px-4 py-3 font-medium text-black dark:text-white">
+                  {adminUser.name?.trim() || '—'}
+                </td>
+                <td className="px-4 py-3 text-neutral-700 dark:text-zinc-300 break-all">{adminUser.email || '—'}</td>
+                <td className="px-4 py-3">
+                  <AdminRoleBadge role={adminUser.role} t={t} />
+                </td>
+                <td className="px-4 py-3 text-neutral-600 dark:text-zinc-400 whitespace-nowrap">
+                  {formatDate(adminUser.createdAt)}
+                </td>
+                <td className="px-4 py-3 min-w-[11.5rem]">
+                  <AdminRoleSelect
+                    value={adminUser.role}
+                    disabled={isSelf}
+                    t={t}
+                    language={language}
+                    onChange={(e) => onRoleChange(userId, e.target.value)}
+                  />
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+const TeacherRequestFilterBar = ({ value, onChange, language }) => {
+  const isBg = language === 'bg';
+
+  return (
+    <div
+      className="inline-flex flex-wrap gap-1 rounded-xl bg-stone-100 dark:bg-zinc-800 p-1"
+      role="tablist"
+      aria-label={isBg ? 'Филтър по статус' : 'Filter by status'}
+    >
+      {TEACHER_REQUEST_FILTERS.map((opt) => {
+        const active = value === opt.value;
+        return (
+          <button
+            key={opt.value || 'all'}
+            type="button"
+            role="tab"
+            aria-selected={active}
+            onClick={() => onChange(opt.value)}
+            className={`rounded-lg px-3 py-2 text-sm font-medium font-['Manrope'] transition-colors ${
+              active
+                ? 'bg-white dark:bg-zinc-700 text-black dark:text-white shadow-sm ring-1 ring-gray-200/80 dark:ring-zinc-600'
+                : 'text-neutral-500 dark:text-zinc-400 hover:text-black dark:hover:text-white'
+            }`}
+          >
+            {isBg ? opt.labelBg : opt.labelEn}
+          </button>
+        );
+      })}
+    </div>
+  );
+};
+
+const TeacherRejectModal = ({ open, language, note, error, submitting, onNoteChange, onClose, onSubmit }) => {
+  if (!open) return null;
+  const isBg = language === 'bg';
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/70 px-4">
+      <div className="w-full max-w-md rounded-xl bg-white dark:bg-zinc-900 p-5 shadow-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700">
+        <h3 className="text-lg font-bold font-['Manrope'] text-black dark:text-white">
+          {isBg ? 'Отхвърляне на заявка' : 'Reject request'}
+        </h3>
+        <p className="mt-1 text-sm text-neutral-600 dark:text-zinc-400 font-['Manrope']">
+          {isBg
+            ? 'Посочете причината — потребителят ще я види и може да подаде нова заявка.'
+            : 'Provide a reason — the user will see it and may submit a new request.'}
+        </p>
+        <textarea
+          value={note}
+          onChange={(e) => onNoteChange(e.target.value)}
+          rows={4}
+          className="mt-4 w-full rounded-lg border border-gray-200 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-2 text-sm font-['Manrope'] text-black dark:text-zinc-100 placeholder:text-neutral-400 dark:placeholder:text-zinc-500 focus:border-gray-400 dark:focus:border-zinc-500 focus:outline-none focus:ring-2 focus:ring-black/5 dark:focus:ring-white/10"
+          placeholder={isBg ? 'Причина за отказ...' : 'Reason for rejection...'}
+        />
+        {error && <p className="mt-2 text-xs text-red-600 dark:text-red-400 font-['Manrope']">{error}</p>}
+        <div className="mt-4 flex flex-wrap gap-2 justify-end">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={submitting}
+            className="px-4 py-2 rounded-lg border border-gray-200 dark:border-zinc-600 text-black dark:text-zinc-200 text-sm font-semibold font-['Manrope'] hover:bg-stone-50 dark:hover:bg-zinc-800 transition-colors"
+          >
+            {isBg ? 'Отказ' : 'Cancel'}
+          </button>
+          <button
+            type="button"
+            onClick={onSubmit}
+            disabled={submitting}
+            className="px-4 py-2 rounded-lg bg-black dark:bg-white text-white dark:text-black text-sm font-semibold font-['Manrope'] hover:opacity-90 disabled:opacity-50 transition-opacity"
+          >
+            {submitting ? (isBg ? 'Запис...' : 'Saving...') : isBg ? 'Отхвърли' : 'Reject'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const TeacherRequestCard = ({ req, language, onApprove, onReject, onArchive, onDelete }) => {
+  const isBg = language === 'bg';
+  const statusMeta = REQUEST_STATUS_META[req.status] || REQUEST_STATUS_META.pending;
+  const displayName = req.user?.name?.trim() || (isBg ? 'Без име' : 'No name');
+  const email = req.user?.email || '—';
+
+  return (
+    <article className="rounded-xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 dark:border-zinc-800 px-4 py-3 sm:px-5">
+        <h3 className="min-w-0 text-base font-semibold font-['Manrope'] text-black dark:text-white truncate">{displayName}</h3>
+        <span
+          className={`shrink-0 inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold font-['Manrope'] ring-1 ring-inset ${statusMeta.badge}`}
+        >
+          {isBg ? statusMeta.labelBg : statusMeta.labelEn}
+        </span>
+      </div>
+
+      <dl className="grid grid-cols-1 sm:grid-cols-[7rem_1fr] gap-x-4 gap-y-2.5 px-4 py-4 sm:px-5 text-sm font-['Manrope']">
+        <dt className="text-neutral-500 dark:text-zinc-400 font-medium">{isBg ? 'Имейл' : 'Email'}</dt>
+        <dd className="text-black dark:text-white break-all">{email}</dd>
+
+        <dt className="text-neutral-500 dark:text-zinc-400 font-medium">{isBg ? 'Съобщение' : 'Message'}</dt>
+        <dd className="text-neutral-800 dark:text-zinc-200">
+          {req.message?.trim() ? (
+            <span className="block rounded-lg bg-stone-50 dark:bg-zinc-800 px-3 py-2 text-sm leading-relaxed border border-gray-100 dark:border-zinc-700 text-neutral-800 dark:text-zinc-200">
+              {req.message.trim()}
+            </span>
+          ) : (
+            <span className="text-neutral-400 dark:text-zinc-400 italic">{isBg ? 'Няма съобщение' : 'No message'}</span>
+          )}
+        </dd>
+
+        <dt className="text-neutral-500 dark:text-zinc-400 font-medium">{isBg ? 'Подадена' : 'Submitted'}</dt>
+        <dd className="text-black dark:text-white">{formatRequestDate(req.createdAt, language)}</dd>
+
+        {req.reviewedAt && (
+          <>
+            <dt className="text-neutral-500 dark:text-zinc-400 font-medium">{isBg ? 'Прегледана' : 'Reviewed'}</dt>
+            <dd className="text-black dark:text-white">{formatRequestDate(req.reviewedAt, language)}</dd>
+          </>
+        )}
+
+        {req.status === 'rejected' && req.adminNote?.trim() && (
+          <>
+            <dt className="text-neutral-500 dark:text-zinc-400 font-medium">{isBg ? 'Причина за отказ' : 'Rejection reason'}</dt>
+            <dd>
+              <span className="block rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-sm text-red-900 leading-relaxed dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-200">
+                {req.adminNote.trim()}
+              </span>
+            </dd>
+          </>
+        )}
+        {req.status !== 'rejected' && req.adminNote?.trim() && (
+          <>
+            <dt className="text-neutral-500 dark:text-zinc-400 font-medium">{isBg ? 'Бележка' : 'Admin note'}</dt>
+            <dd className="text-neutral-700 dark:text-zinc-300">{req.adminNote.trim()}</dd>
+          </>
+        )}
+      </dl>
+
+      {req.status === 'pending' && (
+        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-gray-100 dark:border-zinc-800 bg-stone-50/60 dark:bg-zinc-800/60 px-4 py-3 sm:px-5">
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => onApprove(req._id)}
+              className="px-4 py-2 rounded-lg bg-black dark:bg-white text-white dark:text-black text-sm font-semibold font-['Manrope'] hover:opacity-90 transition-opacity"
+            >
+              {isBg ? 'Одобри' : 'Approve'}
+            </button>
+            <button
+              type="button"
+              onClick={() => onReject(req._id)}
+              className="px-4 py-2 rounded-lg bg-white dark:bg-zinc-800 text-black dark:text-zinc-100 text-sm font-semibold font-['Manrope'] border border-gray-200 dark:border-zinc-600 hover:bg-stone-50 dark:hover:bg-zinc-700 transition-colors"
+            >
+              {isBg ? 'Отхвърли' : 'Reject'}
+            </button>
+          </div>
+          <button
+            type="button"
+            onClick={() => onDelete(req._id)}
+            className="px-3 py-1.5 rounded-lg text-sm font-medium font-['Manrope'] text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors"
+          >
+            {isBg ? 'Изтрий' : 'Delete'}
+          </button>
+        </div>
+      )}
+
+      {(req.status === 'rejected' || req.archived) && (
+        <div className="flex flex-wrap gap-2 border-t border-gray-100 dark:border-zinc-800 px-4 py-3 sm:px-5">
+          {!req.archived && (
+            <button
+              type="button"
+              onClick={() => onArchive(req._id)}
+              className="px-3 py-1.5 rounded-lg text-sm font-medium font-['Manrope'] text-neutral-600 dark:text-zinc-300 border border-gray-200 dark:border-zinc-600 hover:bg-stone-50 dark:hover:bg-zinc-800 transition-colors"
+            >
+              {isBg ? 'Архивирай' : 'Archive'}
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => onDelete(req._id)}
+            className="px-3 py-1.5 rounded-lg text-sm font-medium font-['Manrope'] text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900/60 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors"
+          >
+            {isBg ? 'Изтрий' : 'Delete'}
+          </button>
+        </div>
+      )}
+
+      {req.status === 'approved' && !req.archived && (
+        <div className="flex flex-wrap gap-2 border-t border-gray-100 dark:border-zinc-800 px-4 py-3 sm:px-5">
+          <button
+            type="button"
+            onClick={() => onArchive(req._id)}
+            className="px-3 py-1.5 rounded-lg text-sm font-medium font-['Manrope'] text-neutral-600 dark:text-zinc-300 border border-gray-200 dark:border-zinc-600 hover:bg-stone-50 dark:hover:bg-zinc-800 transition-colors"
+          >
+            {isBg ? 'Архивирай' : 'Archive'}
+          </button>
+        </div>
+      )}
+    </article>
+  );
+};
+
 const Account = () => {
-  const { user, logout, refreshUser, changePassword } = useAuth();
+  const { user, logout, refreshUser } = useAuth();
   const { t, language } = useTranslation();
   
   console.log('Account.js loaded, user:', user);
@@ -135,14 +607,6 @@ const Account = () => {
   const [loading, setLoading] = useState(true);
   const [initialLoadDone, setInitialLoadDone] = useState(false);
   const [error, setError] = useState(null);
-  const [showSettings, setShowSettings] = useState(false);
-  const [oldPassword, setOldPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [passwordSaving, setPasswordSaving] = useState(false);
-  const [passwordError, setPasswordError] = useState(null);
-  const [passwordSuccess, setPasswordSuccess] = useState(null);
-  
   // Admin panel state
   const [adminUsers, setAdminUsers] = useState([]);
   const [adminLoading, setAdminLoading] = useState(false);
@@ -154,6 +618,11 @@ const Account = () => {
   const [teacherRequests, setTeacherRequests] = useState([]);
   const [teacherRequestsLoading, setTeacherRequestsLoading] = useState(false);
   const [teacherRequestFilter, setTeacherRequestFilter] = useState('pending');
+  const [rejectModalOpen, setRejectModalOpen] = useState(false);
+  const [rejectRequestId, setRejectRequestId] = useState(null);
+  const [rejectNote, setRejectNote] = useState('');
+  const [rejectError, setRejectError] = useState('');
+  const [rejectSubmitting, setRejectSubmitting] = useState(false);
 
   const isProUser =
     user?.role === 'admin' ||
@@ -195,35 +664,6 @@ const Account = () => {
   useEffect(() => {
     if (refreshUser) refreshUser();
   }, [refreshUser]);
-
-  const handleChangePassword = async () => {
-    setPasswordError(null);
-    setPasswordSuccess(null);
-    if (!oldPassword || !newPassword || !confirmPassword) {
-      setPasswordError(language === 'bg' ? 'Моля, попълнете всички полета.' : 'Please fill in all fields.');
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      setPasswordError(language === 'bg' ? 'Новите пароли не съвпадат.' : 'New passwords do not match.');
-      return;
-    }
-    setPasswordSaving(true);
-    try {
-      const ok = await changePassword(oldPassword, newPassword);
-      if (ok) {
-        setPasswordSuccess(language === 'bg' ? 'Паролата е сменена успешно.' : 'Password updated successfully.');
-        setOldPassword('');
-        setNewPassword('');
-        setConfirmPassword('');
-      } else {
-        setPasswordError(language === 'bg' ? 'Грешка при смяна на паролата.' : 'Failed to change password.');
-      }
-    } catch (err) {
-      setPasswordError(err.message || 'Failed to change password');
-    } finally {
-      setPasswordSaving(false);
-    }
-  };
 
   const handleAddPaymentMethod = async () => {
     try {
@@ -556,9 +996,13 @@ const Account = () => {
     if (!user || user.role !== 'admin') return;
     setTeacherRequestsLoading(true);
     try {
-      const res = await teacherAccessApi.listRequestsAdmin(
-        teacherRequestFilter ? { status: teacherRequestFilter } : {}
-      );
+      const params =
+        teacherRequestFilter === 'archived'
+          ? { archived: 'true' }
+          : teacherRequestFilter
+            ? { status: teacherRequestFilter }
+            : {};
+      const res = await teacherAccessApi.listRequestsAdmin(params);
       setTeacherRequests(res.data || []);
     } catch (e) {
       console.error(e);
@@ -568,14 +1012,76 @@ const Account = () => {
     }
   };
 
-  const handleTeacherRequestReview = async (requestId, status) => {
-    const note =
-      status === 'rejected'
-        ? window.prompt(language === 'bg' ? 'Причина (по избор):' : 'Reason (optional):') || ''
-        : '';
+  const openRejectModal = (requestId) => {
+    setRejectRequestId(requestId);
+    setRejectNote('');
+    setRejectError('');
+    setRejectModalOpen(true);
+  };
+
+  const closeRejectModal = () => {
+    if (rejectSubmitting) return;
+    setRejectModalOpen(false);
+    setRejectRequestId(null);
+    setRejectNote('');
+    setRejectError('');
+  };
+
+  const submitRejectRequest = async () => {
+    const note = rejectNote.trim();
+    if (note.length < 3) {
+      setRejectError(
+        language === 'bg' ? 'Въведете причина (минимум 3 символа).' : 'Enter a reason (at least 3 characters).'
+      );
+      return;
+    }
+    setRejectSubmitting(true);
+    setRejectError('');
     try {
-      await teacherAccessApi.reviewRequestAdmin(requestId, { status, adminNote: note });
-      alert(language === 'bg' ? 'Готово.' : 'Done.');
+      await teacherAccessApi.reviewRequestAdmin(rejectRequestId, {
+        status: 'rejected',
+        adminNote: note,
+      });
+      closeRejectModal();
+      loadTeacherRequests();
+    } catch (e) {
+      setRejectError(e.message);
+    } finally {
+      setRejectSubmitting(false);
+    }
+  };
+
+  const handleTeacherRequestApprove = async (requestId) => {
+    try {
+      await teacherAccessApi.reviewRequestAdmin(requestId, { status: 'approved' });
+      loadTeacherRequests();
+    } catch (e) {
+      alert(e.message);
+    }
+  };
+
+  const handleTeacherRequestArchive = async (requestId) => {
+    const msg =
+      language === 'bg'
+        ? 'Архивиране скрива заявката от списъка. Потребителят може да подаде нова, ако е отхвърлен.'
+        : 'Archive hides this request. The user can submit a new one if rejected.';
+    if (!window.confirm(msg)) return;
+    try {
+      await teacherAccessApi.archiveRequestAdmin(requestId);
+      loadTeacherRequests();
+    } catch (e) {
+      alert(e.message);
+    }
+  };
+
+  const handleTeacherRequestDelete = async (requestId) => {
+    const msg =
+      language === 'bg'
+        ? 'Изтриване премахва заявката напълно. Потребителят може да подаде нова заявка.'
+        : 'Delete removes the request completely. The user can submit a new one.';
+    if (!window.confirm(msg)) return;
+    try {
+      await teacherAccessApi.deleteRequestAdmin(requestId);
       loadTeacherRequests();
     } catch (e) {
       alert(e.message);
@@ -631,8 +1137,8 @@ const Account = () => {
   if (loading && !initialLoadDone) {
     return (
       <Layout>
-        <div className="w-full min-h-screen bg-stone-50 flex flex-col items-center justify-center">
-          <div className="text-black text-lg font-medium">Loading...</div>
+        <div className="w-full min-h-screen bg-stone-50 dark:bg-zinc-950 transition-colors flex flex-col items-center justify-center">
+          <div className="text-black dark:text-white text-lg font-medium">Loading...</div>
         </div>
       </Layout>
     );
@@ -641,7 +1147,7 @@ const Account = () => {
   if (error) {
     return (
       <Layout>
-        <div className="w-full min-h-screen bg-stone-50 flex flex-col items-center justify-center">
+        <div className="w-full min-h-screen bg-stone-50 dark:bg-zinc-950 transition-colors flex flex-col items-center justify-center">
           <div className="text-red-500 text-lg font-medium">Error: {error}</div>
         </div>
       </Layout>
@@ -655,29 +1161,28 @@ const Account = () => {
         description={t.accountDescription}
         canonical="/account"
       />
-      <div className="w-full min-h-screen bg-stone-50 flex flex-col items-center">
+      <div className="w-full min-h-screen bg-stone-50 dark:bg-zinc-950 transition-colors flex flex-col items-center">
         <div className="w-full max-w-[1180px] mt-8 mb-8 px-4 sm:px-0 inline-flex flex-col justify-start items-start gap-10">
-          <div className="self-stretch justify-start text-black text-3xl font-bold font-['Manrope']">{t.accountTitle}</div>
+          <div className="self-stretch justify-start text-black dark:text-white text-3xl font-bold font-['Manrope']">{t.accountTitle}</div>
           
           <div className="self-stretch flex flex-col lg:flex-row justify-start items-start gap-5">
             <div className="w-full max-w-sm lg:w-96 inline-flex flex-col justify-center items-center gap-5">
-              <div className="self-stretch p-4 bg-white rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-0.50px] outline-gray-200 flex flex-col justify-start items-start gap-4 overflow-hidden">
+              <div className="self-stretch p-4 bg-white dark:bg-zinc-900 rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-0.50px] outline-gray-200 dark:outline-zinc-800 flex flex-col justify-start items-start gap-4 overflow-hidden">
                 <div className="flex flex-col justify-start items-start gap-2">
-                  <div className="justify-start text-black text-lg font-semibold font-['Manrope']">{user?.name || t.user}</div>
-                  <div className="justify-start text-neutral-400 text-base font-semibold font-['Manrope']">{user?.email || ''}</div>
+                  <div className="justify-start text-black dark:text-white text-lg font-semibold font-['Manrope']">{user?.name || t.user}</div>
+                  <div className="justify-start text-neutral-400 dark:text-zinc-400 text-base font-semibold font-['Manrope']">{user?.email || ''}</div>
                 </div>
                 <div className="inline-flex justify-center items-center gap-2">
-                  <button onClick={logout} className="px-4 py-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 flex justify-start items-center gap-3">
-                    <div className="justify-start text-black text-base font-medium font-['Manrope']">{t.logoutFromAccount}</div>
+                  <button onClick={logout} className="px-4 py-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700 flex justify-start items-center gap-3 hover:bg-stone-50 dark:hover:bg-zinc-800 transition-colors">
+                    <div className="justify-start text-black dark:text-white text-base font-medium font-['Manrope']">{t.logoutFromAccount}</div>
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowSettings(true)}
-                    className="w-9 h-9 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 flex justify-center items-center gap-3"
+                  <Link
+                    to="/account/settings"
+                    className="w-9 h-9 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700 flex justify-center items-center hover:bg-stone-50 dark:hover:bg-zinc-800 transition-colors"
                     aria-label={t.settings}
                   >
-                    <img src="/icons/account_settings.svg" alt={t.settings} className="w-5 h-5" />
-                  </button>
+                    <img src="/icons/account_settings.svg" alt={t.settings} className="w-5 h-5 dark:invert" />
+                  </Link>
                 </div>
               </div>
               <div className="self-stretch rounded-[20px] flex flex-col justify-center items-center gap-1 relative overflow-hidden">
@@ -694,9 +1199,9 @@ const Account = () => {
                       : (plan?.displayName?.[language] || (plan?.name === 'free' ? t.freePlan : plan?.name) || defaultPlan.name)}
                   </div>
                 </div>
-                <div className="self-stretch p-4 bg-white rounded-tl rounded-tr rounded-bl-xl rounded-br-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-0.50px] outline-gray-200 flex flex-col justify-start items-start gap-4 overflow-hidden z-10 relative">
-                  <div className="justify-start"><span className="text-black text-base font-medium font-['Manrope']">{subscription?.startDate ? Math.floor((new Date() - new Date(subscription.startDate)) / (1000 * 60 * 60 * 24)) : 0} {t.daysFromStart}</span></div>
-                  <div className="justify-start"><span className="text-black text-base font-medium font-['Manrope']">{subscription?.endDate ? Math.floor((new Date(subscription.endDate) - new Date()) / (1000 * 60 * 60 * 24)) : (plan?.name === 'free' ? '0' : 0)} {t.daysToNext}</span></div>
+                <div className="self-stretch p-4 bg-white dark:bg-zinc-900 rounded-tl rounded-tr rounded-bl-xl rounded-br-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-0.50px] outline-gray-200 dark:outline-zinc-800 flex flex-col justify-start items-start gap-4 overflow-hidden z-10 relative">
+                  <div className="justify-start"><span className="text-black dark:text-white text-base font-medium font-['Manrope']">{subscription?.startDate ? Math.floor((new Date() - new Date(subscription.startDate)) / (1000 * 60 * 60 * 24)) : 0} {t.daysFromStart}</span></div>
+                  <div className="justify-start"><span className="text-black dark:text-white text-base font-medium font-['Manrope']">{subscription?.endDate ? Math.floor((new Date(subscription.endDate) - new Date()) / (1000 * 60 * 60 * 24)) : (plan?.name === 'free' ? '0' : 0)} {t.daysToNext}</span></div>
                   {(user?.hasBillingCustomer || user?.plan === 'pro') ? (
                     <button
                       onClick={async () => {
@@ -707,66 +1212,66 @@ const Account = () => {
                           alert(err.message);
                         }
                       }}
-                      className="px-4 py-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-3"
+                      className="px-4 py-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 inline-flex justify-start items-center gap-3"
                     >
-                      <div className="justify-start text-black text-base font-medium font-['Manrope']">{t.manageSubscription || 'Управление на абонамента'}</div>
+                      <div className="justify-start text-black dark:text-white text-base font-medium font-['Manrope']">{t.manageSubscription || 'Управление на абонамента'}</div>
                     </button>
                   ) : (
-                    <Link to="/prices" className="px-4 py-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-3">
-                      <div className="justify-start text-black text-base font-medium font-['Manrope']">{t.changePlan}</div>
+                    <Link to="/prices" className="px-4 py-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 inline-flex justify-start items-center gap-3">
+                      <div className="justify-start text-black dark:text-white text-base font-medium font-['Manrope']">{t.changePlan}</div>
                     </Link>
                   )}
                 </div>
               </div>
-              <div className="self-stretch p-4 bg-white rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-0.50px] outline-gray-200 flex flex-col justify-start items-start gap-4 overflow-hidden">
-                <div className="justify-start text-black text-lg font-semibold font-['Manrope']">{t.paymentMethods}</div>
-                <div className="self-stretch h-0 outline outline-1 outline-offset-[-0.50px] outline-gray-200" />
+              <div className="self-stretch p-4 bg-white dark:bg-zinc-900 rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-0.50px] outline-gray-200 dark:outline-zinc-800 flex flex-col justify-start items-start gap-4 overflow-hidden">
+                <div className="justify-start text-black dark:text-white text-lg font-semibold font-['Manrope']">{t.paymentMethods}</div>
+                <div className="self-stretch h-0 outline outline-1 outline-offset-[-0.50px] outline-gray-200 dark:outline-zinc-800" />
                 {paymentMethods.map((method, index) => (
                   <div key={index} className="self-stretch inline-flex justify-between items-center">
                     <div className="flex justify-center items-center gap-4">
-                      <div className={`w-12 h-6 p-1 rounded-[30px] ${method.active ? 'bg-black' : 'outline outline-1 outline-offset-[-1px] outline-gray-200'} flex ${method.active ? 'justify-end' : 'justify-start'} items-center gap-2`}>
-                        <div className={`w-4 h-4 ${method.active ? 'bg-white' : 'bg-black'} rounded-full`} />
+                      <div className={`w-12 h-6 p-1 rounded-[30px] ${method.active ? 'bg-black' : 'outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800'} flex ${method.active ? 'justify-end' : 'justify-start'} items-center gap-2`}>
+                        <div className={`w-4 h-4 ${method.active ? 'bg-white dark:bg-zinc-900' : 'bg-black'} rounded-full`} />
                       </div>
                       <img {...getCardBrandIcon(method.brand)} alt={getCardBrandIcon(method.brand).alt} />
-                      <div className="justify-start text-neutral-400 text-base font-medium font-['Manrope']">**** {method.last4}</div>
+                      <div className="justify-start text-neutral-400 dark:text-zinc-400 text-base font-medium font-['Manrope']">**** {method.last4}</div>
                     </div>
                     <button className="w-5 h-5 flex items-center justify-center">
                       <img src="/icons/account_x.svg" alt={t.remove} className="w-4 h-4 opacity-60" />
                     </button>
                   </div>
                 ))}
-                <div className="self-stretch h-0 outline outline-1 outline-offset-[-0.50px] outline-gray-200" />
+                <div className="self-stretch h-0 outline outline-1 outline-offset-[-0.50px] outline-gray-200 dark:outline-zinc-800" />
                 <button
                   type="button"
                   onClick={handleAddPaymentMethod}
-                  className="px-4 py-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-3"
+                  className="px-4 py-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 inline-flex justify-start items-center gap-3"
                 >
-                  <div className="justify-start text-black text-base font-medium font-['Manrope']">{t.addNewMethod}</div>
+                  <div className="justify-start text-black dark:text-white text-base font-medium font-['Manrope']">{t.addNewMethod}</div>
                 </button>
               </div>
             </div>
             <div className="flex-1 w-full inline-flex flex-col justify-center items-start gap-5">
-              <div className="self-stretch p-4 bg-white rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-0.50px] outline-gray-200 flex flex-col justify-start items-start gap-4 overflow-hidden">
-        <div className="justify-start text-black text-lg font-semibold font-['Manrope']">{t.usageHistory}</div>
+              <div className="self-stretch p-4 bg-white dark:bg-zinc-900 rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-0.50px] outline-gray-200 dark:outline-zinc-800 flex flex-col justify-start items-start gap-4 overflow-hidden">
+        <div className="justify-start text-black dark:text-white text-lg font-semibold font-['Manrope']">{t.usageHistory}</div>
                 {/* Progress Bar - Different design for free vs paid plans */}
                 {!isProUser ? (
                   // Free Plan Progress Bar
-                  <div className="w-full max-w-[748px] p-3 bg-white rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-start items-start gap-3">
+                  <div className="w-full max-w-[748px] p-3 bg-white dark:bg-zinc-900 rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 inline-flex flex-col justify-start items-start gap-3">
                     <div className="self-stretch inline-flex justify-between items-center">
                       <div className="justify-start">
-                        <span className="text-black text-sm font-medium font-['Manrope']">
+                        <span className="text-black dark:text-white text-sm font-medium font-['Manrope']">
                           {displayUsed}/{displayLimit}
                         </span>
-                        <span className="text-neutral-400 text-sm font-medium font-['Manrope']">
+                        <span className="text-neutral-400 dark:text-zinc-400 text-sm font-medium font-['Manrope']">
                           {' '}{t.freeCalculationsUntil}
                         </span>
                       </div>
                       <Link to="/prices" className="flex justify-start items-center gap-2">
-                        <div className="justify-start text-black text-sm font-medium font-['Manrope']">{t.viewPlans}</div>
-                        <img src="/icons/small_right_arrow.svg" alt={t.next} className="w-3 h-3 opacity-70" />
+                        <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{t.viewPlans}</div>
+                        <img src="/icons/small_right_arrow.svg" alt={t.next} className="w-3 h-3 opacity-70 dark:invert" />
                       </Link>
                     </div>
-                    <div className="w-full lg:w-[723.99px] h-2 bg-gray-200 rounded-[30px] relative">
+                    <div className="w-full lg:w-[723.99px] h-2 bg-gray-200 dark:bg-zinc-700 rounded-[30px] relative">
                       <div 
                         className="h-2 bg-gradient-to-r from-amber-600 to-gray-800 rounded-[30px] transition-all duration-300"
                         style={{ 
@@ -777,9 +1282,9 @@ const Account = () => {
                   </div>
                 ) : (
                   // Paid Plan Progress Bar (always full)
-                  <div className="self-stretch p-3 bg-white rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-start items-start gap-3">
+                  <div className="self-stretch p-3 bg-white dark:bg-zinc-900 rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex flex-col justify-start items-start gap-3">
                     <div className="self-stretch inline-flex justify-between items-center">
-                      <div className="justify-start text-black text-sm font-medium font-['Manrope']">{totalCalculations} {t.calculations}</div>
+                      <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{totalCalculations} {t.calculations}</div>
                       <img src="/icons/infinity.svg" alt="Infinity" className="w-3 h-2"/>
                     </div>
                     <div
@@ -792,13 +1297,13 @@ const Account = () => {
                     />
                   </div>
                 )}
-                <div className="self-stretch bg-stone-50 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-start items-start gap-px overflow-hidden">
+                <div className="self-stretch bg-stone-50 dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex flex-col justify-start items-start gap-px overflow-hidden">
                   <div className="self-stretch shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] inline-flex justify-start items-start gap-px">
-                    <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                      <div className="justify-start text-black text-sm font-medium font-['Manrope']">{t.tool}</div>
+                    <div className="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                      <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{t.tool}</div>
                     </div>
-                    <div className="w-48 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                      <div className="justify-start text-black text-sm font-medium font-['Manrope']">{t.date}</div>
+                    <div className="w-48 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                      <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{t.date}</div>
                     </div>
                   </div>
                   {(() => {
@@ -813,7 +1318,7 @@ const Account = () => {
                     if (!paginatedUsageHistory || paginatedUsageHistory.length === 0) {
                       console.log('  - No history to display, showing empty message');
                       return (
-                        <div className="w-full px-3 py-2 bg-white text-neutral-400 text-sm font-medium font-['Manrope']">Няма изчисления.</div>
+                        <div className="w-full px-3 py-2 bg-white dark:bg-zinc-900 text-neutral-400 dark:text-zinc-400 text-sm font-medium font-['Manrope']">Няма изчисления.</div>
                       );
                     }
                     
@@ -822,11 +1327,11 @@ const Account = () => {
                       console.log(`  - Rendering item ${i}:`, h);
                       return (
                         <div key={i} className="self-stretch inline-flex justify-start items-start gap-px">
-                          <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                            <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{h.tool || 'Неизвестен инструмент'}</div>
+                          <div className="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                            <div className="justify-start text-neutral-400 dark:text-zinc-400 text-sm font-medium font-['Manrope']">{h.tool || 'Неизвестен инструмент'}</div>
                           </div>
-                          <div className="w-48 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                            <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{h.date || 'Няма дата'}</div>
+                          <div className="w-48 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                            <div className="justify-start text-neutral-400 dark:text-zinc-400 text-sm font-medium font-['Manrope']">{h.date || 'Няма дата'}</div>
                           </div>
                         </div>
                       );
@@ -840,10 +1345,10 @@ const Account = () => {
                       setUsageCurrentPage(newPage);
                       if (user) reloadUsageHistory(newPage);
                     }} disabled={usageCurrentPage === 1 || loading}>
-                      <img src="/icons/small_left_arrow.svg" alt={t.back} className="w-3 h-3 opacity-70" />
+                      <img src="/icons/small_left_arrow.svg" alt={t.back} className="w-3 h-3 opacity-70 dark:invert" />
                     </button>
                     {Array.from({ length: usageTotalPages }, (_, i) => (
-                      <button key={i} className={`w-7 px-2 py-1 rounded ${usageCurrentPage === i + 1 ? 'bg-gray-200 text-black' : 'outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400'} inline-flex flex-col justify-center items-center`} onClick={() => {
+                      <button key={i} className={`w-7 px-2 py-1 rounded ${usageCurrentPage === i + 1 ? 'bg-gray-200 dark:bg-zinc-700 text-black dark:text-white' : 'outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 text-neutral-400 dark:text-zinc-400'} inline-flex flex-col justify-center items-center`} onClick={() => {
                         setUsageCurrentPage(i + 1);
                         if (user) reloadUsageHistory(i + 1);
                       }} disabled={usageCurrentPage === i + 1 || loading}>
@@ -855,39 +1360,39 @@ const Account = () => {
                       setUsageCurrentPage(newPage);
                       if (user) reloadUsageHistory(newPage);
                     }} disabled={usageCurrentPage === usageTotalPages || usageTotalPages === 0 || loading}>
-                      <img src="/icons/small_right_arrow.svg" alt={t.next} className="w-3 h-3 opacity-70" />
+                      <img src="/icons/small_right_arrow.svg" alt={t.next} className="w-3 h-3 opacity-70 dark:invert" />
                     </button>
                   </div>
                 </div>
               </div>
-              <div className="self-stretch p-4 bg-white rounded-xl outline outline-1 outline-offset-[-0.50px] outline-gray-200 inline-flex flex-col justify-start items-start gap-4 overflow-hidden">
-                <div className="justify-start text-black text-lg font-semibold font-['Manrope']">{t.paymentHistory}</div>
-                <div className="self-stretch bg-stone-50 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-start items-start gap-px overflow-hidden">
+              <div className="self-stretch p-4 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-0.50px] outline-gray-200 dark:outline-zinc-800 inline-flex flex-col justify-start items-start gap-4 overflow-hidden">
+                <div className="justify-start text-black dark:text-white text-lg font-semibold font-['Manrope']">{t.paymentHistory}</div>
+                <div className="self-stretch bg-stone-50 dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex flex-col justify-start items-start gap-px overflow-hidden">
                   <div className="self-stretch shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] inline-flex justify-start items-start gap-px">
-                    <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                      <div className="justify-start text-black text-sm font-medium font-['Manrope']">{t.paymentMethod}</div>
+                    <div className="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                      <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{t.paymentMethod}</div>
                     </div>
-                    <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                      <div className="justify-start text-black text-sm font-medium font-['Manrope']">{t.value}</div>
+                    <div className="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                      <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{t.value}</div>
                     </div>
-                    <div className="w-48 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                      <div className="justify-start text-black text-sm font-medium font-['Manrope']">{t.date}</div>
+                    <div className="w-48 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                      <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{t.date}</div>
                     </div>
                   </div>
                   {paginatedPaymentHistory.length === 0 ? (
-                    <div className="w-full px-3 py-2 bg-white text-neutral-400 text-sm font-medium font-['Manrope']">Няма плащания.</div>
+                    <div className="w-full px-3 py-2 bg-white dark:bg-zinc-900 text-neutral-400 dark:text-zinc-400 text-sm font-medium font-['Manrope']">Няма плащания.</div>
                   ) : (
                     paginatedPaymentHistory.map((payment, i) => (
                       <div key={i} className="self-stretch inline-flex justify-start items-center gap-px">
-                        <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
+                        <div className="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
                           <img {...getCardBrandIcon(payment.brand, 'small')} alt={getCardBrandIcon(payment.brand, 'small').alt} />
-                          <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{payment.method}</div>
+                          <div className="justify-start text-neutral-400 dark:text-zinc-400 text-sm font-medium font-['Manrope']">{payment.method}</div>
                         </div>
-                        <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                          <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{payment.amount}</div>
+                        <div className="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                          <div className="justify-start text-neutral-400 dark:text-zinc-400 text-sm font-medium font-['Manrope']">{payment.amount}</div>
                         </div>
-                        <div className="w-48 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                          <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{payment.date}</div>
+                        <div className="w-48 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                          <div className="justify-start text-neutral-400 dark:text-zinc-400 text-sm font-medium font-['Manrope']">{payment.date}</div>
                         </div>
                       </div>
                     ))
@@ -900,10 +1405,10 @@ const Account = () => {
                       setPaymentCurrentPage(newPage);
                       if (user) reloadPaymentHistory(newPage);
                     }} disabled={paymentCurrentPage === 1 || loading}>
-                      <img src="/icons/small_left_arrow.svg" alt={t.back} className="w-3 h-3 opacity-70" />
+                      <img src="/icons/small_left_arrow.svg" alt={t.back} className="w-3 h-3 opacity-70 dark:invert" />
                     </button>
                     {Array.from({ length: paymentTotalPages }, (_, i) => (
-                      <button key={i} className={`w-7 px-2 py-1 rounded ${paymentCurrentPage === i + 1 ? 'bg-gray-200 text-black' : 'outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400'} inline-flex flex-col justify-center items-center`} onClick={() => {
+                      <button key={i} className={`w-7 px-2 py-1 rounded ${paymentCurrentPage === i + 1 ? 'bg-gray-200 dark:bg-zinc-700 text-black dark:text-white' : 'outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 text-neutral-400 dark:text-zinc-400'} inline-flex flex-col justify-center items-center`} onClick={() => {
                         setPaymentCurrentPage(i + 1);
                         if (user) reloadPaymentHistory(i + 1);
                       }} disabled={paymentCurrentPage === i + 1 || loading}>
@@ -915,7 +1420,7 @@ const Account = () => {
                       setPaymentCurrentPage(newPage);
                       if (user) reloadPaymentHistory(newPage);
                     }} disabled={paymentCurrentPage === paymentTotalPages || paymentTotalPages === 0 || loading}>
-                      <img src="/icons/small_right_arrow.svg" alt={t.next} className="w-3 h-3 opacity-70" />
+                      <img src="/icons/small_right_arrow.svg" alt={t.next} className="w-3 h-3 opacity-70 dark:invert" />
                     </button>
                   </div>
                 </div>
@@ -925,265 +1430,101 @@ const Account = () => {
 
           {/* Admin Panel Section - Only visible for admins */}
           {user && user.role === 'admin' && (
-            <div className="self-stretch flex flex-col justify-start items-start gap-4">
-              <div className="self-stretch justify-start text-black text-2xl font-bold font-['Manrope']">{t.adminPanel}</div>
-              
-              {/* Search and Filter */}
-              <div className="self-stretch flex gap-4">
-                <input
-                  type="text"
-                  placeholder={t.searchByNameOrEmail}
-                  value={adminSearch}
-                  onChange={(e) => setAdminSearch(e.target.value)}
-                  className="flex-1 p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']"
+            <div className="self-stretch flex flex-col gap-6">
+              <section className={ADMIN_SECTION_CLASS}>
+                <h2 className="text-black dark:text-white text-2xl font-bold font-['Manrope']">{t.adminPanel}</h2>
+
+                <div className="flex flex-col gap-4">
+                  <input
+                    type="search"
+                    placeholder={t.searchByNameOrEmail}
+                    value={adminSearch}
+                    onChange={(e) => setAdminSearch(e.target.value)}
+                    className={ADMIN_INPUT_CLASS}
+                  />
+                  <AdminRoleFilterBar
+                    value={adminRoleFilter}
+                    onChange={setAdminRoleFilter}
+                    t={t}
+                  />
+                </div>
+
+                <div className={ADMIN_TABLE_WRAP_CLASS}>
+                  <AdminUsersTable
+                    users={adminUsers}
+                    loading={adminLoading}
+                    currentUserId={user.id || user._id}
+                    language={language}
+                    t={t}
+                    onRoleChange={handleRoleChange}
+                  />
+                </div>
+
+                <AdminPagination
+                  currentPage={adminCurrentPage}
+                  totalPages={adminTotalPages}
+                  loading={adminLoading}
+                  onPageChange={setAdminCurrentPage}
+                  t={t}
                 />
-                <select
-                  value={adminRoleFilter}
-                  onChange={(e) => setAdminRoleFilter(e.target.value)}
-                  className="px-4 py-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400 text-sm font-medium font-['Manrope']"
-                >
-                  <option value="">{t.allRoles}</option>
-                  <option value="student">{t.student}</option>
-                  <option value="teacher">{t.teacher}</option>
-                  <option value="admin">{t.administrator}</option>
-                </select>
-              </div>
 
-              {/* Users Table */}
-              <div className="self-stretch rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-start items-start gap-px overflow-hidden">
-                <div className="self-stretch shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] inline-flex justify-start items-start gap-px">
-                  <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5 border-r border-gray-200">
-                    <div className="text-black text-sm font-medium font-['Manrope']">{t.name}</div>
-                  </div>
-                  <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5 border-r border-gray-200">
-                    <div className="text-black text-sm font-medium font-['Manrope']">{t.email}</div>
-                  </div>
-                  <div className="w-32 px-3 py-2 bg-white flex justify-center items-center gap-2.5 border-r border-gray-200">
-                    <div className="text-black text-sm font-medium font-['Manrope']">{t.role}</div>
-                  </div>
-                  <div className="w-32 px-3 py-2 bg-white flex justify-center items-center gap-2.5 border-r border-gray-200">
-                    <div className="text-black text-sm font-medium font-['Manrope']">{t.registration}</div>
-                  </div>
-                  <div className="w-48 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                    <div className="text-black text-sm font-medium font-['Manrope']">{t.actions}</div>
-                  </div>
+                <p className="text-sm font-medium font-['Manrope'] text-neutral-600 dark:text-zinc-400">
+                  {t.totalUsers}{' '}
+                  <span className="text-black dark:text-white font-semibold">{adminTotalUsers}</span>
+                </p>
+              </section>
+
+              <section className={ADMIN_SECTION_CLASS}>
+                <div className="flex flex-col gap-4">
+                  <h2 className="text-black dark:text-white text-xl font-bold font-['Manrope']">
+                    {language === 'bg' ? 'Заявки за преподавател' : 'Teacher access requests'}
+                  </h2>
+                  <TeacherRequestFilterBar
+                    value={teacherRequestFilter}
+                    onChange={setTeacherRequestFilter}
+                    language={language}
+                  />
                 </div>
-                {adminLoading ? (
-                  <div className="w-full px-3 py-2 bg-white text-neutral-400 text-sm font-medium font-['Manrope']">{t.loading}</div>
-                ) : adminUsers.length === 0 ? (
-                  <div className="w-full px-3 py-2 bg-white text-neutral-400 text-sm font-medium font-['Manrope']">{t.noUsers}</div>
-                ) : (
-                  adminUsers.map((adminUser) => (
-                    <div key={adminUser._id || adminUser.id} className="self-stretch inline-flex justify-start items-start gap-px">
-                      <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5 border-r border-gray-200">
-                        <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{adminUser.name}</div>
-                      </div>
-                      <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5 border-r border-gray-200">
-                        <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{adminUser.email}</div>
-                      </div>
-                      <div className="w-32 px-3 py-2 bg-white flex justify-center items-center gap-2.5 border-r border-gray-200">
-                        <div className={`justify-start text-sm font-medium font-['Manrope'] ${
-                          adminUser.role === 'admin' ? 'text-red-600' : 
-                          adminUser.role === 'teacher' ? 'text-blue-600' : 
-                          'text-neutral-400'
-                        }`}>
-                          {adminUser.role === 'admin' ? t.administrator : 
-                           adminUser.role === 'teacher' ? t.teacher : 
-                           t.student}
-                        </div>
-                      </div>
-                      <div className="w-32 px-3 py-2 bg-white flex justify-center items-center gap-2.5 border-r border-gray-200">
-                        <div className="justify-start text-neutral-400 text-xs font-medium font-['Manrope']">
-                          {adminUser.createdAt ? new Date(adminUser.createdAt).toLocaleDateString('bg-BG') : '-'}
-                        </div>
-                      </div>
-                      <div className="w-48 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                        <select
-                          value={adminUser.role}
-                          onChange={(e) => handleRoleChange(adminUser._id || adminUser.id, e.target.value)}
-                          className="px-2 py-1 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']"
-                          disabled={adminUser._id === user.id || adminUser.id === user.id}
-                        >
-                          <option value="student">{t.student}</option>
-                          <option value="teacher">{t.teacher}</option>
-                          <option value="admin">{t.administrator}</option>
-                        </select>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-
-              {/* Pagination */}
-              {adminTotalPages > 1 && (
-                <div className="self-stretch inline-flex justify-center items-center gap-4">
-                  <div className="flex justify-start items-center gap-2">
-                    <button
-                      className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center"
-                      onClick={() => setAdminCurrentPage(p => Math.max(1, p - 1))}
-                      disabled={adminCurrentPage === 1 || adminLoading}
-                    >
-                      <img src="/icons/small_left_arrow.svg" alt={t.back} className="w-3 h-3 opacity-70" />
-                    </button>
-                    {Array.from({ length: Math.min(adminTotalPages, 10) }, (_, i) => {
-                      const pageNum = i + 1;
-                      return (
-                        <button
-                          key={i}
-                          className={`w-7 px-2 py-1 rounded ${
-                            adminCurrentPage === pageNum ? 'bg-gray-200 text-black' : 'outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400'
-                          } inline-flex flex-col justify-center items-center`}
-                          onClick={() => setAdminCurrentPage(pageNum)}
-                          disabled={adminCurrentPage === pageNum || adminLoading}
-                        >
-                          <div className="justify-start text-sm font-medium font-['Manrope']">{pageNum}</div>
-                        </button>
-                      );
-                    })}
-                    <button
-                      className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center"
-                      onClick={() => setAdminCurrentPage(p => Math.min(adminTotalPages, p + 1))}
-                      disabled={adminCurrentPage === adminTotalPages || adminTotalPages === 0 || adminLoading}
-                    >
-                      <img src="/icons/small_right_arrow.svg" alt={t.next} className="w-3 h-3 opacity-70" />
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              <div className="self-stretch text-neutral-400 text-sm font-medium font-['Manrope']">
-                {t.totalUsers} {adminTotalUsers}
-              </div>
-
-              <div className="self-stretch flex flex-col gap-4 mt-6 pt-6 border-t border-gray-200">
-                <div className="self-stretch text-black text-xl font-bold font-['Manrope']">
-                  {language === 'bg' ? 'Заявки за преподавател' : 'Teacher access requests'}
-                </div>
-                <select
-                  value={teacherRequestFilter}
-                  onChange={(e) => setTeacherRequestFilter(e.target.value)}
-                  className="w-fit px-4 py-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm"
-                >
-                  <option value="pending">{language === 'bg' ? 'Чакащи' : 'Pending'}</option>
-                  <option value="approved">{language === 'bg' ? 'Одобрени' : 'Approved'}</option>
-                  <option value="rejected">{language === 'bg' ? 'Отхвърлени' : 'Rejected'}</option>
-                  <option value="">{language === 'bg' ? 'Всички' : 'All'}</option>
-                </select>
                 {teacherRequestsLoading ? (
-                  <p className="text-sm text-neutral-500">{t.loading}</p>
+                  <p className="text-sm text-neutral-500 dark:text-zinc-400 font-['Manrope']">{t.loading}</p>
                 ) : teacherRequests.length === 0 ? (
-                  <p className="text-sm text-neutral-500">
-                    {language === 'bg' ? 'Няма заявки.' : 'No requests.'}
-                  </p>
+                  <div className="rounded-xl border border-dashed border-gray-200 dark:border-zinc-600 bg-stone-50/80 dark:bg-zinc-800/50 px-4 py-8 text-center">
+                    <p className="text-sm text-neutral-500 dark:text-zinc-400 font-['Manrope']">
+                      {language === 'bg' ? 'Няма заявки за избрания филтър.' : 'No requests for this filter.'}
+                    </p>
+                  </div>
                 ) : (
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-3">
                     {teacherRequests.map((req) => (
-                      <div
+                      <TeacherRequestCard
                         key={req._id}
-                        className="p-4 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 bg-white flex flex-wrap justify-between gap-3"
-                      >
-                        <div>
-                          <div className="font-semibold text-sm font-['Manrope']">
-                            {req.user?.name || req.user?.email}
-                          </div>
-                          <div className="text-xs text-neutral-500">{req.user?.email}</div>
-                          {req.message && (
-                            <p className="text-sm mt-2 font-['Manrope'] text-neutral-700">{req.message}</p>
-                          )}
-                          <span className="text-xs text-neutral-400 mt-1 inline-block">{req.status}</span>
-                        </div>
-                        {req.status === 'pending' && (
-                          <div className="flex gap-2 items-center">
-                            <button
-                              type="button"
-                              onClick={() => handleTeacherRequestReview(req._id, 'approved')}
-                              className="px-3 py-1.5 bg-black text-white rounded-lg text-sm"
-                            >
-                              {language === 'bg' ? 'Одобри' : 'Approve'}
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleTeacherRequestReview(req._id, 'rejected')}
-                              className="px-3 py-1.5 rounded-lg text-sm outline outline-1 outline-gray-200"
-                            >
-                              {language === 'bg' ? 'Отхвърли' : 'Reject'}
-                            </button>
-                          </div>
-                        )}
-                      </div>
+                        req={req}
+                        language={language}
+                        onApprove={handleTeacherRequestApprove}
+                        onReject={openRejectModal}
+                        onArchive={handleTeacherRequestArchive}
+                        onDelete={handleTeacherRequestDelete}
+                      />
                     ))}
                   </div>
                 )}
-              </div>
+              </section>
             </div>
           )}
         </div>
       </div>
 
-      {showSettings && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-md rounded-xl bg-white p-5 shadow-xl">
-            <div className="flex items-center justify-between">
-              <div className="text-black text-lg font-semibold font-['Manrope']">
-                {language === 'bg' ? 'Настройки на акаунта' : 'Account Settings'}
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowSettings(false)}
-                className="w-8 h-8 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 flex items-center justify-center"
-                aria-label={language === 'bg' ? 'Затвори' : 'Close'}
-              >
-                <img src="/icons/close_button.svg" alt={language === 'bg' ? 'Затвори' : 'Close'} className="w-4 h-4 opacity-70" />
-              </button>
-            </div>
+      <TeacherRejectModal
+        open={rejectModalOpen}
+        language={language}
+        note={rejectNote}
+        error={rejectError}
+        submitting={rejectSubmitting}
+        onNoteChange={setRejectNote}
+        onClose={closeRejectModal}
+        onSubmit={submitRejectRequest}
+      />
 
-            <div className="mt-4 flex flex-col gap-4">
-              <div className="rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 p-3">
-                <div className="text-black text-sm font-medium font-['Manrope']">
-                  {language === 'bg' ? 'Смяна на парола' : 'Change password'}
-                </div>
-                {passwordError && (
-                  <div className="mt-2 text-xs text-red-500">{passwordError}</div>
-                )}
-                {passwordSuccess && (
-                  <div className="mt-2 text-xs text-green-600">{passwordSuccess}</div>
-                )}
-                <div className="mt-3 flex flex-col gap-2">
-                  <input
-                    type="password"
-                    value={oldPassword}
-                    onChange={(e) => setOldPassword(e.target.value)}
-                    placeholder={language === 'bg' ? 'Текуща парола' : 'Current password'}
-                    className="w-full p-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']"
-                  />
-                  <input
-                    type="password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder={language === 'bg' ? 'Нова парола' : 'New password'}
-                    className="w-full p-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']"
-                  />
-                  <input
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder={language === 'bg' ? 'Повтори новата парола' : 'Confirm new password'}
-                    className="w-full p-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 text-sm font-medium font-['Manrope']"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleChangePassword}
-                    disabled={passwordSaving}
-                    className="mt-1 px-4 py-2 bg-black text-white rounded-lg text-sm font-medium font-['Manrope']"
-                  >
-                    {passwordSaving ? (language === 'bg' ? 'Запис...' : 'Saving...') : (language === 'bg' ? 'Запази' : 'Save')}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </Layout>
   );
 };

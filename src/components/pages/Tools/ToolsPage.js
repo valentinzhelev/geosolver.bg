@@ -96,7 +96,7 @@ const ToolsPage = () => {
         <div className="max-w-[400px] md:max-w-[1180px] w-full mx-auto flex flex-col justify-start items-start gap-6 md:gap-10 px-4 md:px-0">
           <div className="w-full flex flex-col justify-start items-start gap-1">
             <div className="text-black dark:text-white text-2xl md:text-3xl font-bold font-['Manrope']">{t.toolsTitle}</div>
-            <div className="text-neutral-400 dark:text-neutral-400 text-xs md:text-base font-semibold font-['Manrope']">
+            <div className="text-neutral-400 dark:text-zinc-400 text-xs md:text-base font-semibold font-['Manrope']">
               {language === 'bg'
                 ? "Четири основни инструмента за координатни изчисления и класически засечки в геодезията."
                 : "Four core tools for coordinate calculations and classic geodetic intersections."
@@ -125,29 +125,29 @@ const ToolsPage = () => {
                       title={language === 'bg' ? 'Документация' : 'Documentation'}
                       aria-label={language === 'bg' ? 'Документация' : 'Documentation'}
                     >
-                      <img src="/icons/question_icon.svg" alt="" className="w-2.5 h-2.5" />
+                      <img src="/icons/question_icon.svg" alt="" className="w-2.5 h-2.5 dark:invert opacity-80" />
                     </Link>
                   </div>
                   <div className="w-full h-0 outline outline-1 outline-offset-[-0.50px] outline-gray-200 dark:outline-zinc-800" />
-                  <div className="text-neutral-400 dark:text-neutral-400 text-xs md:text-sm font-medium font-['Manrope']">{tool.description}</div>
+                  <div className="text-neutral-400 dark:text-zinc-400 text-xs md:text-sm font-medium font-['Manrope']">{tool.description}</div>
                   <div className="w-full flex flex-col justify-start items-start gap-2">
                     <div className="w-full px-3 py-2 bg-stone-50 dark:bg-zinc-800 rounded-lg flex flex-col justify-start items-start">
                       <div className="text-black dark:text-white text-xs md:text-sm font-medium font-['Manrope']">
                         {language === 'bg' ? "Параметри" : "Parameters"}
                       </div>
-                      <div className="text-neutral-400 dark:text-neutral-400 text-xs md:text-sm font-medium font-['Manrope']">{tool.parameters}</div>
+                      <div className="text-neutral-400 dark:text-zinc-400 text-xs md:text-sm font-medium font-['Manrope']">{tool.parameters}</div>
                     </div>
                     <div className="w-full px-3 py-2 bg-stone-50 dark:bg-zinc-800 rounded-lg flex flex-col justify-start items-start">
                       <div className="text-black dark:text-white text-xs md:text-sm font-medium font-['Manrope']">
                         {language === 'bg' ? "Тип" : "Type"}
                       </div>
-                      <div className="text-neutral-400 dark:text-neutral-400 text-xs md:text-sm font-medium font-['Manrope']">{tool.type}</div>
+                      <div className="text-neutral-400 dark:text-zinc-400 text-xs md:text-sm font-medium font-['Manrope']">{tool.type}</div>
                     </div>
                     <div className="w-full px-3 py-2 bg-stone-50 dark:bg-zinc-800 rounded-lg flex flex-col justify-start items-start">
                       <div className="text-black dark:text-white text-xs md:text-sm font-medium font-['Manrope']">
                         {language === 'bg' ? "Изчисление" : "Calculation"}
                       </div>
-                      <div className="text-neutral-400 dark:text-neutral-400 text-xs md:text-sm font-medium font-['Manrope']">{tool.calculation}</div>
+                      <div className="text-neutral-400 dark:text-zinc-400 text-xs md:text-sm font-medium font-['Manrope']">{tool.calculation}</div>
                     </div>
                   </div>
                 </div>

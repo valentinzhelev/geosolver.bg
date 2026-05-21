@@ -30,7 +30,7 @@ const Footer = () => {
         {/* Logo and copyright */}
         <div className="w-full flex flex-col justify-start items-start gap-3 md:flex-1">
           <Link to="/" className="self-stretch inline-flex justify-start items-center gap-2.5">
-            <img src="/images/logo.png" alt="GeoSolver Logo" className="w-10 h-10" />
+            <img src={isDark ? '/icons/homepage_white_logo.svg' : '/images/logo.png'} alt="GeoSolver Logo" className="w-10 h-10" />
             <div className="justify-start text-black dark:text-white text-xl font-bold font-['Manrope']">GeoSolver</div>
           </Link>
           <div className="self-stretch inline-flex justify-start items-center gap-3">
@@ -45,7 +45,7 @@ const Footer = () => {
           {quickLinks.map((link) => (
             <Link key={link.text} to={link.path} className="self-stretch inline-flex justify-start items-center gap-3 hover:text-black dark:hover:text-white">
               <div className="justify-start text-neutral-400 dark:text-zinc-400 text-base font-medium font-['Manrope']">{link.text}</div>
-              <img src="/icons/footer_right_arrow.svg" alt="Arrow" className="w-[5.09px] h-2" />
+              <img src="/icons/footer_right_arrow.svg" alt="Arrow" className={`w-[5.09px] h-2 ${isDark ? 'invert opacity-80' : ''}`} />
             </Link>
           ))}
         </div>
@@ -55,7 +55,7 @@ const Footer = () => {
           {socialLinks.map((link) => (
             <a key={link.text} href={link.url} target="_blank" rel="noopener noreferrer" className="self-stretch inline-flex justify-start items-center gap-3 hover:text-black dark:hover:text-white">
               <div className="justify-start text-neutral-400 dark:text-zinc-400 text-base font-medium font-['Manrope']">{link.text}</div>
-              <img src="/icons/footer_right_arrow.svg" alt="Arrow" className="w-[5.09px] h-2" />
+              <img src="/icons/footer_right_arrow.svg" alt="Arrow" className={`w-[5.09px] h-2 ${isDark ? 'invert opacity-80' : ''}`} />
             </a>
           ))}
         </div>
@@ -66,7 +66,7 @@ const Footer = () => {
             className="w-full px-4 py-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700 inline-flex justify-between items-center hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
           >
             <div className="justify-start text-black dark:text-white text-base font-medium font-['Manrope']">{t.language}</div>
-            <img src="/icons/footer_down_arrow.svg" alt="Down Arrow" className="w-2 h-2" />
+            <img src="/icons/footer_down_arrow.svg" alt="Down Arrow" className={`w-2 h-2 ${isDark ? 'invert opacity-80' : ''}`} />
           </button>
           <button 
             onClick={toggleTheme}
@@ -76,11 +76,11 @@ const Footer = () => {
               <img src={isDark ? "/icons/light_mode_icon.svg" : "/icons/night_mode_icon.svg"} alt="Theme Icon" className="w-5 h-5" />
               <div className="justify-start text-black dark:text-white text-base font-medium font-['Manrope']">{t.theme}</div>
             </div>
-            <img src="/icons/footer_down_arrow.svg" alt="Down Arrow" className="w-2 h-2" />
+            <img src="/icons/footer_down_arrow.svg" alt="Down Arrow" className={`w-2 h-2 ${isDark ? 'invert opacity-80' : ''}`} />
           </button>
         </div>
       </div>
-      <div className="w-full border-t border-gray-100 dark:border-zinc-800/80 py-2 mt-2">
+      <div className="w-full border-t border-gray-100 dark:border-zinc-800 py-2 mt-2">
         <div className="max-w-[1180px] w-full mx-auto px-4 md:px-6 flex justify-center items-center">
           <div className="text-neutral-400 dark:text-zinc-400 text-xs md:text-sm font-medium font-['Manrope']">
             <span className="text-neutral-600 dark:text-zinc-300">GEOSOLVER.BG</span>{' '}

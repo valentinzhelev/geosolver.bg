@@ -120,10 +120,10 @@ const TeacherDashboard = () => {
   if (loading) {
     return (
       <Layout>
-        <div className="w-full min-h-screen bg-stone-50 flex items-center justify-center">
+        <div className="w-full min-h-screen bg-stone-50 dark:bg-zinc-950 transition-colors flex items-center justify-center">
           <div className="text-center">
             <div className="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4 animate-spin"></div>
-            <p className="text-neutral-600">
+            <p className="text-neutral-600 dark:text-zinc-400">
               {language === 'bg' ? 'Зареждане на панела...' : 'Loading dashboard...'}
             </p>
           </div>
@@ -141,32 +141,32 @@ const TeacherDashboard = () => {
         canonical="/teacher/dashboard"
       />
       <Layout>
-        <div className="w-full min-h-screen bg-stone-50">
+        <div className="w-full min-h-screen bg-stone-50 dark:bg-zinc-950 transition-colors">
           <div className="w-full max-w-[1180px] mx-auto px-4 lg:px-6 pt-6 lg:pt-16 pb-8 lg:pb-20 flex flex-col gap-8">
             
             <div className="flex flex-col lg:flex-row justify-between gap-6">
               <div className="flex-1">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-white rounded-xl border border-gray-200">
+                  <div className="p-2 bg-white dark:bg-zinc-900 rounded-xl border border-gray-200">
                     <DashboardIcon className="w-7 h-7 text-gray-700" />
                   </div>
-                  <h1 className="text-black text-3xl font-bold font-['Manrope']">
+                  <h1 className="text-black dark:text-white text-3xl font-bold font-['Manrope']">
                     {language === 'bg' ? 'Учителски панел' : 'Teacher Dashboard'}
                   </h1>
                 </div>
-                <p className="text-neutral-600 text-sm lg:text-base mt-3 max-w-xl">
+                <p className="text-neutral-600 dark:text-zinc-400 text-sm lg:text-base mt-3 max-w-xl">
                   {language === 'bg'
                     ? 'Център за управление на класове, тестове и проверка на резултати.'
                     : 'Manage classes, tests, and grading in one place.'}
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <span className="px-3 py-1 text-xs rounded-full bg-white border border-gray-200 text-neutral-600">
+                  <span className="px-3 py-1 text-xs rounded-full bg-white dark:bg-zinc-900 border border-gray-200 text-neutral-600 dark:text-zinc-400">
                     {language === 'bg' ? 'Роля: Учител' : 'Role: Teacher'}
                   </span>
-                  <span className="px-3 py-1 text-xs rounded-full bg-white border border-gray-200 text-neutral-600">
+                  <span className="px-3 py-1 text-xs rounded-full bg-white dark:bg-zinc-900 border border-gray-200 text-neutral-600 dark:text-zinc-400">
                     {language === 'bg' ? 'Всички действия се логват' : 'All actions are logged'}
                   </span>
-                  <span className="px-3 py-1 text-xs rounded-full bg-white border border-gray-200 text-neutral-600">
+                  <span className="px-3 py-1 text-xs rounded-full bg-white dark:bg-zinc-900 border border-gray-200 text-neutral-600 dark:text-zinc-400">
                     {language === 'bg' ? 'Desktop и Mobile' : 'Desktop & Mobile'}
                   </span>
                 </div>
@@ -180,13 +180,13 @@ const TeacherDashboard = () => {
                 </Link>
                 <Link
                   to="/teacher/create-assignment"
-                  className="px-4 py-2 bg-gray-200 text-black rounded-lg hover:bg-gray-300 transition-colors duration-200 text-sm font-medium"
+                  className="px-4 py-2 bg-gray-200 dark:bg-zinc-700 text-black dark:text-white rounded-lg hover:bg-gray-300 transition-colors duration-200 text-sm font-medium"
                 >
                   {language === 'bg' ? 'Генерирай задачи' : 'Generate Tasks'}
                 </Link>
                 <Link
                   to="/teacher/courses"
-                  className="px-4 py-2 bg-gray-200 text-black rounded-lg hover:bg-gray-300 transition-colors duration-200 text-sm font-medium"
+                  className="px-4 py-2 bg-gray-200 dark:bg-zinc-700 text-black dark:text-white rounded-lg hover:bg-gray-300 transition-colors duration-200 text-sm font-medium"
                 >
                   {language === 'bg' ? 'Нов клас' : 'New Class'}
                 </Link>
@@ -194,57 +194,57 @@ const TeacherDashboard = () => {
             </div>
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="p-5 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200">
+              <div className="p-5 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-gray-100 rounded-lg">
                     <StudentsIcon className="w-5 h-5 text-gray-600" />
                   </div>
-                  <div className="text-sm text-neutral-600">{language === 'bg' ? 'Ученици' : 'Students'}</div>
+                  <div className="text-sm text-neutral-600 dark:text-zinc-400">{language === 'bg' ? 'Ученици' : 'Students'}</div>
                 </div>
-                <div className="text-2xl font-bold text-black mt-2">{stats.totalStudents}</div>
-                <div className="text-xs text-neutral-500">{stats.activeStudents} {language === 'bg' ? 'активни' : 'active'}</div>
+                <div className="text-2xl font-bold text-black dark:text-white mt-2">{stats.totalStudents}</div>
+                <div className="text-xs text-neutral-500 dark:text-zinc-400">{stats.activeStudents} {language === 'bg' ? 'активни' : 'active'}</div>
               </div>
-              <div className="p-5 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200">
+              <div className="p-5 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-gray-100 rounded-lg">
                     <AssignmentIcon className="w-5 h-5 text-gray-600" />
                   </div>
-                  <div className="text-sm text-neutral-600">{language === 'bg' ? 'Активни тестове' : 'Active Tests'}</div>
+                  <div className="text-sm text-neutral-600 dark:text-zinc-400">{language === 'bg' ? 'Активни тестове' : 'Active Tests'}</div>
                 </div>
-                <div className="text-2xl font-bold text-black mt-2">{stats.activeAssignments}</div>
-                <div className="text-xs text-neutral-500">{stats.totalAssignments} {language === 'bg' ? 'общо' : 'total'}</div>
+                <div className="text-2xl font-bold text-black dark:text-white mt-2">{stats.activeAssignments}</div>
+                <div className="text-xs text-neutral-500 dark:text-zinc-400">{stats.totalAssignments} {language === 'bg' ? 'общо' : 'total'}</div>
               </div>
-              <div className="p-5 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200">
+              <div className="p-5 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-gray-100 rounded-lg">
                     <CheckIcon className="w-5 h-5 text-gray-600" />
                   </div>
-                  <div className="text-sm text-neutral-600">{language === 'bg' ? 'Предадени' : 'Submitted'}</div>
+                  <div className="text-sm text-neutral-600 dark:text-zinc-400">{language === 'bg' ? 'Предадени' : 'Submitted'}</div>
                 </div>
-                <div className="text-2xl font-bold text-black mt-2">{stats.completedReviews}</div>
-                <div className="text-xs text-neutral-500">{language === 'bg' ? 'Тази седмица' : 'This week'}: {stats.thisWeekActivity}</div>
+                <div className="text-2xl font-bold text-black dark:text-white mt-2">{stats.completedReviews}</div>
+                <div className="text-xs text-neutral-500 dark:text-zinc-400">{language === 'bg' ? 'Тази седмица' : 'This week'}: {stats.thisWeekActivity}</div>
               </div>
-              <div className="p-5 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200">
+              <div className="p-5 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-gray-100 rounded-lg">
                     <TrendingUpIcon className="w-5 h-5 text-gray-600" />
                   </div>
-                  <div className="text-sm text-neutral-600">{language === 'bg' ? 'Среден резултат' : 'Average Score'}</div>
+                  <div className="text-sm text-neutral-600 dark:text-zinc-400">{language === 'bg' ? 'Среден резултат' : 'Average Score'}</div>
                 </div>
-                <div className="text-2xl font-bold text-black mt-2">{stats.averageScore.toFixed(1)}</div>
-                <div className="text-xs text-neutral-500">{language === 'bg' ? 'По клас' : 'By class'}</div>
+                <div className="text-2xl font-bold text-black dark:text-white mt-2">{stats.averageScore.toFixed(1)}</div>
+                <div className="text-xs text-neutral-500 dark:text-zinc-400">{language === 'bg' ? 'По клас' : 'By class'}</div>
               </div>
             </div>
 
             <div className="flex flex-col gap-6">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div className="p-6 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200">
+                  <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800">
                     <div className="flex items-center gap-3 mb-5">
                       <div className="p-2 bg-gray-100 rounded-lg">
                         <StudentsIcon className="w-5 h-5 text-gray-600" />
                       </div>
-                      <h3 className="text-lg font-semibold text-black">
+                      <h3 className="text-lg font-semibold text-black dark:text-white">
                         {language === 'bg' ? 'Активни класове' : 'Active Classes'}
                       </h3>
                     </div>
@@ -252,70 +252,70 @@ const TeacherDashboard = () => {
                       {activeClasses.map(cls => (
                         <div key={cls.id} className="flex justify-between items-center p-3 rounded-lg border border-gray-100 bg-stone-50">
                           <div>
-                            <div className="text-sm font-semibold text-black">{cls.name}</div>
-                            <div className="text-xs text-neutral-500">{cls.year}</div>
+                            <div className="text-sm font-semibold text-black dark:text-white">{cls.name}</div>
+                            <div className="text-xs text-neutral-500 dark:text-zinc-400">{cls.year}</div>
                           </div>
-                          <div className="text-xs text-neutral-500">{cls.students} {language === 'bg' ? 'ученици' : 'students'}</div>
+                          <div className="text-xs text-neutral-500 dark:text-zinc-400">{cls.students} {language === 'bg' ? 'ученици' : 'students'}</div>
                         </div>
                       ))}
                     </div>
                   </div>
-                  <div className="p-6 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200">
+                  <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800">
                     <div className="flex items-center gap-3 mb-5">
                       <div className="p-2 bg-gray-100 rounded-lg">
                         <ClockIcon className="w-5 h-5 text-gray-600" />
                       </div>
-                      <h3 className="text-lg font-semibold text-black">
+                      <h3 className="text-lg font-semibold text-black dark:text-white">
                         {language === 'bg' ? 'Предстоящи тестове' : 'Upcoming Tests'}
                       </h3>
                     </div>
                     <div className="space-y-3">
                       {upcomingTests.map(test => (
                         <div key={test.id} className="flex justify-between items-center p-3 rounded-lg border border-gray-100 bg-stone-50">
-                          <div className="text-sm font-semibold text-black">{test.title}</div>
-                          <div className="text-xs text-neutral-500">{test.dueDate}</div>
+                          <div className="text-sm font-semibold text-black dark:text-white">{test.title}</div>
+                          <div className="text-xs text-neutral-500 dark:text-zinc-400">{test.dueDate}</div>
                         </div>
                       ))}
                     </div>
                   </div>
                 </div>
-                <div className="p-6 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200">
+                <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800">
                   <div className="flex items-center gap-3 mb-5">
                     <div className="p-2 bg-gray-100 rounded-lg">
                       <AnalyticsIcon className="w-5 h-5 text-gray-600" />
                     </div>
-                    <h3 className="text-lg font-semibold text-black">
+                    <h3 className="text-lg font-semibold text-black dark:text-white">
                       {language === 'bg' ? 'Статистика' : 'Statistics'}
                     </h3>
                   </div>
                   <div className="space-y-3">
                     <div className="flex items-center justify-between p-3 rounded-lg border border-gray-100 bg-stone-50">
-                      <div className="text-xs text-neutral-500">{language === 'bg' ? 'Среден резултат по клас' : 'Avg score per class'}</div>
-                      <div className="text-sm font-semibold text-black">{stats.averageScore.toFixed(1)}</div>
+                      <div className="text-xs text-neutral-500 dark:text-zinc-400">{language === 'bg' ? 'Среден резултат по клас' : 'Avg score per class'}</div>
+                      <div className="text-sm font-semibold text-black dark:text-white">{stats.averageScore.toFixed(1)}</div>
                     </div>
                     <div className="flex items-center justify-between p-3 rounded-lg border border-gray-100 bg-stone-50">
-                      <div className="text-xs text-neutral-500">{language === 'bg' ? 'Брой предадени тестове' : 'Submitted tests'}</div>
-                      <div className="text-sm font-semibold text-black">{stats.completedReviews}</div>
+                      <div className="text-xs text-neutral-500 dark:text-zinc-400">{language === 'bg' ? 'Брой предадени тестове' : 'Submitted tests'}</div>
+                      <div className="text-sm font-semibold text-black dark:text-white">{stats.completedReviews}</div>
                     </div>
                     <div className="flex items-center justify-between p-3 rounded-lg border border-gray-100 bg-stone-50">
-                      <div className="text-xs text-neutral-500">{language === 'bg' ? 'Най-грешени задачи' : 'Most missed tasks'}</div>
-                      <div className="text-sm font-semibold text-black">{language === 'bg' ? 'Първа основна задача' : 'First Basic Task'}</div>
+                      <div className="text-xs text-neutral-500 dark:text-zinc-400">{language === 'bg' ? 'Най-грешени задачи' : 'Most missed tasks'}</div>
+                      <div className="text-sm font-semibold text-black dark:text-white">{language === 'bg' ? 'Първа основна задача' : 'First Basic Task'}</div>
                     </div>
                     <div className="flex items-center justify-between p-3 rounded-lg border border-gray-100 bg-stone-50">
-                      <div className="text-xs text-neutral-500">{language === 'bg' ? 'Активни класове' : 'Active classes'}</div>
-                      <div className="text-sm font-semibold text-black">{stats.totalClasses}</div>
+                      <div className="text-xs text-neutral-500 dark:text-zinc-400">{language === 'bg' ? 'Активни класове' : 'Active classes'}</div>
+                      <div className="text-sm font-semibold text-black dark:text-white">{stats.totalClasses}</div>
                     </div>
                   </div>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="p-6 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200">
+                <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800">
                   <div className="flex items-center gap-3 mb-5">
                     <div className="p-2 bg-gray-100 rounded-lg">
                       <ActivityIcon className="w-5 h-5 text-gray-600" />
                     </div>
-                    <h3 className="text-lg font-semibold text-black">
+                    <h3 className="text-lg font-semibold text-black dark:text-white">
                       {language === 'bg' ? 'Последни проверени работи' : 'Recently Graded'}
                     </h3>
                   </div>
@@ -323,48 +323,48 @@ const TeacherDashboard = () => {
                     {recentReviews.length > 0 ? recentReviews.map((activity, index) => (
                       <div key={activity.id || index} className="flex justify-between items-center p-3 rounded-lg border border-gray-100 bg-stone-50">
                         <div>
-                          <div className="text-sm font-semibold text-black">
+                          <div className="text-sm font-semibold text-black dark:text-white">
                             {activity.student || activity.studentName || (language === 'bg' ? 'Проверена работа' : 'Graded work')}
                           </div>
-                          <div className="text-xs text-neutral-500">
+                          <div className="text-xs text-neutral-500 dark:text-zinc-400">
                             {activity.task || activity.title || (language === 'bg' ? 'Тест' : 'Test')}
                           </div>
                         </div>
-                        <div className="text-sm font-semibold text-black">{activity.score ?? activity.grade ?? '-'}</div>
+                        <div className="text-sm font-semibold text-black dark:text-white">{activity.score ?? activity.grade ?? '-'}</div>
                       </div>
                     )) : (
-                      <div className="text-center py-6 text-neutral-500 text-sm">
+                      <div className="text-center py-6 text-neutral-500 dark:text-zinc-400 text-sm">
                         {language === 'bg' ? 'Няма проверени работи.' : 'No graded work yet.'}
                       </div>
                     )}
                   </div>
                 </div>
 
-                <div className="p-6 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200">
+                <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800">
                   <div className="flex items-center gap-3 mb-5">
                     <div className="p-2 bg-gray-100 rounded-lg">
                       <PlusIcon className="w-5 h-5 text-gray-600" />
                     </div>
-                    <h3 className="text-lg font-semibold text-black">
+                    <h3 className="text-lg font-semibold text-black dark:text-white">
                       {language === 'bg' ? 'Бързи действия' : 'Quick Actions'}
                     </h3>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <Link to="/teacher/create-assignment" className="p-4 rounded-lg border border-gray-100 bg-stone-50 hover:bg-stone-100 transition-colors duration-200">
-                      <div className="text-sm font-semibold text-black">{language === 'bg' ? 'Създай тест' : 'Create Test'}</div>
-                      <div className="text-xs text-neutral-500 mt-1">{language === 'bg' ? 'Контролно по параметри' : 'Build with settings'}</div>
+                      <div className="text-sm font-semibold text-black dark:text-white">{language === 'bg' ? 'Създай тест' : 'Create Test'}</div>
+                      <div className="text-xs text-neutral-500 dark:text-zinc-400 mt-1">{language === 'bg' ? 'Контролно по параметри' : 'Build with settings'}</div>
                     </Link>
                     <Link to="/teacher/create-assignment" className="p-4 rounded-lg border border-gray-100 bg-stone-50 hover:bg-stone-100 transition-colors duration-200">
-                      <div className="text-sm font-semibold text-black">{language === 'bg' ? 'Генерирай задачи' : 'Generate Tasks'}</div>
-                      <div className="text-xs text-neutral-500 mt-1">{language === 'bg' ? 'Автоматично генериране' : 'Auto generation'}</div>
+                      <div className="text-sm font-semibold text-black dark:text-white">{language === 'bg' ? 'Генерирай задачи' : 'Generate Tasks'}</div>
+                      <div className="text-xs text-neutral-500 dark:text-zinc-400 mt-1">{language === 'bg' ? 'Автоматично генериране' : 'Auto generation'}</div>
                     </Link>
                     <Link to="/teacher/scan-submissions" className="p-4 rounded-lg border border-gray-100 bg-stone-50 hover:bg-stone-100 transition-colors duration-200">
-                      <div className="text-sm font-semibold text-black">{language === 'bg' ? 'OCR проверки' : 'OCR Checks'}</div>
-                      <div className="text-xs text-neutral-500 mt-1">{language === 'bg' ? 'Сканирай решения' : 'Scan submissions'}</div>
+                      <div className="text-sm font-semibold text-black dark:text-white">{language === 'bg' ? 'OCR проверки' : 'OCR Checks'}</div>
+                      <div className="text-xs text-neutral-500 dark:text-zinc-400 mt-1">{language === 'bg' ? 'Сканирай решения' : 'Scan submissions'}</div>
                     </Link>
                     <Link to="/teacher/courses" className="p-4 rounded-lg border border-gray-100 bg-stone-50 hover:bg-stone-100 transition-colors duration-200">
-                      <div className="text-sm font-semibold text-black">{language === 'bg' ? 'Управление на класове' : 'Class Management'}</div>
-                      <div className="text-xs text-neutral-500 mt-1">{language === 'bg' ? 'Създай и архивирай' : 'Create and archive'}</div>
+                      <div className="text-sm font-semibold text-black dark:text-white">{language === 'bg' ? 'Управление на класове' : 'Class Management'}</div>
+                      <div className="text-xs text-neutral-500 dark:text-zinc-400 mt-1">{language === 'bg' ? 'Създай и архивирай' : 'Create and archive'}</div>
                     </Link>
                   </div>
                 </div>

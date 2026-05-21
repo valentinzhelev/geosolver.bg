@@ -141,35 +141,35 @@ const TaskGenerator = () => {
         canonical="/teacher/tasks"
       />
       <Layout>
-        <div className="w-full min-h-screen bg-stone-50 flex flex-col items-center py-8 px-2 md:px-0">
+        <div className="w-full min-h-screen bg-stone-50 dark:bg-zinc-950 transition-colors flex flex-col items-center py-8 px-2 md:px-0">
           <div className="w-full max-w-[1180px] flex flex-col gap-8">
             <div className="flex items-center gap-4">
-              <Link to="/teacher/dashboard" className="px-3 py-2 bg-white rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 flex items-center gap-2">
+              <Link to="/teacher/dashboard" className="px-3 py-2 bg-white dark:bg-zinc-900 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex items-center gap-2">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
-                <span className="text-sm text-neutral-600">{language === 'bg' ? 'Назад' : 'Back'}</span>
+                <span className="text-sm text-neutral-600 dark:text-zinc-400">{language === 'bg' ? 'Назад' : 'Back'}</span>
               </Link>
-              <h1 className="text-black text-3xl font-bold font-['Manrope']">
+              <h1 className="text-black dark:text-white text-3xl font-bold font-['Manrope']">
                 {language === 'bg' ? 'Генериране на задачи' : 'Task Generation'}
               </h1>
             </div>
 
             <div className="self-stretch inline-flex justify-start items-start gap-5">
               <div className="w-96 inline-flex flex-col justify-center items-center gap-5">
-                <div className="self-stretch p-4 bg-white rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-0.50px] outline-gray-200 flex flex-col justify-start items-start gap-4 overflow-hidden">
-                  <div className="self-stretch justify-start text-black text-lg font-semibold font-['Manrope']">
+                <div className="self-stretch p-4 bg-white dark:bg-zinc-900 rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-0.50px] outline-gray-200 dark:outline-zinc-800 flex flex-col justify-start items-start gap-4 overflow-hidden">
+                  <div className="self-stretch justify-start text-black dark:text-white text-lg font-semibold font-['Manrope']">
                     {language === 'bg' ? 'Входни данни' : 'Input Data'}
                   </div>
                   <div className="self-stretch flex flex-col gap-4">
                     <div>
-                      <div className="text-black text-sm font-medium font-['Manrope'] mb-2">
+                      <div className="text-black dark:text-white text-sm font-medium font-['Manrope'] mb-2">
                         {language === 'bg' ? 'Тип задача' : 'Task type'}
                       </div>
                       <select
                         value={selectedTaskType}
                         onChange={(e) => setSelectedTaskType(e.target.value)}
-                        className="w-full p-3 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400"
+                        className="w-full p-3 bg-white dark:bg-zinc-900 border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400"
                       >
                         <option value="">{language === 'bg' ? 'Изберете' : 'Select'}</option>
                         {taskTypes.map(task => (
@@ -181,7 +181,7 @@ const TaskGenerator = () => {
                     </div>
 
                     <div>
-                      <div className="text-black text-sm font-medium font-['Manrope'] mb-2">
+                      <div className="text-black dark:text-white text-sm font-medium font-['Manrope'] mb-2">
                         {language === 'bg' ? 'Брой задачи' : 'Number of tasks'}
                       </div>
                       <input
@@ -190,12 +190,12 @@ const TaskGenerator = () => {
                         max="50"
                         value={taskParameters.count}
                         onChange={(e) => handleParameterChange('count', e.target.value)}
-                        className="w-full p-3 bg-white border border-gray-200 rounded-lg"
+                        className="w-full p-3 bg-white dark:bg-zinc-900 border border-gray-200 rounded-lg"
                       />
                     </div>
 
                     <div>
-                      <div className="text-black text-sm font-medium font-['Manrope'] mb-2">
+                      <div className="text-black dark:text-white text-sm font-medium font-['Manrope'] mb-2">
                         {language === 'bg' ? 'Y1 диапазон (м)' : 'Y1 range (m)'}
                       </div>
                       <div className="flex gap-2">
@@ -203,19 +203,19 @@ const TaskGenerator = () => {
                           type="number"
                           value={taskParameters.y1Min}
                           onChange={(e) => handleParameterChange('y1Min', e.target.value)}
-                          className="w-full p-3 bg-white border border-gray-200 rounded-lg"
+                          className="w-full p-3 bg-white dark:bg-zinc-900 border border-gray-200 rounded-lg"
                         />
                         <input
                           type="number"
                           value={taskParameters.y1Max}
                           onChange={(e) => handleParameterChange('y1Max', e.target.value)}
-                          className="w-full p-3 bg-white border border-gray-200 rounded-lg"
+                          className="w-full p-3 bg-white dark:bg-zinc-900 border border-gray-200 rounded-lg"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <div className="text-black text-sm font-medium font-['Manrope'] mb-2">
+                      <div className="text-black dark:text-white text-sm font-medium font-['Manrope'] mb-2">
                         {language === 'bg' ? 'X1 диапазон (м)' : 'X1 range (m)'}
                       </div>
                       <div className="flex gap-2">
@@ -223,19 +223,19 @@ const TaskGenerator = () => {
                           type="number"
                           value={taskParameters.x1Min}
                           onChange={(e) => handleParameterChange('x1Min', e.target.value)}
-                          className="w-full p-3 bg-white border border-gray-200 rounded-lg"
+                          className="w-full p-3 bg-white dark:bg-zinc-900 border border-gray-200 rounded-lg"
                         />
                         <input
                           type="number"
                           value={taskParameters.x1Max}
                           onChange={(e) => handleParameterChange('x1Max', e.target.value)}
-                          className="w-full p-3 bg-white border border-gray-200 rounded-lg"
+                          className="w-full p-3 bg-white dark:bg-zinc-900 border border-gray-200 rounded-lg"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <div className="text-black text-sm font-medium font-['Manrope'] mb-2">
+                      <div className="text-black dark:text-white text-sm font-medium font-['Manrope'] mb-2">
                         {language === 'bg' ? 'α диапазон (gon)' : 'α range (gon)'}
                       </div>
                       <div className="flex gap-2">
@@ -243,19 +243,19 @@ const TaskGenerator = () => {
                           type="number"
                           value={taskParameters.alphaMin}
                           onChange={(e) => handleParameterChange('alphaMin', e.target.value)}
-                          className="w-full p-3 bg-white border border-gray-200 rounded-lg"
+                          className="w-full p-3 bg-white dark:bg-zinc-900 border border-gray-200 rounded-lg"
                         />
                         <input
                           type="number"
                           value={taskParameters.alphaMax}
                           onChange={(e) => handleParameterChange('alphaMax', e.target.value)}
-                          className="w-full p-3 bg-white border border-gray-200 rounded-lg"
+                          className="w-full p-3 bg-white dark:bg-zinc-900 border border-gray-200 rounded-lg"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <div className="text-black text-sm font-medium font-['Manrope'] mb-2">
+                      <div className="text-black dark:text-white text-sm font-medium font-['Manrope'] mb-2">
                         {language === 'bg' ? 'S диапазон (м)' : 'S range (m)'}
                       </div>
                       <div className="flex gap-2">
@@ -263,13 +263,13 @@ const TaskGenerator = () => {
                           type="number"
                           value={taskParameters.sMin}
                           onChange={(e) => handleParameterChange('sMin', e.target.value)}
-                          className="w-full p-3 bg-white border border-gray-200 rounded-lg"
+                          className="w-full p-3 bg-white dark:bg-zinc-900 border border-gray-200 rounded-lg"
                         />
                         <input
                           type="number"
                           value={taskParameters.sMax}
                           onChange={(e) => handleParameterChange('sMax', e.target.value)}
-                          className="w-full p-3 bg-white border border-gray-200 rounded-lg"
+                          className="w-full p-3 bg-white dark:bg-zinc-900 border border-gray-200 rounded-lg"
                         />
                       </div>
                     </div>
@@ -291,9 +291,9 @@ const TaskGenerator = () => {
                         setGeneratedTasks([]);
                         setTaskParameters(prev => ({ ...prev, count: 5 }));
                       }}
-                      className="px-4 py-2 bg-gray-200 rounded-lg flex justify-start items-center gap-3"
+                      className="px-4 py-2 bg-gray-200 dark:bg-zinc-700 rounded-lg flex justify-start items-center gap-3"
                     >
-                      <div className="justify-start text-black text-sm font-medium font-['Manrope']">
+                      <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">
                         {language === 'bg' ? 'Нулирай' : 'Reset'}
                       </div>
                     </button>
@@ -301,17 +301,17 @@ const TaskGenerator = () => {
                 </div>
               </div>
 
-              <div className="flex-1 self-stretch p-4 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-center items-end gap-3">
-                <div className="self-stretch justify-start text-black text-lg font-semibold font-['Manrope']">
+              <div className="flex-1 self-stretch p-4 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 inline-flex flex-col justify-center items-end gap-3">
+                <div className="self-stretch justify-start text-black dark:text-white text-lg font-semibold font-['Manrope']">
                   {language === 'bg' ? 'Резултати' : 'Results'}
                 </div>
-                <div className="self-stretch flex-1 p-3 bg-stone-50 rounded-lg flex flex-col justify-start items-start">
+                <div className="self-stretch flex-1 p-3 bg-stone-50 dark:bg-zinc-800 rounded-lg flex flex-col justify-start items-start">
                   {generatedTasks.length === 0 ? (
-                    <div className="text-neutral-400 text-sm font-medium font-['Manrope']">
+                    <div className="text-neutral-400 dark:text-zinc-400 text-sm font-medium font-['Manrope']">
                       {language === 'bg' ? 'Натиснете "Генерирай", за да видите резултатите.' : 'Click "Generate" to see results.'}
                     </div>
                   ) : (
-                    <div className="w-full text-neutral-700 text-sm font-medium font-['Manrope'] space-y-2">
+                    <div className="w-full text-neutral-700 dark:text-zinc-300 text-sm font-medium font-['Manrope'] space-y-2">
                       {generatedTasks.map((task) => (
                         <div key={task.id} className="flex justify-between border-b border-gray-200 pb-2">
                           <div>Y1={formatNumber(task.y1, 2)}, X1={formatNumber(task.x1, 2)}</div>

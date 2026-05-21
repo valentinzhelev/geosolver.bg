@@ -21,7 +21,7 @@ const ToolTabSwitcher = ({ toolPath, active }) => {
         </div>
       ) : (
         <Link to={toolPath} className={`${tabBase} bg-white dark:bg-zinc-900`}>
-          <span className={`${labelBase} text-neutral-400`}>{t.instrument}</span>
+          <span className={`${labelBase} text-neutral-400 dark:text-zinc-400`}>{t.instrument}</span>
         </Link>
       )}
       {active === 'docs' ? (
@@ -30,7 +30,7 @@ const ToolTabSwitcher = ({ toolPath, active }) => {
         </div>
       ) : (
         <Link to={docsPath} className={`${tabBase} bg-white dark:bg-zinc-900`}>
-          <span className={`${labelBase} text-neutral-400`}>{t.documentation}</span>
+          <span className={`${labelBase} text-neutral-400 dark:text-zinc-400`}>{t.documentation}</span>
         </Link>
       )}
     </div>

@@ -6,6 +6,7 @@ export const translations = {
     prices: 'Цени',
     contacts: 'Контакти',
     forTeachers: 'За преподаватели',
+    gai: 'GAI',
     account: 'Акаунт',
     login: 'Вход',
     logout: 'Изход',
@@ -20,13 +21,51 @@ export const translations = {
     socialNetworks: 'Социални мрежи',
     language: 'Български език',
     theme: 'Светъл режим',
-    copyright: '© GEOSOLVER, 2025.\nВсички права запазени.\nТекуща версия: v3.1.9-beta.2',
+    copyright: '© GEOSOLVER, 2025.\nВсички права запазени.\nТекуща версия: v3.2.0-beta.2',
     wortexaFooterBefore: 'е част от продуктовото семейство на ',
     wortexaFooterAfter: '',
     // FirstTask translations
     firstTaskTitle: 'Първа основна задача',
     firstTaskDescription: 'Изчисляване на координати по начална точка, ъгъл и дължина с онлайн геодезически калкулатор. Бързи и точни решения за геодезисти.',
     firstTaskKeywords: 'геодезия, онлайн калкулатор, първа основна задача, координати, ъгъл, дължина, трансформация, геодезически изчисления',
+    secondTaskTitle: 'Втора основна задача',
+    secondTaskDescription:
+      'Изчисляване на разстояние и посочен ъгъл между две точки по координати с онлайн геодезически калкулатор.',
+    secondTaskKeywords:
+      'геодезия, втора основна задача, разстояние, посочен ъгъл, координати, геодезически калкулатор',
+    secondTaskDefaultResultText:
+      'Въведете координати и натиснете „Изчисли“, за да видите резултатите тук.',
+    forwardIntersectionDescription:
+      'Права засечка — определяне на координати на точка по две известни точки и ъгли с онлайн калкулатор.',
+    forwardIntersectionKeywords:
+      'геодезия, права засечка, триангулация, координати, геодезически калкулатор',
+    resectionDescription:
+      'Обратна засечка — определяне на позиция по ъгли от три известни точки с онлайн калкулатор.',
+    resectionKeywords:
+      'геодезия, обратна засечка, Hansen, координати, геодезически калкулатор',
+    resectionDefaultResultText:
+      'Въведете координатите на трите точки и двата ъгъла, след което натиснете „Изчисли“.',
+    fillAllFields: 'Моля, попълнете всички полета.',
+    enterX1Short: 'Въведете X₁',
+    enterY1Short: 'Въведете Y₁',
+    enterX2Short: 'Въведете X₂',
+    enterY2Short: 'Въведете Y₂',
+    docsFirstTaskSeoDescription:
+      'Документация за първата основна геодезическа задача: теория, формули, таблица на знаците, проверка в GeoSolver и пример с числа.',
+    docsFirstTaskSeoKeywords:
+      'първа основна задача, документация, геодезия, формули, гради, координати, GeoSolver',
+    docsSecondTaskSeoDescription:
+      'Документация за втората основна задача: обратно изчисление на разстояние и посочен ъгъл между две точки, квадранти и проверка.',
+    docsSecondTaskSeoKeywords:
+      'втора основна задача, документация, обратна задача, разстояние, посочен ъгъл, GeoSolver',
+    docsForwardIntersectionSeoDescription:
+      'Документация за права засечка: синусова теорема, двойно определяне на точка P, ограничения за ъглите и пример.',
+    docsForwardIntersectionSeoKeywords:
+      'права засечка, документация, триангулация, геодезия, GeoSolver',
+    docsResectionSeoDescription:
+      'Документация за обратна засечка: три контролни точки, ъгли в станция P, метод на Хансен и контрол на ъглите.',
+    docsResectionSeoKeywords:
+      'обратна засечка, документация, Hansen, триангулация, геодезия, GeoSolver',
     inputData: 'Входни данни',
     results: 'Резултати',
     y1Coordinate: 'Y₁ (координата)',
@@ -117,6 +156,53 @@ export const translations = {
     user: 'Потребител',
     logoutFromAccount: 'Излез от акаунта',
     settings: 'Настройки',
+    settingsPanel: {
+      title: 'Настройки',
+      subtitle: 'Профил, изглед, сигурност и предпочитания',
+      backToAccount: 'Обратно към акаунта',
+      close: 'Затвори',
+      sections: {
+        profile: 'Профил',
+        appearance: 'Изглед',
+        security: 'Сигурност',
+        preferences: 'Предпочитания',
+        privacy: 'Поверителност',
+      },
+      profileDesc: 'Основна информация за акаунта ви в GeoSolver.',
+      profileHint: 'За промяна на имейл или име се свържете с поддръжката.',
+      nameLabel: 'Име',
+      emailLabel: 'Имейл',
+      roleLabel: 'Роля',
+      memberSince: 'Регистрация',
+      appearanceDesc: 'Език на интерфейса и светла/тъмна тема.',
+      languageLabel: 'Език',
+      langBg: 'Български',
+      langEn: 'English',
+      themeLabel: 'Тема',
+      themeLight: 'Светла',
+      themeDark: 'Тъмна',
+      securityDesc: 'Управление на паролата и достъпа до акаунта.',
+      changePassword: 'Смяна на парола',
+      currentPassword: 'Текуща парола',
+      newPassword: 'Нова парола',
+      confirmPassword: 'Повтори новата парола',
+      savePassword: 'Запази паролата',
+      saving: 'Запис...',
+      passwordFillAll: 'Моля, попълнете всички полета.',
+      passwordMismatch: 'Новите пароли не съвпадат.',
+      passwordTooShort: 'Паролата трябва да е поне 6 символа.',
+      passwordSuccess: 'Паролата е сменена успешно.',
+      passwordFailed: 'Грешка при смяна на паролата.',
+      forgotPasswordLink: 'Забравена парола?',
+      googleSignInTitle: 'Вход с Google',
+      googleSignInDesc: 'Акаунтът е свързан с Google. Смяна на парола не е налична — управлявайте достъпа от Google акаунта си.',
+      preferencesDesc: 'Допълнителни опции за работа с платформата.',
+      toolsInDevLabel: 'Инструменти в разработка',
+      toolsInDevDesc: 'Показва в менюто инструменти, които още не са публично пуснати.',
+      privacyDesc: 'Политики, бисквитки и правна информация.',
+      cookieReset: 'Промени избора за бисквитки',
+      cookieResetHint: 'Презарежда страницата',
+    },
     professionalPlanMonthly: 'Професионален план (Месечен)',
     daysFromStart: 'дни от началото на плана Ви',
     daysToNext: 'дни до следващото плащане',
@@ -184,23 +270,179 @@ export const translations = {
 
     // For Teachers page
     forTeachersTitle: 'За преподаватели',
-    forTeachersDescription: 'GeoSolver предоставя на учителите по геодезия в България безплатен достъп до професионални инструменти за проверка, анализ и създаване на задачи. Бързо, сигурно и модерно образование!',
-    forTeachersHeadline: 'Вашият дигитален асистент в обучението по геодезия',
-    forTeachersIntro: 'GeoSolver предоставя на учителите по геодезия в България напълно безплатен достъп до всички професионални инструменти на платформата. Нашата мисия е да улесним преподаването, да повишим качеството на обучението и да спестим време на учителите чрез автоматизация и дигитализация на процеса по проверка и анализ на задачи.',
+    forTeachersDescription:
+      'Класна стая GeoSolver за преподаватели по геодезия: групи, задания, автоматична проверка и контрол върху калкулатора при решаване.',
+    forTeachersHeadline: 'Класна стая за геодезия в училище',
+    forTeachersIntro:
+      'Създавайте групи, задавайте задачи с ясни входни данни и получавайте отговорите на учениците на едно място. Проверката е автоматична; вие решавате дали калкулаторът е разрешен за всяко задание.',
     forTeachersFeatures: [
-      { title: 'Бърза и сигурна проверка на задачи', desc: 'Проверявайте решенията на учениците за секунди. GeoSolver елиминира риска от човешка грешка с до 99.9% точност.' },
-      { title: 'Създаване на примерни задачи и тестове', desc: 'Генерирайте и споделяйте задачи за класна и домашна работа с няколко клика.' },
-      { title: 'Анализ на грешки и автоматични обяснения', desc: 'Получавайте подробен анализ на всяка стъпка и автоматични обяснения за допуснати грешки.' },
-      { title: 'Пълна документация на всяка задача', desc: 'Всяка задача е придружена с подробна документация, примери и обяснения за методите на решаване.' },
-      { title: 'Поверителност и сигурност', desc: 'Данните на вас и вашите ученици са защитени с най-високо ниво на сигурност.' },
-      { title: 'Постоянна поддръжка и обучение', desc: 'Получавате достъп до специализирана поддръжка и обучения за работа с платформата.' },
-      { title: 'Достъп до нови функционалности', desc: 'Учителите получават ранен достъп до нови инструменти и възможности.' },
-      { title: 'Скоро: Сканиране на задачи от снимка', desc: 'Планираме възможност за директно качване и автоматично разпознаване на задачи чрез снимка. Това ще ускори проверките с до 70% и ще спести ценно време.' }
+      {
+        title: 'Групи и код за присъединяване',
+        desc: 'Учениците влизат с код — без отделни настройки за всеки профил в клас.',
+      },
+      {
+        title: 'Задания с краен срок',
+        desc: 'Задайте условие, очакван резултат и режим на калкулатора: изключен, само помощ или пълен достъп.',
+      },
+      {
+        title: 'Автоматична проверка',
+        desc: 'След предаване виждате резултат, грешки и опашка за преглед — без ръчно смятане на всяко решение.',
+      },
+      {
+        title: 'Инструменти и документация',
+        desc: 'Четирите основни геодезически задачи с кратка документация — подходящи за упражнения и контролни.',
+      },
     ],
-    howToGetAccess: 'Как да получите достъп?',
-    howToGetAccessText: 'Свържете се с нас чрез формата за контакт (от менюто Контакти) или ни пишете директно на',
-    howToGetAccessHelp: 'Ще ви съдействаме за бързо и лесно активиране на вашия безплатен преподавателски акаунт.',
-    thanksForSupport: 'Благодарим, че подкрепяте дигиталното образование по геодезия!',
+    forTeachersHowTitle: 'Как започвате',
+    forTeachersSteps: [
+      'Регистрирайте се и заявете преподавателски достъп (или използвайте акаунт, ако вече сте одобрени).',
+      'Отворете класната стая, създайте група и споделете кода с учениците.',
+      'Създайте задание — изберете инструмент, режим на калкулатор и краен срок.',
+      'Прегледайте предадените отговори и маркирайте нуждаещите се от внимание.',
+    ],
+    forTeachersPlanFreeTitle: 'Класна стая',
+    forTeachersPlanFreePrice: '0 лв',
+    forTeachersPlanFreeNote: 'За преподаватели в България',
+    forTeachersPlanFreeFeatures: [
+      'Една група (до около 40 ученика)',
+      'Неограничени задания в групата',
+      'Автоматична проверка и код за група',
+      'Режим на калкулатор по задание',
+    ],
+    forTeachersPlanProTitle: 'Класна стая Pro',
+    forTeachersPlanProBadge: 'Пилот',
+    forTeachersPlanProNote: 'За училища и курсове с повече групи — свържете се с нас.',
+    forTeachersPlanProFeatures: [
+      'Неограничени групи',
+      'Експорт CSV и аналитика',
+      'Шаблони за задания',
+      'Приоритетна поддръжка',
+    ],
+    forTeachersPlanProCta: 'Заяви пилот',
+    forTeachersStudentsNote:
+      'Учениците в клас не се нуждаят от платен абонамент. За самостоятелна работа извън задание важат обикновените лимити на сайта.',
+    forTeachersStudentsLink: 'Виж страницата за ученици',
+    forTeachersOpenClassroom: 'Отвори класната стая',
+    howToGetAccess: 'Преподавателски достъп',
+    howToGetAccessText:
+      'Ако сте регистрирани като ученик, подайте заявка по-долу. Можете и да ни пишете на',
+    howToGetAccessHelp:
+      'Ще прегледаме заявката и ще активираме роля „преподавател“, за да виждате класната стая.',
+    howToGetAccessContact: 'Контакти',
+    teacherRequestPlaceholder: 'Кратко съобщение (по избор): училище, предмет, брой часове…',
+    forTeachersThanksTitle: 'Благодарим ви',
+    forTeachersThanksP1:
+      'Оценяваме всеки преподавател, който реши да опита GeoSolver в часовете си — вашата обратна връзка от реални групи ни помага да подобряваме класната стая и инструментите.',
+    forTeachersThanksP2:
+      'GeoSolver е създаден от геодезисти за геодезисти: познаваме задачите, допуските и ритъма на обучението, защото сме минали през същите изчисления в практиката и в зала.',
+    forTeachersThanksP3:
+      'Платформата е в ранен стадий (beta). Възможно е да срещнете грешки или неудобства — ще сме благодарни, ако ни ги съобщите, както и ако споделите идеи за подобрение.',
+    forTeachersThanksContactBefore: 'Пишете ни чрез',
+    forTeachersThanksContactAfter: 'или на team@geosolver.bg.',
+
+    // For Students page
+    forStudentsTitle: 'За ученици',
+    forStudentsDescription:
+      'Задания по геодезия от преподавателя: код за група, предаване на отговори и калкулатор само когато е разрешен.',
+    forStudentsHeadline: 'Задания от учителя на едно място',
+    forStudentsIntro:
+      'Преподавателят ви дава код на група. Влизате, виждате заданията с краен срок и предавате решението. Калкулаторът на сайта се ползва само ако за това задание е разрешено — иначе смятате на тетрадка и въвеждате крайните стойности.',
+    forStudentsFeatures: [
+      {
+        title: 'Код за група',
+        desc: 'Един код от учителя — без отделни настройки за всеки в час.',
+      },
+      {
+        title: 'Ясни задания',
+        desc: 'Виждате условието, кои полета да попълните и до кога е крайният срок.',
+      },
+      {
+        title: 'Калкулатор по правила',
+        desc: 'Изключен, само помощ или пълен достъп — решава преподавателят за всяко задание.',
+      },
+      {
+        title: 'Обратна връзка след предаване',
+        desc: 'След предаване виждате дали сте в допуск и съвети от GAI какво да поправите.',
+      },
+    ],
+    forStudentsHowTitle: 'Как да започнете',
+    forStudentsSteps: [
+      'Регистрирайте се (или влезте с акаунт).',
+      'Отворете „Присъедини се с код“ и въведете кода от преподавателя.',
+      'Изберете задание, решете според указанията и предайте отговора.',
+      'Прегледайте резултата и обратната връзка — при нужда поправете преди крайния срок, ако учителят е разрешил.',
+    ],
+    forStudentsInClassTitle: 'В час с преподавател',
+    forStudentsInClassDesc:
+      'Предаванията в класната стая са безплатни и не изискват платен абонамент. Изчисления в рамките на разрешено задание не намаляват лимита от 5 свободни изчисления на инструментите.',
+    forStudentsSelfStudyTitle: 'Самостоятелна практика',
+    forStudentsSelfStudyDesc:
+      'Извън задание от учител ползвате обикновените калкулатори на сайта — с безплатен лимит от 5 изчисления общо или с Pro абонамент.',
+    forStudentsJoinCta: 'Присъедини се с код',
+    forStudentsRegisterCta: 'Регистрация',
+    forStudentsToolsCta: 'Инструменти за упражнение',
+    forStudentsGaiLink: 'Научете повече за GAI',
+    forStudentsTeachersLink: 'Информация за преподаватели',
+    forStudentsNoteTitle: 'За платформата',
+    forStudentsNoteP1:
+      'GeoSolver е направен от геодезисти за геодезисти — за да улесни същите задачи, които решавате в курса.',
+    forStudentsNoteP2:
+      'Сайтът е в ранен стадий (beta). Ако забележите грешка, кажете ни през контактната форма — ще сме ви благодарни.',
+
+    // GAI page
+    gaiTitle: 'GAI',
+    gaiDescription:
+      'GAI в класната стая — обратна връзка по полета след предаване и преглед на класа за преподавателя.',
+    gaiHeadline: 'Обратна връзка след предаване',
+    gaiIntro:
+      'GAI е помощникът на GeoSolver в класната стая. След като предадете задание, сравнява вашите стойности с очаквания отговор и обяснява къде сте в допуск, къде не — и какъв е вероятният пропуск (знак, единици, десетична запетая).',
+    gaiAcronymNote: 'GAI = GeoSolver Artificial Intelligence',
+    gaiFeatures: [
+      {
+        title: 'Резултат по полета',
+        desc: 'За X₂, Y₂, ъгъл, разстояние и др. — ясно дали стойността е приета, близка или грешна.',
+      },
+      {
+        title: 'Типични грешки',
+        desc: 'Подсказва чести причини: объркан знак, грешка в поредността на величините, объркване ×10.',
+      },
+      {
+        title: 'Поглед към класа',
+        desc: 'Ученикът вижда анонимно обобщение спрямо групата. Преподавателят — статистика за цялото задание.',
+      },
+      {
+        title: 'Четирите задачи',
+        desc: 'Работи с първа и втора основна, права и обратна засечка — същите инструменти като в заданието.',
+      },
+    ],
+    gaiForStudentsTitle: 'Ако сте ученик',
+    gaiForStudentsIntro:
+      'След предаване виждате процент и коментар по всяко поле. Понякога има и кратък съвет преди предаване, ако учителят е разрешил калкулатора.',
+    gaiForStudentsPoints: [
+      'Обратна връзка веднага след предаване',
+      'Без показване на чужи лични отговори',
+      'По избор — по-разговорно обяснение върху фактите',
+    ],
+    gaiForTeachersTitle: 'Ако сте преподавател',
+    gaiForTeachersIntro:
+      'В заданието виждате обобщение за класа: среден резултат, разпределение, най-чести грешки по поле и идеи за следващия час.',
+    gaiForTeachersPoints: [
+      'Анализ на всички предавания по задание',
+      'GAI изводи при преглед на всяко решение',
+      'По избор — кратък текстов преглед за часа',
+    ],
+    gaiHowTitle: 'Как работи',
+    gaiHowSteps: [
+      'Предавате решение — GeoSolver сравнява с очаквания отговор и допуска.',
+      'GAI прилага правила за геодезия и описва грешките по поле.',
+      'Ученикът вижда своята обратна връзка; преподавателят — и обобщение за групата.',
+      'При нужда се добавя по-четим текст върху вече изчислените данни.',
+    ],
+    gaiLimitsTitle: 'Важно',
+    gaiLimitsText:
+      'GAI не решава задачите вместо вас и не дава оценка вместо преподавателя. Работи само в класната стая, при задания с автоматична проверка.',
+    gaiCtaTeachers: 'Страница за преподаватели',
+    gaiCtaStudents: 'Страница за ученици',
 
     // Scientific Calculator
     scientificCalculatorTitle: 'Научен калкулатор',
@@ -249,6 +491,44 @@ export const translations = {
     calcParentheses: 'Скоби',
     calcDecimalPoint: 'Десетична точка',
     calcPercent: 'Процент',
+    calcKeyPi: 'π (пи)',
+    calcKeyE: 'e (експонента)',
+    scientificCalculatorKeywords:
+      'научен калкулатор, калкулатор, математика, тригонометрия, логаритми, степени, изчисления, GeoSolver',
+    calcExampleBasic: [
+      '• 2 + 3 * 4 = 14',
+      '• (2 + 3) * 4 = 20',
+      '• 10 / 2 + 5 = 10',
+      '• 2^3 + 4^2 = 24',
+    ],
+    calcExampleBasicShort: [
+      '• 2 + 3 * 4 = 14',
+      '• (2 + 3) * 4 = 20',
+      '• 10 / 2 + 5 = 10',
+    ],
+    calcExampleTrig: [
+      '• sin(30) = 0.5 (в DEG режим)',
+      '• cos(π/3) = 0.5 (в RAD режим)',
+      '• tan(45) = 1',
+      '• asin(0.5) = 30°',
+    ],
+    calcExampleTrigShort: [
+      '• sin(30) = 0.5 (DEG режим)',
+      '• cos(π/3) = 0.5 (RAD режим)',
+      '• tan(45) = 1',
+    ],
+    calcExampleLogs: [
+      '• log(100) = 2',
+      '• ln(e) = 1',
+      '• 10^2 = 100',
+      '• √16 = 4',
+    ],
+    calcExampleSpecial: [
+      '• 5! = 120',
+      '• 10 mod 3 = 1',
+      '• 1/4 = 0.25',
+      '• π * 2 = 6.283',
+    ],
 
     // Login page
     loginTitle: 'Вход',
@@ -260,6 +540,7 @@ export const translations = {
     enterPassword: 'Въведете паролата си',
     rememberMe: 'Запомни ме',
     forgotPassword: 'Забравена парола',
+    loginWithGoogle: 'Вход с Google',
     loggingIn: 'Вход...',
     or: 'или',
     successLogin: 'Успешен вход!',
@@ -300,6 +581,7 @@ export const translations = {
     student: 'Студент',
     teacher: 'Учител',
     administrator: 'Администратор',
+    administratorShort: 'Админ',
     name: 'Име',
     role: 'Роля',
     registration: 'Регистрация',
@@ -315,6 +597,7 @@ export const translations = {
     prices: 'Prices',
     contacts: 'Contacts',
     forTeachers: 'For Teachers',
+    gai: 'GAI',
     account: 'Account',
     login: 'Login',
     logout: 'Logout',
@@ -329,7 +612,7 @@ export const translations = {
     socialNetworks: 'Social Networks',
     language: 'English',
     theme: 'Light Mode',
-    copyright: '© GEOSOLVER, 2025.\nAll rights reserved.\nCurrent version: v3.1.9-beta.2',
+    copyright: '© GEOSOLVER, 2025.\nAll rights reserved.\nCurrent version: v3.2.0-beta.2',
     wortexaFooterBefore: 'is part of the ',
     wortexaFooterAfter: ' product family',
 
@@ -337,6 +620,44 @@ export const translations = {
     firstTaskTitle: 'First Basic Task',
     firstTaskDescription: 'Calculate coordinates using initial point, angle, and distance with online geodetic calculator. Fast and accurate solutions for surveyors.',
     firstTaskKeywords: 'geodesy, online calculator, first basic task, coordinates, angle, distance, transformation, geodetic calculations',
+    secondTaskTitle: 'Second Basic Task',
+    secondTaskDescription:
+      'Calculate distance and bearing between two points from coordinates with the online geodetic calculator.',
+    secondTaskKeywords:
+      'geodesy, second basic task, distance, bearing, coordinates, geodetic calculator',
+    secondTaskDefaultResultText:
+      'Enter coordinates and click "Calculate" to see results here.',
+    forwardIntersectionDescription:
+      'Forward intersection — determine point coordinates from two known points and angles.',
+    forwardIntersectionKeywords:
+      'geodesy, forward intersection, triangulation, coordinates, geodetic calculator',
+    resectionDescription:
+      'Resection — determine station position from angles at three known points.',
+    resectionKeywords:
+      'geodesy, resection, Hansen, coordinates, geodetic calculator',
+    resectionDefaultResultText:
+      'Enter the coordinates of the three points and two angles, then click "Calculate".',
+    fillAllFields: 'Please fill in all fields.',
+    enterX1Short: 'Enter X₁',
+    enterY1Short: 'Enter Y₁',
+    enterX2Short: 'Enter X₂',
+    enterY2Short: 'Enter Y₂',
+    docsFirstTaskSeoDescription:
+      'Documentation for the first basic geodetic task: theory, formulas, sign table, GeoSolver verification, and a worked example.',
+    docsFirstTaskSeoKeywords:
+      'first basic task, documentation, geodesy, formulas, gon, coordinates, GeoSolver',
+    docsSecondTaskSeoDescription:
+      'Documentation for the second basic task: inverse computation of distance and bearing, quadrants, and back-check.',
+    docsSecondTaskSeoKeywords:
+      'second basic task, documentation, inverse task, distance, bearing, GeoSolver',
+    docsForwardIntersectionSeoDescription:
+      'Documentation for forward intersection: law of sines, double determination of point P, angle constraints, and example.',
+    docsForwardIntersectionSeoKeywords:
+      'forward intersection, documentation, triangulation, geodesy, GeoSolver',
+    docsResectionSeoDescription:
+      'Documentation for resection: three control points, angles at station P, Hansen method, and angle verification.',
+    docsResectionSeoKeywords:
+      'resection, documentation, Hansen, triangulation, geodesy, GeoSolver',
     inputData: 'Input Data',
     results: 'Results',
     y1Coordinate: 'Y₁ (coordinate)',
@@ -427,6 +748,53 @@ export const translations = {
     user: 'User',
     logoutFromAccount: 'Log out of account',
     settings: 'Settings',
+    settingsPanel: {
+      title: 'Settings',
+      subtitle: 'Profile, appearance, security and preferences',
+      backToAccount: 'Back to account',
+      close: 'Close',
+      sections: {
+        profile: 'Profile',
+        appearance: 'Appearance',
+        security: 'Security',
+        preferences: 'Preferences',
+        privacy: 'Privacy',
+      },
+      profileDesc: 'Basic information for your GeoSolver account.',
+      profileHint: 'Contact support to change your name or email.',
+      nameLabel: 'Name',
+      emailLabel: 'Email',
+      roleLabel: 'Role',
+      memberSince: 'Member since',
+      appearanceDesc: 'Interface language and light/dark theme.',
+      languageLabel: 'Language',
+      langBg: 'Български',
+      langEn: 'English',
+      themeLabel: 'Theme',
+      themeLight: 'Light',
+      themeDark: 'Dark',
+      securityDesc: 'Manage your password and account access.',
+      changePassword: 'Change password',
+      currentPassword: 'Current password',
+      newPassword: 'New password',
+      confirmPassword: 'Confirm new password',
+      savePassword: 'Save password',
+      saving: 'Saving...',
+      passwordFillAll: 'Please fill in all fields.',
+      passwordMismatch: 'New passwords do not match.',
+      passwordTooShort: 'Password must be at least 6 characters.',
+      passwordSuccess: 'Password updated successfully.',
+      passwordFailed: 'Failed to change password.',
+      forgotPasswordLink: 'Forgot password?',
+      googleSignInTitle: 'Signed in with Google',
+      googleSignInDesc: 'This account uses Google sign-in. Password change is not available — manage access from your Google account.',
+      preferencesDesc: 'Additional options for using the platform.',
+      toolsInDevLabel: 'Tools in development',
+      toolsInDevDesc: 'Shows menu items for tools not yet publicly released.',
+      privacyDesc: 'Policies, cookies and legal information.',
+      cookieReset: 'Change cookie choice',
+      cookieResetHint: 'Reloads the page',
+    },
     professionalPlanMonthly: 'Professional Plan (Monthly)',
     daysFromStart: 'days since the start of your plan',
     daysToNext: 'days until the next payment',
@@ -494,23 +862,179 @@ export const translations = {
 
     // For Teachers page
     forTeachersTitle: 'For Teachers',
-    forTeachersDescription: 'GeoSolver provides geodesy teachers in Bulgaria with free access to professional tools for checking, analyzing and creating tasks. Fast, secure and modern education!',
-    forTeachersHeadline: 'Your digital assistant in geodesy education',
-    forTeachersIntro: 'GeoSolver provides geodesy teachers in Bulgaria with completely free access to all professional platform tools. Our mission is to make teaching easier, improve education quality and save teachers time through automation and digitization of the task checking and analysis process.',
+    forTeachersDescription:
+      'GeoSolver classroom for geodesy teachers: groups, assignments, auto-grading, and per-task calculator control.',
+    forTeachersHeadline: 'Classroom for geodesy at school',
+    forTeachersIntro:
+      'Create groups, assign tasks with clear inputs, and collect student submissions in one place. Grading is automatic; you decide whether the calculator is allowed for each assignment.',
     forTeachersFeatures: [
-      { title: 'Fast and secure task checking', desc: 'Check student solutions in seconds. GeoSolver eliminates the risk of human error with 99.9% accuracy.' },
-      { title: 'Creating sample tasks and tests', desc: 'Generate and share tasks for classwork and homework with a few clicks.' },
-      { title: 'Error analysis and automatic explanations', desc: 'Get detailed analysis of each step and automatic explanations for mistakes made.' },
-      { title: 'Full documentation for each task', desc: 'Each task comes with detailed documentation, examples and explanations of solution methods.' },
-      { title: 'Privacy and security', desc: 'Your and your students\' data is protected with the highest level of security.' },
-      { title: 'Ongoing support and training', desc: 'You get access to specialized support and training for working with the platform.' },
-      { title: 'Access to new features', desc: 'Teachers get early access to new tools and capabilities.' },
-      { title: 'Coming soon: Task scanning from photo', desc: 'We are planning the ability to directly upload and automatically recognize tasks from a photo. This will speed up checking by up to 70% and save valuable time.' }
+      {
+        title: 'Groups and join code',
+        desc: 'Students join with a code — no per-device setup in class.',
+      },
+      {
+        title: 'Assignments with deadlines',
+        desc: 'Set the problem, expected result, and calculator mode: off, guided, or full access.',
+      },
+      {
+        title: 'Automatic checking',
+        desc: 'After submission you see score, errors, and a review queue — without hand-checking every solution.',
+      },
+      {
+        title: 'Tools and documentation',
+        desc: 'Four core geodetic tasks with short docs — suitable for exercises and tests.',
+      },
     ],
-    howToGetAccess: 'How to get access?',
-    howToGetAccessText: 'Contact us via the contact form (from the Contacts menu) or email us directly at',
-    howToGetAccessHelp: 'We will help you quickly and easily activate your free teacher account.',
-    thanksForSupport: 'Thank you for supporting digital geodesy education!',
+    forTeachersHowTitle: 'How to get started',
+    forTeachersSteps: [
+      'Register and request teacher access (or sign in if already approved).',
+      'Open the classroom, create a group, and share the code with students.',
+      'Create an assignment — pick a tool, calculator mode, and due date.',
+      'Review submissions and flag students who need follow-up.',
+    ],
+    forTeachersPlanFreeTitle: 'Classroom',
+    forTeachersPlanFreePrice: '€0',
+    forTeachersPlanFreeNote: 'For teachers in Bulgaria',
+    forTeachersPlanFreeFeatures: [
+      'One group (up to ~40 students)',
+      'Unlimited assignments in the group',
+      'Auto-grading and group code',
+      'Calculator mode per assignment',
+    ],
+    forTeachersPlanProTitle: 'Classroom Pro',
+    forTeachersPlanProBadge: 'Pilot',
+    forTeachersPlanProNote: 'For schools and courses with multiple groups — contact us.',
+    forTeachersPlanProFeatures: [
+      'Unlimited groups',
+      'CSV export and analytics',
+      'Assignment templates',
+      'Priority support',
+    ],
+    forTeachersPlanProCta: 'Request pilot',
+    forTeachersStudentsNote:
+      'Students in class do not need a paid subscription. For self-study outside assignments, normal site limits apply.',
+    forTeachersStudentsLink: 'See the page for students',
+    forTeachersOpenClassroom: 'Open classroom',
+    howToGetAccess: 'Teacher access',
+    howToGetAccessText:
+      'If you registered as a student, submit a request below. You can also email us at',
+    howToGetAccessHelp:
+      'We will review your request and enable the teacher role so you can use the classroom.',
+    howToGetAccessContact: 'Contact',
+    teacherRequestPlaceholder: 'Short message (optional): school, subject, class size…',
+    forTeachersThanksTitle: 'Thank you',
+    forTeachersThanksP1:
+      'We appreciate every teacher who tries GeoSolver in class — your feedback from real groups helps us improve the classroom and our tools.',
+    forTeachersThanksP2:
+      'GeoSolver is built by geodesists for geodesists: we know the tasks, tolerances, and pace of teaching because we have worked through the same calculations in practice and in the classroom.',
+    forTeachersThanksP3:
+      'The platform is in an early stage (beta). You may run into bugs or rough edges — we would be grateful if you report them and share ideas for improvement.',
+    forTeachersThanksContactBefore: 'Reach us via the',
+    forTeachersThanksContactAfter: 'or at team@geosolver.bg.',
+
+    // For Students page
+    forStudentsTitle: 'For students',
+    forStudentsDescription:
+      'Geodesy assignments from your teacher: group code, submit answers, calculator only when allowed.',
+    forStudentsHeadline: 'Teacher assignments in one place',
+    forStudentsIntro:
+      'Your teacher gives you a group code. You sign in, see assignments with due dates, and submit your solution. Use the site calculator only when that assignment allows it — otherwise work on paper and enter final values.',
+    forStudentsFeatures: [
+      {
+        title: 'Group code',
+        desc: 'One code from your teacher — no per-device setup in class.',
+      },
+      {
+        title: 'Clear assignments',
+        desc: 'See the problem, which fields to fill, and the deadline.',
+      },
+      {
+        title: 'Calculator rules',
+        desc: 'Off, guided, or full access — your teacher decides per assignment.',
+      },
+      {
+        title: 'Feedback after submit',
+        desc: 'After submitting, see if you are within tolerance and GAI tips on what to fix.',
+      },
+    ],
+    forStudentsHowTitle: 'How to get started',
+    forStudentsSteps: [
+      'Register (or sign in).',
+      'Open “Join with code” and enter your teacher’s code.',
+      'Pick an assignment, solve as instructed, and submit.',
+      'Review your result and feedback — resubmit before the deadline if your teacher allows it.',
+    ],
+    forStudentsInClassTitle: 'In class with your teacher',
+    forStudentsInClassDesc:
+      'Classroom submissions are free and do not require a paid plan. Calculations within an allowed assignment do not use your 5 free tool calculations.',
+    forStudentsSelfStudyTitle: 'Self-study practice',
+    forStudentsSelfStudyDesc:
+      'Outside teacher assignments, use the site calculators — 5 free calculations total or a Pro subscription.',
+    forStudentsJoinCta: 'Join with code',
+    forStudentsRegisterCta: 'Register',
+    forStudentsToolsCta: 'Practice tools',
+    forStudentsGaiLink: 'Learn more about GAI',
+    forStudentsTeachersLink: 'Information for teachers',
+    forStudentsNoteTitle: 'About the platform',
+    forStudentsNoteP1:
+      'GeoSolver is built by geodesists for geodesists — to make the same tasks you study easier to practice.',
+    forStudentsNoteP2:
+      'The site is in an early stage (beta). If you spot a bug, tell us via the contact form — we appreciate it.',
+
+    // GAI page
+    gaiTitle: 'GAI',
+    gaiDescription:
+      'GAI in the classroom — field-level feedback after submit and class overview for teachers.',
+    gaiHeadline: 'Feedback after you submit',
+    gaiIntro:
+      'GAI is GeoSolver’s assistant in the classroom. After you submit an assignment, it compares your values to the expected answer and explains what is within tolerance, what is not — and the likely slip-up (sign, units, decimal place).',
+    gaiAcronymNote: 'GAI = GeoSolver Artificial Intelligence',
+    gaiFeatures: [
+      {
+        title: 'Results per field',
+        desc: 'For X₂, Y₂, angle, distance, etc. — clearly accepted, close, or wrong.',
+      },
+      {
+        title: 'Typical mistakes',
+        desc: 'Hints at common causes: sign errors, swapped values, ×10 decimal mistakes.',
+      },
+      {
+        title: 'Class context',
+        desc: 'Students see anonymous group summary. Teachers get stats for the whole assignment.',
+      },
+      {
+        title: 'Four task types',
+        desc: 'Works with first and second basic tasks, forward and resection — same as in assignments.',
+      },
+    ],
+    gaiForStudentsTitle: 'If you are a student',
+    gaiForStudentsIntro:
+      'After submit you see a score and comments per field. Sometimes a short hint appears before submit if your teacher allowed the calculator.',
+    gaiForStudentsPoints: [
+      'Feedback right after submission',
+      'No other students’ personal answers shown',
+      'Optional — clearer wording on top of the facts',
+    ],
+    gaiForTeachersTitle: 'If you are a teacher',
+    gaiForTeachersIntro:
+      'On the assignment you see a class summary: average, distribution, common field errors, and ideas for the next lesson.',
+    gaiForTeachersPoints: [
+      'Analytics across all submissions for one assignment',
+      'GAI notes when reviewing each solution',
+      'Optional — short narrative for planning class',
+    ],
+    gaiHowTitle: 'How it works',
+    gaiHowSteps: [
+      'You submit — GeoSolver compares to the expected answer and tolerance.',
+      'GAI applies geodesy rules and describes errors per field.',
+      'The student sees personal feedback; the teacher sees group summary too.',
+      'When needed, readable text is added on top of computed data.',
+    ],
+    gaiLimitsTitle: 'Important',
+    gaiLimitsText:
+      'GAI does not solve tasks for you and does not grade instead of the teacher. It only works in the classroom for auto-checked assignments.',
+    gaiCtaTeachers: 'Page for teachers',
+    gaiCtaStudents: 'Page for students',
 
     // Scientific Calculator
     scientificCalculatorTitle: 'Scientific Calculator',
@@ -559,6 +1083,44 @@ export const translations = {
     calcParentheses: 'Parentheses',
     calcDecimalPoint: 'Decimal point',
     calcPercent: 'Percent',
+    calcKeyPi: 'π (pi)',
+    calcKeyE: 'e (Euler\'s number)',
+    scientificCalculatorKeywords:
+      'scientific calculator, calculator, math, trigonometry, logarithms, powers, calculations, GeoSolver',
+    calcExampleBasic: [
+      '• 2 + 3 * 4 = 14',
+      '• (2 + 3) * 4 = 20',
+      '• 10 / 2 + 5 = 10',
+      '• 2^3 + 4^2 = 24',
+    ],
+    calcExampleBasicShort: [
+      '• 2 + 3 * 4 = 14',
+      '• (2 + 3) * 4 = 20',
+      '• 10 / 2 + 5 = 10',
+    ],
+    calcExampleTrig: [
+      '• sin(30) = 0.5 (in DEG mode)',
+      '• cos(π/3) = 0.5 (in RAD mode)',
+      '• tan(45) = 1',
+      '• asin(0.5) = 30°',
+    ],
+    calcExampleTrigShort: [
+      '• sin(30) = 0.5 (DEG mode)',
+      '• cos(π/3) = 0.5 (RAD mode)',
+      '• tan(45) = 1',
+    ],
+    calcExampleLogs: [
+      '• log(100) = 2',
+      '• ln(e) = 1',
+      '• 10^2 = 100',
+      '• √16 = 4',
+    ],
+    calcExampleSpecial: [
+      '• 5! = 120',
+      '• 10 mod 3 = 1',
+      '• 1/4 = 0.25',
+      '• π * 2 = 6.283',
+    ],
 
     // Login page
     loginTitle: 'Login',
@@ -570,6 +1132,7 @@ export const translations = {
     enterPassword: 'Enter your password',
     rememberMe: 'Remember me',
     forgotPassword: 'Forgot password',
+    loginWithGoogle: 'Sign in with Google',
     loggingIn: 'Logging in...',
     or: 'or',
     successLogin: 'Login successful!',
@@ -610,6 +1173,7 @@ export const translations = {
     student: 'Student',
     teacher: 'Teacher',
     administrator: 'Administrator',
+    administratorShort: 'Admin',
     name: 'Name',
     role: 'Role',
     registration: 'Registration',

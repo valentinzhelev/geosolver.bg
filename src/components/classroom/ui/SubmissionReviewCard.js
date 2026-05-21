@@ -43,14 +43,14 @@ const SubmissionReviewCard = ({
           <div className="font-bold font-['Manrope'] text-black dark:text-white">
             {s.student?.name || s.student?.email}
           </div>
-          <div className="text-sm text-neutral-500">
+          <div className="text-sm text-neutral-500 dark:text-zinc-400">
             {s.assignment?.title}
             {s.assignment?.course?.name && ` · ${s.assignment.course.name}`}
           </div>
           {assignmentId && (
             <Link
               to={`/classroom/teaching/assignments/${assignmentId}`}
-              className="text-xs text-neutral-500 hover:text-black dark:hover:text-white mt-1 inline-block font-['Manrope']"
+              className="text-xs text-neutral-500 dark:text-zinc-400 hover:text-black dark:hover:text-white mt-1 inline-block font-['Manrope']"
             >
               {bg ? 'Към заданието →' : 'View assignment →'}
             </Link>
@@ -65,7 +65,7 @@ const SubmissionReviewCard = ({
             <div className="font-semibold">{Math.round(s.finalScore)}%</div>
           )}
           {s.submittedAt && (
-            <div className="text-xs text-neutral-400">
+            <div className="text-xs text-neutral-400 dark:text-zinc-400">
               {new Date(s.submittedAt).toLocaleString(bg ? 'bg-BG' : 'en-US')}
             </div>
           )}
@@ -74,14 +74,14 @@ const SubmissionReviewCard = ({
 
       {answerEntries.length > 0 && (
         <div className="px-3 py-3 rounded-lg bg-stone-50 dark:bg-zinc-800">
-          <span className="text-xs text-neutral-500 font-['Manrope'] block mb-2">
+          <span className="text-xs text-neutral-500 dark:text-zinc-400 font-['Manrope'] block mb-2">
             {bg ? 'Отговори на ученика' : 'Student answers'} · {bg ? 'вариант' : 'variant'}{' '}
             {(s.variantIndex ?? 0) + 1}
           </span>
           <div className="grid sm:grid-cols-2 gap-2">
             {answerEntries.map((row) => (
               <div key={row.key} className="text-sm font-['Manrope']">
-                <span className="text-neutral-500">{row.label}: </span>
+                <span className="text-neutral-500 dark:text-zinc-400">{row.label}: </span>
                 <span className="font-mono text-black dark:text-white">{formatAnswerValue(row.value)}</span>
               </div>
             ))}
@@ -91,7 +91,7 @@ const SubmissionReviewCard = ({
 
       {comparisonRows.length > 0 && (
         <div className="px-3 py-3 rounded-lg border border-stone-200 dark:border-zinc-700">
-          <span className="text-xs text-neutral-500 font-['Manrope'] block mb-2">
+          <span className="text-xs text-neutral-500 dark:text-zinc-400 font-['Manrope'] block mb-2">
             {bg ? 'Сравнение с верния отговор' : 'Comparison with solution'}
           </span>
           <ul className="flex flex-col gap-1 text-sm font-['Manrope']">
@@ -99,7 +99,7 @@ const SubmissionReviewCard = ({
               <li key={row.field} className="flex flex-wrap gap-2 items-center">
                 <span className="font-medium">{fieldLabel(row.field)}</span>
                 <span className="font-mono">{formatAnswerValue(row.studentValue)}</span>
-                <span className="text-neutral-400">→ {formatAnswerValue(row.correctValue)}</span>
+                <span className="text-neutral-400 dark:text-zinc-400">→ {formatAnswerValue(row.correctValue)}</span>
                 <span
                   className={
                     row.isCorrect

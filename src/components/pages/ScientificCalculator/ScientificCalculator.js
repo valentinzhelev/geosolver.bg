@@ -56,6 +56,22 @@ function preprocess(expr, angleMode) {
   return e;
 }
 
+const CALC_BTN =
+  "px-2 py-2 bg-white dark:bg-zinc-800 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700 text-black dark:text-white text-sm font-medium font-['Manrope'] hover:bg-stone-100 dark:hover:bg-zinc-700 active:bg-stone-200 dark:active:bg-zinc-600 transition-colors";
+
+const CALC_BTN_PRIMARY =
+  "px-2 py-2 bg-black dark:bg-white rounded-lg text-white dark:text-black text-sm font-semibold font-['Manrope'] hover:opacity-90 transition-opacity";
+
+const DOC_PANEL = 'w-full bg-stone-50 dark:bg-zinc-800/80 rounded-xl p-4 border border-gray-100 dark:border-zinc-700/80';
+
+const ExampleList = ({ lines, className = 'text-neutral-600 dark:text-zinc-400 space-y-1' }) => (
+  <div className={className}>
+    {(lines || []).map((line, i) => (
+      <div key={i}>{line}</div>
+    ))}
+  </div>
+);
+
 const ScientificCalculator = () => {
   const { t } = useTranslation();
   const docRows = t.calcDocRows || [];
@@ -154,39 +170,49 @@ const ScientificCalculator = () => {
       <SEO
         title={t.scientificCalculatorTitle}
         description={t.scientificCalculatorDesc}
-        keywords="научен калкулатор, калкулатор, математика, тригонометрия, логаритми, степени, изчисления, GeoSolver"
-        canonical="/tools/scientific-calculator"
+        keywords={t.scientificCalculatorKeywords}
+        canonical="/scientific-calculator"
       />
       <Layout>
-        <div className="w-full min-h-screen bg-stone-50 flex flex-col items-center py-8 px-2 md:px-0">
+        <div className="w-full min-h-screen bg-stone-50 dark:bg-zinc-950 transition-colors flex flex-col items-center py-8 px-2 md:px-0">
           <div className="w-full max-w-[1180px] flex flex-col gap-10">
             <div className="flex flex-col gap-10 w-full">
-              <h1 className="text-black text-3xl font-bold font-['Manrope']">{t.scientificCalculatorTitle}</h1>
-              <div className="w-full p-4 bg-white rounded-xl border border-gray-200 flex flex-col gap-4">
+              <h1 className="text-black dark:text-white text-3xl font-bold font-['Manrope']">{t.scientificCalculatorTitle}</h1>
+              <div className="w-full p-4 md:p-6 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex flex-col gap-4 shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)]">
                 {/* Дисплей */}
-                <div className="flex flex-row items-center justify-between mb-2">
-                  <div className="flex gap-2">
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-1">
+                  <div className="inline-flex flex-wrap gap-1 rounded-lg bg-stone-100 dark:bg-zinc-800 p-0.5">
                     {angleModes.map((mode) => (
                       <button
                         key={mode.value}
+                        type="button"
                         onClick={() => setAngleMode(mode.value)}
-                        className={`px-3 py-1 rounded-lg text-sm font-semibold font-['Manrope'] outline outline-1 outline-gray-200 transition ${angleMode === mode.value ? 'bg-black text-white' : 'bg-white text-black'}`}
+                        className={`px-3 py-1.5 rounded-md text-sm font-semibold font-['Manrope'] transition-colors ${
+                          angleMode === mode.value
+                            ? 'bg-black dark:bg-white text-white dark:text-black shadow-sm'
+                            : 'text-neutral-600 dark:text-zinc-400 hover:text-black dark:hover:text-white'
+                        }`}
                       >
                         {mode.label}
                       </button>
                     ))}
                   </div>
-                  <div className="bg-gray-100 rounded-lg px-4 py-2 text-right text-xl font-mono text-black min-w-[200px]">
-                    {expression || "0"}
-                    <div className="text-xs text-neutral-500">= {result}</div>
+                  <div className="w-full lg:min-w-[240px] lg:max-w-md bg-stone-100 dark:bg-zinc-950 rounded-lg px-4 py-3 text-right border border-gray-200 dark:border-zinc-700">
+                    <div className="text-lg md:text-xl font-mono text-neutral-500 dark:text-zinc-400 break-all min-h-[1.5rem]">
+                      {expression || '0'}
+                    </div>
+                    <div className="text-xl md:text-2xl font-mono font-semibold text-black dark:text-white break-all">
+                      = {result}
+                    </div>
                   </div>
                 </div>
                 {/* Бутони */}
-                <div className="w-full grid grid-cols-9 gap-2">
+                <div className="w-full grid grid-cols-5 sm:grid-cols-7 md:grid-cols-9 gap-1.5 md:gap-2">
                   {scientificButtons.flat().map((btn, i) => (
                     <button
                       key={btn + i}
-                      className="px-2 py-2 bg-white rounded outline outline-1 outline-gray-200 text-black text-sm font-medium font-['Manrope'] hover:bg-gray-50 transition"
+                      type="button"
+                      className={btn === '=' ? CALC_BTN_PRIMARY : CALC_BTN}
                       onClick={() => handleButton(btn)}
                     >
                       {btn}
@@ -195,9 +221,9 @@ const ScientificCalculator = () => {
                 </div>
                 {/* История */}
                 {history.length > 0 && (
-                  <div className="mt-4">
-                    <div className="text-sm text-neutral-500 mb-1">{t.calcHistory}</div>
-                    <ul className="text-xs text-neutral-700 space-y-1">
+                  <div className="mt-2 pt-4 border-t border-gray-100 dark:border-zinc-800">
+                    <div className="text-sm font-medium text-neutral-500 dark:text-zinc-400 mb-2 font-['Manrope']">{t.calcHistory}</div>
+                    <ul className="text-xs text-neutral-700 dark:text-zinc-300 space-y-1 font-mono">
                       {history.slice(0, 5).map((h, i) => (
                         <li key={i}>{h.expr} = <b>{h.res}</b></li>
                       ))}
@@ -208,99 +234,79 @@ const ScientificCalculator = () => {
             </div>
             {/* Документация */}
             {/* Desktop version */}
-            <div className="hidden md:flex w-full p-6 bg-white rounded-3xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-1px] outline-gray-200 flex-col gap-6">
-              <div className="justify-start text-black text-3xl font-bold font-['Manrope']">{t.calcDocumentation}</div>
+            <div className="hidden md:flex w-full p-6 bg-white dark:bg-zinc-900 rounded-3xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex-col gap-6">
+              <div className="justify-start text-black dark:text-white text-3xl font-bold font-['Manrope']">{t.calcDocumentation}</div>
               
               {/* Примери */}
-              <div className="w-full bg-stone-50 rounded-xl p-4">
-                <div className="text-black text-lg font-semibold font-['Manrope'] mb-3">{t.calcUsageExamples}</div>
+              <div className={DOC_PANEL}>
+                <div className="text-black dark:text-white text-lg font-semibold font-['Manrope'] mb-3">{t.calcUsageExamples}</div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <div>
-                    <div className="font-medium text-black mb-2">{t.calcBasicOps}</div>
-                    <div className="text-neutral-600 space-y-1">
-                      <div>• 2 + 3 * 4 = 14</div>
-                      <div>• (2 + 3) * 4 = 20</div>
-                      <div>• 10 / 2 + 5 = 10</div>
-                      <div>• 2^3 + 4^2 = 24</div>
-                    </div>
+                    <div className="font-medium text-black dark:text-white mb-2">{t.calcBasicOps}</div>
+                    <ExampleList lines={t.calcExampleBasic} />
                   </div>
                   <div>
-                    <div className="font-medium text-black mb-2">{t.calcTrigonometry}</div>
-                    <div className="text-neutral-600 space-y-1">
-                      <div>• sin(30) = 0.5 (в DEG режим)</div>
-                      <div>• cos(π/3) = 0.5 (в RAD режим)</div>
-                      <div>• tan(45) = 1</div>
-                      <div>• asin(0.5) = 30°</div>
-                    </div>
+                    <div className="font-medium text-black dark:text-white mb-2">{t.calcTrigonometry}</div>
+                    <ExampleList lines={t.calcExampleTrig} />
                   </div>
                   <div>
-                    <div className="font-medium text-black mb-2">{t.calcLogsPowers}</div>
-                    <div className="text-neutral-600 space-y-1">
-                      <div>• log(100) = 2</div>
-                      <div>• ln(e) = 1</div>
-                      <div>• 10^2 = 100</div>
-                      <div>• √16 = 4</div>
-                    </div>
+                    <div className="font-medium text-black dark:text-white mb-2">{t.calcLogsPowers}</div>
+                    <ExampleList lines={t.calcExampleLogs} />
                   </div>
                   <div>
-                    <div className="font-medium text-black mb-2">{t.calcSpecialFuncs}</div>
-                    <div className="text-neutral-600 space-y-1">
-                      <div>• 5! = 120</div>
-                      <div>• 10 mod 3 = 1</div>
-                      <div>• 1/4 = 0.25</div>
-                      <div>• π * 2 = 6.283</div>
-                    </div>
+                    <div className="font-medium text-black dark:text-white mb-2">{t.calcSpecialFuncs}</div>
+                    <ExampleList lines={t.calcExampleSpecial} />
                   </div>
                 </div>
               </div>
               
               {/* Клавиатурни съкращения */}
-              <div className="w-full bg-stone-50 rounded-xl p-4">
-                <div className="text-black text-lg font-semibold font-['Manrope'] mb-3">{t.calcKeyboardShortcuts}</div>
+              <div className={DOC_PANEL}>
+                <div className="text-black dark:text-white text-lg font-semibold font-['Manrope'] mb-3">{t.calcKeyboardShortcuts}</div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <div>
-                    <div className="font-medium text-black mb-2">{t.calcBasicKeys}</div>
-                    <div className="text-neutral-600 space-y-1">
-                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">0-9</span> - {t.calcDigits}</div>
-                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">+ - * /</span> - {t.calcOperations}</div>
-                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">Enter</span> - {t.calcCalculate}</div>
-                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">Backspace</span> - {t.calcDelete}</div>
-                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">Escape</span> - {t.calcClear}</div>
+                    <div className="font-medium text-black dark:text-white mb-2">{t.calcBasicKeys}</div>
+                    <div className="text-neutral-600 dark:text-zinc-400 space-y-1">
+                      <div>• <span className="font-mono bg-gray-200 dark:bg-zinc-700 px-1 rounded">0-9</span> - {t.calcDigits}</div>
+                      <div>• <span className="font-mono bg-gray-200 dark:bg-zinc-700 px-1 rounded">+ - * /</span> - {t.calcOperations}</div>
+                      <div>• <span className="font-mono bg-gray-200 dark:bg-zinc-700 px-1 rounded">Enter</span> - {t.calcCalculate}</div>
+                      <div>• <span className="font-mono bg-gray-200 dark:bg-zinc-700 px-1 rounded">Backspace</span> - {t.calcDelete}</div>
+                      <div>• <span className="font-mono bg-gray-200 dark:bg-zinc-700 px-1 rounded">Escape</span> - {t.calcClear}</div>
                     </div>
                   </div>
                   <div>
-                    <div className="font-medium text-black mb-2">{t.calcSpecialKeys}</div>
-                    <div className="text-neutral-600 space-y-1">
-                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">( )</span> - {t.calcParentheses}</div>
-                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">.</span> - {t.calcDecimalPoint}</div>
-                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">%</span> - {t.calcPercent}</div>
-                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">P</span> - π (пи)</div>
-                      <div>• <span className="font-mono bg-gray-200 px-1 rounded">E</span> - e (експонента)</div>
+                    <div className="font-medium text-black dark:text-white mb-2">{t.calcSpecialKeys}</div>
+                    <div className="text-neutral-600 dark:text-zinc-400 space-y-1">
+                      <div>• <span className="font-mono bg-gray-200 dark:bg-zinc-700 px-1 rounded">( )</span> - {t.calcParentheses}</div>
+                      <div>• <span className="font-mono bg-gray-200 dark:bg-zinc-700 px-1 rounded">.</span> - {t.calcDecimalPoint}</div>
+                      <div>• <span className="font-mono bg-gray-200 dark:bg-zinc-700 px-1 rounded">%</span> - {t.calcPercent}</div>
+                      <div>• <span className="font-mono bg-gray-200 dark:bg-zinc-700 px-1 rounded">P</span> - {t.calcKeyPi}</div>
+                      <div>• <span className="font-mono bg-gray-200 dark:bg-zinc-700 px-1 rounded">E</span> - {t.calcKeyE}</div>
                     </div>
                   </div>
                 </div>
               </div>
               
-              <div className="self-stretch bg-stone-50 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-start items-start gap-px overflow-hidden">
+              <div className="self-stretch bg-stone-50 dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex flex-col justify-start items-start gap-px overflow-hidden">
                 <div className="self-stretch shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] inline-flex justify-start items-start gap-px">
-                  <div className="w-72 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                    <div className="justify-start text-black text-sm font-medium font-['Manrope']">Бутон</div>
+                  <div className="w-72 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                    <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{t.calcButton}</div>
                   </div>
-                  <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                    <div className="justify-start text-black text-sm font-medium font-['Manrope']">Употреба</div>
+                  <div className="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                    <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{t.calcUsage}</div>
                   </div>
                 </div>
                 {docRows.map((row, idx) => (
                   <div key={idx} className="self-stretch inline-flex justify-start items-center gap-px">
-                    <div className="w-72 px-3 py-2 bg-white flex justify-center items-center gap-1 flex-wrap content-center">
+                    <div className="w-72 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-1 flex-wrap content-center">
                       {row.buttons.map((b, i) => (
-                        <div key={i} className="px-2 py-1 bg-white rounded outline outline-1 outline-offset-[-1px] outline-gray-200 flex justify-center items-center gap-3">
-                          <div className="justify-start text-black text-sm font-medium font-['Manrope']">{b}</div>
+                        <div key={i} className="px-2 py-1 bg-white dark:bg-zinc-900 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex justify-center items-center gap-3">
+                          <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{b}</div>
                         </div>
                       ))}
                     </div>
-                    <div className="flex-1 self-stretch px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                      <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{row.usage}</div>
+                    <div className="flex-1 self-stretch px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                      <div className="justify-start text-neutral-400 dark:text-zinc-400 text-sm font-medium font-['Manrope']">{row.usage}</div>
                     </div>
                   </div>
                 ))}
@@ -308,85 +314,72 @@ const ScientificCalculator = () => {
             </div>
             {/* Mobile version */}
             <div className="flex md:hidden self-stretch inline-flex flex-col justify-start items-start gap-3">
-              <div className="justify-start text-black text-lg font-bold font-['Manrope']">{t.calcDocumentation}</div>
+              <div className="justify-start text-black dark:text-white text-lg font-bold font-['Manrope']">{t.calcDocumentation}</div>
               
               {/* Примери за мобилна версия */}
-              <div className="w-full bg-stone-50 rounded-xl p-4">
-                <div className="text-black text-base font-semibold font-['Manrope'] mb-3">{t.calcUsageExamples}</div>
+              <div className={DOC_PANEL}>
+                <div className="text-black dark:text-white text-base font-semibold font-['Manrope'] mb-3">{t.calcUsageExamples}</div>
                 <div className="text-sm space-y-2">
                   <div>
-                    <div className="font-medium text-black mb-1">{t.calcBasicOps}</div>
-                    <div className="text-neutral-600 text-xs space-y-1">
-                      <div>• 2 + 3 * 4 = 14</div>
-                      <div>• (2 + 3) * 4 = 20</div>
-                      <div>• 10 / 2 + 5 = 10</div>
-                    </div>
+                    <div className="font-medium text-black dark:text-white mb-1">{t.calcBasicOps}</div>
+                    <ExampleList lines={t.calcExampleBasicShort} className="text-neutral-600 dark:text-zinc-400 text-xs space-y-1" />
                   </div>
                   <div>
-                    <div className="font-medium text-black mb-1">{t.calcTrigonometry}</div>
-                    <div className="text-neutral-600 text-xs space-y-1">
-                      <div>• sin(30) = 0.5 (DEG режим)</div>
-                      <div>• cos(π/3) = 0.5 (RAD режим)</div>
-                      <div>• tan(45) = 1</div>
-                    </div>
+                    <div className="font-medium text-black dark:text-white mb-1">{t.calcTrigonometry}</div>
+                    <ExampleList lines={t.calcExampleTrigShort} className="text-neutral-600 dark:text-zinc-400 text-xs space-y-1" />
                   </div>
                   <div>
-                    <div className="font-medium text-black mb-1">{t.calcLogsPowers}</div>
-                    <div className="text-neutral-600 text-xs space-y-1">
-                      <div>• log(100) = 2</div>
-                      <div>• ln(e) = 1</div>
-                      <div>• 10^2 = 100</div>
-                      <div>• √16 = 4</div>
-                    </div>
+                    <div className="font-medium text-black dark:text-white mb-1">{t.calcLogsPowers}</div>
+                    <ExampleList lines={t.calcExampleLogs} className="text-neutral-600 dark:text-zinc-400 text-xs space-y-1" />
                   </div>
                 </div>
               </div>
               
               {/* Клавиатурни съкращения за мобилна версия */}
-              <div className="w-full bg-stone-50 rounded-xl p-4">
-                <div className="text-black text-base font-semibold font-['Manrope'] mb-3">{t.calcKeyboardShortcuts}</div>
+              <div className={DOC_PANEL}>
+                <div className="text-black dark:text-white text-base font-semibold font-['Manrope'] mb-3">{t.calcKeyboardShortcuts}</div>
                 <div className="text-sm space-y-2">
                   <div>
-                    <div className="font-medium text-black mb-1">{t.calcBasicKeys}</div>
-                    <div className="text-neutral-600 text-xs space-y-1">
-                      <div>• <span className="font-mono bg-gray-200 px-1 rounded text-xs">0-9</span> - {t.calcDigits}</div>
-                      <div>• <span className="font-mono bg-gray-200 px-1 rounded text-xs">+ - * /</span> - {t.calcOperations}</div>
-                      <div>• <span className="font-mono bg-gray-200 px-1 rounded text-xs">Enter</span> - {t.calcCalculate}</div>
-                      <div>• <span className="font-mono bg-gray-200 px-1 rounded text-xs">Backspace</span> - {t.calcDelete}</div>
+                    <div className="font-medium text-black dark:text-white mb-1">{t.calcBasicKeys}</div>
+                    <div className="text-neutral-600 dark:text-zinc-400 text-xs space-y-1">
+                      <div>• <span className="font-mono bg-gray-200 dark:bg-zinc-700 px-1 rounded text-xs">0-9</span> - {t.calcDigits}</div>
+                      <div>• <span className="font-mono bg-gray-200 dark:bg-zinc-700 px-1 rounded text-xs">+ - * /</span> - {t.calcOperations}</div>
+                      <div>• <span className="font-mono bg-gray-200 dark:bg-zinc-700 px-1 rounded text-xs">Enter</span> - {t.calcCalculate}</div>
+                      <div>• <span className="font-mono bg-gray-200 dark:bg-zinc-700 px-1 rounded text-xs">Backspace</span> - {t.calcDelete}</div>
                     </div>
                   </div>
                   <div>
-                    <div className="font-medium text-black mb-1">{t.calcSpecialKeys}</div>
-                    <div className="text-neutral-600 text-xs space-y-1">
-                      <div>• <span className="font-mono bg-gray-200 px-1 rounded text-xs">Escape</span> - {t.calcClear}</div>
-                      <div>• <span className="font-mono bg-gray-200 px-1 rounded text-xs">P</span> - π (пи)</div>
-                      <div>• <span className="font-mono bg-gray-200 px-1 rounded text-xs">E</span> - e (експонента)</div>
+                    <div className="font-medium text-black dark:text-white mb-1">{t.calcSpecialKeys}</div>
+                    <div className="text-neutral-600 dark:text-zinc-400 text-xs space-y-1">
+                      <div>• <span className="font-mono bg-gray-200 dark:bg-zinc-700 px-1 rounded text-xs">Escape</span> - {t.calcClear}</div>
+                      <div>• <span className="font-mono bg-gray-200 dark:bg-zinc-700 px-1 rounded text-xs">P</span> - {t.calcKeyPi}</div>
+                      <div>• <span className="font-mono bg-gray-200 dark:bg-zinc-700 px-1 rounded text-xs">E</span> - {t.calcKeyE}</div>
                     </div>
                   </div>
                 </div>
               </div>
               
-              <div className="w-96 flex flex-col justify-start items-start gap-2.5">
-                <div className="bg-stone-50 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-start items-start gap-px overflow-hidden">
+              <div className="w-full flex flex-col justify-start items-start gap-2.5">
+                <div className="w-full bg-stone-50 dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex flex-col justify-start items-start gap-px overflow-hidden">
                   <div className="shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] inline-flex justify-start items-start gap-px">
-                    <div className="w-72 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                      <div className="justify-start text-black text-sm font-medium font-['Manrope']">{t.calcButton}</div>
+                    <div className="w-72 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                      <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{t.calcButton}</div>
                     </div>
-                    <div className="w-72 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                      <div className="justify-start text-black text-sm font-medium font-['Manrope']">{t.calcUsage}</div>
+                    <div className="w-72 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                      <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{t.calcUsage}</div>
                     </div>
                   </div>
                   {docRows.map((row, idx) => (
                     <div key={idx} className="inline-flex justify-start items-center gap-px">
-                      <div className="w-72 self-stretch px-3 py-2 bg-white flex justify-center items-center gap-1 flex-wrap content-center">
+                      <div className="w-72 self-stretch px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-1 flex-wrap content-center">
                         {row.buttons.map((b, i) => (
-                          <div key={i} className="px-2 py-1 bg-white rounded outline outline-1 outline-offset-[-1px] outline-gray-200 flex justify-center items-center gap-3">
-                            <div className="justify-start text-black text-sm font-medium font-['Manrope']">{b}</div>
+                          <div key={i} className="px-2 py-1 bg-white dark:bg-zinc-900 rounded outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex justify-center items-center gap-3">
+                            <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{b}</div>
                           </div>
                         ))}
                       </div>
-                      <div className="w-72 self-stretch px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                        <div className="flex-1 justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{row.usage}</div>
+                      <div className="w-72 self-stretch px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                        <div className="flex-1 justify-start text-neutral-400 dark:text-zinc-400 text-sm font-medium font-['Manrope']">{row.usage}</div>
                       </div>
                     </div>
                   ))}

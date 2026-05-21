@@ -163,7 +163,7 @@ const TeacherAssignmentDetailPage = () => {
         {courseId && (
           <Link
             to={`/classroom/groups/${courseId}`}
-            className="text-sm text-neutral-500 hover:text-black dark:hover:text-white font-['Manrope'] w-fit"
+            className="text-sm text-neutral-500 dark:text-zinc-400 hover:text-black dark:hover:text-white font-['Manrope'] w-fit"
           >
             ← {bg ? 'Към групата' : 'Back to group'}
           </Link>
@@ -171,7 +171,7 @@ const TeacherAssignmentDetailPage = () => {
 
         {error && <Card className="p-4 text-sm text-red-600">{error}</Card>}
         {actionMsg && <Card className="p-4 text-sm text-green-700 dark:text-green-300">{actionMsg}</Card>}
-        {loading && <Card className="p-8 text-center text-neutral-500">{bg ? 'Зареждане...' : 'Loading...'}</Card>}
+        {loading && <Card className="p-8 text-center text-neutral-500 dark:text-zinc-400">{bg ? 'Зареждане...' : 'Loading...'}</Card>}
 
         <ConfirmDialog
           open={confirmArchive}
@@ -236,7 +236,7 @@ const TeacherAssignmentDetailPage = () => {
                 )}
               </div>
               {calculatorPolicyMeta && (
-                <p className="text-xs text-neutral-500 font-['Manrope']">{calculatorPolicyMeta.teacherHint}</p>
+                <p className="text-xs text-neutral-500 dark:text-zinc-400 font-['Manrope']">{calculatorPolicyMeta.teacherHint}</p>
               )}
               {assignment.description && (
                 <p className="text-sm text-neutral-700 dark:text-zinc-300 font-['Manrope'] whitespace-pre-wrap pt-2 border-t border-stone-100 dark:border-zinc-800">
@@ -309,7 +309,7 @@ const TeacherAssignmentDetailPage = () => {
             </h2>
 
             {(assignment.variants || []).length === 0 ? (
-              <Card className="p-6 text-sm text-neutral-500">
+              <Card className="p-6 text-sm text-neutral-500 dark:text-zinc-400">
                 {bg ? 'Няма генерирани варианти.' : 'No variants generated.'}
               </Card>
             ) : (
@@ -324,7 +324,7 @@ const TeacherAssignmentDetailPage = () => {
                       </h3>
                       <div className="grid md:grid-cols-2 gap-6">
                         <div>
-                          <p className="text-xs font-semibold uppercase text-neutral-400 mb-2">
+                          <p className="text-xs font-semibold uppercase text-neutral-400 dark:text-zinc-400 mb-2">
                             {bg ? 'Дадено (вход)' : 'Given (input)'}
                           </p>
                           <div className="grid grid-cols-2 gap-2">
@@ -334,7 +334,7 @@ const TeacherAssignmentDetailPage = () => {
                                   key={f.key}
                                   className="px-3 py-2 bg-stone-50 dark:bg-zinc-800 rounded-lg text-sm font-['Manrope']"
                                 >
-                                  <span className="text-neutral-500">{bg ? f.labelBg : f.labelEn}: </span>
+                                  <span className="text-neutral-500 dark:text-zinc-400">{bg ? f.labelBg : f.labelEn}: </span>
                                   <span className="font-mono text-black dark:text-white">{formatValue(input[f.key])}</span>
                                 </div>
                               )
@@ -342,7 +342,7 @@ const TeacherAssignmentDetailPage = () => {
                           </div>
                         </div>
                         <div>
-                          <p className="text-xs font-semibold uppercase text-neutral-400 mb-2">
+                          <p className="text-xs font-semibold uppercase text-neutral-400 dark:text-zinc-400 mb-2">
                             {bg ? 'Очакван отговор' : 'Expected answer'}
                           </p>
                           <div className="grid grid-cols-2 gap-2">
@@ -370,7 +370,7 @@ const TeacherAssignmentDetailPage = () => {
               </div>
             )}
 
-            <p className="text-xs text-neutral-400 font-['Manrope']">
+            <p className="text-xs text-neutral-400 dark:text-zinc-400 font-['Manrope']">
               {bg
                 ? 'Всеки ученик получава един вариант (по ID). Броят варианти = брой различни задачи в групата.'
                 : 'Each student gets one variant (by ID). Variant count = number of distinct problems.'}
@@ -382,10 +382,10 @@ const TeacherAssignmentDetailPage = () => {
               {bg ? 'Предавания от ученици' : 'Student submissions'}
             </h2>
             {submissionsLoading && (
-              <Card className="p-6 text-sm text-neutral-500">{bg ? 'Зареждане...' : 'Loading...'}</Card>
+              <Card className="p-6 text-sm text-neutral-500 dark:text-zinc-400">{bg ? 'Зареждане...' : 'Loading...'}</Card>
             )}
             {!submissionsLoading && submissions.length === 0 && (
-              <Card className="p-6 text-sm text-neutral-500 font-['Manrope']">
+              <Card className="p-6 text-sm text-neutral-500 dark:text-zinc-400 font-['Manrope']">
                 {bg ? 'Все още няма предавания.' : 'No submissions yet.'}
               </Card>
             )}

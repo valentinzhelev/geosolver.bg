@@ -4,7 +4,7 @@ import { Card } from './Card';
 const GaiAssignmentAnalytics = ({ analytics, bg, loading }) => {
   if (loading) {
     return (
-      <Card className="p-6 text-sm text-neutral-500 font-['Manrope']">
+      <Card className="p-6 text-sm text-neutral-500 dark:text-zinc-400 font-['Manrope']">
         {bg ? 'GAI анализира класа...' : 'GAI is analyzing the class...'}
       </Card>
     );
@@ -23,7 +23,7 @@ const GaiAssignmentAnalytics = ({ analytics, bg, loading }) => {
             <h2 className="text-lg font-bold font-['Manrope'] text-black dark:text-white">
               {bg ? 'Анализ на класа' : 'Class analytics'}
             </h2>
-            <p className="text-xs text-neutral-500 font-['Manrope']">
+            <p className="text-xs text-neutral-500 dark:text-zinc-400 font-['Manrope']">
               {bg
                 ? 'GeoSolver Artificial Intelligence · обобщение по предаванията'
                 : 'GeoSolver Artificial Intelligence · submission summary'}
@@ -33,18 +33,18 @@ const GaiAssignmentAnalytics = ({ analytics, bg, loading }) => {
         <div className="flex flex-wrap gap-4 text-sm font-['Manrope']">
           <div className="text-center">
             <div className="text-2xl font-bold text-black dark:text-white">{analytics.submissionCount}</div>
-            <div className="text-xs text-neutral-500">{bg ? 'предавания' : 'submissions'}</div>
+            <div className="text-xs text-neutral-500 dark:text-zinc-400">{bg ? 'предавания' : 'submissions'}</div>
           </div>
           {analytics.avgScore != null && (
             <div className="text-center">
               <div className="text-2xl font-bold text-violet-700 dark:text-violet-300">{analytics.avgScore}%</div>
-              <div className="text-xs text-neutral-500">{bg ? 'среден резултат' : 'average'}</div>
+              <div className="text-xs text-neutral-500 dark:text-zinc-400">{bg ? 'среден резултат' : 'average'}</div>
             </div>
           )}
           {analytics.passRatePct != null && (
             <div className="text-center">
               <div className="text-2xl font-bold text-black dark:text-white">{analytics.passRatePct}%</div>
-              <div className="text-xs text-neutral-500">{bg ? 'над 50%' : 'pass rate'}</div>
+              <div className="text-xs text-neutral-500 dark:text-zinc-400">{bg ? 'над 50%' : 'pass rate'}</div>
             </div>
           )}
         </div>
@@ -52,7 +52,7 @@ const GaiAssignmentAnalytics = ({ analytics, bg, loading }) => {
 
       {analytics.scoreDistribution?.length > 0 && (
         <div>
-          <p className="text-xs font-semibold uppercase text-neutral-500 mb-2 font-['Manrope']">
+          <p className="text-xs font-semibold uppercase text-neutral-500 dark:text-zinc-400 mb-2 font-['Manrope']">
             {bg ? 'Разпределение на оценките' : 'Score distribution'}
           </p>
           <div className="flex flex-wrap gap-2">
@@ -62,7 +62,7 @@ const GaiAssignmentAnalytics = ({ analytics, bg, loading }) => {
                 className="flex-1 min-w-[72px] px-3 py-2 rounded-lg bg-white dark:bg-zinc-800 border border-stone-200 dark:border-zinc-700 text-center"
               >
                 <div className="text-lg font-bold font-['Manrope']">{b.count}</div>
-                <div className="text-xs text-neutral-500">{b.range}%</div>
+                <div className="text-xs text-neutral-500 dark:text-zinc-400">{b.range}%</div>
               </div>
             ))}
           </div>
@@ -71,7 +71,7 @@ const GaiAssignmentAnalytics = ({ analytics, bg, loading }) => {
 
       {analytics.fieldErrorRates?.length > 0 && (
         <div>
-          <p className="text-xs font-semibold uppercase text-neutral-500 mb-2 font-['Manrope']">
+          <p className="text-xs font-semibold uppercase text-neutral-500 dark:text-zinc-400 mb-2 font-['Manrope']">
             {bg ? 'Грешки по полета' : 'Errors by field'}
           </p>
           <div className="flex flex-col gap-2">
@@ -84,7 +84,7 @@ const GaiAssignmentAnalytics = ({ analytics, bg, loading }) => {
                     style={{ width: `${Math.min(100, f.errorRatePct)}%` }}
                   />
                 </div>
-                <span className="text-xs text-neutral-500 w-10 text-right">{f.errorRatePct}%</span>
+                <span className="text-xs text-neutral-500 dark:text-zinc-400 w-10 text-right">{f.errorRatePct}%</span>
               </div>
             ))}
           </div>
@@ -106,13 +106,13 @@ const GaiAssignmentAnalytics = ({ analytics, bg, loading }) => {
 
       {analytics.studentSnapshots?.length > 0 && (
         <div>
-          <p className="text-xs font-semibold uppercase text-neutral-500 mb-2 font-['Manrope']">
+          <p className="text-xs font-semibold uppercase text-neutral-500 dark:text-zinc-400 mb-2 font-['Manrope']">
             {bg ? 'Ученици (по резултат)' : 'Students (by score)'}
           </p>
           <div className="overflow-x-auto">
             <table className="w-full text-sm font-['Manrope']">
               <thead>
-                <tr className="text-left text-xs text-neutral-500 border-b border-stone-200 dark:border-zinc-700">
+                <tr className="text-left text-xs text-neutral-500 dark:text-zinc-400 border-b border-stone-200 dark:border-zinc-700">
                   <th className="pb-2 pr-4">{bg ? 'Ученик' : 'Student'}</th>
                   <th className="pb-2 pr-4">{bg ? 'Резултат' : 'Score'}</th>
                   <th className="pb-2">{bg ? 'GAI' : 'GAI'}</th>
@@ -130,7 +130,7 @@ const GaiAssignmentAnalytics = ({ analytics, bg, loading }) => {
                     <td className="py-2 pr-4 font-mono">
                       {row.score != null ? `${Math.round(row.score)}%` : '—'}
                     </td>
-                    <td className="py-2 text-xs text-neutral-500 capitalize">{row.level}</td>
+                    <td className="py-2 text-xs text-neutral-500 dark:text-zinc-400 capitalize">{row.level}</td>
                   </tr>
                 ))}
               </tbody>

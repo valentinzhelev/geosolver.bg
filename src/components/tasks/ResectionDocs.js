@@ -61,13 +61,12 @@ const ResectionDocs = () => {
       <DocSection title={isBg ? 'Пример' : 'Example'}>
         <DocCallout>
           <div className="font-mono text-sm space-y-1">
-            <p>A: (4047.53, 1209.12)</p>
-            <p>B: (4214.61, 1289.19)</p>
-            <p>C: (4100.00, 1400.00)</p>
+            <p>Yₐ = 1209.12, Xₐ = 4047.53</p>
+            <p>Yᵦ = 1289.19, Xᵦ = 4214.61</p>
+            <p>Yᶜ = 1400.00, Xᶜ = 4100.00</p>
             <p>β₁ = 80 gon, β₂ = 70 gon</p>
             <p className="pt-2 font-sans font-semibold">
-              {isBg ? 'Резултат (ориентировъчно):' : 'Approximate result:'}{' '}
-              Xₚ ≈ 4142.16, Yₚ ≈ 1417.19
+              {isBg ? 'Резултат:' : 'Result:'} Yₚ = 1417.19, Xₚ = 4142.16
             </p>
           </div>
         </DocCallout>

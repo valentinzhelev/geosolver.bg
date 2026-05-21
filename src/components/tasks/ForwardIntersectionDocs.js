@@ -72,7 +72,7 @@ const ForwardIntersectionDocs = () => {
             <p className="pt-2 font-sans font-semibold">
               {isBg ? 'Резултат:' : 'Result:'} Yₚ ≈ 942.08, Xₚ ≈ 1173.76
             </p>
-            <p className="font-sans text-xs text-neutral-600">Sₐᵦ ≈ 223.61 m</p>
+            <p className="font-sans text-xs text-neutral-600 dark:text-zinc-400">Sₐᵦ ≈ 223.61 m</p>
           </div>
         </DocCallout>
       </DocSection>

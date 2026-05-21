@@ -37,7 +37,7 @@ const ToolComingSoon = () => {
             <div className="text-black dark:text-white text-2xl md:text-3xl font-bold font-['Manrope']">
               {language === 'bg' ? 'Очаквайте скоро' : 'Coming soon'}
             </div>
-            <p className="text-neutral-500 dark:text-neutral-400 text-sm md:text-base font-medium font-['Manrope']">
+            <p className="text-neutral-500 dark:text-zinc-400 text-sm md:text-base font-medium font-['Manrope']">
               {language === 'bg'
                 ? `„${toolName}" е част от следващата версия на GeoSolver. Засега използвайте четирите основни инструмента за координатни изчисления и засечки.`
                 : `"${toolName}" is planned for a future release. For now, use our four core tools for coordinate calculations and intersections.`}

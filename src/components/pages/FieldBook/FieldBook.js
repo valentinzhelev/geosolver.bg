@@ -284,33 +284,33 @@ const FieldBook = () => {
         canonical="/fieldbook"
       />
       <Layout>
-        <div className="w-full min-h-screen bg-stone-50">
+        <div className="w-full min-h-screen bg-stone-50 dark:bg-zinc-950 transition-colors">
           <div className="w-full max-w-[1180px] mx-auto px-4 lg:px-6 pt-6 lg:pt-16 pb-8 lg:pb-20 flex flex-col gap-8">
             <div className="flex flex-col lg:flex-row justify-between gap-6">
               <div className="flex-1">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-white rounded-xl border border-gray-200">
+                  <div className="p-2 bg-white dark:bg-zinc-900 rounded-xl border border-gray-200">
                     <svg className="w-7 h-7 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                   </div>
-                  <h1 className="text-black text-3xl font-bold font-['Manrope']">
+                  <h1 className="text-black dark:text-white text-3xl font-bold font-['Manrope']">
                     {language === 'bg' ? 'Електронни карнети' : 'Electronic Field Books'}
                   </h1>
                 </div>
-                <p className="text-neutral-600 text-sm lg:text-base mt-3 max-w-2xl">
+                <p className="text-neutral-600 dark:text-zinc-400 text-sm lg:text-base mt-3 max-w-2xl">
                   {language === 'bg'
                     ? 'Въвеждане на теренни измервания, автоматични проверки и официален експорт за професионална работа.'
                     : 'Capture field measurements, run validations, and export official reports.'}
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <span className="px-3 py-1 text-xs rounded-full bg-white border border-gray-200 text-neutral-600">
+                  <span className="px-3 py-1 text-xs rounded-full bg-white dark:bg-zinc-900 border border-gray-200 text-neutral-600 dark:text-zinc-400">
                     {language === 'bg' ? 'Auto-save' : 'Auto-save'}
                   </span>
-                  <span className="px-3 py-1 text-xs rounded-full bg-white border border-gray-200 text-neutral-600">
+                  <span className="px-3 py-1 text-xs rounded-full bg-white dark:bg-zinc-900 border border-gray-200 text-neutral-600 dark:text-zinc-400">
                     {language === 'bg' ? 'Offline режим' : 'Offline mode'}
                   </span>
-                  <span className="px-3 py-1 text-xs rounded-full bg-white border border-gray-200 text-neutral-600">
+                  <span className="px-3 py-1 text-xs rounded-full bg-white dark:bg-zinc-900 border border-gray-200 text-neutral-600 dark:text-zinc-400">
                     {language === 'bg' ? 'Професионална употреба' : 'Professional use'}
                   </span>
                 </div>
@@ -326,13 +326,13 @@ const FieldBook = () => {
                 <button
                   type="button"
                   onClick={() => setShowBookForm(true)}
-                  className="px-4 py-2 bg-gray-200 text-black rounded-lg hover:bg-gray-300 transition-colors duration-200 text-sm font-medium"
+                  className="px-4 py-2 bg-gray-200 dark:bg-zinc-700 text-black dark:text-white rounded-lg hover:bg-gray-300 transition-colors duration-200 text-sm font-medium"
                 >
                   {language === 'bg' ? 'Нов карнет' : 'New Field Book'}
                 </button>
                 <Link
                   to="/tools"
-                  className="px-4 py-2 bg-gray-200 text-black rounded-lg hover:bg-gray-300 transition-colors duration-200 text-sm font-medium"
+                  className="px-4 py-2 bg-gray-200 dark:bg-zinc-700 text-black dark:text-white rounded-lg hover:bg-gray-300 transition-colors duration-200 text-sm font-medium"
                 >
                   {language === 'bg' ? 'Инструменти' : 'Tools'}
                 </Link>
@@ -340,21 +340,21 @@ const FieldBook = () => {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-1 p-5 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200">
+              <div className="lg:col-span-1 p-5 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-semibold text-black">
+                  <h2 className="text-lg font-semibold text-black dark:text-white">
                     {language === 'bg' ? 'Проекти' : 'Projects'}
                   </h2>
                   <button
                     type="button"
                     onClick={() => setShowProjectForm(true)}
-                    className="text-sm text-gray-600 hover:text-black"
+                    className="text-sm text-gray-600 hover:text-black dark:hover:text-white"
                   >
                     {language === 'bg' ? '+ Добави' : '+ Add'}
                   </button>
                 </div>
                 {showProjectForm && (
-                  <div className="p-3 bg-stone-50 rounded-lg border border-gray-100 mb-4">
+                  <div className="p-3 bg-stone-50 dark:bg-zinc-800 rounded-lg border border-gray-100 mb-4">
                     <div className="grid grid-cols-1 gap-2">
                       <input
                         type="text"
@@ -395,7 +395,7 @@ const FieldBook = () => {
                         <button
                           type="button"
                           onClick={() => setShowProjectForm(false)}
-                          className="px-3 py-2 bg-gray-200 text-black rounded-lg text-sm"
+                          className="px-3 py-2 bg-gray-200 dark:bg-zinc-700 text-black dark:text-white rounded-lg text-sm"
                         >
                           {language === 'bg' ? 'Отказ' : 'Cancel'}
                         </button>
@@ -410,31 +410,31 @@ const FieldBook = () => {
                       key={project.id}
                       onClick={() => setSelectedProjectId(project.id)}
                       className={`w-full text-left p-3 rounded-lg border ${
-                        selectedProjectId === project.id ? 'border-black bg-stone-50' : 'border-gray-100 bg-white'
+                        selectedProjectId === project.id ? 'border-black bg-stone-50' : 'border-gray-100 bg-white dark:bg-zinc-900'
                       }`}
                     >
-                      <div className="text-sm font-semibold text-black">{project.name}</div>
-                      <div className="text-xs text-neutral-500">{project.year} • {project.site || '-'}</div>
+                      <div className="text-sm font-semibold text-black dark:text-white">{project.name}</div>
+                      <div className="text-xs text-neutral-500 dark:text-zinc-400">{project.year} • {project.site || '-'}</div>
                     </button>
                   ))}
                 </div>
               </div>
 
-              <div className="lg:col-span-2 p-5 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200">
+              <div className="lg:col-span-2 p-5 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-semibold text-black">
+                  <h2 className="text-lg font-semibold text-black dark:text-white">
                     {language === 'bg' ? 'Карнети' : 'Field Books'}
                   </h2>
                   <button
                     type="button"
                     onClick={() => setShowBookForm(true)}
-                    className="text-sm text-gray-600 hover:text-black"
+                    className="text-sm text-gray-600 hover:text-black dark:hover:text-white"
                   >
                     {language === 'bg' ? '+ Нов карнет' : '+ New Field Book'}
                   </button>
                 </div>
                 {showBookForm && (
-                  <div className="p-3 bg-stone-50 rounded-lg border border-gray-100 mb-4">
+                  <div className="p-3 bg-stone-50 dark:bg-zinc-800 rounded-lg border border-gray-100 mb-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                       <input
                         type="text"
@@ -485,7 +485,7 @@ const FieldBook = () => {
                         <button
                           type="button"
                           onClick={() => setShowBookForm(false)}
-                          className="px-3 py-2 bg-gray-200 text-black rounded-lg text-sm"
+                          className="px-3 py-2 bg-gray-200 dark:bg-zinc-700 text-black dark:text-white rounded-lg text-sm"
                         >
                           {language === 'bg' ? 'Отказ' : 'Cancel'}
                         </button>
@@ -507,8 +507,8 @@ const FieldBook = () => {
                           onClick={() => setSelectedBookId(book.id)}
                           className="text-left flex-1"
                         >
-                          <div className="text-sm font-semibold text-black">{book.name}</div>
-                          <div className="text-xs text-neutral-500">
+                          <div className="text-sm font-semibold text-black dark:text-white">{book.name}</div>
+                          <div className="text-xs text-neutral-500 dark:text-zinc-400">
                             {book.date} • {language === 'bg' ? 'Екип' : 'Crew'}: {book.crew || '-'}
                           </div>
                         </button>
@@ -516,14 +516,14 @@ const FieldBook = () => {
                           <button
                             type="button"
                             onClick={() => handleCopyBook(book)}
-                            className="px-2 py-1 text-xs bg-gray-200 rounded-lg"
+                            className="px-2 py-1 text-xs bg-gray-200 dark:bg-zinc-700 rounded-lg"
                           >
                             {language === 'bg' ? 'Копирай' : 'Copy'}
                           </button>
                           <button
                             type="button"
                             onClick={() => handleArchiveBook(book.id)}
-                            className="px-2 py-1 text-xs bg-gray-200 rounded-lg"
+                            className="px-2 py-1 text-xs bg-gray-200 dark:bg-zinc-700 rounded-lg"
                           >
                             {language === 'bg' ? 'Архив' : 'Archive'}
                           </button>
@@ -536,22 +536,22 @@ const FieldBook = () => {
                           </button>
                         </div>
                       </div>
-                      <div className="text-xs text-neutral-400 mt-1">
+                      <div className="text-xs text-neutral-400 dark:text-zinc-400 mt-1">
                         {language === 'bg' ? 'Тип' : 'Type'}: {language === 'bg' ? TEMPLATE_DEFINITIONS.find((t) => t.id === book.type)?.labelBg : TEMPLATE_DEFINITIONS.find((t) => t.id === book.type)?.labelEn}
                         {book.locked ? ` • ${language === 'bg' ? 'Заключен' : 'Locked'}` : ''}
                       </div>
                     </div>
                   ))}
                   {booksForProject.length === 0 && (
-                    <div className="text-sm text-neutral-500">{language === 'bg' ? 'Няма карнети.' : 'No field books yet.'}</div>
+                    <div className="text-sm text-neutral-500 dark:text-zinc-400">{language === 'bg' ? 'Няма карнети.' : 'No field books yet.'}</div>
                   )}
                 </div>
                 {archivedBooks.length > 0 && (
                   <div className="mt-4">
-                    <div className="text-xs text-neutral-400 mb-2">{language === 'bg' ? 'Архивирани' : 'Archived'}</div>
+                    <div className="text-xs text-neutral-400 dark:text-zinc-400 mb-2">{language === 'bg' ? 'Архивирани' : 'Archived'}</div>
                     <div className="space-y-2">
                       {archivedBooks.map((book) => (
-                        <div key={book.id} className="p-3 rounded-lg border border-gray-100 text-neutral-400 text-sm">
+                        <div key={book.id} className="p-3 rounded-lg border border-gray-100 text-neutral-400 dark:text-zinc-400 text-sm">
                           {book.name}
                         </div>
                       ))}
@@ -563,11 +563,11 @@ const FieldBook = () => {
 
             {selectedBook && (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 p-6 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200">
+                <div className="lg:col-span-2 p-6 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800">
                   <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                     <div>
-                      <div className="text-lg font-semibold text-black">{selectedBook.name}</div>
-                      <div className="text-xs text-neutral-500">
+                      <div className="text-lg font-semibold text-black dark:text-white">{selectedBook.name}</div>
+                      <div className="text-xs text-neutral-500 dark:text-zinc-400">
                         {selectedBook.date} • {selectedBook.site || '-'} • {selectedBook.locked ? (language === 'bg' ? 'Заключен' : 'Locked') : (language === 'bg' ? 'Работен' : 'Active')}
                       </div>
                     </div>
@@ -586,27 +586,27 @@ const FieldBook = () => {
                       <thead className="bg-stone-50">
                         <tr>
                           {template.columns.map((col) => (
-                            <th key={col.key} className="px-3 py-2 text-left text-neutral-600 font-medium">
+                            <th key={col.key} className="px-3 py-2 text-left text-neutral-600 dark:text-zinc-400 font-medium">
                               {language === 'bg' ? col.labelBg : col.labelEn}
                             </th>
                           ))}
-                          <th className="px-3 py-2 text-left text-neutral-600 font-medium">
+                          <th className="px-3 py-2 text-left text-neutral-600 dark:text-zinc-400 font-medium">
                             {language === 'bg' ? 'Контролна' : 'Control'}
                           </th>
-                          <th className="px-3 py-2 text-left text-neutral-600 font-medium">
+                          <th className="px-3 py-2 text-left text-neutral-600 dark:text-zinc-400 font-medium">
                             {language === 'bg' ? 'Коментар' : 'Comment'}
                           </th>
-                          <th className="px-3 py-2 text-left text-neutral-600 font-medium">
+                          <th className="px-3 py-2 text-left text-neutral-600 dark:text-zinc-400 font-medium">
                             {language === 'bg' ? 'Снимка' : 'Photo'}
                           </th>
-                          <th className="px-3 py-2 text-left text-neutral-600 font-medium">
+                          <th className="px-3 py-2 text-left text-neutral-600 dark:text-zinc-400 font-medium">
                             {language === 'bg' ? 'Действия' : 'Actions'}
                           </th>
                         </tr>
                       </thead>
                       <tbody>
                         {rows.map((row) => (
-                          <tr key={row.id} className="border-t border-gray-100">
+                          <tr key={row.id} className="border-t border-gray-100 dark:border-zinc-800">
                             {template.columns.map((col) => (
                               <td key={col.key} className="px-3 py-2">
                                 <input
@@ -623,7 +623,7 @@ const FieldBook = () => {
                                 type="button"
                                 onClick={() => handleToggleControl(row.id)}
                                 disabled={selectedBook.locked}
-                                className={`px-2 py-1 rounded-lg text-xs ${row.isControl ? 'bg-black text-white' : 'bg-gray-200 text-black'}`}
+                                className={`px-2 py-1 rounded-lg text-xs ${row.isControl ? 'bg-black text-white' : 'bg-gray-200 dark:bg-zinc-700 text-black dark:text-white'}`}
                               >
                                 {row.isControl ? (language === 'bg' ? 'Да' : 'Yes') : (language === 'bg' ? 'Не' : 'No')}
                               </button>
@@ -645,7 +645,7 @@ const FieldBook = () => {
                                 className="text-xs"
                               />
                               {row.photoName && (
-                                <div className="text-xs text-neutral-500 mt-1">{row.photoName}</div>
+                                <div className="text-xs text-neutral-500 dark:text-zinc-400 mt-1">{row.photoName}</div>
                               )}
                             </td>
                             <td className="px-3 py-2">
@@ -653,7 +653,7 @@ const FieldBook = () => {
                                 type="button"
                                 onClick={() => handleDuplicateRow(row)}
                                 disabled={selectedBook.locked}
-                                className="px-2 py-1 text-xs bg-gray-200 rounded-lg"
+                                className="px-2 py-1 text-xs bg-gray-200 dark:bg-zinc-700 rounded-lg"
                               >
                                 {language === 'bg' ? 'Дублирай' : 'Duplicate'}
                               </button>
@@ -668,20 +668,20 @@ const FieldBook = () => {
                       type="button"
                       onClick={handleAddRow}
                       disabled={selectedBook.locked}
-                      className="px-4 py-2 bg-gray-200 text-black rounded-lg text-sm"
+                      className="px-4 py-2 bg-gray-200 dark:bg-zinc-700 text-black dark:text-white rounded-lg text-sm"
                     >
                       {language === 'bg' ? 'Добави ред' : 'Add Row'}
                     </button>
                   </div>
                 </div>
 
-                <div className="p-6 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col gap-5">
+                <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex flex-col gap-5">
                   <div>
-                    <div className="text-sm font-semibold text-black mb-2">
+                    <div className="text-sm font-semibold text-black dark:text-white mb-2">
                       {language === 'bg' ? 'Контрол и проверки' : 'Checks'}
                     </div>
                     {warnings.length === 0 ? (
-                      <div className="text-xs text-neutral-500">
+                      <div className="text-xs text-neutral-500 dark:text-zinc-400">
                         {language === 'bg' ? 'Няма открити проблеми.' : 'No issues detected.'}
                       </div>
                     ) : (
@@ -694,17 +694,17 @@ const FieldBook = () => {
                   </div>
 
                   <div>
-                    <div className="text-sm font-semibold text-black mb-2">
+                    <div className="text-sm font-semibold text-black dark:text-white mb-2">
                       {language === 'bg' ? 'История на пресмятанията' : 'Calculation history'}
                     </div>
                     <div className="space-y-2">
                       {calculationHistory.length === 0 ? (
-                        <div className="text-xs text-neutral-500">
+                        <div className="text-xs text-neutral-500 dark:text-zinc-400">
                           {language === 'bg' ? 'Няма изчисления.' : 'No calculations yet.'}
                         </div>
                       ) : (
                         calculationHistory.slice(0, 5).map((item) => (
-                          <div key={item.id} className="text-xs text-neutral-500">
+                          <div key={item.id} className="text-xs text-neutral-500 dark:text-zinc-400">
                             {item.timestamp}
                           </div>
                         ))
@@ -713,18 +713,18 @@ const FieldBook = () => {
                   </div>
 
                   <div>
-                    <div className="text-sm font-semibold text-black mb-2">{language === 'bg' ? 'Експорт' : 'Export'}</div>
+                    <div className="text-sm font-semibold text-black dark:text-white mb-2">{language === 'bg' ? 'Експорт' : 'Export'}</div>
                     <div className="grid grid-cols-2 gap-2">
-                      <button type="button" className="px-3 py-2 bg-gray-200 rounded-lg text-xs">
+                      <button type="button" className="px-3 py-2 bg-gray-200 dark:bg-zinc-700 rounded-lg text-xs">
                         PDF
                       </button>
-                      <button type="button" className="px-3 py-2 bg-gray-200 rounded-lg text-xs">
+                      <button type="button" className="px-3 py-2 bg-gray-200 dark:bg-zinc-700 rounded-lg text-xs">
                         Excel
                       </button>
-                      <button type="button" className="px-3 py-2 bg-gray-200 rounded-lg text-xs">
+                      <button type="button" className="px-3 py-2 bg-gray-200 dark:bg-zinc-700 rounded-lg text-xs">
                         CSV
                       </button>
-                      <button type="button" className="px-3 py-2 bg-gray-200 rounded-lg text-xs">
+                      <button type="button" className="px-3 py-2 bg-gray-200 dark:bg-zinc-700 rounded-lg text-xs">
                         {language === 'bg' ? 'Печат' : 'Print'}
                       </button>
                     </div>
@@ -734,11 +734,11 @@ const FieldBook = () => {
             )}
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="p-6 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200">
-                <div className="text-lg font-semibold text-black mb-4">
+              <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800">
+                <div className="text-lg font-semibold text-black dark:text-white mb-4">
                   {language === 'bg' ? 'Колаборация' : 'Collaboration'}
                 </div>
-                <div className="space-y-3 text-sm text-neutral-600">
+                <div className="space-y-3 text-sm text-neutral-600 dark:text-zinc-400">
                   <div className="flex justify-between">
                     <span>{language === 'bg' ? 'owner' : 'owner'}</span>
                     <span>geosolver@demo.com</span>
@@ -754,8 +754,8 @@ const FieldBook = () => {
                 </div>
               </div>
 
-              <div className="p-6 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200">
-                <div className="text-lg font-semibold text-black mb-4">
+              <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800">
+                <div className="text-lg font-semibold text-black dark:text-white mb-4">
                   {language === 'bg' ? 'Настройки' : 'Settings'}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

@@ -48,7 +48,7 @@ export default function TaskScanButton({ onClick, isScanning = false, comingSoon
         {isScanning ? (
           <span className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-gray-400 border-t-transparent" />
         ) : (
-          <img src="/icons/scan_icon.svg" alt={t.scan} className="h-4 w-4 shrink-0" />
+          <img src="/icons/scan_icon.svg" alt={t.scan} className="h-4 w-4 shrink-0 dark:invert" />
         )}
         <span className={`min-w-0 truncate font-medium font-['Manrope'] text-black dark:text-white ${textSize}`}>
           {t.scan}

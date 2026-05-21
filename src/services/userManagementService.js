@@ -1,4 +1,5 @@
 import API_BASE_URL from '../config/api';
+import { getApiLanguageHeaders, getAdminClientFallback } from '../utils/apiLanguage';
 
 class UserManagementService {
   // GET /api/users - List all users (admin only)
@@ -6,7 +7,7 @@ class UserManagementService {
     try {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       if (!token) {
-        throw new Error('Не сте влезли в системата');
+        throw new Error(getAdminClientFallback('notSignedIn'));
       }
 
       let url = `${API_BASE_URL}/users?page=${page}&limit=${limit}`;
@@ -14,15 +15,15 @@ class UserManagementService {
       if (role) url += `&role=${role}`;
 
       const response = await fetch(url, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+        headers: getApiLanguageHeaders({
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        })
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Грешка при зареждане на потребителите');
+        throw new Error(errorData.error || errorData.message || getAdminClientFallback('loadUsers'));
       }
 
       return await response.json();
@@ -37,19 +38,19 @@ class UserManagementService {
     try {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       if (!token) {
-        throw new Error('Не сте влезли в системата');
+        throw new Error(getAdminClientFallback('notSignedIn'));
       }
 
       const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+        headers: getApiLanguageHeaders({
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        })
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Грешка при зареждане на потребителя');
+        throw new Error(errorData.error || errorData.message || getAdminClientFallback('loadUser'));
       }
 
       return await response.json();
@@ -64,21 +65,21 @@ class UserManagementService {
     try {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       if (!token) {
-        throw new Error('Не сте влезли в системата');
+        throw new Error(getAdminClientFallback('notSignedIn'));
       }
 
       const response = await fetch(`${API_BASE_URL}/users/${userId}/role`, {
         method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
+        headers: getApiLanguageHeaders({
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        }),
         body: JSON.stringify({ role })
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Грешка при промяна на ролята');
+        throw new Error(errorData.error || errorData.message || getAdminClientFallback('changeRole'));
       }
 
       return await response.json();
@@ -93,20 +94,20 @@ class UserManagementService {
     try {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       if (!token) {
-        throw new Error('Не сте влезли в системата');
+        throw new Error(getAdminClientFallback('notSignedIn'));
       }
 
       const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+        headers: getApiLanguageHeaders({
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        })
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Грешка при изтриване на потребителя');
+        throw new Error(errorData.error || errorData.message || getAdminClientFallback('deleteUser'));
       }
 
       return await response.json();

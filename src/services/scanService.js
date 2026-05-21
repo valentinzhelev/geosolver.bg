@@ -1,4 +1,5 @@
 import API_BASE_URL from '../config/api';
+import { getApiLanguageHeaders } from '../utils/apiLanguage';
 
 export async function extractTaskInputFromImage(file) {
   const formData = new FormData();
@@ -7,7 +8,7 @@ export async function extractTaskInputFromImage(file) {
 
   const response = await fetch(`${API_BASE_URL}/scan/extract-input`, {
     method: 'POST',
-    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    headers: getApiLanguageHeaders(token ? { Authorization: `Bearer ${token}` } : {}),
     body: formData
   });
 

@@ -9,6 +9,7 @@ import ToolComingSoon from './components/pages/Tools/ToolComingSoon';
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import Account from './components/auth/Account';
+import AccountSettingsPage from './components/auth/AccountSettingsPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { AuthProvider } from './components/auth/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
@@ -23,6 +24,7 @@ import ResectionDocs from './components/tasks/ResectionDocs';
 import SecondTaskDocs from './components/tasks/SecondTaskDocs';
 import ForTeachers from './components/pages/ForTeachers/ForTeachers';
 import ForStudents from './components/pages/ForStudents/ForStudents';
+import GaiPage from './components/pages/Gai/GaiPage';
 import ScientificCalculator from './components/pages/ScientificCalculator/ScientificCalculator';
 import ClassroomHub from './components/classroom/ClassroomHub';
 import ClassroomRoute from './components/auth/ClassroomRoute';
@@ -67,6 +69,14 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/account/settings"
+                element={
+                  <ProtectedRoute>
+                    <AccountSettingsPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/contacts" element={<Contacts />} />
               <Route path="/first-task/docs" element={<FirstTaskDocs />} />
               <Route path="/second-task/docs" element={<SecondTaskDocs />} />
@@ -74,6 +84,7 @@ function App() {
               <Route path="/resection/docs" element={<ResectionDocs />} />
               <Route path="/for-teachers" element={<ForTeachers />} />
               <Route path="/for-students" element={<ForStudents />} />
+              <Route path="/gai" element={<GaiPage />} />
               <Route path="/scientific-calculator" element={<ScientificCalculator />} />
               <Route path="/fieldbook" element={<FieldBook />} />
               <Route path="/billing/success" element={<BillingSuccess />} />

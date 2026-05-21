@@ -208,25 +208,25 @@ const ScanInterface = () => {
         canonical="/teacher/scan"
       />
       <Layout>
-        <div className="w-full min-h-screen bg-stone-50 flex flex-col items-center py-8 px-2 md:px-0">
+        <div className="w-full min-h-screen bg-stone-50 dark:bg-zinc-950 transition-colors flex flex-col items-center py-8 px-2 md:px-0">
           <div className="w-full max-w-[1180px] flex flex-col gap-10">
             {/* Header */}
             <div className="flex flex-col gap-6">
               <div className="flex items-center gap-4">
                 <Link 
                   to="/teacher/dashboard" 
-                  className="px-3 py-2 bg-white rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 hover:bg-gray-50 transition-colors duration-200 flex items-center gap-2"
+                  className="px-3 py-2 bg-white dark:bg-zinc-900 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 hover:bg-gray-50 transition-colors duration-200 flex items-center gap-2"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                   </svg>
-                  <span className="text-sm text-neutral-600">{language === 'bg' ? 'Назад' : 'Back'}</span>
+                  <span className="text-sm text-neutral-600 dark:text-zinc-400">{language === 'bg' ? 'Назад' : 'Back'}</span>
                 </Link>
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-gray-100 rounded-lg">
                     <ScanIcon className="w-8 h-8 text-gray-600" />
                   </div>
-                  <h1 className="text-black text-3xl font-bold font-['Manrope']">
+                  <h1 className="text-black dark:text-white text-3xl font-bold font-['Manrope']">
                     {language === 'bg' ? 'Сканиране на решения' : 'Solution Scanning'}
                   </h1>
                 </div>
@@ -243,12 +243,12 @@ const ScanInterface = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Upload Section */}
-              <div className="p-6 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200">
+              <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="p-2 bg-gray-100 rounded-lg">
                     <UploadIcon className="w-6 h-6 text-gray-600" />
                   </div>
-                  <h2 className="text-xl font-bold text-black">
+                  <h2 className="text-xl font-bold text-black dark:text-white">
                     {language === 'bg' ? 'Качване на решение' : 'Upload Solution'}
                   </h2>
                 </div>
@@ -273,22 +273,22 @@ const ScanInterface = () => {
                         <FileIcon className="w-8 h-8 text-green-600" />
                       </div>
                       <div>
-                        <div className="font-medium text-black">{selectedFile.name}</div>
-                        <div className="text-sm text-neutral-600">
+                        <div className="font-medium text-black dark:text-white">{selectedFile.name}</div>
+                        <div className="text-sm text-neutral-600 dark:text-zinc-400">
                           {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                         </div>
                       </div>
                       <div className="flex flex-wrap justify-center gap-2">
                         <button
                           onClick={() => fileInputRef.current?.click()}
-                          className="px-4 py-2 bg-gray-200 text-black rounded-lg hover:bg-gray-300 transition-colors duration-200 text-sm font-medium flex items-center gap-2"
+                          className="px-4 py-2 bg-gray-200 dark:bg-zinc-700 text-black dark:text-white rounded-lg hover:bg-gray-300 transition-colors duration-200 text-sm font-medium flex items-center gap-2"
                         >
                           <UploadIcon className="w-4 h-4" />
                           {language === 'bg' ? 'Избери друг файл' : 'Choose different file'}
                         </button>
                         <button
                           onClick={() => cameraInputRef.current?.click()}
-                          className="px-4 py-2 bg-gray-200 text-black rounded-lg hover:bg-gray-300 transition-colors duration-200 text-sm font-medium flex items-center gap-2"
+                          className="px-4 py-2 bg-gray-200 dark:bg-zinc-700 text-black dark:text-white rounded-lg hover:bg-gray-300 transition-colors duration-200 text-sm font-medium flex items-center gap-2"
                         >
                           <CameraIcon className="w-4 h-4" />
                           {language === 'bg' ? 'Направи нова снимка' : 'Take new photo'}
@@ -301,7 +301,7 @@ const ScanInterface = () => {
                         <UploadIcon className="w-8 h-8 text-blue-600" />
                       </div>
                       <div>
-                        <div className="font-medium text-black mb-2">
+                        <div className="font-medium text-black dark:text-white mb-2">
                           {language === 'bg' ? 'Плъзнете файла тук или' : 'Drag file here or'}
                         </div>
                         <div className="flex flex-wrap justify-center gap-2">
@@ -321,7 +321,7 @@ const ScanInterface = () => {
                           </button>
                         </div>
                       </div>
-                      <div className="text-xs text-neutral-500">
+                      <div className="text-xs text-neutral-500 dark:text-zinc-400">
                         {language === 'bg' ? 'Поддържани формати: JPG, PNG, PDF. На мобилни „Направи снимка" отваря камерата.' : 'Supported formats: JPG, PNG, PDF. On mobile, "Take photo" opens the camera.'}
                       </div>
                     </div>
@@ -365,7 +365,7 @@ const ScanInterface = () => {
                   </button>
                   <button
                     onClick={handleReset}
-                    className="px-6 py-3 bg-gray-200 text-black rounded-lg hover:bg-gray-300 transition-colors duration-200 text-sm font-medium flex items-center gap-2"
+                    className="px-6 py-3 bg-gray-200 dark:bg-zinc-700 text-black dark:text-white rounded-lg hover:bg-gray-300 transition-colors duration-200 text-sm font-medium flex items-center gap-2"
                   >
                     <ResetIcon className="w-4 h-4" />
                     {language === 'bg' ? 'Нулирай' : 'Reset'}
@@ -374,12 +374,12 @@ const ScanInterface = () => {
               </div>
 
               {/* Analysis Results */}
-              <div className="p-6 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200">
+              <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="p-2 bg-purple-100 rounded-lg">
                     <AnalysisIcon className="w-6 h-6 text-purple-600" />
                   </div>
-                  <h2 className="text-xl font-bold text-black">
+                  <h2 className="text-xl font-bold text-black dark:text-white">
                     {language === 'bg' ? 'Резултати от анализа' : 'Analysis Results'}
                   </h2>
                 </div>
@@ -399,7 +399,7 @@ const ScanInterface = () => {
                         </div>
                         <span className="text-3xl font-bold text-gray-700">{analysisResult.overallScore}/10</span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-3">
+                      <div className="w-full bg-gray-200 dark:bg-zinc-700 rounded-full h-3">
                         <div 
                           className="bg-gradient-to-r from-gray-500 to-gray-600 h-3 rounded-full transition-all duration-500 shadow-sm"
                           style={{ width: `${(analysisResult.overallScore / 10) * 100}%` }}
@@ -416,7 +416,7 @@ const ScanInterface = () => {
                     {/* Student Info */}
                     <div className="p-4 bg-gradient-to-br from-gray-50 to-stone-50 rounded-lg border border-gray-200">
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-100">
+                        <div className="flex items-center gap-3 p-3 bg-white dark:bg-zinc-900 rounded-lg border border-gray-100">
                           <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
                             <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -427,7 +427,7 @@ const ScanInterface = () => {
                             <div className="text-sm font-semibold text-gray-900">{analysisResult.studentName}</div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-100">
+                        <div className="flex items-center gap-3 p-3 bg-white dark:bg-zinc-900 rounded-lg border border-gray-100">
                           <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
                             <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -438,7 +438,7 @@ const ScanInterface = () => {
                             <div className="text-sm font-semibold text-gray-900">{analysisResult.taskType}</div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-100">
+                        <div className="flex items-center gap-3 p-3 bg-white dark:bg-zinc-900 rounded-lg border border-gray-100">
                           <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
                             <ErrorIcon className="w-4 h-4 text-red-600" />
                           </div>
@@ -456,7 +456,7 @@ const ScanInterface = () => {
                         <div className="p-2 bg-red-100 rounded-lg">
                           <ErrorIcon className="w-5 h-5 text-red-600" />
                         </div>
-                        <h3 className="font-semibold text-black text-lg">
+                        <h3 className="font-semibold text-black dark:text-white text-lg">
                           {language === 'bg' ? 'Намерени грешки' : 'Detected Errors'}
                         </h3>
                       </div>
@@ -486,7 +486,7 @@ const ScanInterface = () => {
                                 {getSeverityLabel(error.severity)}
                               </span>
                             </div>
-                            <div className="p-3 bg-white/50 rounded-lg">
+                            <div className="p-3 bg-white dark:bg-zinc-900/50 rounded-lg">
                               <div className="text-sm font-medium text-gray-700 mb-1">
                                 {language === 'bg' ? 'Препоръка:' : 'Suggestion:'}
                               </div>
@@ -503,7 +503,7 @@ const ScanInterface = () => {
                         <div className="p-2 bg-green-100 rounded-lg">
                           <CheckIcon className="w-5 h-5 text-green-600" />
                         </div>
-                        <h3 className="font-semibold text-black text-lg">
+                        <h3 className="font-semibold text-black dark:text-white text-lg">
                           {language === 'bg' ? 'Правилни стъпки' : 'Correct Steps'}
                         </h3>
                       </div>
@@ -531,7 +531,7 @@ const ScanInterface = () => {
                           {language === 'bg' ? 'Преподавателска обратна връзка' : 'Teacher Feedback'}
                         </h3>
                       </div>
-                      <div className="p-4 bg-white rounded-lg border border-blue-100">
+                      <div className="p-4 bg-white dark:bg-zinc-900 rounded-lg border border-blue-100">
                         <p className="text-sm text-blue-800 leading-relaxed">{analysisResult.feedback}</p>
                       </div>
                     </div>
@@ -558,12 +558,12 @@ const ScanInterface = () => {
             </div>
 
             {/* Recent Scans */}
-            <div className="p-6 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200">
+            <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800">
               <div className="flex items-center gap-3 mb-6">
                 <div className="p-2 bg-purple-100 rounded-lg">
                   <ActivityIcon className="w-6 h-6 text-purple-600" />
                 </div>
-                <h2 className="text-xl font-bold text-black">
+                <h2 className="text-xl font-bold text-black dark:text-white">
                   {language === 'bg' ? 'Последни сканирания' : 'Recent Scans'}
                 </h2>
               </div>

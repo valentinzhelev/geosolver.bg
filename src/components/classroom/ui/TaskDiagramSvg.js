@@ -7,7 +7,7 @@ const H = 240;
 function NorthArrow({ x, y, bg }) {
   return (
     <g transform={`translate(${x},${y})`}>
-      <line x1="0" y1="8" x2="0" y2="-14" stroke="currentColor" strokeWidth="1.5" className="text-neutral-400" />
+      <line x1="0" y1="8" x2="0" y2="-14" stroke="currentColor" strokeWidth="1.5" className="text-neutral-400 dark:text-zinc-400" />
       <polygon points="0,-18 -4,-10 4,-10" className="fill-neutral-500" />
       <text x="0" y="-22" textAnchor="middle" className="text-[9px] fill-neutral-500 font-['Manrope']">
         Y
@@ -272,7 +272,7 @@ const TaskDiagramSvg = ({ toolKey, inputData, answers, bg }) => {
   }
 
   return (
-    <div className="w-full max-w-[340px] h-[140px] mx-auto rounded-xl border border-dashed border-stone-200 dark:border-zinc-700 flex items-center justify-center text-xs text-neutral-400 font-['Manrope']">
+    <div className="w-full max-w-[340px] h-[140px] mx-auto rounded-xl border border-dashed border-stone-200 dark:border-zinc-700 flex items-center justify-center text-xs text-neutral-400 dark:text-zinc-400 font-['Manrope']">
       {bg ? 'Няма схема за този тип' : 'No diagram for this type'}
     </div>
   );

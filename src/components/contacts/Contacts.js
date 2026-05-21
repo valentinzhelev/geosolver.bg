@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import API_BASE_URL from '../../config/api';
+import { getApiLanguageHeaders } from '../../utils/apiLanguage';
 import SEO from '../shared/SEO';
 import Layout from '../layout/Layout';
 import { useTranslation } from '../../hooks/useTranslation';
@@ -26,7 +27,7 @@ const Contacts = () => {
       const timeoutId = setTimeout(() => controller.abort(), 30000);
       const res = await fetch(`${API_BASE_URL}/contact`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getApiLanguageHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify(formData),
         signal: controller.signal
       });

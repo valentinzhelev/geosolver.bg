@@ -74,14 +74,14 @@ export function NotificationBell() {
                 <button
                   type="button"
                   onClick={markAllRead}
-                  className="text-xs text-neutral-500 hover:text-black dark:hover:text-white"
+                  className="text-xs text-neutral-500 dark:text-zinc-400 hover:text-black dark:hover:text-white"
                 >
                   {bg ? 'Прочети всички' : 'Mark all read'}
                 </button>
               )}
             </div>
             {items.length === 0 ? (
-              <p className="text-xs text-neutral-500 px-2 py-4 font-['Manrope']">
+              <p className="text-xs text-neutral-500 dark:text-zinc-400 px-2 py-4 font-['Manrope']">
                 {bg ? 'Няма известия' : 'No notifications'}
               </p>
             ) : (
@@ -102,12 +102,12 @@ export function NotificationBell() {
                       className="block text-black dark:text-white hover:underline"
                     >
                       <div className="font-medium">{n.title}</div>
-                      {n.body && <div className="text-xs text-neutral-500 mt-0.5">{n.body}</div>}
+                      {n.body && <div className="text-xs text-neutral-500 dark:text-zinc-400 mt-0.5">{n.body}</div>}
                     </Link>
                   ) : (
                     <div>
                       <div className="font-medium text-black dark:text-white">{n.title}</div>
-                      {n.body && <div className="text-xs text-neutral-500 mt-0.5">{n.body}</div>}
+                      {n.body && <div className="text-xs text-neutral-500 dark:text-zinc-400 mt-0.5">{n.body}</div>}
                     </div>
                   )}
                 </div>

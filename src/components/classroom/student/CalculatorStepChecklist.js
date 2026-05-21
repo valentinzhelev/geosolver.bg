@@ -25,8 +25,8 @@ const CalculatorStepChecklist = ({ assignmentId, steps, bg }) => {
   const done = steps.filter((s) => checked[s.key]).length;
 
   return (
-    <div className="rounded-lg border border-stone-200 dark:border-zinc-700 p-3 bg-stone-50/80 dark:bg-zinc-800/50">
-      <p className="text-xs font-semibold uppercase text-neutral-500 mb-2 font-['Manrope'] flex justify-between">
+    <div className="rounded-lg border border-stone-200 dark:border-zinc-700 p-3 bg-stone-50/80 dark:bg-zinc-900/80 dark:bg-zinc-800/50">
+      <p className="text-xs font-semibold uppercase text-neutral-500 dark:text-zinc-400 mb-2 font-['Manrope'] flex justify-between">
         <span>{bg ? 'Междинни стъпки (калкулатор)' : 'Calculator steps'}</span>
         <span>
           {done}/{steps.length}
@@ -42,7 +42,7 @@ const CalculatorStepChecklist = ({ assignmentId, steps, bg }) => {
                 onChange={() => toggle(s.key)}
                 className="rounded border-stone-300"
               />
-              <span className={checked[s.key] ? 'text-neutral-500 line-through' : 'text-black dark:text-white'}>
+              <span className={checked[s.key] ? 'text-neutral-500 dark:text-zinc-400 line-through' : 'text-black dark:text-white'}>
                 {bg ? s.labelBg : s.labelEn}
               </span>
             </label>

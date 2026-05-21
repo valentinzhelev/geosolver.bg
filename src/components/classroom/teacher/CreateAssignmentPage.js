@@ -210,7 +210,7 @@ const CreateAssignmentPage = () => {
           <div className="flex flex-col gap-2 border-t border-stone-100 dark:border-zinc-800 pt-4">
             <span className="text-sm font-medium font-['Manrope']">{bg ? 'Моите шаблони' : 'My saved templates'}</span>
             {myTemplates.length === 0 ? (
-              <p className="text-xs text-neutral-500 font-['Manrope']">
+              <p className="text-xs text-neutral-500 dark:text-zinc-400 font-['Manrope']">
                 {bg ? 'Няма запазени шаблони.' : 'No saved templates yet.'}
               </p>
             ) : (
@@ -239,7 +239,7 @@ const CreateAssignmentPage = () => {
             )}
             <div className="flex flex-wrap gap-2 items-end">
               <label className="flex flex-col gap-1 flex-1 min-w-[160px]">
-                <span className="text-xs text-neutral-500 font-['Manrope']">
+                <span className="text-xs text-neutral-500 dark:text-zinc-400 font-['Manrope']">
                   {bg ? 'Име при запазване (по избор)' : 'Save as (optional)'}
                 </span>
                 <input
@@ -377,7 +377,7 @@ const CreateAssignmentPage = () => {
                   </option>
                 ))}
               </select>
-              <p className="text-xs text-neutral-500 font-['Manrope']">{policyMeta.teacherHint}</p>
+              <p className="text-xs text-neutral-500 dark:text-zinc-400 font-['Manrope']">{policyMeta.teacherHint}</p>
             </label>
 
             <label className="flex flex-col gap-1">

@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import SEO from '../shared/SEO';
 import Layout from '../layout/Layout';
 import { Link } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
+import { useSyncTaskLanguage } from '../../hooks/useSyncTaskLanguage';
+import { isTaskPlaceholderResult } from '../../utils/taskI18n';
 import useTypewriter from '../../hooks/useTypewriter';
 import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
 import { useEduAssignmentBridge } from '../../hooks/useEduAssignmentBridge';
@@ -55,6 +57,7 @@ const PurvaZadacha = () => {
   const { t, language } = useTranslation();
   const { isProUser, proScanMessage } = useProScan(language);
   const [resultText, setResultText] = useState(t.defaultResultText);
+  useSyncTaskLanguage(resultText, setResultText, (tr) => tr.defaultResultText);
   const [history, setHistory] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
@@ -143,7 +146,7 @@ const PurvaZadacha = () => {
     const alpha = parseFloat(form.alpha);
     const s = parseFloat(form.s);
     if (isNaN(y1) || isNaN(x1) || isNaN(alpha) || isNaN(s)) {
-      alert(language === 'bg' ? "Моля, попълнете всички полета коректно." : "Please fill in all fields correctly.");
+      alert(t.fillAllFields);
       return;
     }
 
@@ -247,25 +250,28 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
   const resetForm = () => {
     setForm({ y1: '', x1: '', alpha: '', s: '' });
     setResultText(t.defaultResultText);
+    setLastCalcResult(null);
     setLowConfFields({});
   };
 
   const inputClass = (fieldId) => {
-    const base = "self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] text-neutral-400 text-xs font-medium font-['Manrope']";
-    const low = lowConfFields[fieldId] ? 'outline-amber-400 ring-1 ring-amber-200' : 'outline-gray-200';
-    return `${base} ${low}`;
+    const low = lowConfFields[fieldId]
+      ? 'outline-amber-400 dark:outline-amber-500 ring-1 ring-amber-200 dark:ring-amber-900/50'
+      : 'outline-gray-200 dark:outline-zinc-600';
+    return `self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] bg-white dark:bg-zinc-800 text-black dark:text-zinc-100 placeholder:text-neutral-400 dark:placeholder:text-zinc-500 text-xs font-medium font-['Manrope'] ${low}`;
   };
 
   const inputClassDesktop = (fieldId) => {
-    const base = "self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] text-neutral-400 text-sm font-medium font-['Manrope']";
-    const low = lowConfFields[fieldId] ? 'outline-amber-400 ring-1 ring-amber-200' : 'outline-gray-200';
-    return `${base} ${low}`;
+    const low = lowConfFields[fieldId]
+      ? 'outline-amber-400 dark:outline-amber-500 ring-1 ring-amber-200 dark:ring-amber-900/50'
+      : 'outline-gray-200 dark:outline-zinc-600';
+    return `self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] bg-white dark:bg-zinc-800 text-black dark:text-zinc-100 placeholder:text-neutral-400 dark:placeholder:text-zinc-500 text-sm font-medium font-['Manrope'] ${low}`;
   };
 
   const handleDownload = (entry) => {
     const text = language === 'bg'
-      ? `Y1: ${entry.y1}\nX1: ${entry.x1}\nα: ${entry.alpha}\nS: ${entry.s}\nY2: ${entry.y2}\nX2: ${entry.x2}\nДата: ${(() => { const d = new Date(entry.date); return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()}` })()}`
-      : `Y1: ${entry.y1}\nX1: ${entry.x1}\nα: ${entry.alpha}\nS: ${entry.s}\nY2: ${entry.y2}\nX2: ${entry.x2}\nDate: ${(() => { const d = new Date(entry.date); return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()}` })()}`;
+      ? `Y1: ${entry.y1}\nX1: ${entry.x1}\nα: ${entry.alpha}\nS: ${entry.s}\nY2: ${entry.y2}\nX2: ${entry.x2}\n${t.date}: ${(() => { const d = new Date(entry.date); return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()}` })()}`
+      : `Y1: ${entry.y1}\nX1: ${entry.x1}\nα: ${entry.alpha}\nS: ${entry.s}\nY2: ${entry.y2}\nX2: ${entry.x2}\n${t.date}: ${(() => { const d = new Date(entry.date); return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()}` })()}`;
     const blob = new Blob([text], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -289,35 +295,42 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
     );
   };
 
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "Първа основна задача - GeoSolver",
-    "description": "Изчисляване на координати по начална точка, ъгъл и дължина с онлайн геодезически калкулатор",
-    "applicationCategory": "BusinessApplication",
-    "operatingSystem": "Web Browser",
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "EUR"
-    },
-    "featureList": [
-      "Изчисляване на координати",
-      "Трансформация по полярен метод",
-      "Валидация на входни данни",
-      "История на изчисленията"
-    ]
-  };
+  const structuredData = useMemo(
+    () => ({
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
+      name: `${t.firstTaskTitle} - GeoSolver`,
+      description: t.firstTaskDescription,
+      applicationCategory: 'BusinessApplication',
+      operatingSystem: 'Web Browser',
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
+      featureList:
+        language === 'bg'
+          ? [
+              'Изчисляване на координати',
+              'Трансформация по полярен метод',
+              'Валидация на входни данни',
+              'История на изчисленията',
+            ]
+          : [
+              'Coordinate calculation',
+              'Polar method transformation',
+              'Input validation',
+              'Calculation history',
+            ],
+    }),
+    [t, language]
+  );
 
   return (
     <>
       <input ref={fileInputRef} type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && handleScanFile(e.target.files[0])} className="hidden" aria-hidden="true" />
       <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" onChange={(e) => e.target.files?.[0] && handleScanFile(e.target.files[0])} className="hidden" aria-hidden="true" />
       <SEO
-        title="Първа основна задача – Изчисляване по начална точка, ъгъл и дължина"
-        description="Изчисляване на координати по начална точка, ъгъл и дължина с онлайн геодезически калкулатор. Бързи и точни решения за геодезисти."
-        keywords="геодезия, онлайн калкулатор, първа основна задача, координати, ъгъл, дължина, трансформация, геодезически изчисления"
-        canonical="/tools/first-task"
+        title={t.firstTaskTitle}
+        description={t.firstTaskDescription}
+        keywords={t.firstTaskKeywords}
+        canonical="/first-task"
         structuredData={structuredData}
       />
       <Layout>
@@ -329,33 +342,33 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
           onDismiss={dismissEduBanner}
         />
         {/* MOBILE LAYOUT */}
-        <div className="block md:hidden w-full max-w-md mx-auto min-h-screen bg-stone-50 relative px-4 py-4">
+        <div className="block md:hidden w-full max-w-md mx-auto min-h-screen bg-stone-50 dark:bg-zinc-950 transition-colors relative px-4 py-4">
           {/* Main Content */}
           <div className="flex flex-col justify-start items-start gap-6 w-full">
             <div className="self-stretch flex flex-col justify-start items-start gap-1">
               <div className="inline-flex items-center gap-3 w-full">
                 <TaskMobileBackButton />
-                <span className="text-black text-2xl font-bold font-['Manrope']">Първа основна задача</span>
+                <span className="text-black dark:text-white text-2xl font-bold font-['Manrope']">{t.firstTaskTitle}</span>
               </div>
             </div>
             {/* Tab group above the form card - use desktop design, but only as wide as content */}
-            <div className="p-1.5 bg-white rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-2 mb-2">
-              <div data-property-1="Default" className="px-3 py-1 bg-gray-200 rounded flex justify-center items-center gap-2.5">
-                <div className="justify-start text-black text-base font-medium font-['Manrope']">Инструмент</div>
+            <div className="p-1.5 bg-white dark:bg-zinc-900 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 inline-flex justify-start items-center gap-2 mb-2">
+              <div data-property-1="Default" className="px-3 py-1 bg-gray-200 dark:bg-zinc-700 rounded flex justify-center items-center gap-2.5">
+                <div className="justify-start text-black dark:text-white text-base font-medium font-['Manrope']">{t.instrument}</div>
               </div>
-              <Link to="/first-task/docs" className="px-3 py-1 bg-white rounded flex justify-center items-center gap-2.5">
-                <div className="justify-start text-neutral-400 text-base font-medium font-['Manrope']">Документация</div>
+              <Link to="/first-task/docs" className="px-3 py-1 bg-white dark:bg-zinc-900 rounded flex justify-center items-center gap-2.5">
+                <div className="justify-start text-neutral-400 dark:text-zinc-400 text-base font-medium font-['Manrope']">{t.documentation}</div>
               </Link>
             </div>
             <div className="self-stretch flex flex-col justify-start items-start gap-10 w-full">
               <div className="self-stretch flex flex-col justify-start items-start gap-5 w-full">
                 {/* Form Card */}
-                <div className="self-stretch p-3 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-center items-end gap-3 w-full min-w-0 overflow-hidden">
-                  <div className="self-stretch justify-start text-black text-base font-semibold font-['Manrope']">Входни данни</div>
+                <div className="self-stretch p-3 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex flex-col justify-center items-end gap-3 w-full min-w-0 overflow-hidden">
+                  <div className="self-stretch justify-start text-black dark:text-white text-base font-semibold font-['Manrope']">{t.inputData}</div>
                   <div className="self-stretch flex flex-col justify-start items-start gap-4 w-full">
                     {/* Y1 */}
                     <div className="self-stretch flex flex-col justify-start items-start gap-2 w-full">
-                      <div className="justify-start text-black text-xs font-medium font-['Manrope']">Y₁ (координата)</div>
+                      <div className="justify-start text-black dark:text-white text-xs font-medium font-['Manrope']">{t.y1Coordinate}</div>
                       <input
                         type="number"
                         id="y1"
@@ -363,7 +376,7 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
                         onChange={handleChange}
                         step="any"
                         className={inputClass('y1')}
-                        placeholder="Въведете координата Y1"
+                        placeholder={t.enterY1}
                         list="y1-history"
                       />
                       <datalist id="y1-history">
@@ -372,7 +385,7 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
                     </div>
                     {/* X1 */}
                     <div className="self-stretch flex flex-col justify-start items-start gap-2 w-full">
-                      <div className="justify-start text-black text-xs font-medium font-['Manrope']">X₁ (координата)</div>
+                      <div className="justify-start text-black dark:text-white text-xs font-medium font-['Manrope']">{t.x1Coordinate}</div>
                       <input
                         type="number"
                         id="x1"
@@ -380,7 +393,7 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
                         onChange={handleChange}
                         step="any"
                         className={inputClass('x1')}
-                        placeholder="Въведете координата X1"
+                        placeholder={t.enterX1}
                         list="x1-history"
                       />
                       <datalist id="x1-history">
@@ -389,7 +402,7 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
                     </div>
                     {/* Alpha */}
                     <div className="self-stretch flex flex-col justify-start items-start gap-2 w-full">
-                      <div className="justify-start text-black text-xs font-medium font-['Manrope']">Ъгъл α (в гради)</div>
+                      <div className="justify-start text-black dark:text-white text-xs font-medium font-['Manrope']">{t.angleAlpha}</div>
                       <input
                         type="number"
                         id="alpha"
@@ -397,7 +410,7 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
                         onChange={handleChange}
                         step="any"
                         className={inputClass('alpha')}
-                        placeholder="Въведете ъгъл α"
+                        placeholder={t.enterAlpha}
                         list="alpha-history"
                       />
                       <datalist id="alpha-history">
@@ -406,7 +419,7 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
                     </div>
                     {/* S */}
                     <div className="self-stretch flex flex-col justify-start items-start gap-2 w-full">
-                      <div className="justify-start text-black text-xs font-medium font-['Manrope']">Дължина S</div>
+                      <div className="justify-start text-black dark:text-white text-xs font-medium font-['Manrope']">{t.lengthS}</div>
                       <input
                         type="number"
                         id="s"
@@ -414,7 +427,7 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
                         onChange={handleChange}
                         step="any"
                         className={inputClass('s')}
-                        placeholder="Въведете дължина S"
+                        placeholder={t.enterS}
                         list="s-history"
                       />
                       <datalist id="s-history">
@@ -432,10 +445,10 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
 
                 </div>
                 {/* Results Card */}
-                <div className="self-stretch p-3 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-center items-end gap-3 w-full min-w-0 overflow-hidden">
-                  <div className="self-stretch justify-start text-black text-base font-semibold font-['Manrope']">Резултати</div>
-                  <div className="self-stretch p-3 bg-stone-50 rounded-lg flex flex-col justify-start items-start w-full">
-                    <div className="self-stretch justify-start text-neutral-400 text-sm font-medium font-['Manrope'] whitespace-pre-line">
+                <div className="self-stretch p-3 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex flex-col justify-center items-end gap-3 w-full min-w-0 overflow-hidden">
+                  <div className="self-stretch justify-start text-black dark:text-white text-base font-semibold font-['Manrope']">{t.results}</div>
+                  <div className="self-stretch p-3 bg-stone-50 dark:bg-zinc-800 rounded-lg flex flex-col justify-start items-start w-full">
+                    <div className="self-stretch justify-start text-neutral-400 dark:text-zinc-400 text-sm font-medium font-['Manrope'] whitespace-pre-line">
                       {displayText}
                       {isTyping && <span className="animate-pulse">|</span>}
                     </div>
@@ -444,64 +457,64 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
               </div>
               {/* History Table */}
               <div className="self-stretch flex flex-col justify-start items-start gap-3 w-full">
-                <div className="justify-start text-black text-lg font-bold font-['Manrope']">История на изчисленията</div>
+                <div className="justify-start text-black dark:text-white text-lg font-bold font-['Manrope']">{t.calculationHistory}</div>
                 <div className="self-stretch flex flex-col justify-start items-start gap-2.5 w-full">
                   <div className="w-full overflow-x-auto">
-                    <div className="min-w-[800px] rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-start items-start gap-px overflow-hidden">
-                      <div className="self-stretch shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] inline-flex justify-start items-start gap-px bg-white">
+                    <div className="min-w-[800px] rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex flex-col justify-start items-start gap-px overflow-hidden">
+                      <div className="self-stretch shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] inline-flex justify-start items-start gap-px bg-white dark:bg-zinc-900">
                         <div className="flex-1 px-3 py-2 min-w-[80px] flex justify-center items-center gap-2.5 text-center border-r border-gray-200">
-                          <div className="text-black text-sm font-medium font-['Manrope'] text-center">Y₁</div>
+                          <div className="text-black dark:text-white text-sm font-medium font-['Manrope'] text-center">Y₁</div>
                         </div>
                         <div className="flex-1 px-3 py-2 min-w-[80px] flex justify-center items-center gap-2.5 text-center border-r border-gray-200">
-                          <div className="text-black text-sm font-medium font-['Manrope'] text-center">X₁</div>
+                          <div className="text-black dark:text-white text-sm font-medium font-['Manrope'] text-center">X₁</div>
                         </div>
                         <div className="flex-1 px-3 py-2 min-w-[80px] flex justify-center items-center gap-2.5 text-center border-r border-gray-200">
-                          <div className="text-black text-sm font-medium font-['Manrope'] text-center">α</div>
+                          <div className="text-black dark:text-white text-sm font-medium font-['Manrope'] text-center">α</div>
                         </div>
                         <div className="flex-1 px-3 py-2 min-w-[80px] flex justify-center items-center gap-2.5 text-center border-r border-gray-200">
-                          <div className="text-black text-sm font-medium font-['Manrope'] text-center">S</div>
+                          <div className="text-black dark:text-white text-sm font-medium font-['Manrope'] text-center">S</div>
                         </div>
                         <div className="flex-1 px-3 py-2 min-w-[80px] flex justify-center items-center gap-2.5 text-center border-r border-gray-200">
-                          <div className="text-black text-sm font-medium font-['Manrope'] text-center">Y₂</div>
+                          <div className="text-black dark:text-white text-sm font-medium font-['Manrope'] text-center">Y₂</div>
                         </div>
                         <div className="flex-1 px-3 py-2 min-w-[80px] flex justify-center items-center gap-2.5 text-center border-r border-gray-200">
-                          <div className="text-black text-sm font-medium font-['Manrope'] text-center">X₂</div>
+                          <div className="text-black dark:text-white text-sm font-medium font-['Manrope'] text-center">X₂</div>
                         </div>
                         <div className="flex-1 px-3 py-2 min-w-[80px] flex justify-center items-center gap-2.5 text-center border-r border-gray-200">
-                          <div className="text-black text-sm font-medium font-['Manrope'] text-center">Дата</div>
+                          <div className="text-black dark:text-white text-sm font-medium font-['Manrope'] text-center">{t.date}</div>
                         </div>
                         <div className="flex-1 px-3 py-2 min-w-[80px] flex justify-center items-center gap-2.5 text-center">
-                          <div className="text-black text-sm font-medium font-['Manrope'] text-center">Изтегли</div>
+                          <div className="text-black dark:text-white text-sm font-medium font-['Manrope'] text-center">{t.download}</div>
                         </div>
                       </div>
                       {paginatedHistory.length === 0 ? (
-                        <div className="w-full px-3 py-2 bg-white text-neutral-400 text-sm font-medium font-['Manrope']">Няма изчисления.</div>
+                        <div className="w-full px-3 py-2 bg-white dark:bg-zinc-900 text-neutral-400 dark:text-zinc-400 text-sm font-medium font-['Manrope']">{t.noCalculations}</div>
                       ) : (
                         paginatedHistory.map((entry, idx) => (
                           <div key={idx} className="self-stretch inline-flex justify-start items-start gap-px">
-                            <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                              <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{entry.y1}</div>
+                            <div className="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                              <div className="justify-start text-neutral-400 dark:text-zinc-400 text-sm font-medium font-['Manrope']">{entry.y1}</div>
                             </div>
-                            <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                              <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{entry.x1}</div>
+                            <div className="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                              <div className="justify-start text-neutral-400 dark:text-zinc-400 text-sm font-medium font-['Manrope']">{entry.x1}</div>
                             </div>
-                            <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                              <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{entry.alpha}</div>
+                            <div className="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                              <div className="justify-start text-neutral-400 dark:text-zinc-400 text-sm font-medium font-['Manrope']">{entry.alpha}</div>
                             </div>
-                            <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                              <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{entry.s}</div>
+                            <div className="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                              <div className="justify-start text-neutral-400 dark:text-zinc-400 text-sm font-medium font-['Manrope']">{entry.s}</div>
                             </div>
-                            <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                              <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{entry.y2}</div>
+                            <div className="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                              <div className="justify-start text-neutral-400 dark:text-zinc-400 text-sm font-medium font-['Manrope']">{entry.y2}</div>
                             </div>
-                            <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                              <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{entry.x2}</div>
+                            <div className="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                              <div className="justify-start text-neutral-400 dark:text-zinc-400 text-sm font-medium font-['Manrope']">{entry.x2}</div>
                             </div>
-                            <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                              <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{(() => { const d = new Date(entry.date); return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()}` })()}</div>
+                            <div className="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                              <div className="justify-start text-neutral-400 dark:text-zinc-400 text-sm font-medium font-['Manrope']">{(() => { const d = new Date(entry.date); return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()}` })()}</div>
                             </div>
-                            <div className="flex-1 self-stretch px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                              <button onClick={() => handleDownload(entry)} className="flex items-center justify-center"><svg className="w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" strokeLinecap="round" strokeLinejoin="round"/></svg></button>
+                            <div className="flex-1 self-stretch px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                              <button onClick={() => handleDownload(entry)} className="flex items-center justify-center"><svg className="w-4 h-4 text-neutral-400 dark:text-zinc-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" strokeLinecap="round" strokeLinejoin="round"/></svg></button>
                             </div>
                           </div>
                         ))
@@ -513,15 +526,15 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
                 <div className="self-stretch inline-flex justify-center items-center gap-4 w-full">
                   <div className="flex justify-start items-center gap-2">
                     <button className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>
-                      <img src="/icons/small_left_arrow.svg" alt="Назад" className="w-3 h-3 opacity-70" />
+                      <img src="/icons/small_left_arrow.svg" alt={t.back} className="w-3 h-3 opacity-70 dark:invert" />
                     </button>
                     {Array.from({ length: totalPages }, (_, i) => (
-                      <button key={i} className={`w-7 px-2 py-1 rounded ${currentPage === i + 1 ? 'bg-gray-200 text-black' : 'outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400'} inline-flex flex-col justify-center items-center`} onClick={() => setCurrentPage(i + 1)} disabled={currentPage === i + 1}>
+                      <button key={i} className={`w-7 px-2 py-1 rounded ${currentPage === i + 1 ? 'bg-gray-200 dark:bg-zinc-700 text-black dark:text-white' : 'outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 text-neutral-400 dark:text-zinc-400'} inline-flex flex-col justify-center items-center`} onClick={() => setCurrentPage(i + 1)} disabled={currentPage === i + 1}>
                         <div className="justify-start text-sm font-medium font-['Manrope']">{i + 1}</div>
                       </button>
                     ))}
                     <button className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages || totalPages === 0}>
-                      <img src="/icons/small_right_arrow.svg" alt="Напред" className="w-3 h-3 opacity-70" />
+                      <img src="/icons/small_right_arrow.svg" alt={t.next} className="w-3 h-3 opacity-70 dark:invert" />
                     </button>
                   </div>
                 </div>
@@ -530,35 +543,35 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
           </div>
         </div>
         {/* DESKTOP LAYOUT */}
-        <div className="hidden md:flex w-[1180px] mx-auto my-10 flex-col justify-start items-start gap-10">
+        <div className="hidden md:flex w-full max-w-[1180px] mx-auto px-4 py-10 bg-stone-50 dark:bg-zinc-950 transition-colors flex-col justify-start items-start gap-10">
           <div className="self-stretch flex flex-col justify-center items-start gap-10">
             {/* Breadcrumbs and Title */}
             <div className="w-[580px] flex flex-col justify-start items-start gap-4">
               <div className="flex flex-col justify-start items-start gap-1">
                 <div className="justify-start">
-                  <Link to="/tools" className="text-neutral-400 text-base font-medium font-['Manrope'] underline">Инструменти</Link>
-                  <span className="text-neutral-400 text-base font-medium font-['Manrope']"> {'>'} Първа основна задача</span>
+                  <Link to="/tools" className="text-neutral-400 dark:text-zinc-400 text-base font-medium font-['Manrope'] underline">{t.toolsTitle}</Link>
+                  <span className="text-neutral-400 dark:text-zinc-400 text-base font-medium font-['Manrope']"> {'>'} {t.firstTaskTitle}</span>
                 </div>
-                <div className="justify-start text-black text-3xl font-bold font-['Manrope']">Първа основна задача</div>
+                <div className="justify-start text-black dark:text-white text-3xl font-bold font-['Manrope']">{t.firstTaskTitle}</div>
               </div>
-              <div className="p-1.5 bg-white rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-2">
-                <div className="px-3 py-1 bg-gray-200 rounded flex justify-center items-center gap-2.5">
-                  <div className="justify-start text-black text-base font-medium font-['Manrope']">Инструмент</div>
+              <div className="p-1.5 bg-white dark:bg-zinc-900 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 inline-flex justify-start items-center gap-2">
+                <div className="px-3 py-1 bg-gray-200 dark:bg-zinc-700 rounded flex justify-center items-center gap-2.5">
+                  <div className="justify-start text-black dark:text-white text-base font-medium font-['Manrope']">{t.instrument}</div>
                 </div>
-                <Link to="/first-task/docs" className="px-3 py-1 bg-white rounded flex justify-center items-center gap-2.5">
-                  <div className="justify-start text-neutral-400 text-base font-medium font-['Manrope']">Документация</div>
+                <Link to="/first-task/docs" className="px-3 py-1 bg-white dark:bg-zinc-900 rounded flex justify-center items-center gap-2.5">
+                  <div className="justify-start text-neutral-400 dark:text-zinc-400 text-base font-medium font-['Manrope']">{t.documentation}</div>
                 </Link>
               </div>
             </div>
             {/* Form and Results */}
             <div className="self-stretch inline-flex justify-start items-start gap-5">
               {/* Form Card */}
-              <div className="flex-1 p-4 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-center items-end gap-4">
-                <div className="self-stretch justify-start text-black text-lg font-semibold font-['Manrope']">Входни данни</div>
+              <div className="flex-1 p-4 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 inline-flex flex-col justify-center items-end gap-4">
+                <div className="self-stretch justify-start text-black dark:text-white text-lg font-semibold font-['Manrope']">{t.inputData}</div>
                 <div className="self-stretch flex flex-col justify-start items-start gap-4">
                   {/* Y1 */}
                   <div className="self-stretch flex flex-col justify-start items-start gap-2">
-                    <div className="justify-start text-black text-sm font-medium font-['Manrope']">Y₁ (координата)</div>
+                    <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{t.y1Coordinate}</div>
                     <input
                       type="number"
                       id="y1"
@@ -566,7 +579,7 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
                       onChange={handleChange}
                       step="any"
                       className={inputClassDesktop('y1')}
-                      placeholder="Въведете координата Y1"
+                      placeholder={t.enterY1}
                       list="y1-history"
                     />
                     <datalist id="y1-history">
@@ -575,7 +588,7 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
                   </div>
                   {/* X1 */}
                   <div className="self-stretch flex flex-col justify-start items-start gap-2">
-                    <div className="justify-start text-black text-sm font-medium font-['Manrope']">X₁ (координата)</div>
+                    <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{t.x1Coordinate}</div>
                     <input
                       type="number"
                       id="x1"
@@ -583,7 +596,7 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
                       onChange={handleChange}
                       step="any"
                       className={inputClassDesktop('x1')}
-                      placeholder="Въведете координата X1"
+                      placeholder={t.enterX1}
                       list="x1-history"
                     />
                     <datalist id="x1-history">
@@ -592,7 +605,7 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
                   </div>
                   {/* Alpha */}
                   <div className="self-stretch flex flex-col justify-start items-start gap-2">
-                    <div className="justify-start text-black text-sm font-medium font-['Manrope']">Ъгъл α (в гради)</div>
+                    <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{t.angleAlpha}</div>
                     <input
                       type="number"
                       id="alpha"
@@ -600,7 +613,7 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
                       onChange={handleChange}
                       step="any"
                       className={inputClassDesktop('alpha')}
-                      placeholder="Въведете ъгъл α"
+                      placeholder={t.enterAlpha}
                       list="alpha-history"
                     />
                     <datalist id="alpha-history">
@@ -609,7 +622,7 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
                   </div>
                   {/* S */}
                   <div className="self-stretch flex flex-col justify-start items-start gap-2">
-                    <div className="justify-start text-black text-sm font-medium font-['Manrope']">Дължина S</div>
+                    <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{t.lengthS}</div>
                     <input
                       type="number"
                       id="s"
@@ -617,7 +630,7 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
                       onChange={handleChange}
                       step="any"
                       className={inputClassDesktop('s')}
-                      placeholder="Въведете дължина S"
+                      placeholder={t.enterS}
                       list="s-history"
                     />
                     <datalist id="s-history">
@@ -636,20 +649,20 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
 
               </div>
               {/* Results Card */}
-              <div className="flex-1 self-stretch p-4 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-center items-end gap-3">
-                <div className="self-stretch justify-start text-black text-lg font-semibold font-['Manrope']">Резултати</div>
-                <div className="self-stretch flex-1 p-3 bg-stone-50 rounded-lg flex flex-col justify-start items-start">
-                  <div className="self-stretch justify-start text-neutral-400 text-sm font-medium font-['Manrope'] whitespace-pre-line">
+              <div className="flex-1 self-stretch p-4 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 inline-flex flex-col justify-center items-end gap-3">
+                <div className="self-stretch justify-start text-black dark:text-white text-lg font-semibold font-['Manrope']">{t.results}</div>
+                <div className="self-stretch flex-1 p-3 bg-stone-50 dark:bg-zinc-800 rounded-lg flex flex-col justify-start items-start">
+                  <div className="self-stretch justify-start text-neutral-400 dark:text-zinc-400 text-sm font-medium font-['Manrope'] whitespace-pre-line">
                     {displayText}
                     {isTyping && <span className="animate-pulse">|</span>}
                   </div>
                 </div>
                 <button
                   type="button"
-                  className={`px-4 py-2 ${!resultText || resultText.includes('Въведете данни') ? 'opacity-20 cursor-not-allowed' : ''} bg-gray-200 rounded-lg inline-flex justify-start items-center gap-3`}
-                  disabled={!resultText || resultText.includes('Въведете данни')}
+                  className={`px-4 py-2 ${isTaskPlaceholderResult(resultText) ? 'opacity-20 cursor-not-allowed' : ''} bg-gray-200 dark:bg-zinc-700 rounded-lg inline-flex justify-start items-center gap-3`}
+                  disabled={isTaskPlaceholderResult(resultText)}
                   onClick={() => {
-                    if (!resultText || resultText.includes('Въведете данни')) return;
+                    if (isTaskPlaceholderResult(resultText)) return;
                     const blob = new Blob([resultText], { type: 'text/plain' });
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
@@ -659,70 +672,70 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
                     URL.revokeObjectURL(url);
                   }}
                 >
-                  <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                  <div className="justify-start text-black text-base font-medium font-['Manrope']">Изтегли</div>
+                  <svg className="w-5 h-5 text-black dark:text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  <div className="justify-start text-black dark:text-white text-base font-medium font-['Manrope']">{t.download}</div>
                 </button>
               </div>
             </div>
           </div>
           {/* History Table */}
           <div className="self-stretch flex flex-col justify-start items-start gap-4">
-            <div className="justify-start text-black text-2xl font-bold font-['Manrope']">История на изчисленията</div>
-            <div className="self-stretch rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-start items-start gap-px overflow-hidden">
+            <div className="justify-start text-black dark:text-white text-2xl font-bold font-['Manrope']">{t.calculationHistory}</div>
+            <div className="self-stretch rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex flex-col justify-start items-start gap-px overflow-hidden">
               <div className="self-stretch shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] inline-flex justify-start items-start gap-px">
-                <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                  <div className="justify-start text-black text-sm font-medium font-['Manrope']">Y₁</div>
+                <div className="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                  <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">Y₁</div>
                 </div>
-                <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                  <div className="justify-start text-black text-sm font-medium font-['Manrope']">X₁</div>
+                <div className="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                  <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">X₁</div>
                 </div>
-                <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                  <div className="justify-start text-black text-sm font-medium font-['Manrope']">α</div>
+                <div className="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                  <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">α</div>
                 </div>
-                <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                  <div className="justify-start text-black text-sm font-medium font-['Manrope']">S</div>
+                <div className="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                  <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">S</div>
                 </div>
-                <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                  <div className="justify-start text-black text-sm font-medium font-['Manrope']">Y₂</div>
+                <div className="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                  <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">Y₂</div>
                 </div>
-                <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                  <div className="justify-start text-black text-sm font-medium font-['Manrope']">X₂</div>
+                <div className="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                  <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">X₂</div>
                 </div>
-                <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                  <div className="justify-start text-black text-sm font-medium font-['Manrope']">Дата</div>
+                <div className="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                  <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{t.date}</div>
                 </div>
-                <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                  <div className="justify-start text-black text-sm font-medium font-['Manrope']">Изтегли</div>
+                <div className="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                  <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{t.download}</div>
                 </div>
               </div>
               {paginatedHistory.length === 0 ? (
-                <div className="w-full px-3 py-2 bg-white text-neutral-400 text-sm font-medium font-['Manrope']">Няма изчисления.</div>
+                <div className="w-full px-3 py-2 bg-white dark:bg-zinc-900 text-neutral-400 dark:text-zinc-400 text-sm font-medium font-['Manrope']">{t.noCalculations}</div>
               ) : (
                 paginatedHistory.map((entry, idx) => (
                   <div key={idx} className="self-stretch inline-flex justify-start items-start gap-px">
-                    <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                      <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{entry.y1}</div>
+                    <div className="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                      <div className="justify-start text-neutral-400 dark:text-zinc-400 text-sm font-medium font-['Manrope']">{entry.y1}</div>
                     </div>
-                    <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                      <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{entry.x1}</div>
+                    <div className="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                      <div className="justify-start text-neutral-400 dark:text-zinc-400 text-sm font-medium font-['Manrope']">{entry.x1}</div>
                     </div>
-                    <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                      <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{entry.alpha}</div>
+                    <div className="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                      <div className="justify-start text-neutral-400 dark:text-zinc-400 text-sm font-medium font-['Manrope']">{entry.alpha}</div>
                     </div>
-                    <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                      <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{entry.s}</div>
+                    <div className="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                      <div className="justify-start text-neutral-400 dark:text-zinc-400 text-sm font-medium font-['Manrope']">{entry.s}</div>
                     </div>
-                    <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                      <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{entry.y2}</div>
+                    <div className="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                      <div className="justify-start text-neutral-400 dark:text-zinc-400 text-sm font-medium font-['Manrope']">{entry.y2}</div>
                     </div>
-                    <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                      <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{entry.x2}</div>
+                    <div className="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                      <div className="justify-start text-neutral-400 dark:text-zinc-400 text-sm font-medium font-['Manrope']">{entry.x2}</div>
                     </div>
-                    <div className="flex-1 px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                      <div className="justify-start text-neutral-400 text-sm font-medium font-['Manrope']">{(() => { const d = new Date(entry.date); return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()}` })()}</div>
+                    <div className="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                      <div className="justify-start text-neutral-400 dark:text-zinc-400 text-sm font-medium font-['Manrope']">{(() => { const d = new Date(entry.date); return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()}` })()}</div>
                     </div>
-                    <div className="flex-1 self-stretch px-3 py-2 bg-white flex justify-center items-center gap-2.5">
-                      <button onClick={() => handleDownload(entry)} className="flex items-center justify-center"><svg className="w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" strokeLinecap="round" strokeLinejoin="round"/></svg></button>
+                    <div className="flex-1 self-stretch px-3 py-2 bg-white dark:bg-zinc-900 flex justify-center items-center gap-2.5">
+                      <button onClick={() => handleDownload(entry)} className="flex items-center justify-center"><svg className="w-4 h-4 text-neutral-400 dark:text-zinc-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" strokeLinecap="round" strokeLinejoin="round"/></svg></button>
                     </div>
                   </div>
                 ))
@@ -732,15 +745,15 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
             <div className="self-stretch inline-flex justify-center items-center gap-4">
               <div className="flex justify-start items-center gap-2">
                 <button className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>
-                  <img src="/icons/small_left_arrow.svg" alt="Назад" className="w-3 h-3 opacity-70" />
+                  <img src="/icons/small_left_arrow.svg" alt="Назад" className="w-3 h-3 opacity-70 dark:invert" />
                 </button>
                 {Array.from({ length: totalPages }, (_, i) => (
-                  <button key={i} className={`w-7 px-2 py-1 rounded ${currentPage === i + 1 ? 'bg-gray-200 text-black' : 'outline outline-1 outline-offset-[-1px] outline-gray-200 text-neutral-400'} inline-flex flex-col justify-center items-center`} onClick={() => setCurrentPage(i + 1)} disabled={currentPage === i + 1}>
+                  <button key={i} className={`w-7 px-2 py-1 rounded ${currentPage === i + 1 ? 'bg-gray-200 dark:bg-zinc-700 text-black dark:text-white' : 'outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 text-neutral-400 dark:text-zinc-400'} inline-flex flex-col justify-center items-center`} onClick={() => setCurrentPage(i + 1)} disabled={currentPage === i + 1}>
                     <div className="justify-start text-sm font-medium font-['Manrope']">{i + 1}</div>
                   </button>
                 ))}
                 <button className="w-7 self-stretch px-2 py-1 rounded inline-flex flex-col justify-center items-center" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages || totalPages === 0}>
-                  <img src="/icons/small_right_arrow.svg" alt="Напред" className="w-3 h-3 opacity-70" />
+                  <img src="/icons/small_right_arrow.svg" alt="Напред" className="w-3 h-3 opacity-70 dark:invert" />
                 </button>
               </div>
             </div>

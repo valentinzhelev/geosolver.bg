@@ -1,4 +1,5 @@
 import { API_ORIGIN } from '../config/api';
+import { getApiLanguageHeaders } from '../utils/apiLanguage';
 
 const BASE_URL = API_ORIGIN;
 
@@ -8,10 +9,10 @@ export const userPreferencesService = {
     try {
       const response = await fetch(`${BASE_URL}/api/user-preferences`, {
         method: 'GET',
-        headers: {
+        headers: getApiLanguageHeaders({
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        })
       });
 
       if (!response.ok) {
@@ -32,10 +33,10 @@ export const userPreferencesService = {
     try {
       const response = await fetch(`${BASE_URL}/api/user-preferences`, {
         method: 'PUT',
-        headers: {
+        headers: getApiLanguageHeaders({
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+          Authorization: `Bearer ${token}`,
+        }),
         body: JSON.stringify(preferences)
       });
 

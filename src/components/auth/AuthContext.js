@@ -1,5 +1,10 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { API_ORIGIN } from '../../config/api';
+import {
+  getApiLanguageHeaders,
+  getAuthClientFallback,
+  getNetworkErrorMessage,
+} from '../../utils/apiLanguage';
 
 const BASE_URL = API_ORIGIN;
 
@@ -34,7 +39,7 @@ export function AuthProvider({ children }) {
     if (token) {
       setLoading(true);
       fetch(`${BASE_URL}/api/auth/account`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: getApiLanguageHeaders({ Authorization: `Bearer ${token}` }),
       })
         .then(res => {
           if (res.ok) {
@@ -83,9 +88,7 @@ export function AuthProvider({ children }) {
       console.log('Sending Google token to backend...');
       const result = await fetch(`${BASE_URL}/api/google-auth/login`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getApiLanguageHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ token: response.credential }),
       });
 
@@ -139,7 +142,7 @@ export function AuthProvider({ children }) {
     try {
       const res = await fetch(`${BASE_URL}/api/auth/login`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getApiLanguageHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
@@ -162,7 +165,7 @@ export function AuthProvider({ children }) {
         setError(null);
         return true;
       } else {
-        setError(data.message || 'Грешка при вход.');
+        setError(data.message || getAuthClientFallback('login'));
         setUser(null);
         setToken(null);
         setRefreshToken(null);
@@ -173,7 +176,7 @@ export function AuthProvider({ children }) {
         return false;
       }
     } catch (e) {
-      setError('Грешка при връзка със сървъра.');
+      setError(getNetworkErrorMessage());
       setUser(null);
       setToken(null);
       setRefreshToken(null);
@@ -194,7 +197,7 @@ export function AuthProvider({ children }) {
     try {
       const res = await fetch(`${BASE_URL}/api/auth/register`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getApiLanguageHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ name, email, password, repeatPassword, purpose }),
       });
       const data = await res.json();
@@ -210,7 +213,7 @@ export function AuthProvider({ children }) {
         setError(null);
         return true;
       } else {
-        setError(data.message || 'Грешка при регистрация.');
+        setError(data.message || getAuthClientFallback('register'));
         setUser(null);
         setToken(null);
         setRefreshToken(null);
@@ -221,7 +224,7 @@ export function AuthProvider({ children }) {
         return false;
       }
     } catch (e) {
-      setError('Грешка при връзка със сървъра.');
+      setError(getNetworkErrorMessage());
       setUser(null);
       setToken(null);
       setRefreshToken(null);
@@ -241,7 +244,7 @@ export function AuthProvider({ children }) {
       try {
         await fetch(`${BASE_URL}/api/auth/logout`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: getApiLanguageHeaders({ 'Content-Type': 'application/json' }),
           body: JSON.stringify({ refreshToken }),
         });
       } catch {}
@@ -262,19 +265,19 @@ export function AuthProvider({ children }) {
     try {
       const res = await fetch(`${BASE_URL}/api/auth/forgot-password`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getApiLanguageHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ email }),
       });
       const data = await res.json();
       if (res.ok) {
         setError(null);
-        return data.message || 'Изпратен е email за възстановяване на парола.';
+        return data.message || getAuthClientFallback('forgotSuccess');
       } else {
-        setError(data.message || 'Грешка при заявка за нова парола.');
+        setError(data.message || getAuthClientFallback('forgot'));
         return false;
       }
     } catch (e) {
-      setError('Грешка при връзка със сървъра.');
+      setError(getNetworkErrorMessage());
       return false;
     } finally {
       setLoading(false);
@@ -286,7 +289,7 @@ export function AuthProvider({ children }) {
     if (!token) return;
     try {
       const res = await fetch(`${BASE_URL}/api/auth/account`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: getApiLanguageHeaders({ Authorization: `Bearer ${token}` }),
       });
       if (res.ok) {
         const data = await res.json();
@@ -304,10 +307,10 @@ export function AuthProvider({ children }) {
     try {
       const res = await fetch(`${BASE_URL}/api/auth/change-password`, {
         method: 'POST',
-        headers: {
+        headers: getApiLanguageHeaders({
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
-        },
+        }),
         body: JSON.stringify({ oldPassword, newPassword }),
       });
       const data = await res.json();
@@ -315,11 +318,11 @@ export function AuthProvider({ children }) {
         setError(null);
         return true;
       } else {
-        setError(data.message || 'Грешка при смяна на паролата.');
+        setError(data.message || getAuthClientFallback('changePassword'));
         return false;
       }
     } catch (e) {
-      setError('Грешка при връзка със сървъра.');
+      setError(getNetworkErrorMessage());
       return false;
     } finally {
       setLoading(false);

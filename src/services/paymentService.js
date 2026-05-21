@@ -1,4 +1,5 @@
 import API_BASE_URL from '../config/api';
+import { getApiLanguageHeaders } from '../utils/apiLanguage';
 
 class PaymentService {
   // Fetch payment history
@@ -20,10 +21,10 @@ class PaymentService {
       }
       
       const response = await fetch(`${API_BASE_URL}/payments?page=${page}&limit=${limit}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+        headers: getApiLanguageHeaders({
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        })
       });
       if (!response.ok) throw new Error('Failed to fetch payment history');
       return await response.json();
@@ -47,10 +48,10 @@ class PaymentService {
     try {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/payments/stats`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+        headers: getApiLanguageHeaders({
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        })
       });
       if (!response.ok) throw new Error('Failed to fetch payment stats');
       return await response.json();
@@ -66,10 +67,10 @@ class PaymentService {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/payments`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
+        headers: getApiLanguageHeaders({
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        }),
         body: JSON.stringify(paymentData)
       });
       if (!response.ok) throw new Error('Failed to create payment');
@@ -86,10 +87,10 @@ class PaymentService {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/payments/${paymentId}/status`, {
         method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
+        headers: getApiLanguageHeaders({
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        }),
         body: JSON.stringify({ status, failureReason })
       });
       if (!response.ok) throw new Error('Failed to update payment status');

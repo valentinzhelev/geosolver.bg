@@ -1,4 +1,5 @@
 import { API_ORIGIN } from '../config/api';
+import { getApiLanguageHeaders } from '../utils/apiLanguage';
 
 const BASE_URL = API_ORIGIN;
 
@@ -38,9 +39,7 @@ export const googleAuthService = {
     try {
       const response = await fetch(`${BASE_URL}/api/google-auth/login`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getApiLanguageHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ token }),
       });
 

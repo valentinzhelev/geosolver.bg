@@ -6,85 +6,152 @@ import { useTranslation } from '../../../hooks/useTranslation';
 import { useAuth } from '../../auth/AuthContext';
 
 const ForStudents = () => {
-  const { language } = useTranslation();
+  const { t } = useTranslation();
   const { user } = useAuth();
-  const bg = language === 'bg';
+  const features = t.forStudentsFeatures || [];
+  const steps = t.forStudentsSteps || [];
 
   return (
     <>
       <SEO
-        title={bg ? 'За ученици' : 'For students'}
-        description={
-          bg
-            ? 'GeoSolver Edu — предаване на домашни, код от преподавателя, калкулатор само когато е разрешен.'
-            : 'GeoSolver Edu — submit homework, join with a code, calculator only when allowed.'
-        }
+        title={t.forStudentsTitle}
+        description={t.forStudentsDescription}
+        keywords="геодезия, ученици, задания, класна стая, код за група, GeoSolver, GAI"
         canonical="/for-students"
       />
       <Layout>
-        <div className="w-full flex justify-center bg-stone-50 dark:bg-zinc-950 min-h-screen py-8 px-4">
-          <div className="w-full max-w-[900px] flex flex-col gap-8">
-            <h1 className="text-2xl font-bold font-['Manrope'] text-black dark:text-white">
-              {bg ? 'GeoSolver за ученици' : 'GeoSolver for students'}
-            </h1>
-
-            <div className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-700 p-6 md:p-8 flex flex-col gap-6 shadow-sm">
-              <p className="text-sm text-neutral-700 dark:text-zinc-300 font-['Manrope'] leading-relaxed">
-                {bg
-                  ? 'В училище използвате GeoSolver Edu: преподавателят ви дава код на група, вие виждате заданията и предавате отговори. Калкулаторът на сайта се ползва само ако за конкретното задание е разрешено — иначе решавате на тетрадка и въвеждате крайните стойности.'
-                  : 'At school you use GeoSolver Edu: your teacher gives a group code, you see assignments and submit answers. The site calculator is only for assignments where your teacher allows it — otherwise solve on paper and enter final values.'}
+        <div className="w-full min-h-screen bg-stone-50 dark:bg-zinc-950 transition-colors">
+          <div className="w-full max-w-[1180px] mx-auto px-4 lg:px-6 pt-6 lg:pt-16 pb-12 flex flex-col gap-10 lg:gap-14">
+            {/* Hero */}
+            <div className="max-w-[640px] flex flex-col gap-2">
+              <h1 className="text-black dark:text-white text-2xl lg:text-3xl font-bold font-['Manrope']">
+                {t.forStudentsTitle}
+              </h1>
+              <p className="text-neutral-500 dark:text-zinc-400 text-sm lg:text-base font-semibold font-['Manrope']">
+                {t.forStudentsHeadline}
               </p>
-
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="p-4 rounded-lg bg-stone-50 dark:bg-zinc-800 border border-stone-100 dark:border-zinc-700">
-                  <h2 className="font-bold font-['Manrope'] text-black dark:text-white mb-2">
-                    {bg ? 'Безплатно в клас' : 'Free in class'}
-                  </h2>
-                  <p className="text-sm text-neutral-600 dark:text-zinc-400 font-['Manrope']">
-                    {bg
-                      ? 'Предаванията в classroom не изискват Pro. Изчисленията в рамките на разрешено задание не влизат в лимита 5/5 за свободно ползване на инструментите.'
-                      : 'Classroom submissions do not require Pro. Calculations within an allowed assignment do not count toward the 5/5 free limit on tools.'}
-                  </p>
-                </div>
-                <div className="p-4 rounded-lg bg-stone-50 dark:bg-zinc-800 border border-stone-100 dark:border-zinc-700">
-                  <h2 className="font-bold font-['Manrope'] text-black dark:text-white mb-2">
-                    {bg ? 'Самостоятелна практика' : 'Self-study'}
-                  </h2>
-                  <p className="text-sm text-neutral-600 dark:text-zinc-400 font-['Manrope']">
-                    {bg
-                      ? 'Извън задание от учител — обикновените калкулатори с лимит 5 изчисления или Pro абонамент.'
-                      : 'Outside teacher assignments — standard tools with 5 free calculations or a Pro subscription.'}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap gap-3">
-                {user ? (
-                  <Link
-                    to="/classroom/assignments"
-                    className="px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg text-sm font-medium"
-                  >
-                    {bg ? 'Моите задания' : 'My assignments'}
-                  </Link>
-                ) : (
-                  <Link
-                    to="/register"
-                    className="px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg text-sm font-medium"
-                  >
-                    {bg ? 'Регистрация' : 'Register'}
-                  </Link>
-                )}
-                <Link
-                  to="/classroom/join"
-                  className="px-4 py-2 rounded-lg outline outline-1 outline-gray-200 dark:outline-zinc-700 text-sm font-medium"
-                >
-                  {bg ? 'Присъедини се с код' : 'Join with code'}
-                </Link>
-                <Link to="/tools" className="px-4 py-2 text-sm text-neutral-600 underline">
-                  {bg ? 'Инструменти (свободно)' : 'Tools (self-study)'}
-                </Link>
-              </div>
+              <p className="text-neutral-700 dark:text-zinc-300 text-sm lg:text-base font-['Manrope'] leading-relaxed mt-1">
+                {t.forStudentsIntro}
+              </p>
             </div>
+
+            {/* Features */}
+            <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {features.map((f, i) => (
+                <div
+                  key={i}
+                  className="p-4 lg:p-5 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700 flex flex-col gap-2 transition-colors"
+                >
+                  <h2 className="text-black dark:text-white text-base font-semibold font-['Manrope']">
+                    {f.title}
+                  </h2>
+                  <p className="text-neutral-600 dark:text-zinc-400 text-sm font-['Manrope'] leading-relaxed">
+                    {f.desc}
+                  </p>
+                </div>
+              ))}
+            </section>
+
+            {/* How to start */}
+            <section className="flex flex-col gap-4">
+              <h2 className="text-black dark:text-white text-lg font-bold font-['Manrope']">
+                {t.forStudentsHowTitle}
+              </h2>
+              <ol className="grid grid-cols-1 md:grid-cols-2 gap-3 list-none p-0 m-0">
+                {steps.map((step, i) => (
+                  <li
+                    key={i}
+                    className="flex gap-3 p-4 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700 transition-colors"
+                  >
+                    <span className="shrink-0 w-7 h-7 rounded-full bg-stone-100 dark:bg-zinc-800 flex items-center justify-center text-sm font-bold font-['Manrope'] text-black dark:text-white">
+                      {i + 1}
+                    </span>
+                    <span className="text-sm text-neutral-700 dark:text-zinc-300 font-['Manrope'] leading-relaxed pt-0.5">
+                      {step}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </section>
+
+            {/* In class / Self-study */}
+            <section className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-5">
+              <div className="p-5 lg:p-6 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700 flex flex-col gap-3 transition-colors">
+                <h2 className="text-black dark:text-white text-lg font-semibold font-['Manrope']">
+                  {t.forStudentsInClassTitle}
+                </h2>
+                <p className="text-sm text-neutral-700 dark:text-zinc-300 font-['Manrope'] leading-relaxed">
+                  {t.forStudentsInClassDesc}
+                </p>
+              </div>
+              <div className="p-5 lg:p-6 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700 flex flex-col gap-3 transition-colors">
+                <h2 className="text-black dark:text-white text-lg font-semibold font-['Manrope']">
+                  {t.forStudentsSelfStudyTitle}
+                </h2>
+                <p className="text-sm text-neutral-700 dark:text-zinc-300 font-['Manrope'] leading-relaxed">
+                  {t.forStudentsSelfStudyDesc}
+                </p>
+              </div>
+            </section>
+
+            {/* Actions */}
+            <section className="flex flex-col sm:flex-row flex-wrap items-start gap-3">
+              <Link
+                to="/classroom/join"
+                className="px-4 py-2 bg-black dark:bg-white rounded-lg text-sm font-medium font-['Manrope'] text-white dark:text-black hover:opacity-90 transition-opacity"
+              >
+                {t.forStudentsJoinCta}
+              </Link>
+              {!user && (
+                <Link
+                  to="/register"
+                  className="px-4 py-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700 text-sm font-medium font-['Manrope'] text-black dark:text-white hover:bg-stone-50 dark:hover:bg-zinc-800 transition-colors"
+                >
+                  {t.forStudentsRegisterCta}
+                </Link>
+              )}
+              <Link
+                to="/tools"
+                className="px-4 py-2 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700 text-sm font-medium font-['Manrope'] text-black dark:text-white hover:bg-stone-50 dark:hover:bg-zinc-800 transition-colors"
+              >
+                {t.forStudentsToolsCta}
+              </Link>
+            </section>
+
+            <section className="flex flex-wrap gap-4 text-sm font-['Manrope']">
+              <Link
+                to="/gai"
+                className="text-neutral-600 dark:text-zinc-400 underline underline-offset-2 hover:text-black dark:hover:text-white transition-colors"
+              >
+                {t.forStudentsGaiLink}
+              </Link>
+              <Link
+                to="/for-teachers"
+                className="text-neutral-600 dark:text-zinc-400 underline underline-offset-2 hover:text-black dark:hover:text-white transition-colors"
+              >
+                {t.forStudentsTeachersLink}
+              </Link>
+            </section>
+
+            {/* About */}
+            <section className="p-5 lg:p-6 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700 flex flex-col gap-3 transition-colors">
+              <h2 className="text-black dark:text-white text-base font-bold font-['Manrope']">
+                {t.forStudentsNoteTitle}
+              </h2>
+              <p className="text-sm text-neutral-700 dark:text-zinc-300 font-['Manrope'] leading-relaxed">
+                {t.forStudentsNoteP1}
+              </p>
+              <p className="text-sm text-neutral-700 dark:text-zinc-300 font-['Manrope'] leading-relaxed">
+                {t.forStudentsNoteP2}{' '}
+                <Link
+                  to="/contacts"
+                  className="text-black dark:text-white font-medium underline underline-offset-2 hover:opacity-80"
+                >
+                  {t.howToGetAccessContact}
+                </Link>
+                .
+              </p>
+            </section>
           </div>
         </div>
       </Layout>

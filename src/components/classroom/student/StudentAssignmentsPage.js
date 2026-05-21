@@ -38,7 +38,7 @@ const StudentAssignmentsPage = () => {
         subtitle={bg ? 'Задачи от преподавателите ви.' : 'Tasks from your teachers.'}
       >
         {error && <Card className="p-4 text-sm text-red-600">{error}</Card>}
-        {loading && <Card className="p-8 text-center text-neutral-500">{bg ? 'Зареждане...' : 'Loading...'}</Card>}
+        {loading && <Card className="p-8 text-center text-neutral-500 dark:text-zinc-400">{bg ? 'Зареждане...' : 'Loading...'}</Card>}
         {!loading && list.length === 0 && (
           <EmptyState
             title={bg ? 'Няма задания' : 'No assignments'}
@@ -57,7 +57,7 @@ const StudentAssignmentsPage = () => {
                 <div className="flex justify-between gap-4 flex-wrap">
                   <div>
                     <h3 className="font-bold text-black dark:text-white font-['Manrope']">{a.title}</h3>
-                    <p className="text-sm text-neutral-500 mt-1">
+                    <p className="text-sm text-neutral-500 dark:text-zinc-400 mt-1">
                       {a.course?.name} · {toolName(a)}
                     </p>
                   </div>
@@ -68,7 +68,7 @@ const StudentAssignmentsPage = () => {
                     <div className="mt-1 flex flex-col items-end gap-1">
                       <StudentStatusBadge status={a.studentStatus} language={language} />
                       {a.submissionScore != null && (
-                        <span className="text-xs text-neutral-500">{Math.round(a.submissionScore)}%</span>
+                        <span className="text-xs text-neutral-500 dark:text-zinc-400">{Math.round(a.submissionScore)}%</span>
                       )}
                     </div>
                   </div>

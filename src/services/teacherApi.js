@@ -1,5 +1,6 @@
 import axios from 'axios';
 import API_BASE_URL from '../config/api';
+import { getApiLanguage } from '../utils/apiLanguage';
 
 // Create axios instance with default config
 const api = axios.create({
@@ -15,6 +16,7 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  config.headers['X-GeoSolver-Language'] = getApiLanguage();
   return config;
 });
 

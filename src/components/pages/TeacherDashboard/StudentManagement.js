@@ -148,25 +148,25 @@ const StudentManagement = () => {
         canonical="/teacher/students"
       />
       <Layout>
-        <div className="w-full min-h-screen bg-stone-50 flex flex-col items-center py-8 px-2 md:px-0">
+        <div className="w-full min-h-screen bg-stone-50 dark:bg-zinc-950 transition-colors flex flex-col items-center py-8 px-2 md:px-0">
           <div className="w-full max-w-[1180px] flex flex-col gap-10">
             {/* Header */}
             <div className="flex flex-col gap-6">
               <div className="flex items-center gap-4">
                 <Link 
                   to="/teacher/dashboard" 
-                  className="px-3 py-2 bg-white rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 hover:bg-gray-50 transition-colors duration-200 flex items-center gap-2"
+                  className="px-3 py-2 bg-white dark:bg-zinc-900 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 hover:bg-gray-50 transition-colors duration-200 flex items-center gap-2"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                   </svg>
-                  <span className="text-sm text-neutral-600">{language === 'bg' ? 'Назад' : 'Back'}</span>
+                  <span className="text-sm text-neutral-600 dark:text-zinc-400">{language === 'bg' ? 'Назад' : 'Back'}</span>
                 </Link>
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-gray-100 rounded-lg">
                     <StudentsIcon className="w-8 h-8 text-gray-600" />
                   </div>
-                  <h1 className="text-black text-3xl font-bold font-['Manrope']">
+                  <h1 className="text-black dark:text-white text-3xl font-bold font-['Manrope']">
                     {language === 'bg' ? 'Управление на ученици' : 'Student Management'}
                   </h1>
                 </div>
@@ -183,7 +183,7 @@ const StudentManagement = () => {
 
             {/* Enhanced Stats Overview */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <div className="p-6 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 hover:shadow-lg transition-shadow duration-200">
+              <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 hover:shadow-lg transition-shadow duration-200">
                 <div className="flex items-center justify-between mb-4">
                   <div className="p-3 bg-gray-100 rounded-lg">
                     <StudentsIcon className="w-6 h-6 text-gray-600" />
@@ -193,16 +193,16 @@ const StudentManagement = () => {
                     +8%
                   </span>
                 </div>
-                <div className="text-3xl font-bold text-black mb-1">{students.length}</div>
-                <div className="text-sm text-neutral-600 font-medium mb-1">
+                <div className="text-3xl font-bold text-black dark:text-white mb-1">{students.length}</div>
+                <div className="text-sm text-neutral-600 dark:text-zinc-400 font-medium mb-1">
                   {language === 'bg' ? 'Общо ученици' : 'Total Students'}
                 </div>
-                <div className="text-xs text-neutral-500">
+                <div className="text-xs text-neutral-500 dark:text-zinc-400">
                   {students.filter(s => s.status === 'active').length} {language === 'bg' ? 'активни' : 'active'}
                 </div>
               </div>
               
-              <div className="p-6 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 hover:shadow-lg transition-shadow duration-200">
+              <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 hover:shadow-lg transition-shadow duration-200">
                 <div className="flex items-center justify-between mb-4">
                   <div className="p-3 bg-gray-100 rounded-lg">
                     <CheckIcon className="w-6 h-6 text-gray-600" />
@@ -215,15 +215,15 @@ const StudentManagement = () => {
                 <div className="text-3xl font-bold text-gray-600 mb-1">
                   {students.filter(s => s.status === 'active').length}
                 </div>
-                <div className="text-sm text-neutral-600 font-medium mb-1">
+                <div className="text-sm text-neutral-600 dark:text-zinc-400 font-medium mb-1">
                   {language === 'bg' ? 'Активни ученици' : 'Active Students'}
                 </div>
-                <div className="text-xs text-neutral-500">
+                <div className="text-xs text-neutral-500 dark:text-zinc-400">
                   {Math.round((students.filter(s => s.status === 'active').length / students.length) * 100)}% {language === 'bg' ? 'от общо' : 'of total'}
                 </div>
               </div>
               
-              <div className="p-6 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 hover:shadow-lg transition-shadow duration-200">
+              <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 hover:shadow-lg transition-shadow duration-200">
                 <div className="flex items-center justify-between mb-4">
                   <div className="p-3 bg-gray-100 rounded-lg">
                     <ClassIcon className="w-6 h-6 text-gray-600" />
@@ -236,15 +236,15 @@ const StudentManagement = () => {
                   </span>
                 </div>
                 <div className="text-3xl font-bold text-gray-600 mb-1">{classes.length}</div>
-                <div className="text-sm text-neutral-600 font-medium mb-1">
+                <div className="text-sm text-neutral-600 dark:text-zinc-400 font-medium mb-1">
                   {language === 'bg' ? 'Класове' : 'Classes'}
                 </div>
-                <div className="text-xs text-neutral-500">
+                <div className="text-xs text-neutral-500 dark:text-zinc-400">
                   {Math.round(students.length / classes.length)} {language === 'bg' ? 'средно на клас' : 'avg per class'}
                 </div>
               </div>
               
-              <div className="p-6 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 hover:shadow-lg transition-shadow duration-200">
+              <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 hover:shadow-lg transition-shadow duration-200">
                 <div className="flex items-center justify-between mb-4">
                   <div className="p-3 bg-gray-100 rounded-lg">
                     <TrendingUpIcon className="w-6 h-6 text-gray-600" />
@@ -257,10 +257,10 @@ const StudentManagement = () => {
                 <div className="text-3xl font-bold text-gray-600 mb-1">
                   {(students.reduce((acc, s) => acc + s.averageScore, 0) / students.length).toFixed(1)}
                 </div>
-                <div className="text-sm text-neutral-600 font-medium mb-1">
+                <div className="text-sm text-neutral-600 dark:text-zinc-400 font-medium mb-1">
                   {language === 'bg' ? 'Средна оценка' : 'Average Grade'}
                 </div>
-                <div className="text-xs text-neutral-500">
+                <div className="text-xs text-neutral-500 dark:text-zinc-400">
                   {language === 'bg' ? 'От 5.0' : 'Out of 5.0'}
                 </div>
               </div>
@@ -276,8 +276,8 @@ const StudentManagement = () => {
                     onClick={() => setActiveTab(tab.id)}
                     className={`px-4 py-3 rounded-lg text-base font-medium font-['Manrope'] transition-all duration-200 flex items-center gap-2 ${
                       activeTab === tab.id
-                        ? 'bg-gray-100 text-black border border-gray-300 shadow-sm'
-                        : 'bg-white text-neutral-600 border border-gray-200 hover:bg-gray-50 hover:text-black hover:shadow-sm'
+                        ? 'bg-gray-100 text-black dark:text-white border border-gray-300 shadow-sm'
+                        : 'bg-white dark:bg-zinc-900 text-neutral-600 dark:text-zinc-400 border border-gray-200 hover:bg-gray-50 hover:text-black dark:hover:text-white hover:shadow-sm'
                     }`}
                   >
                     <IconComponent className="w-5 h-5" />
@@ -290,13 +290,13 @@ const StudentManagement = () => {
             {/* Tab Content */}
             <div className="flex flex-col gap-6">
               {activeTab === 'students' && (
-                <div className="p-6 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200">
+                <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800">
                   <div className="flex justify-between items-center mb-6">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-green-100 rounded-lg">
                         <StudentsIcon className="w-6 h-6 text-green-600" />
                       </div>
-                      <h2 className="text-xl font-bold text-black">
+                      <h2 className="text-xl font-bold text-black dark:text-white">
                         {language === 'bg' ? 'Списък с ученици' : 'Student List'}
                       </h2>
                     </div>
@@ -314,33 +314,33 @@ const StudentManagement = () => {
                     <table className="w-full">
                       <thead>
                         <tr className="border-b border-gray-200">
-                          <th className="text-left py-3 px-4 font-semibold text-black">
+                          <th className="text-left py-3 px-4 font-semibold text-black dark:text-white">
                             {language === 'bg' ? 'Име' : 'Name'}
                           </th>
-                          <th className="text-left py-3 px-4 font-semibold text-black">
+                          <th className="text-left py-3 px-4 font-semibold text-black dark:text-white">
                             {language === 'bg' ? 'Клас' : 'Class'}
                           </th>
-                          <th className="text-left py-3 px-4 font-semibold text-black">
+                          <th className="text-left py-3 px-4 font-semibold text-black dark:text-white">
                             {language === 'bg' ? 'Завършени задачи' : 'Completed'}
                           </th>
-                          <th className="text-left py-3 px-4 font-semibold text-black">
+                          <th className="text-left py-3 px-4 font-semibold text-black dark:text-white">
                             {language === 'bg' ? 'Средна оценка' : 'Average'}
                           </th>
-                          <th className="text-left py-3 px-4 font-semibold text-black">
+                          <th className="text-left py-3 px-4 font-semibold text-black dark:text-white">
                             {language === 'bg' ? 'Последна активност' : 'Last Active'}
                           </th>
-                          <th className="text-left py-3 px-4 font-semibold text-black">
+                          <th className="text-left py-3 px-4 font-semibold text-black dark:text-white">
                             {language === 'bg' ? 'Действия' : 'Actions'}
                           </th>
                         </tr>
                       </thead>
                       <tbody>
                         {students.map((student) => (
-                          <tr key={student.id} className="border-b border-gray-100 hover:bg-gray-50">
+                          <tr key={student.id} className="border-b border-gray-100 dark:border-zinc-800 hover:bg-gray-50">
                             <td className="py-3 px-4">
                               <div>
-                                <div className="font-medium text-black">{student.name}</div>
-                                <div className="text-sm text-neutral-600">{student.email}</div>
+                                <div className="font-medium text-black dark:text-white">{student.name}</div>
+                                <div className="text-sm text-neutral-600 dark:text-zinc-400">{student.email}</div>
                               </div>
                             </td>
                             <td className="py-3 px-4">
@@ -348,7 +348,7 @@ const StudentManagement = () => {
                                 {student.class}
                               </span>
                             </td>
-                            <td className="py-3 px-4 text-black">{student.assignmentsCompleted}</td>
+                            <td className="py-3 px-4 text-black dark:text-white">{student.assignmentsCompleted}</td>
                             <td className="py-3 px-4">
                               <span className={`px-2 py-1 rounded text-sm font-medium ${
                                 student.averageScore >= 4.5 ? 'bg-green-50 text-green-700' :
@@ -359,7 +359,7 @@ const StudentManagement = () => {
                                 {student.averageScore}
                               </span>
                             </td>
-                            <td className="py-3 px-4 text-neutral-600">{student.lastActive}</td>
+                            <td className="py-3 px-4 text-neutral-600 dark:text-zinc-400">{student.lastActive}</td>
                             <td className="py-3 px-4">
                               <div className="flex gap-2">
                                 <button className="px-3 py-2 text-sm text-blue-600 hover:text-blue-800 font-medium border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors duration-200 flex items-center gap-1">
@@ -390,13 +390,13 @@ const StudentManagement = () => {
                     const activeStudents = classStudents.filter(s => s.status === 'active').length;
                     
                     return (
-                      <div key={className} className="p-6 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 hover:shadow-lg transition-shadow duration-200">
+                      <div key={className} className="p-6 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 hover:shadow-lg transition-shadow duration-200">
                         <div className="flex justify-between items-start mb-4">
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
                               <ClassIcon className="w-5 h-5 text-purple-600" />
                             </div>
-                            <h3 className="text-lg font-bold text-black">{className}</h3>
+                            <h3 className="text-lg font-bold text-black dark:text-white">{className}</h3>
                           </div>
                           <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium border border-blue-200">
                             {classStudents.length} {language === 'bg' ? 'ученика' : 'students'}
@@ -433,13 +433,13 @@ const StudentManagement = () => {
               )}
 
               {activeTab === 'invitations' && (
-                <div className="p-6 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200">
+                <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800">
                   <div className="flex justify-between items-center mb-6">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-orange-100 rounded-lg">
                         <InviteIcon className="w-6 h-6 text-orange-600" />
                       </div>
-                      <h2 className="text-xl font-bold text-black">
+                      <h2 className="text-xl font-bold text-black dark:text-white">
                         {language === 'bg' ? 'Покани за присъединяване' : 'Invitation Codes'}
                       </h2>
                     </div>
@@ -477,18 +477,18 @@ const StudentManagement = () => {
         {/* Add Student Modal */}
         {showAddStudent && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl p-6 w-full max-w-md mx-4 shadow-2xl">
+            <div className="bg-white dark:bg-zinc-900 rounded-xl p-6 w-full max-w-md mx-4 shadow-2xl">
               <div className="flex items-center gap-3 mb-6">
                 <div className="p-2 bg-blue-100 rounded-lg">
                   <PlusIcon className="w-6 h-6 text-blue-600" />
                 </div>
-                <h3 className="text-xl font-bold text-black">
+                <h3 className="text-xl font-bold text-black dark:text-white">
                   {language === 'bg' ? 'Добави ученик' : 'Add Student'}
                 </h3>
               </div>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-black mb-2">
+                  <label className="block text-sm font-medium text-black dark:text-white mb-2">
                     {language === 'bg' ? 'Име' : 'Name'}
                   </label>
                   <input
@@ -496,11 +496,11 @@ const StudentManagement = () => {
                     value={newStudent.name}
                     onChange={(e) => setNewStudent(prev => ({ ...prev, name: e.target.value }))}
                     placeholder={language === 'bg' ? 'Въведете име на ученика' : 'Enter student name'}
-                    className="w-full p-3 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400"
+                    className="w-full p-3 bg-white dark:bg-zinc-900 border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-black mb-2">
+                  <label className="block text-sm font-medium text-black dark:text-white mb-2">
                     {language === 'bg' ? 'Имейл' : 'Email'}
                   </label>
                   <input
@@ -508,17 +508,17 @@ const StudentManagement = () => {
                     value={newStudent.email}
                     onChange={(e) => setNewStudent(prev => ({ ...prev, email: e.target.value }))}
                     placeholder={language === 'bg' ? 'Въведете имейл на ученика' : 'Enter student email'}
-                    className="w-full p-3 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400"
+                    className="w-full p-3 bg-white dark:bg-zinc-900 border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-black mb-2">
+                  <label className="block text-sm font-medium text-black dark:text-white mb-2">
                     {language === 'bg' ? 'Клас' : 'Class'}
                   </label>
                   <select
                     value={newStudent.class}
                     onChange={(e) => setNewStudent(prev => ({ ...prev, class: e.target.value }))}
-                    className="w-full p-3 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400"
+                    className="w-full p-3 bg-white dark:bg-zinc-900 border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400"
                   >
                     <option value="">{language === 'bg' ? 'Изберете клас' : 'Select class'}</option>
                     {classes.map((className) => (
@@ -537,7 +537,7 @@ const StudentManagement = () => {
                 </button>
                 <button
                   onClick={() => setShowAddStudent(false)}
-                  className="px-6 py-3 bg-white text-black border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200 text-sm font-medium flex items-center gap-2"
+                  className="px-6 py-3 bg-white dark:bg-zinc-900 text-black dark:text-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200 text-sm font-medium flex items-center gap-2"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

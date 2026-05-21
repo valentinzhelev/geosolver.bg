@@ -5,6 +5,7 @@ import TaskDocsLayout, {
   DocCallout,
   DocFormulaBlock,
   DocList,
+  DocTable,
   CalculatorLink,
 } from './docs/TaskDocsLayout';
 
@@ -43,25 +44,15 @@ const FirstTaskDocs = () => {
       </DocSection>
 
       <DocSection title={isBg ? 'Таблица на знаците' : 'Sign table'}>
-        <div className="overflow-x-auto">
-          <table className="min-w-[350px] w-full text-center border border-gray-300 dark:border-zinc-600 rounded text-sm">
-            <thead className="bg-gray-100 dark:bg-zinc-800">
-              <tr>
-                <th className="border border-gray-300 dark:border-zinc-600 px-2 py-2">
-                  {isBg ? 'Посочен ъгъл' : 'Bearing'}
-                </th>
-                <th className="border border-gray-300 dark:border-zinc-600 px-2 py-2">ΔY</th>
-                <th className="border border-gray-300 dark:border-zinc-600 px-2 py-2">ΔX</th>
-              </tr>
-            </thead>
-            <tbody className="text-black dark:text-white">
-              <tr><td className="border px-2 py-1">0 – 100g</td><td className="border px-2 py-1">+</td><td className="border px-2 py-1">+</td></tr>
-              <tr><td className="border px-2 py-1">100 – 200g</td><td className="border px-2 py-1">+</td><td className="border px-2 py-1">−</td></tr>
-              <tr><td className="border px-2 py-1">200 – 300g</td><td className="border px-2 py-1">−</td><td className="border px-2 py-1">−</td></tr>
-              <tr><td className="border px-2 py-1">300 – 400g</td><td className="border px-2 py-1">−</td><td className="border px-2 py-1">+</td></tr>
-            </tbody>
-          </table>
-        </div>
+        <DocTable
+          headers={[isBg ? 'Посочен ъгъл' : 'Bearing', 'ΔY', 'ΔX']}
+          rows={[
+            ['0 – 100g', '+', '+'],
+            ['100 – 200g', '+', '−'],
+            ['200 – 300g', '−', '−'],
+            ['300 – 400g', '−', '+'],
+          ]}
+        />
       </DocSection>
 
       <DocSection title={isBg ? 'Проверка в GeoSolver' : 'Verification in GeoSolver'}>

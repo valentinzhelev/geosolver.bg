@@ -1,4 +1,5 @@
 import API_BASE_URL from '../config/api';
+import { getApiLanguageHeaders, getApiErrorFallback } from '../utils/apiLanguage';
 
 function getToken() {
   return localStorage.getItem('token') || sessionStorage.getItem('token');
@@ -8,6 +9,7 @@ async function request(path, options = {}) {
   const token = getToken();
   const headers = {
     'Content-Type': 'application/json',
+    ...getApiLanguageHeaders(),
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...options.headers,
   };
@@ -29,11 +31,7 @@ async function request(path, options = {}) {
       data.message ||
       data.detail ||
       data.error ||
-      (response.status === 403
-        ? 'Нямате достъп до тази функция.'
-        : response.status === 404
-          ? 'API endpoint не е намерен — рестартирайте backend с последния код.'
-          : `Грешка ${response.status}`);
+      getApiErrorFallback(response.status);
     const err = new Error(msg);
     err.status = response.status;
     err.data = data;
@@ -68,6 +66,13 @@ export const teacherAccessApi = {
       method: 'PATCH',
       body: JSON.stringify(body),
     }),
+  archiveRequestAdmin: (id) =>
+    request(`/teacher-access/admin/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ archived: true }),
+    }),
+  deleteRequestAdmin: (id) =>
+    request(`/teacher-access/admin/${id}`, { method: 'DELETE' }),
 };
 
 export const classroomApi = {
@@ -109,7 +114,7 @@ export const classroomApi = {
   exportCourseGrades: async (courseId) => {
     const token = getToken();
     const response = await fetch(`${API_BASE_URL}/teacher/courses/${courseId}/export-grades`, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      headers: getApiLanguageHeaders(token ? { Authorization: `Bearer ${token}` } : {}),
     });
     if (!response.ok) throw new Error(`Export failed (${response.status})`);
     return response.blob();
@@ -146,7 +151,7 @@ export const classroomApi = {
   exportAssignmentGrades: async (id) => {
     const token = getToken();
     const response = await fetch(`${API_BASE_URL}/teacher/assignments/${id}/export-grades`, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      headers: getApiLanguageHeaders(token ? { Authorization: `Bearer ${token}` } : {}),
     });
     if (!response.ok) {
       const err = new Error(`Export failed (${response.status})`);

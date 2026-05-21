@@ -1,4 +1,5 @@
 import API_BASE_URL from '../config/api';
+import { getApiLanguageHeaders } from '../utils/apiLanguage';
 
 class CalculationService {
   // Save calculation
@@ -7,10 +8,10 @@ class CalculationService {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/calculations`, {
         method: 'POST',
-        headers: {
-          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-          'Content-Type': 'application/json'
-        },
+        headers: getApiLanguageHeaders({
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          'Content-Type': 'application/json',
+        }),
         body: JSON.stringify(calculationData)
       });
       
@@ -67,10 +68,10 @@ class CalculationService {
       }
       
       const response = await fetch(url, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+        headers: getApiLanguageHeaders({
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        }),
       });
       
       console.log('  - Response status:', response.status);
@@ -113,10 +114,10 @@ class CalculationService {
     try {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/calculations/stats`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+        headers: getApiLanguageHeaders({
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        }),
       });
       if (!response.ok) throw new Error('Failed to fetch calculation stats');
       return await response.json();
@@ -138,14 +139,10 @@ class CalculationService {
       console.log('  - Token exists:', !!token);
       console.log('  - Token preview:', token ? token.substring(0, 20) + '...' : 'null');
       
-      const headers = {
-        'Content-Type': 'application/json'
-      };
-      
-      // Only add Authorization header if token exists
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
+      const headers = getApiLanguageHeaders({
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      });
       
       const response = await fetch(url, {
         headers

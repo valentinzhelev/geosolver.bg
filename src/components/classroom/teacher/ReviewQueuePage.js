@@ -76,7 +76,7 @@ const ReviewQueuePage = () => {
     `px-3 py-2 rounded-lg text-sm font-medium font-['Manrope'] transition-colors ${
       active
         ? 'bg-black text-white dark:bg-white dark:text-black shadow-sm'
-        : 'text-neutral-600 dark:text-zinc-400 hover:bg-white dark:hover:bg-zinc-700 hover:text-black dark:hover:text-white'
+        : 'text-neutral-600 dark:text-zinc-400 hover:bg-white dark:bg-zinc-900 dark:hover:bg-zinc-700 hover:text-black dark:hover:text-white'
     }`;
 
   const handleGrade = async (submission) => {
@@ -122,7 +122,7 @@ const ReviewQueuePage = () => {
                 <button
                   type="button"
                   onClick={clearFilters}
-                  className="text-xs font-medium font-['Manrope'] text-neutral-500 hover:text-black dark:hover:text-white underline-offset-2 hover:underline"
+                  className="text-xs font-medium font-['Manrope'] text-neutral-500 dark:text-zinc-400 hover:text-black dark:hover:text-white underline-offset-2 hover:underline"
                 >
                   {bg ? 'Изчисти всички' : 'Clear all'}
                 </button>
@@ -227,7 +227,7 @@ const ReviewQueuePage = () => {
         </Card>
 
         {error && <Card className="p-4 text-sm text-red-600">{error}</Card>}
-        {loading && <Card className="p-8 text-center text-neutral-500">{bg ? 'Зареждане...' : 'Loading...'}</Card>}
+        {loading && <Card className="p-8 text-center text-neutral-500 dark:text-zinc-400">{bg ? 'Зареждане...' : 'Loading...'}</Card>}
         {!loading && items.length === 0 && (
           <EmptyState
             title={bg ? 'Няма предавания' : 'No submissions'}

@@ -94,28 +94,8 @@ const HomePage = () => {
         structuredData={structuredData}
       />
       <Layout>
-        <div className="w-full min-h-screen bg-stone-50 dark:bg-neutral-950">
+        <div className="w-full min-h-screen bg-stone-50 dark:bg-zinc-950">
           <div className="w-full max-w-[1180px] mx-auto px-4 lg:px-6 pt-6 lg:pt-20 pb-6 flex flex-col gap-6 lg:gap-10">
-            <div className="flex flex-col lg:flex-row justify-start items-start gap-2 lg:gap-5">
-              <Link
-                to="/for-teachers"
-                className="w-full lg:flex-1 p-4 bg-black dark:bg-white rounded-xl flex justify-between items-center hover:opacity-90 transition"
-              >
-                <div className="text-white dark:text-black text-sm lg:text-base font-semibold font-['Manrope']">
-                  {language === 'bg' ? 'За учители (Edu)' : 'For teachers (Edu)'}
-                </div>
-                <img src="/icons/hero_buttons_arrow.svg" alt="" className="w-1.5 h-2.5 lg:w-2 lg:h-3 invert dark:invert-0" />
-              </Link>
-              <Link
-                to="/for-students"
-                className="w-full lg:flex-1 p-4 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex justify-between items-center hover:shadow-md transition"
-              >
-                <div className="text-black dark:text-white text-sm lg:text-base font-semibold font-['Manrope']">
-                  {language === 'bg' ? 'За ученици' : 'For students'}
-                </div>
-                <img src={isDark ? "/icons/homepage_arrow_icon.svg" : "/icons/hero_buttons_arrow.svg"} alt="" className="w-1.5 h-2.5 lg:w-2 lg:h-3" />
-              </Link>
-            </div>
             <div className="flex flex-col lg:flex-row justify-start items-start gap-2 lg:gap-5">
               <Link
                 to="/tools"
@@ -209,7 +189,7 @@ const HomePage = () => {
                         className={`shrink-0 rounded-full px-4 py-2 font-['Manrope'] text-base font-semibold transition-colors lg:text-lg ${
                           activeYear === item.id
                             ? 'bg-black text-white shadow-sm dark:bg-white dark:text-black'
-                            : 'bg-stone-200 text-black hover:bg-stone-300 dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700'
+                            : 'bg-stone-200 text-black dark:text-white hover:bg-stone-300 dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700'
                         }`}
                       >
                         {item.label[language]}

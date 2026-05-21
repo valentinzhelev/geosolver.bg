@@ -69,13 +69,13 @@ const ClassroomDashboard = () => {
                   </h2>
                   <Link
                     to="/classroom/groups"
-                    className="text-sm text-neutral-500 hover:text-black dark:hover:text-white font-['Manrope']"
+                    className="text-sm text-neutral-500 dark:text-zinc-400 hover:text-black dark:hover:text-white font-['Manrope']"
                   >
                     {bg ? 'Всички →' : 'All →'}
                   </Link>
                 </div>
                 {data.groups?.length === 0 ? (
-                  <p className="text-sm text-neutral-500 font-['Manrope']">
+                  <p className="text-sm text-neutral-500 dark:text-zinc-400 font-['Manrope']">
                     {bg ? 'Все още нямате групи.' : 'No groups yet.'}
                   </p>
                 ) : (
@@ -89,7 +89,7 @@ const ClassroomDashboard = () => {
                           <span className="font-medium font-['Manrope'] text-black dark:text-white">
                             {g.name}
                           </span>
-                          <span className="text-xs text-neutral-500 font-mono">{g.code}</span>
+                          <span className="text-xs text-neutral-500 dark:text-zinc-400 font-mono">{g.code}</span>
                         </Link>
                       </li>
                     ))}
@@ -110,13 +110,13 @@ const ClassroomDashboard = () => {
                   </h2>
                   <Link
                     to="/classroom/review"
-                    className="text-sm text-neutral-500 hover:text-black dark:hover:text-white font-['Manrope']"
+                    className="text-sm text-neutral-500 dark:text-zinc-400 hover:text-black dark:hover:text-white font-['Manrope']"
                   >
                     {bg ? 'Преглед →' : 'Review →'}
                   </Link>
                 </div>
                 {data.recentActivity?.length === 0 ? (
-                  <p className="text-sm text-neutral-500 font-['Manrope']">
+                  <p className="text-sm text-neutral-500 dark:text-zinc-400 font-['Manrope']">
                     {bg ? 'Няма предавания.' : 'No submissions yet.'}
                   </p>
                 ) : (

@@ -27,7 +27,7 @@ const ForgotPassword = () => {
         description={t.forgotPasswordDescription}
         canonical="/forgot-password"
       />
-      <div className="w-full min-h-screen bg-stone-50 flex flex-col items-center justify-center">
+      <div className="w-full min-h-screen bg-stone-50 dark:bg-zinc-950 transition-colors flex flex-col items-center justify-center">
         <div className="w-[580px] inline-flex flex-col justify-start items-start gap-5">
           <div className="self-stretch px-14 py-10 relative rounded-xl inline-flex justify-center items-center gap-4 overflow-hidden" style={{backgroundColor: '#000'}}>
             <div className="absolute inset-0 w-full h-full" style={{backgroundImage: 'url(/images/gradient_wallpaper.jpg)', backgroundSize: 'cover', backgroundPosition: 'left', transform: 'scaleX(-1)', zIndex: 0}} />
@@ -37,17 +37,17 @@ const ForgotPassword = () => {
             </div>
           </div>
           <div className="self-stretch px-10 flex flex-col justify-center items-center gap-2.5">
-            <div className="self-stretch p-4 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-center items-center gap-6">
-              <div className="justify-start text-black text-sm font-medium font-['Manrope']">{t.forgotPasswordTitle}</div>
+            <div className="self-stretch p-4 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex flex-col justify-center items-center gap-6">
+              <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{t.forgotPasswordTitle}</div>
               {success ? (
-                <div className="text-green-600 text-center">{message || t.checkEmail}</div>
+                <div className="text-green-600 dark:text-green-400 text-center">{message || t.checkEmail}</div>
               ) : (
                 <form className="self-stretch flex flex-col justify-start items-start gap-4" onSubmit={handleSubmit}>
                   <div className="self-stretch flex flex-col justify-start items-start gap-2">
-                    <div className="justify-start text-black text-sm font-medium font-['Manrope']">{t.email}</div>
+                    <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{t.email}</div>
                     <input
                       type="email"
-                      className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-start items-start text-sm font-medium font-['Manrope']"
+                      className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-600 bg-white dark:bg-zinc-800 text-black dark:text-zinc-100 placeholder-neutral-400 dark:placeholder-zinc-500 text-sm font-medium font-['Manrope']"
                       placeholder={t.enterEmail}
                       value={email}
                       onChange={e => setEmail(e.target.value)}
@@ -56,16 +56,16 @@ const ForgotPassword = () => {
                   </div>
                   <button 
                     type="submit" 
-                    className="px-4 py-2 bg-black rounded-lg inline-flex items-center gap-3 self-center"
+                    className="px-4 py-2 bg-black dark:bg-white rounded-lg inline-flex items-center gap-3 self-center hover:opacity-90 transition-opacity disabled:opacity-50"
                     disabled={loading}
                   >
-                    <div className="justify-start text-white text-base font-medium font-['Manrope']">
+                    <div className="justify-start text-white dark:text-black text-base font-medium font-['Manrope']">
                       {loading ? t.sending : t.sendCode}
                     </div>
-                    {loading && <div className="justify-start text-neutral-400 text-base font-medium font-['Manrope']">59</div>}
+                    {loading && <div className="justify-start text-neutral-400 dark:text-zinc-400 text-base font-medium font-['Manrope']">59</div>}
                   </button>
                   {error && (
-                    <div className="text-red-500 text-center text-sm">{error}</div>
+                    <div className="text-red-500 dark:text-red-400 text-center text-sm">{error}</div>
                   )}
                 </form>
               )}

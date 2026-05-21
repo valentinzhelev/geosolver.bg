@@ -37,7 +37,7 @@ const Header = () => {
         <div className="flex justify-start items-center gap-2">
           <Link
             to="/"
-            className={`px-3 py-1 rounded-lg flex justify-center items-center gap-2.5 ${location.pathname === '/' ? 'text-black dark:text-white' : 'text-neutral-400 dark:text-neutral-400'} text-base font-medium font-['Manrope'] hover:text-black dark:hover:text-white`}
+            className={`px-3 py-1 rounded-lg flex justify-center items-center gap-2.5 ${location.pathname === '/' ? 'text-black dark:text-white' : 'text-neutral-400 dark:text-zinc-400'} text-base font-medium font-['Manrope'] hover:text-black dark:hover:text-white`}
           >
             {t.home}
           </Link>
@@ -50,42 +50,58 @@ const Header = () => {
               location.pathname.startsWith('/forward-intersection') ||
               location.pathname.startsWith('/resection')
                 ? 'text-black dark:text-white'
-                : 'text-neutral-400 dark:text-neutral-400'
+                : 'text-neutral-400 dark:text-zinc-400'
             } text-base font-medium font-['Manrope'] hover:text-black dark:hover:text-white`}
           >
             {t.tools}
           </Link>
           <Link
             to="/prices"
-            className={`px-3 py-1 rounded-lg flex justify-center items-center gap-2.5 ${location.pathname === '/prices' ? 'text-black dark:text-white' : 'text-neutral-400 dark:text-neutral-400'} text-base font-medium font-['Manrope'] hover:text-black dark:hover:text-white`}
+            className={`px-3 py-1 rounded-lg flex justify-center items-center gap-2.5 ${location.pathname === '/prices' ? 'text-black dark:text-white' : 'text-neutral-400 dark:text-zinc-400'} text-base font-medium font-['Manrope'] hover:text-black dark:hover:text-white`}
           >
             {t.prices}
           </Link>
           <Link
             to="/contacts"
-            className={`px-3 py-1 rounded-lg flex justify-center items-center gap-2.5 ${location.pathname === '/contacts' ? 'text-black dark:text-white' : 'text-neutral-400 dark:text-neutral-400'} text-base font-medium font-['Manrope'] hover:text-black dark:hover:text-white`}
+            className={`px-3 py-1 rounded-lg flex justify-center items-center gap-2.5 ${location.pathname === '/contacts' ? 'text-black dark:text-white' : 'text-neutral-400 dark:text-zinc-400'} text-base font-medium font-['Manrope'] hover:text-black dark:hover:text-white`}
           >
             {t.contacts}
           </Link>
           <Link
             to="/for-teachers"
-            className={`px-3 py-1 rounded-lg flex justify-center items-center gap-2.5 ${location.pathname === '/for-teachers' ? 'text-black dark:text-white' : 'text-neutral-400 dark:text-neutral-400'} text-base font-medium font-['Manrope'] hover:text-black dark:hover:text-white`}
+            className={`px-3 py-1 rounded-lg flex justify-center items-center gap-2.5 ${location.pathname === '/for-teachers' ? 'text-black dark:text-white' : 'text-neutral-400 dark:text-zinc-400'} text-base font-medium font-['Manrope'] hover:text-black dark:hover:text-white`}
           >
             {t.forTeachers}
+          </Link>
+          <Link
+            to="/gai"
+            className={`px-3 py-1 rounded-lg flex justify-center items-center gap-2.5 ${location.pathname === '/gai' ? 'text-black dark:text-white' : 'text-neutral-400 dark:text-zinc-400'} text-base font-medium font-['Manrope'] hover:text-black dark:hover:text-white`}
+          >
+            {t.gai}
           </Link>
         </div>
         <div className="flex-1 flex justify-end items-center gap-3">
           {showTeacherClassroom && (
-            <Link to="/classroom/dashboard" className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg flex justify-start items-center gap-3 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200">
-              <img src="/icons/homepage_login_icon.svg" alt="Classroom Icon" className="w-5 h-5" />
-              <div className="justify-start text-black dark:text-white text-base font-medium font-['Manrope']">
+            <Link
+              to="/classroom/dashboard"
+              className="px-4 py-2 bg-black dark:bg-white rounded-lg flex justify-start items-center gap-3 hover:opacity-90 transition-opacity"
+            >
+              <img
+                src={isDark ? '/icons/homepage_login_icon.svg' : '/icons/login_icon.svg'}
+                alt="Classroom Icon"
+                className="w-5 h-5 shrink-0"
+              />
+              <div className="justify-start text-white dark:text-black text-base font-medium font-['Manrope']">
                 {language === 'bg' ? 'Класна стая' : 'Classroom'}
               </div>
             </Link>
           )}
           {showStudentClassroom && (
-            <Link to="/classroom/assignments" className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg flex justify-start items-center gap-3 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200">
-              <div className="justify-start text-black dark:text-white text-base font-medium font-['Manrope']">
+            <Link
+              to="/classroom/assignments"
+              className="px-4 py-2 bg-black dark:bg-white rounded-lg flex justify-start items-center gap-3 hover:opacity-90 transition-opacity"
+            >
+              <div className="justify-start text-white dark:text-black text-base font-medium font-['Manrope']">
                 {language === 'bg' ? 'Задания' : 'Assignments'}
               </div>
             </Link>
@@ -118,7 +134,7 @@ const Header = () => {
       {/* Mobile Header */}
       <div className="md:hidden w-full px-4 pt-4 pb-2 bg-white dark:bg-zinc-950 border-b border-gray-200 dark:border-zinc-800 transition-colors duration-300 flex justify-between items-center">
         <Link to="/" className="flex items-center gap-2">
-          <img src={isDark ? "/icons/homepage_white_logo.svg" : "/images/logo.png"} alt="GeoSolver Logo" className="w-9 h-9 rounded-lg bg-black dark:bg-white" />
+          <img src={isDark ? "/icons/homepage_white_logo.svg" : "/images/logo.png"} alt="GeoSolver Logo" className="w-9 h-9" />
           <div className="text-black dark:text-white text-base font-bold font-['Manrope']">GeoSolver</div>
           <div className="px-3 py-1 bg-gray-200 dark:bg-zinc-900 rounded flex items-center gap-2.5">
             <div className="text-black dark:text-white text-xs font-bold font-['Manrope']">{t.beta}</div>
@@ -138,7 +154,7 @@ const Header = () => {
           <div className="w-96 px-4 pt-12 pb-6 bg-white dark:bg-zinc-950 border-b border-gray-200 dark:border-zinc-800 transition-colors duration-300 inline-flex flex-col justify-start items-start gap-6 rounded-lg shadow-lg">
             <div className="self-stretch inline-flex justify-between items-start">
               <div className="flex justify-start items-center gap-2">
-                <img src={isDark ? "/icons/homepage_white_logo.svg" : "/images/logo.png"} alt="GeoSolver Logo" className="w-9 h-9 rounded-lg bg-black dark:bg-white" />
+                <img src={isDark ? "/icons/homepage_white_logo.svg" : "/images/logo.png"} alt="GeoSolver Logo" className="w-9 h-9" />
                 <div className="justify-start text-black dark:text-white text-base font-bold font-['Manrope']">GeoSolver</div>
                 <div className="px-3 py-1 bg-gray-200 dark:bg-zinc-900 rounded flex justify-center items-center gap-2.5">
                   <div className="justify-start text-black dark:text-white text-xs font-bold font-['Manrope']">{t.beta}</div>
@@ -169,16 +185,35 @@ const Header = () => {
                 <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{t.forTeachers}</div>
                 <img src="/icons/small_header_icon.svg" alt="Arrow" className="w-3 h-3" />
               </Link>
+              <Link to="/gai" onClick={() => setMobileMenuOpen(false)} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700 inline-flex justify-start items-center gap-3">
+                <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{t.gai}</div>
+                <img src="/icons/small_header_icon.svg" alt="Arrow" className="w-3 h-3" />
+              </Link>
               {showTeacherClassroom && (
-                <Link to="/classroom/dashboard" onClick={() => setMobileMenuOpen(false)} className="self-stretch p-3 bg-gray-200 dark:bg-gray-700 rounded-lg inline-flex justify-start items-center gap-3 transition-colors duration-200 hover:bg-gray-300 dark:hover:bg-gray-600">
-                  <div className="justify-start text-black dark:text-white text-sm font-semibold font-['Manrope']">{language === 'bg' ? 'Класна стая' : 'Classroom'}</div>
-                  <img src="/icons/small_header_icon.svg" alt="Arrow" className="w-3 h-3" />
+                <Link
+                  to="/classroom/dashboard"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="self-stretch px-4 py-2 bg-black dark:bg-white rounded-lg inline-flex justify-start items-center gap-3 hover:opacity-90 transition-opacity"
+                >
+                  <img
+                    src={isDark ? '/icons/homepage_login_icon.svg' : '/icons/login_icon.svg'}
+                    alt=""
+                    className="w-4 h-4 shrink-0"
+                  />
+                  <div className="justify-start text-white dark:text-black text-sm font-medium font-['Manrope']">
+                    {language === 'bg' ? 'Класна стая' : 'Classroom'}
+                  </div>
                 </Link>
               )}
               {showStudentClassroom && (
-                <Link to="/classroom/assignments" onClick={() => setMobileMenuOpen(false)} className="self-stretch p-3 bg-gray-200 dark:bg-gray-700 rounded-lg inline-flex justify-start items-center gap-3 transition-colors duration-200 hover:bg-gray-300 dark:hover:bg-gray-600">
-                  <div className="justify-start text-black dark:text-white text-sm font-semibold font-['Manrope']">{language === 'bg' ? 'Задания' : 'Assignments'}</div>
-                  <img src="/icons/small_header_icon.svg" alt="Arrow" className="w-3 h-3" />
+                <Link
+                  to="/classroom/assignments"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="self-stretch px-4 py-2 bg-black dark:bg-white rounded-lg inline-flex justify-start items-center gap-3 hover:opacity-90 transition-opacity"
+                >
+                  <div className="justify-start text-white dark:text-black text-sm font-medium font-['Manrope']">
+                    {language === 'bg' ? 'Задания' : 'Assignments'}
+                  </div>
                 </Link>
               )}
             </div>

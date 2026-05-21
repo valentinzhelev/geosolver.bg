@@ -116,10 +116,10 @@ const CourseManagement = () => {
   if (loading) {
     return (
       <Layout>
-        <div className="w-full min-h-screen bg-stone-50 flex items-center justify-center">
+        <div className="w-full min-h-screen bg-stone-50 dark:bg-zinc-950 transition-colors flex items-center justify-center">
           <div className="text-center">
             <div className="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4 animate-spin"></div>
-            <p className="text-neutral-600">
+            <p className="text-neutral-600 dark:text-zinc-400">
               {language === 'bg' ? 'Зареждане на курсовете...' : 'Loading courses...'}
             </p>
           </div>
@@ -136,25 +136,25 @@ const CourseManagement = () => {
         canonical="/teacher/courses"
       />
       <Layout>
-        <div className="w-full min-h-screen bg-stone-50 flex flex-col items-center py-8 px-2 md:px-0">
+        <div className="w-full min-h-screen bg-stone-50 dark:bg-zinc-950 transition-colors flex flex-col items-center py-8 px-2 md:px-0">
           <div className="w-full max-w-[1180px] flex flex-col gap-10">
             {/* Header */}
             <div className="flex flex-col gap-6">
               <div className="flex items-center gap-4">
                 <Link 
                   to="/teacher/dashboard" 
-                  className="px-3 py-2 bg-white rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 hover:bg-gray-50 transition-colors duration-200 flex items-center gap-2"
+                  className="px-3 py-2 bg-white dark:bg-zinc-900 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 hover:bg-gray-50 transition-colors duration-200 flex items-center gap-2"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                   </svg>
-                  <span className="text-sm text-neutral-600">{language === 'bg' ? 'Назад' : 'Back'}</span>
+                  <span className="text-sm text-neutral-600 dark:text-zinc-400">{language === 'bg' ? 'Назад' : 'Back'}</span>
                 </Link>
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-gray-100 rounded-lg">
                     <CourseIcon className="w-8 h-8 text-gray-600" />
                   </div>
-                  <h1 className="text-black text-3xl font-bold font-['Manrope']">
+                  <h1 className="text-black dark:text-white text-3xl font-bold font-['Manrope']">
                     {language === 'bg' ? 'Управление на курсове' : 'Course Management'}
                   </h1>
                 </div>
@@ -188,14 +188,14 @@ const CourseManagement = () => {
             {/* Courses Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {courses.map((course) => (
-                <div key={course.id} className="p-6 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 hover:shadow-lg transition-shadow duration-200">
+                <div key={course.id} className="p-6 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 hover:shadow-lg transition-shadow duration-200">
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-gray-100 rounded-lg">
                         <CourseIcon className="w-6 h-6 text-gray-600" />
                       </div>
                       <div>
-                        <h3 className="text-lg font-bold text-black">{course.name}</h3>
+                        <h3 className="text-lg font-bold text-black dark:text-white">{course.name}</h3>
                         <p className="text-sm text-gray-600 font-mono">{course.code}</p>
                       </div>
                     </div>
@@ -307,8 +307,8 @@ const CreateCourseModal = ({ onClose, onSubmit, language }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl p-6 w-full max-w-md mx-4">
-        <h2 className="text-xl font-bold text-black mb-4">
+      <div className="bg-white dark:bg-zinc-900 rounded-xl p-6 w-full max-w-md mx-4">
+        <h2 className="text-xl font-bold text-black dark:text-white mb-4">
           {language === 'bg' ? 'Създай нов курс' : 'Create New Course'}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -383,8 +383,8 @@ const AddStudentsModal = ({ course, onClose, onSubmit, language }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl p-6 w-full max-w-md mx-4">
-        <h2 className="text-xl font-bold text-black mb-4">
+      <div className="bg-white dark:bg-zinc-900 rounded-xl p-6 w-full max-w-md mx-4">
+        <h2 className="text-xl font-bold text-black dark:text-white mb-4">
           {language === 'bg' ? `Добави студенти към ${course.name}` : `Add students to ${course.name}`}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
