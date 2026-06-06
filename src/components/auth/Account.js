@@ -9,6 +9,8 @@ import BillingService from '../../services/billingService';
 import CalculationService from '../../services/calculationService';
 import UserManagementService from '../../services/userManagementService';
 import { teacherAccessApi } from '../../services/classroomApi';
+import { fieldbookPilotApi } from '../../services/fieldbookApi';
+import { useFieldBookPilotAccess } from '../../hooks/useFieldBookPilotAccess';
 
 const TEACHER_REQUEST_FILTERS = [
   { value: 'pending', labelBg: 'Чакащи', labelEn: 'Pending' },
@@ -485,6 +487,8 @@ const TeacherRequestCard = ({ req, language, onApprove, onReject, onArchive, onD
 const Account = () => {
   const { user, logout, refreshUser } = useAuth();
   const { t, language } = useTranslation();
+  const { canUse: fieldBookPilotApproved, isPending: fieldBookPilotPending, loading: fieldBookPilotLoading } =
+    useFieldBookPilotAccess();
   
   console.log('Account.js loaded, user:', user);
   console.log('Token in localStorage:', localStorage.getItem('token'));
@@ -618,8 +622,12 @@ const Account = () => {
   const [teacherRequests, setTeacherRequests] = useState([]);
   const [teacherRequestsLoading, setTeacherRequestsLoading] = useState(false);
   const [teacherRequestFilter, setTeacherRequestFilter] = useState('pending');
+  const [fieldbookPilotRequests, setFieldbookPilotRequests] = useState([]);
+  const [fieldbookPilotLoading, setFieldbookPilotLoading] = useState(false);
+  const [fieldbookPilotFilter, setFieldbookPilotFilter] = useState('pending');
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
   const [rejectRequestId, setRejectRequestId] = useState(null);
+  const [rejectContext, setRejectContext] = useState('teacher');
   const [rejectNote, setRejectNote] = useState('');
   const [rejectError, setRejectError] = useState('');
   const [rejectSubmitting, setRejectSubmitting] = useState(false);
@@ -1012,8 +1020,57 @@ const Account = () => {
     }
   };
 
-  const openRejectModal = (requestId) => {
+  const loadFieldbookPilotRequests = async () => {
+    if (!user || user.role !== 'admin') return;
+    setFieldbookPilotLoading(true);
+    try {
+      const params =
+        fieldbookPilotFilter === 'archived'
+          ? { archived: 'true' }
+          : fieldbookPilotFilter
+            ? { status: fieldbookPilotFilter }
+            : {};
+      const res = await fieldbookPilotApi.listRequestsAdmin(params);
+      setFieldbookPilotRequests(res.data || []);
+    } catch (e) {
+      console.error(e);
+      setFieldbookPilotRequests([]);
+    } finally {
+      setFieldbookPilotLoading(false);
+    }
+  };
+
+  const handleFieldbookPilotApprove = async (requestId) => {
+    try {
+      await fieldbookPilotApi.reviewRequestAdmin(requestId, { status: 'approved' });
+      loadFieldbookPilotRequests();
+    } catch (e) {
+      alert(e.message);
+    }
+  };
+
+  const handleFieldbookPilotArchive = async (requestId) => {
+    try {
+      await fieldbookPilotApi.archiveRequestAdmin(requestId);
+      loadFieldbookPilotRequests();
+    } catch (e) {
+      alert(e.message);
+    }
+  };
+
+  const handleFieldbookPilotDelete = async (requestId) => {
+    if (!window.confirm(language === 'bg' ? 'Изтриване на заявката?' : 'Delete this request?')) return;
+    try {
+      await fieldbookPilotApi.deleteRequestAdmin(requestId);
+      loadFieldbookPilotRequests();
+    } catch (e) {
+      alert(e.message);
+    }
+  };
+
+  const openRejectModal = (requestId, context = 'teacher') => {
     setRejectRequestId(requestId);
+    setRejectContext(context);
     setRejectNote('');
     setRejectError('');
     setRejectModalOpen(true);
@@ -1038,12 +1095,15 @@ const Account = () => {
     setRejectSubmitting(true);
     setRejectError('');
     try {
-      await teacherAccessApi.reviewRequestAdmin(rejectRequestId, {
+      const reviewApi =
+        rejectContext === 'fieldbook' ? fieldbookPilotApi.reviewRequestAdmin : teacherAccessApi.reviewRequestAdmin;
+      await reviewApi(rejectRequestId, {
         status: 'rejected',
         adminNote: note,
       });
       closeRejectModal();
-      loadTeacherRequests();
+      if (rejectContext === 'fieldbook') loadFieldbookPilotRequests();
+      else loadTeacherRequests();
     } catch (e) {
       setRejectError(e.message);
     } finally {
@@ -1094,6 +1154,7 @@ const Account = () => {
       loadAdminUsers(1);
       setAdminCurrentPage(1);
       loadTeacherRequests();
+      loadFieldbookPilotRequests();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, adminSearch, adminRoleFilter]);
@@ -1102,6 +1163,11 @@ const Account = () => {
     if (user?.role === 'admin') loadTeacherRequests();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [teacherRequestFilter]);
+
+  useEffect(() => {
+    if (user?.role === 'admin') loadFieldbookPilotRequests();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fieldbookPilotFilter]);
 
   // Load admin users when page changes
   useEffect(() => {
@@ -1164,6 +1230,46 @@ const Account = () => {
       <div className="w-full min-h-screen bg-stone-50 dark:bg-zinc-950 transition-colors flex flex-col items-center">
         <div className="w-full max-w-[1180px] mt-8 mb-8 px-4 sm:px-0 inline-flex flex-col justify-start items-start gap-10">
           <div className="self-stretch justify-start text-black dark:text-white text-3xl font-bold font-['Manrope']">{t.accountTitle}</div>
+
+          {!fieldBookPilotLoading && user && (
+            <div className="self-stretch p-4 sm:p-5 rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex flex-col gap-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-black dark:text-white font-semibold font-['Manrope']">
+                    {language === 'bg' ? 'Електронни карнети' : 'Electronic field books'}
+                  </span>
+                  <span className="px-3 py-1 bg-gray-200 dark:bg-zinc-900 rounded text-black dark:text-white text-xs font-bold font-['Manrope']">
+                    {t.beta}
+                  </span>
+                </div>
+                <p className="text-sm text-neutral-600 dark:text-zinc-400 font-['Manrope'] max-w-xl">
+                  {fieldBookPilotApproved
+                    ? language === 'bg'
+                      ? 'Имате достъп до нивелационния карнет. Създавайте проекти и записвайте теренни измервания.'
+                      : 'You have access to the leveling field book. Create projects and record field measurements.'
+                    : fieldBookPilotPending
+                      ? language === 'bg'
+                        ? 'Заявката ви за пилот чака одобрение.'
+                        : 'Your pilot request is pending approval.'
+                      : language === 'bg'
+                        ? 'Кандидатствайте за пилотна версия на нивелационен електронен карнет.'
+                        : 'Apply for the leveling field book pilot.'}
+                </p>
+              </div>
+              <Link
+                to="/fieldbook"
+                className="shrink-0 px-4 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-lg text-sm font-semibold font-['Manrope'] text-center hover:opacity-90 transition-opacity"
+              >
+                {fieldBookPilotApproved
+                  ? language === 'bg'
+                    ? 'Отвори карнети'
+                    : 'Open field books'
+                  : language === 'bg'
+                    ? 'Към пилота'
+                    : 'Go to pilot'}
+              </Link>
+            </div>
+          )}
           
           <div className="self-stretch flex flex-col lg:flex-row justify-start items-start gap-5">
             <div className="w-full max-w-sm lg:w-96 inline-flex flex-col justify-center items-center gap-5">
@@ -1501,9 +1607,45 @@ const Account = () => {
                         req={req}
                         language={language}
                         onApprove={handleTeacherRequestApprove}
-                        onReject={openRejectModal}
+                        onReject={(id) => openRejectModal(id, 'teacher')}
                         onArchive={handleTeacherRequestArchive}
                         onDelete={handleTeacherRequestDelete}
+                      />
+                    ))}
+                  </div>
+                )}
+              </section>
+
+              <section className={ADMIN_SECTION_CLASS}>
+                <div className="flex flex-col gap-4">
+                  <h2 className="text-black dark:text-white text-xl font-bold font-['Manrope']">
+                    {language === 'bg' ? 'Заявки за пилот: карнети' : 'Field book pilot requests'}
+                  </h2>
+                  <TeacherRequestFilterBar
+                    value={fieldbookPilotFilter}
+                    onChange={setFieldbookPilotFilter}
+                    language={language}
+                  />
+                </div>
+                {fieldbookPilotLoading ? (
+                  <p className="text-sm text-neutral-500 dark:text-zinc-400 font-['Manrope']">{t.loading}</p>
+                ) : fieldbookPilotRequests.length === 0 ? (
+                  <div className="rounded-xl border border-dashed border-gray-200 dark:border-zinc-600 bg-stone-50/80 dark:bg-zinc-800/50 px-4 py-8 text-center">
+                    <p className="text-sm text-neutral-500 dark:text-zinc-400 font-['Manrope']">
+                      {language === 'bg' ? 'Няма заявки за избрания филтър.' : 'No requests for this filter.'}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-3">
+                    {fieldbookPilotRequests.map((req) => (
+                      <TeacherRequestCard
+                        key={req._id}
+                        req={req}
+                        language={language}
+                        onApprove={handleFieldbookPilotApprove}
+                        onReject={(id) => openRejectModal(id, 'fieldbook')}
+                        onArchive={handleFieldbookPilotArchive}
+                        onDelete={handleFieldbookPilotDelete}
                       />
                     ))}
                   </div>

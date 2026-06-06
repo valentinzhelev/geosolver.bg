@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import SEO from '../../shared/SEO';
 import ClassroomLayout from '../ClassroomLayout';
 import { Card } from '../ui/Card';
+import Select from '../ui/Select';
 import { classroomApi } from '../../../services/classroomApi';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { EDU_TOOLS } from '../../../config/eduTools';
@@ -11,6 +12,18 @@ import {
   DEFAULT_CALCULATOR_POLICY,
   getCalculatorPolicyMeta,
 } from '../../../config/eduCalculatorPolicy';
+
+const gradientStyle = {
+  backgroundImage: 'url(/images/gradient_wallpaper.jpg)',
+  backgroundSize: 'cover',
+  backgroundPosition: 'center',
+};
+
+const SectionLabel = ({ children }) => (
+  <span className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400 dark:text-zinc-500 font-['Manrope']">
+    {children}
+  </span>
+);
 
 const CreateAssignmentPage = () => {
   const { language } = useTranslation();
@@ -165,6 +178,10 @@ const CreateAssignmentPage = () => {
 
   const handleSubmit = async (e, asDraft = false) => {
     e.preventDefault();
+    if (!form.course) {
+      setError(bg ? 'Изберете група.' : 'Select a group.');
+      return;
+    }
     setSaving(true);
     setError('');
     try {
@@ -186,228 +203,253 @@ const CreateAssignmentPage = () => {
         title={bg ? 'Ново задание' : 'New assignment'}
         subtitle={bg ? 'Свържете упражнение с калкулатор от GeoSolver.' : 'Link practice to a GeoSolver calculator.'}
       >
-        <Card className="p-6 max-w-xl flex flex-col gap-4">
-          {error && <p className="text-sm text-red-600">{error}</p>}
+        <Card className="relative p-6 lg:p-7 max-w-2xl flex flex-col gap-5 overflow-hidden">
+          {/* Decorative brand-gradient top accent */}
+          <span className="absolute inset-x-0 top-0 h-1" style={gradientStyle} aria-hidden />
 
-          {presets.length > 0 && (
-            <div className="flex flex-col gap-2">
-              <span className="text-sm font-medium font-['Manrope']">{bg ? 'Готови шаблони' : 'Built-in presets'}</span>
-              <div className="flex flex-wrap gap-2">
-                {presets.map((p) => (
+          {error && (
+            <p className="text-sm text-red-600 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 rounded-lg px-3 py-2">
+              {error}
+            </p>
+          )}
+
+          {/* Quick start */}
+          {(presets.length > 0 || myTemplates.length > 0) && (
+            <div className="flex flex-col gap-3 p-4 rounded-xl bg-stone-50 dark:bg-zinc-800/50 border border-stone-100 dark:border-zinc-800">
+              <SectionLabel>{bg ? 'Бърз старт' : 'Quick start'}</SectionLabel>
+
+              {presets.length > 0 && (
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-xs text-neutral-500 dark:text-zinc-400 font-['Manrope']">
+                    {bg ? 'Готови шаблони' : 'Built-in presets'}
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {presets.map((p) => (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => applyPreset(p)}
+                        className="px-3 py-1.5 text-xs font-medium font-['Manrope'] rounded-lg bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 text-black dark:text-white transition-colors hover:border-gray-400 dark:hover:border-zinc-500 hover:-translate-y-0.5 hover:shadow-sm duration-200"
+                      >
+                        {bg ? p.titleBg : p.titleEn}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="flex flex-col gap-1.5">
+                <span className="text-xs text-neutral-500 dark:text-zinc-400 font-['Manrope']">
+                  {bg ? 'Моите шаблони' : 'My saved templates'}
+                </span>
+                {myTemplates.length === 0 ? (
+                  <p className="text-xs text-neutral-400 dark:text-zinc-500 font-['Manrope']">
+                    {bg ? 'Няма запазени шаблони.' : 'No saved templates yet.'}
+                  </p>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {myTemplates.map((tpl) => (
+                      <span
+                        key={tpl._id}
+                        className="inline-flex items-center gap-1 rounded-lg bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 overflow-hidden"
+                      >
+                        <button
+                          type="button"
+                          disabled={templateBusy}
+                          onClick={() => applyMyTemplate(tpl)}
+                          className="pl-3 pr-2 py-1.5 text-xs font-medium font-['Manrope'] text-black dark:text-white hover:bg-stone-50 dark:hover:bg-zinc-800 transition-colors"
+                        >
+                          {tpl.title}
+                        </button>
+                        <button
+                          type="button"
+                          disabled={templateBusy}
+                          onClick={() => handleDeleteTemplate(tpl._id)}
+                          aria-label={bg ? 'Изтрий' : 'Delete'}
+                          className="px-2 py-1.5 text-neutral-400 hover:text-red-600 transition-colors border-l border-gray-200 dark:border-zinc-700"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <div className="flex flex-wrap gap-2 items-end mt-1">
+                  <label className="flex flex-col gap-1 flex-1 min-w-[160px]">
+                    <span className="text-xs text-neutral-500 dark:text-zinc-400 font-['Manrope']">
+                      {bg ? 'Име при запазване (по избор)' : 'Save as (optional)'}
+                    </span>
+                    <input
+                      value={templateTitle}
+                      onChange={(e) => setTemplateTitle(e.target.value)}
+                      placeholder={form.title || (bg ? 'Заглавие' : 'Title')}
+                      className="px-3 py-2 rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm text-black dark:text-white"
+                    />
+                  </label>
                   <button
-                    key={p.id}
                     type="button"
-                    onClick={() => applyPreset(p)}
-                    className="px-3 py-1.5 text-xs rounded-lg border border-gray-200 dark:border-zinc-700 hover:bg-stone-50 dark:hover:bg-zinc-800"
+                    disabled={templateBusy || !form.toolKey}
+                    onClick={handleSaveTemplate}
+                    className="px-3 py-2 text-sm font-medium font-['Manrope'] rounded-lg bg-white dark:bg-zinc-900 outline outline-1 outline-gray-200 dark:outline-zinc-700 text-black dark:text-white hover:bg-stone-50 dark:hover:bg-zinc-800 transition-colors disabled:opacity-50"
                   >
-                    {bg ? p.titleBg : p.titleEn}
+                    {templateBusy ? '...' : bg ? 'Запази като шаблон' : 'Save as template'}
                   </button>
-                ))}
+                </div>
               </div>
             </div>
           )}
 
-          <div className="flex flex-col gap-2 border-t border-stone-100 dark:border-zinc-800 pt-4">
-            <span className="text-sm font-medium font-['Manrope']">{bg ? 'Моите шаблони' : 'My saved templates'}</span>
-            {myTemplates.length === 0 ? (
-              <p className="text-xs text-neutral-500 dark:text-zinc-400 font-['Manrope']">
-                {bg ? 'Няма запазени шаблони.' : 'No saved templates yet.'}
-              </p>
-            ) : (
-              <ul className="flex flex-col gap-1">
-                {myTemplates.map((tpl) => (
-                  <li key={tpl._id} className="flex flex-wrap items-center gap-2">
-                    <button
-                      type="button"
-                      disabled={templateBusy}
-                      onClick={() => applyMyTemplate(tpl)}
-                      className="px-3 py-1.5 text-xs rounded-lg border border-gray-200 dark:border-zinc-700 hover:bg-stone-50 dark:hover:bg-zinc-800"
-                    >
-                      {tpl.title}
-                    </button>
-                    <button
-                      type="button"
-                      disabled={templateBusy}
-                      onClick={() => handleDeleteTemplate(tpl._id)}
-                      className="text-xs text-red-600 hover:underline"
-                    >
-                      {bg ? 'Изтрий' : 'Delete'}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-            <div className="flex flex-wrap gap-2 items-end">
-              <label className="flex flex-col gap-1 flex-1 min-w-[160px]">
-                <span className="text-xs text-neutral-500 dark:text-zinc-400 font-['Manrope']">
-                  {bg ? 'Име при запазване (по избор)' : 'Save as (optional)'}
-                </span>
+          <form onSubmit={(e) => handleSubmit(e, false)} className="flex flex-col gap-6">
+            {/* Section: basics */}
+            <div className="flex flex-col gap-4">
+              <SectionLabel>{bg ? 'Основни' : 'Basics'}</SectionLabel>
+
+              <div className="grid sm:grid-cols-2 gap-4">
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-sm font-medium font-['Manrope'] text-black dark:text-white">{bg ? 'Група' : 'Group'}</span>
+                  <Select
+                    value={form.course}
+                    onChange={(v) => setForm({ ...form, course: v })}
+                    placeholder={bg ? 'Избери...' : 'Select...'}
+                    ariaLabel={bg ? 'Група' : 'Group'}
+                    options={courses.map((c) => ({ value: c._id, label: `${c.name} (${c.code})` }))}
+                  />
+                </label>
+
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-sm font-medium font-['Manrope'] text-black dark:text-white">{bg ? 'Инструмент' : 'Tool'}</span>
+                  <Select
+                    value={form.toolKey}
+                    onChange={(v) => setForm({ ...form, toolKey: v })}
+                    ariaLabel={bg ? 'Инструмент' : 'Tool'}
+                    options={EDU_TOOLS.map((t) => ({ value: t.toolKey, label: bg ? t.titleBg : t.titleEn }))}
+                  />
+                </label>
+              </div>
+
+              <label className="flex flex-col gap-1.5">
+                <span className="text-sm font-medium font-['Manrope'] text-black dark:text-white">{bg ? 'Заглавие' : 'Title'}</span>
                 <input
-                  value={templateTitle}
-                  onChange={(e) => setTemplateTitle(e.target.value)}
-                  placeholder={form.title || (bg ? 'Заглавие' : 'Title')}
-                  className="px-3 py-2 rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm"
+                  required
+                  value={form.title}
+                  onChange={(e) => setForm({ ...form, title: e.target.value })}
+                  className="px-3 py-2.5 rounded-lg border border-gray-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-black dark:text-white font-['Manrope'] transition-colors hover:border-gray-300 dark:hover:border-zinc-600 focus:outline-none focus:ring-2 focus:ring-black/10 dark:focus:ring-white/20"
                 />
               </label>
-              <button
-                type="button"
-                disabled={templateBusy || !form.toolKey}
-                onClick={handleSaveTemplate}
-                className="px-3 py-2 text-sm rounded-lg outline outline-1 outline-gray-200 dark:outline-zinc-700 disabled:opacity-50"
-              >
-                {templateBusy ? '...' : bg ? 'Запази като шаблон' : 'Save as template'}
-              </button>
-            </div>
-          </div>
 
-          <form onSubmit={(e) => handleSubmit(e, false)} className="flex flex-col gap-4">
-            <label className="flex flex-col gap-1">
-              <span className="text-sm font-medium font-['Manrope']">{bg ? 'Група' : 'Group'}</span>
-              <select
-                required
-                value={form.course}
-                onChange={(e) => setForm({ ...form, course: e.target.value })}
-                className="px-3 py-2 rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-black dark:text-white"
-              >
-                <option value="">{bg ? 'Избери...' : 'Select...'}</option>
-                {courses.map((c) => (
-                  <option key={c._id} value={c._id}>
-                    {c.name} ({c.code})
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="flex flex-col gap-1">
-              <span className="text-sm font-medium font-['Manrope']">{bg ? 'Инструмент' : 'Tool'}</span>
-              <select
-                value={form.toolKey}
-                onChange={(e) => setForm({ ...form, toolKey: e.target.value })}
-                className="px-3 py-2 rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800"
-              >
-                {EDU_TOOLS.map((t) => (
-                  <option key={t.toolKey} value={t.toolKey}>
-                    {bg ? t.titleBg : t.titleEn}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="flex flex-col gap-1">
-              <span className="text-sm font-medium font-['Manrope']">{bg ? 'Заглавие' : 'Title'}</span>
-              <input
-                required
-                value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })}
-                className="px-3 py-2 rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-black dark:text-white"
-              />
-            </label>
-
-            <label className="flex flex-col gap-1">
-              <span className="text-sm font-medium font-['Manrope']">{bg ? 'Инструкции' : 'Instructions'}</span>
-              <textarea
-                value={form.description}
-                onChange={(e) => setForm({ ...form, description: e.target.value })}
-                rows={3}
-                className="px-3 py-2 rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-black dark:text-white"
-              />
-            </label>
-
-            <div className="grid grid-cols-2 gap-4">
-              <label className="flex flex-col gap-1">
-                <span className="text-sm font-medium font-['Manrope']">{bg ? 'Варианти' : 'Variants'}</span>
-                <input
-                  type="number"
-                  min={1}
-                  max={30}
-                  value={form.variantsCount}
-                  onChange={(e) => setForm({ ...form, variantsCount: e.target.value })}
-                  className="px-3 py-2 rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800"
-                />
-              </label>
-              <label className="flex flex-col gap-1">
-                <span className="text-sm font-medium font-['Manrope']">{bg ? 'Опити' : 'Attempts'}</span>
-                <input
-                  type="number"
-                  min={1}
-                  max={10}
-                  value={form.maxAttempts}
-                  onChange={(e) => setForm({ ...form, maxAttempts: e.target.value })}
-                  className="px-3 py-2 rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800"
+              <label className="flex flex-col gap-1.5">
+                <span className="text-sm font-medium font-['Manrope'] text-black dark:text-white">{bg ? 'Инструкции' : 'Instructions'}</span>
+                <textarea
+                  value={form.description}
+                  onChange={(e) => setForm({ ...form, description: e.target.value })}
+                  rows={3}
+                  className="px-3 py-2.5 rounded-lg border border-gray-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-black dark:text-white font-['Manrope'] transition-colors hover:border-gray-300 dark:hover:border-zinc-600 focus:outline-none focus:ring-2 focus:ring-black/10 dark:focus:ring-white/20"
                 />
               </label>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <label className="flex flex-col gap-1">
-                <span className="text-sm font-medium font-['Manrope']">{bg ? 'Допуск' : 'Tolerance'}</span>
-                <input
-                  type="number"
-                  step="any"
-                  min={0}
-                  value={form.customTolerance}
-                  onChange={(e) => setForm({ ...form, customTolerance: e.target.value })}
-                  className="px-3 py-2 rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800"
+            {/* Section: grading */}
+            <div className="flex flex-col gap-4 border-t border-stone-100 dark:border-zinc-800 pt-5">
+              <SectionLabel>{bg ? 'Оценяване' : 'Grading'}</SectionLabel>
+
+              <div className="grid grid-cols-2 gap-4">
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-sm font-medium font-['Manrope'] text-black dark:text-white">{bg ? 'Варианти' : 'Variants'}</span>
+                  <input
+                    type="number"
+                    min={1}
+                    max={30}
+                    value={form.variantsCount}
+                    onChange={(e) => setForm({ ...form, variantsCount: e.target.value })}
+                    className="px-3 py-2.5 rounded-lg border border-gray-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-black dark:text-white font-['Manrope'] transition-colors hover:border-gray-300 dark:hover:border-zinc-600 focus:outline-none focus:ring-2 focus:ring-black/10 dark:focus:ring-white/20"
+                  />
+                </label>
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-sm font-medium font-['Manrope'] text-black dark:text-white">{bg ? 'Опити' : 'Attempts'}</span>
+                  <input
+                    type="number"
+                    min={1}
+                    max={10}
+                    value={form.maxAttempts}
+                    onChange={(e) => setForm({ ...form, maxAttempts: e.target.value })}
+                    className="px-3 py-2.5 rounded-lg border border-gray-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-black dark:text-white font-['Manrope'] transition-colors hover:border-gray-300 dark:hover:border-zinc-600 focus:outline-none focus:ring-2 focus:ring-black/10 dark:focus:ring-white/20"
+                  />
+                </label>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-sm font-medium font-['Manrope'] text-black dark:text-white">{bg ? 'Допуск' : 'Tolerance'}</span>
+                  <input
+                    type="number"
+                    step="any"
+                    min={0}
+                    value={form.customTolerance}
+                    onChange={(e) => setForm({ ...form, customTolerance: e.target.value })}
+                    className="px-3 py-2.5 rounded-lg border border-gray-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-black dark:text-white font-['Manrope'] transition-colors hover:border-gray-300 dark:hover:border-zinc-600 focus:outline-none focus:ring-2 focus:ring-black/10 dark:focus:ring-white/20"
+                  />
+                </label>
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-sm font-medium font-['Manrope'] text-black dark:text-white">{bg ? 'Тип допуск' : 'Tolerance type'}</span>
+                  <Select
+                    value={form.customToleranceType}
+                    onChange={(v) => setForm({ ...form, customToleranceType: v })}
+                    ariaLabel={bg ? 'Тип допуск' : 'Tolerance type'}
+                    options={[
+                      { value: 'absolute', label: bg ? 'Абсолютен' : 'Absolute' },
+                      { value: 'relative', label: bg ? 'Относителен' : 'Relative' },
+                      { value: 'percentage', label: bg ? 'Процент' : 'Percentage' },
+                    ]}
+                  />
+                </label>
+              </div>
+
+              <label className="flex flex-col gap-1.5">
+                <span className="text-sm font-medium font-['Manrope'] text-black dark:text-white">{bg ? 'Калкулатор за ученици' : 'Calculator for students'}</span>
+                <Select
+                  value={form.calculatorPolicy}
+                  onChange={(v) => setForm({ ...form, calculatorPolicy: v })}
+                  ariaLabel={bg ? 'Калкулатор за ученици' : 'Calculator for students'}
+                  options={CALCULATOR_POLICY_OPTIONS.map((opt) => ({ value: opt.value, label: bg ? opt.labelBg : opt.labelEn }))}
                 />
-              </label>
-              <label className="flex flex-col gap-1">
-                <span className="text-sm font-medium font-['Manrope']">{bg ? 'Тип допуск' : 'Tolerance type'}</span>
-                <select
-                  value={form.customToleranceType}
-                  onChange={(e) => setForm({ ...form, customToleranceType: e.target.value })}
-                  className="px-3 py-2 rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800"
-                >
-                  <option value="absolute">{bg ? 'Абсолютен' : 'Absolute'}</option>
-                  <option value="relative">{bg ? 'Относителен' : 'Relative'}</option>
-                  <option value="percentage">{bg ? 'Процент' : 'Percentage'}</option>
-                </select>
+                <p className="text-xs text-neutral-500 dark:text-zinc-400 font-['Manrope']">{policyMeta.teacherHint}</p>
               </label>
             </div>
 
-            <label className="flex flex-col gap-1">
-              <span className="text-sm font-medium font-['Manrope']">{bg ? 'Калкулатор за ученици' : 'Calculator for students'}</span>
-              <select
-                value={form.calculatorPolicy}
-                onChange={(e) => setForm({ ...form, calculatorPolicy: e.target.value })}
-                className="px-3 py-2 rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800"
-              >
-                {CALCULATOR_POLICY_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {bg ? opt.labelBg : opt.labelEn}
-                  </option>
-                ))}
-              </select>
-              <p className="text-xs text-neutral-500 dark:text-zinc-400 font-['Manrope']">{policyMeta.teacherHint}</p>
-            </label>
+            {/* Section: schedule */}
+            <div className="flex flex-col gap-4 border-t border-stone-100 dark:border-zinc-800 pt-5">
+              <SectionLabel>{bg ? 'Срокове' : 'Schedule'}</SectionLabel>
 
-            <label className="flex flex-col gap-1">
-              <span className="text-sm font-medium font-['Manrope']">{bg ? 'Краен срок' : 'Due date'}</span>
-              <input
-                required
-                type="datetime-local"
-                value={form.dueDate || defaultDue()}
-                onChange={(e) => setForm({ ...form, dueDate: e.target.value })}
-                className="px-3 py-2 rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800"
-              />
-            </label>
+              <div className="grid sm:grid-cols-2 gap-4">
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-sm font-medium font-['Manrope'] text-black dark:text-white">{bg ? 'Краен срок' : 'Due date'}</span>
+                  <input
+                    required
+                    type="datetime-local"
+                    value={form.dueDate || defaultDue()}
+                    onChange={(e) => setForm({ ...form, dueDate: e.target.value })}
+                    className="px-3 py-2.5 rounded-lg border border-gray-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-black dark:text-white font-['Manrope'] transition-colors hover:border-gray-300 dark:hover:border-zinc-600 focus:outline-none focus:ring-2 focus:ring-black/10 dark:focus:ring-white/20"
+                  />
+                </label>
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-sm font-medium font-['Manrope'] text-black dark:text-white">
+                    {bg ? 'Публикуване от (по избор)' : 'Publish from (optional)'}
+                  </span>
+                  <input
+                    type="datetime-local"
+                    value={form.publishAt}
+                    onChange={(e) => setForm({ ...form, publishAt: e.target.value })}
+                    className="px-3 py-2.5 rounded-lg border border-gray-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-black dark:text-white font-['Manrope'] transition-colors hover:border-gray-300 dark:hover:border-zinc-600 focus:outline-none focus:ring-2 focus:ring-black/10 dark:focus:ring-white/20"
+                  />
+                </label>
+              </div>
+            </div>
 
-            <label className="flex flex-col gap-1">
-              <span className="text-sm font-medium font-['Manrope']">
-                {bg ? 'Публикуване от (по избор)' : 'Publish from (optional)'}
-              </span>
-              <input
-                type="datetime-local"
-                value={form.publishAt}
-                onChange={(e) => setForm({ ...form, publishAt: e.target.value })}
-                className="px-3 py-2 rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800"
-              />
-            </label>
-
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 border-t border-stone-100 dark:border-zinc-800 pt-5">
               <button
                 type="submit"
                 disabled={saving}
-                className="px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg text-sm font-medium disabled:opacity-50"
+                className="px-4 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-lg text-sm font-medium font-['Manrope'] transition-opacity hover:opacity-90 disabled:opacity-50"
               >
                 {saving ? (bg ? 'Създаване...' : 'Creating...') : bg ? 'Публикувай' : 'Publish'}
               </button>
@@ -415,7 +457,7 @@ const CreateAssignmentPage = () => {
                 type="button"
                 disabled={saving}
                 onClick={(e) => handleSubmit(e, true)}
-                className="px-4 py-2 rounded-lg text-sm font-medium outline outline-1 outline-gray-200 dark:outline-zinc-700 disabled:opacity-50"
+                className="px-4 py-2.5 rounded-lg text-sm font-medium font-['Manrope'] bg-white dark:bg-zinc-900 outline outline-1 outline-gray-200 dark:outline-zinc-700 text-black dark:text-white hover:bg-stone-50 dark:hover:bg-zinc-800 transition-colors disabled:opacity-50"
               >
                 {bg ? 'Запази чернова' : 'Save draft'}
               </button>

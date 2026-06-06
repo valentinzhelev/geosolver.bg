@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import SEO from '../../shared/SEO';
 import ClassroomLayout from '../ClassroomLayout';
 import { Card, EmptyState } from '../ui/Card';
+import Select from '../ui/Select';
 import SubmissionReviewCard from '../ui/SubmissionReviewCard';
 import { classroomApi } from '../../../services/classroomApi';
 import { useTranslation } from '../../../hooks/useTranslation';
@@ -129,26 +130,23 @@ const ReviewQueuePage = () => {
               )}
             </div>
 
-            <div className="flex flex-col lg:flex-row lg:items-end gap-4 lg:gap-6">
-              <label className="flex flex-col gap-1.5 flex-1 min-w-0 lg:max-w-sm">
+            <div className="flex flex-col lg:flex-row lg:flex-wrap lg:items-end gap-4 lg:gap-5">
+              <label className="flex flex-col gap-1.5 w-full lg:w-60">
                 <span className="text-sm font-medium text-black dark:text-white font-['Manrope']">
                   {bg ? 'Група' : 'Group'}
                 </span>
-                <select
+                <Select
                   value={courseFilter}
-                  onChange={(e) => setCourseFilter(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-lg border border-gray-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-sm font-['Manrope'] text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-black/10 dark:focus:ring-white/20"
-                >
-                  <option value="">{bg ? 'Всички групи' : 'All groups'}</option>
-                  {courses.map((c) => (
-                    <option key={c._id} value={c._id}>
-                      {c.name} ({c.code})
-                    </option>
-                  ))}
-                </select>
+                  onChange={setCourseFilter}
+                  ariaLabel={bg ? 'Група' : 'Group'}
+                  options={[
+                    { value: '', label: bg ? 'Всички групи' : 'All groups' },
+                    ...courses.map((c) => ({ value: c._id, label: `${c.name} (${c.code})` })),
+                  ]}
+                />
               </label>
 
-              <div className="flex flex-col gap-1.5 flex-1 min-w-0">
+              <div className="flex flex-col gap-1.5">
                 <span className="text-sm font-medium text-black dark:text-white font-['Manrope']">
                   {bg ? 'Покажи' : 'Show'}
                 </span>
@@ -180,34 +178,36 @@ const ReviewQueuePage = () => {
               </div>
 
               {!manualOnly && (
-                <label className="flex flex-col gap-1.5 lg:max-w-[180px]">
+                <label className="flex flex-col gap-1.5 w-full lg:w-44">
                   <span className="text-sm font-medium text-black dark:text-white font-['Manrope']">
                     {bg ? 'Статус' : 'Status'}
                   </span>
-                  <select
+                  <Select
                     value={scope}
-                    onChange={(e) => setScope(e.target.value)}
-                    className="px-3 py-2.5 rounded-lg border border-gray-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-sm font-['Manrope']"
-                  >
-                    <option value="all">{bg ? 'Всички' : 'All'}</option>
-                    <option value="pending">{bg ? 'Чакащи' : 'Pending'}</option>
-                    <option value="graded">{bg ? 'Оценени' : 'Graded'}</option>
-                  </select>
+                    onChange={setScope}
+                    ariaLabel={bg ? 'Статус' : 'Status'}
+                    options={[
+                      { value: 'all', label: bg ? 'Всички' : 'All' },
+                      { value: 'pending', label: bg ? 'Чакащи' : 'Pending' },
+                      { value: 'graded', label: bg ? 'Оценени' : 'Graded' },
+                    ]}
+                  />
                 </label>
               )}
 
-              <label className="flex flex-col gap-1.5 lg:max-w-[160px]">
+              <label className="flex flex-col gap-1.5 w-full lg:w-44">
                 <span className="text-sm font-medium text-black dark:text-white font-['Manrope']">
                   {bg ? 'Подредба' : 'Sort'}
                 </span>
-                <select
+                <Select
                   value={sortOrder}
-                  onChange={(e) => setSortOrder(e.target.value)}
-                  className="px-3 py-2.5 rounded-lg border border-gray-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-sm font-['Manrope']"
-                >
-                  <option value="newest">{bg ? 'Най-нови' : 'Newest first'}</option>
-                  <option value="oldest">{bg ? 'Най-стари' : 'Oldest first'}</option>
-                </select>
+                  onChange={setSortOrder}
+                  ariaLabel={bg ? 'Подредба' : 'Sort'}
+                  options={[
+                    { value: 'newest', label: bg ? 'Най-нови' : 'Newest first' },
+                    { value: 'oldest', label: bg ? 'Най-стари' : 'Oldest first' },
+                  ]}
+                />
               </label>
 
               {!loading && (

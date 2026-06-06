@@ -3,9 +3,12 @@ import Layout from '../../layout/Layout';
 import SEO from '../../shared/SEO';
 import { Link } from "react-router-dom";
 import { useTranslation } from '../../../hooks/useTranslation';
+import { useAuth } from '../../auth/AuthContext';
 
 const ToolsPage = () => {
   const { t, language } = useTranslation();
+  const { user } = useAuth();
+  const bg = language === 'bg';
 
   const tools = [
     {
@@ -154,6 +157,35 @@ const ToolsPage = () => {
               </Link>
             ))}
           </div>
+
+          {user && (
+            <div className="w-full flex flex-col gap-3 pt-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="text-black dark:text-white text-lg font-bold font-['Manrope']">
+                  {bg ? 'Пилот: електронни карнети' : 'Pilot: electronic field books'}
+                </div>
+                <span className="px-3 py-1 bg-gray-200 dark:bg-zinc-900 rounded text-black dark:text-white text-xs font-bold font-['Manrope']">
+                  {t.beta}
+                </span>
+              </div>
+              <Link
+                to="/fieldbook"
+                className="w-full max-w-md p-4 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex flex-col gap-2 hover:shadow-md transition-shadow"
+              >
+                <div className="text-black dark:text-white text-base font-semibold font-['Manrope']">
+                  {bg ? 'Нивелационен карнет' : 'Leveling field book'}
+                </div>
+                <p className="text-neutral-500 dark:text-zinc-400 text-sm font-['Manrope']">
+                  {bg
+                    ? 'Теренни отчетания, автоматични коти и проверки. Изисква одобрение за пилот.'
+                    : 'Field readings, automatic elevations and checks. Pilot approval required.'}
+                </p>
+                <span className="text-sm font-semibold text-black dark:text-white">
+                  {bg ? 'Отвори →' : 'Open →'}
+                </span>
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </Layout>

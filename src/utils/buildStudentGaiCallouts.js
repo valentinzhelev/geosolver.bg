@@ -20,7 +20,7 @@ export function buildStudentGaiCallouts({
         key: 'calc',
         align: 'left',
         variant: 'default',
-        icon: '⚙️',
+        icon: 'settings',
         title: bg ? 'Автоматични изчисления' : 'Automatic calculations',
         body: bg
           ? 'Отвори калкулатора — GAI следи междинните стъпки.'
@@ -31,7 +31,7 @@ export function buildStudentGaiCallouts({
       key: 'method',
       align: 'left',
       variant: 'default',
-      icon: '📐',
+      icon: 'method',
       title: bg ? 'Надежден метод' : 'Reliable method',
       body: bg ? tool?.descBg : tool?.descEn,
     });
@@ -39,7 +39,7 @@ export function buildStudentGaiCallouts({
       key: 'accuracy',
       align: 'right',
       variant: 'ai',
-      icon: '🎯',
+      icon: 'target',
       title: bg ? 'Точност на един клик' : 'Accuracy one click away',
       body: bg
         ? 'Попълни полетата и предай — после GAI ще анализира грешките.'
@@ -50,7 +50,7 @@ export function buildStudentGaiCallouts({
         key: 'class-avg',
         align: 'right',
         variant: 'peer',
-        icon: '👥',
+        icon: 'peer',
         title: bg ? 'Клас (анонимно)' : 'Class (anonymous)',
         body: bg
           ? `${gaiContext.peerCount} ученика · средно ${gaiContext.avgScore ?? '—'}%`
@@ -62,7 +62,7 @@ export function buildStudentGaiCallouts({
         key: 'streak',
         align: 'right',
         variant: 'success',
-        icon: '🔥',
+        icon: 'bolt',
         title: bg ? `Серия ${gamification.streak}` : `Streak ${gamification.streak}`,
         body: bg ? 'Продължавай да предаваш навреме!' : 'Keep submitting on time!',
       });
@@ -72,7 +72,7 @@ export function buildStudentGaiCallouts({
         key: 'llm-hint',
         align: 'left',
         variant: 'ai',
-        icon: '✨',
+        icon: 'gai',
         title: 'GAI',
         body: bg ? gaiStudyHint.bg : gaiStudyHint.en,
         long: true,
@@ -87,7 +87,7 @@ export function buildStudentGaiCallouts({
       key: 'llm-narrative',
       align: 'right',
       variant: 'ai',
-      icon: '✨',
+      icon: 'gai',
       title: bg ? 'GAI обяснение' : 'GAI explanation',
       body: bg ? llmText.bg : llmText.en,
       long: true,
@@ -97,7 +97,7 @@ export function buildStudentGaiCallouts({
       key: 'gai-headline',
       align: 'right',
       variant: 'ai',
-      icon: '✨',
+      icon: 'gai',
       title: 'GAI',
       body: bg ? gaiFeedback?.headline?.bg : gaiFeedback?.headline?.en,
     });
@@ -109,7 +109,7 @@ export function buildStudentGaiCallouts({
       key: `field-${f.key}`,
       align: side === left ? 'left' : 'right',
       variant: f.status === 'correct' ? 'success' : f.status === 'close' ? 'warn' : 'ai',
-      icon: f.status === 'correct' ? '✓' : '!',
+      icon: f.status === 'correct' ? 'check' : 'warn',
       title: bg ? f.label?.bg : f.label?.en,
       body: bg ? f.message?.bg : f.message?.en,
     });
@@ -120,7 +120,7 @@ export function buildStudentGaiCallouts({
       key: `peer-${c.key}`,
       align: 'left',
       variant: 'peer',
-      icon: '📊',
+      icon: 'peer',
       title: bg ? 'Сравнение с класа' : 'Class comparison',
       body: bg ? c.message?.bg : c.message?.en,
     });
@@ -140,7 +140,7 @@ export function buildTeacherGaiCallouts({ bg, gaiInsights, llmNarrative }) {
       key: 'llm-teacher',
       align: 'right',
       variant: 'ai',
-      icon: '✨',
+      icon: 'gai',
       title: bg ? 'GAI анализ' : 'GAI analysis',
       body: bg ? llmNarrative.bg : llmNarrative.en,
       long: true,
@@ -151,7 +151,7 @@ export function buildTeacherGaiCallouts({ bg, gaiInsights, llmNarrative }) {
     key: 'summary',
     align: 'left',
     variant: 'ai',
-    icon: 'GAI',
+    icon: 'gai',
     title: bg ? gaiInsights.summary?.headline?.bg : gaiInsights.summary?.headline?.en,
     body:
       gaiInsights.summary?.score != null
@@ -165,7 +165,7 @@ export function buildTeacherGaiCallouts({ bg, gaiInsights, llmNarrative }) {
       key: f.key,
       align: side === left ? 'left' : 'right',
       variant: f.isCorrect ? 'success' : 'warn',
-      icon: f.isCorrect ? '✓' : '△',
+      icon: f.isCorrect ? 'check' : 'warn',
       title: `${bg ? f.label?.bg : f.label?.en}: ${f.studentValue}`,
       body: bg ? f.diagnosis?.bg : f.diagnosis?.en,
     });
@@ -176,7 +176,7 @@ export function buildTeacherGaiCallouts({ bg, gaiInsights, llmNarrative }) {
       key: `rec-${i}`,
       align: i === 0 ? 'left' : 'right',
       variant: 'ai',
-      icon: '💡',
+      icon: 'tip',
       title: bg ? 'Препоръка' : 'Tip',
       body: bg ? r.bg : r.en,
     });

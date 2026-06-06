@@ -23,10 +23,12 @@ function resolveApiOrigin() {
 const API_ORIGIN = resolveApiOrigin();
 const API_BASE_URL = `${API_ORIGIN}/api`;
 
-console.log('API Configuration:');
-console.log('  - REACT_APP_API_URL env var:', process.env.REACT_APP_API_URL);
-console.log('  - API_ORIGIN:', API_ORIGIN);
-console.log('  - Final API_BASE_URL:', API_BASE_URL);
+if (process.env.NODE_ENV !== 'production') {
+  console.log('API Configuration:');
+  console.log('  - REACT_APP_API_URL env var:', process.env.REACT_APP_API_URL);
+  console.log('  - API_ORIGIN:', API_ORIGIN);
+  console.log('  - Final API_BASE_URL:', API_BASE_URL);
+}
 
 export { API_ORIGIN };
 export default API_BASE_URL;

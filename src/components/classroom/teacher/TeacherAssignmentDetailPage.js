@@ -18,6 +18,38 @@ function flattenInputData(inputData) {
   return inputData;
 }
 
+const Field = ({ label, children }) => (
+  <div className="flex flex-col gap-1 min-w-0">
+    <dt className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400 dark:text-zinc-500 font-['Manrope']">
+      {label}
+    </dt>
+    <dd className="text-sm font-medium text-black dark:text-white font-['Manrope'] break-words">{children}</dd>
+  </div>
+);
+
+const STATUS_LABELS = {
+  active: { bg: 'Активно', en: 'Active' },
+  draft: { bg: 'Чернова', en: 'Draft' },
+  archived: { bg: 'Архивирано', en: 'Archived' },
+};
+
+const StatusPill = ({ status, bg }) => {
+  const label = STATUS_LABELS[status] ? (bg ? STATUS_LABELS[status].bg : STATUS_LABELS[status].en) : status;
+  const muted = status === 'draft' || status === 'archived';
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold font-['Manrope'] ${
+        muted
+          ? 'bg-stone-100 dark:bg-zinc-800 text-neutral-600 dark:text-zinc-300'
+          : 'bg-black dark:bg-white text-white dark:text-black'
+      }`}
+    >
+      <span className={`w-1.5 h-1.5 rounded-full ${muted ? 'bg-neutral-400 dark:bg-zinc-500' : 'bg-white dark:bg-black'}`} />
+      {label}
+    </span>
+  );
+};
+
 const TeacherAssignmentDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -207,39 +239,31 @@ const TeacherAssignmentDetailPage = () => {
                 </ActionButton>
               </Card>
             )}
-            <Card className="p-6 flex flex-col gap-3">
-              <div className="flex flex-wrap gap-4 text-sm font-['Manrope'] text-neutral-600 dark:text-zinc-400">
-                <span>
-                  <strong className="text-black dark:text-white">{bg ? 'Група' : 'Group'}:</strong>{' '}
-                  {assignment.course?.name} ({assignment.course?.code})
-                </span>
-                <span>
-                  <strong className="text-black dark:text-white">{bg ? 'Инструмент' : 'Tool'}:</strong>{' '}
+            <Card className="p-6 flex flex-col gap-4">
+              <dl className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-4">
+                <Field label={bg ? 'Група' : 'Group'}>
+                  {assignment.course?.name}{' '}
+                  <span className="font-mono text-xs text-neutral-500 dark:text-zinc-400">({assignment.course?.code})</span>
+                </Field>
+                <Field label={bg ? 'Инструмент' : 'Tool'}>
                   {tool ? (bg ? tool.titleBg : tool.titleEn) : assignment.taskTemplate?.name}
-                </span>
-                <span>
-                  <strong className="text-black dark:text-white">{bg ? 'Статус' : 'Status'}:</strong> {assignment.status}
-                </span>
-                <span>
-                  <strong className="text-black dark:text-white">{bg ? 'Краен срок' : 'Due'}:</strong>{' '}
+                </Field>
+                <Field label={bg ? 'Статус' : 'Status'}>
+                  <StatusPill status={assignment.status} bg={bg} />
+                </Field>
+                <Field label={bg ? 'Краен срок' : 'Due'}>
                   {new Date(assignment.dueDate).toLocaleString(bg ? 'bg-BG' : 'en-US')}
-                </span>
-                <span>
-                  <strong className="text-black dark:text-white">{bg ? 'Варианти' : 'Variants'}:</strong>{' '}
-                  {assignment.variants?.length || 0}
-                </span>
+                </Field>
+                <Field label={bg ? 'Варианти' : 'Variants'}>{assignment.variants?.length || 0}</Field>
                 {calculatorPolicyMeta && (
-                  <span className="block w-full">
-                    <strong className="text-black dark:text-white">{bg ? 'Калкулатор' : 'Calculator'}:</strong>{' '}
-                    {calculatorPolicyMeta.label}
-                  </span>
+                  <Field label={bg ? 'Калкулатор' : 'Calculator'}>{calculatorPolicyMeta.label}</Field>
                 )}
-              </div>
+              </dl>
               {calculatorPolicyMeta && (
-                <p className="text-xs text-neutral-500 dark:text-zinc-400 font-['Manrope']">{calculatorPolicyMeta.teacherHint}</p>
+                <p className="text-xs text-neutral-500 dark:text-zinc-400 font-['Manrope'] -mt-1">{calculatorPolicyMeta.teacherHint}</p>
               )}
               {assignment.description && (
-                <p className="text-sm text-neutral-700 dark:text-zinc-300 font-['Manrope'] whitespace-pre-wrap pt-2 border-t border-stone-100 dark:border-zinc-800">
+                <p className="text-sm text-neutral-700 dark:text-zinc-300 font-['Manrope'] whitespace-pre-wrap pt-3 border-t border-stone-100 dark:border-zinc-800">
                   {assignment.description}
                 </p>
               )}

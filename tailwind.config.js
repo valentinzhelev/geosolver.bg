@@ -17,6 +17,41 @@ module.exports = {
         'dark-card': '#27272a',
         'dark-input': '#3f3f46',
       },
+      keyframes: {
+        'gai-fade-up': {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        'gai-pop': {
+          '0%': { opacity: '0', transform: 'scale(0.96)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+        'gai-draw': {
+          '0%': { 'stroke-dashoffset': '1' },
+          '100%': { 'stroke-dashoffset': '0' },
+        },
+        'gai-float': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-6px)' },
+        },
+        'gai-card-in': {
+          '0%': { opacity: '0', transform: 'perspective(900px) rotateY(8deg) translateX(var(--gai-in-x, 16px)) scale(0.94)' },
+          '100%': { opacity: '1', transform: 'perspective(900px) rotateY(0deg) translateX(0) scale(1)' },
+        },
+        'gai-node-pulse': {
+          '0%': { transform: 'scale(0.8)', opacity: '0.9' },
+          '70%': { transform: 'scale(2.4)', opacity: '0' },
+          '100%': { transform: 'scale(2.4)', opacity: '0' },
+        },
+      },
+      animation: {
+        'gai-fade-up': 'gai-fade-up 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards',
+        'gai-pop': 'gai-pop 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards',
+        'gai-draw': 'gai-draw 0.9s cubic-bezier(0.65, 0, 0.35, 1) forwards',
+        'gai-float': 'gai-float 6s ease-in-out infinite',
+        'gai-card-in': 'gai-card-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards',
+        'gai-node-pulse': 'gai-node-pulse 2.4s ease-out infinite',
+      },
       colors: {
         black: "#000000",
         gray: {

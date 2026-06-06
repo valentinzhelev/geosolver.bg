@@ -1,6 +1,12 @@
 import React from 'react';
 import { Card } from './Card';
 
+const gradientStyle = {
+  backgroundImage: 'url(/images/gradient_wallpaper.jpg)',
+  backgroundSize: 'cover',
+  backgroundPosition: 'center',
+};
+
 const GaiAssignmentAnalytics = ({ analytics, bg, loading }) => {
   if (loading) {
     return (
@@ -13,10 +19,14 @@ const GaiAssignmentAnalytics = ({ analytics, bg, loading }) => {
   if (!analytics || analytics.submissionCount === 0) return null;
 
   return (
-    <Card className="p-6 flex flex-col gap-5 border-violet-200 dark:border-violet-900/50 bg-gradient-to-br from-violet-50/80 to-white dark:from-violet-950/30 dark:to-zinc-900">
+    <Card className="relative p-6 flex flex-col gap-5 overflow-hidden">
+      <span className="absolute inset-x-0 top-0 h-1" style={gradientStyle} aria-hidden />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <span className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-violet-600 text-white text-sm font-bold font-['Manrope']">
+          <span
+            className="inline-flex items-center justify-center w-10 h-10 rounded-xl text-white text-sm font-bold font-['Manrope'] ring-1 ring-black/10 dark:ring-white/10"
+            style={gradientStyle}
+          >
             GAI
           </span>
           <div>
@@ -37,7 +47,7 @@ const GaiAssignmentAnalytics = ({ analytics, bg, loading }) => {
           </div>
           {analytics.avgScore != null && (
             <div className="text-center">
-              <div className="text-2xl font-bold text-violet-700 dark:text-violet-300">{analytics.avgScore}%</div>
+              <div className="text-2xl font-bold text-black dark:text-white">{analytics.avgScore}%</div>
               <div className="text-xs text-neutral-500 dark:text-zinc-400">{bg ? 'среден резултат' : 'average'}</div>
             </div>
           )}
@@ -80,7 +90,7 @@ const GaiAssignmentAnalytics = ({ analytics, bg, loading }) => {
                 <span className="w-16 shrink-0 font-medium">{bg ? f.label?.bg : f.label?.en}</span>
                 <div className="flex-1 h-2 rounded-full bg-stone-200 dark:bg-zinc-700 overflow-hidden">
                   <div
-                    className="h-full rounded-full bg-violet-500"
+                    className="h-full rounded-full bg-black dark:bg-white"
                     style={{ width: `${Math.min(100, f.errorRatePct)}%` }}
                   />
                 </div>
@@ -96,7 +106,7 @@ const GaiAssignmentAnalytics = ({ analytics, bg, loading }) => {
           {analytics.classInsights.map((ins, i) => (
             <li
               key={i}
-              className="text-sm font-['Manrope'] px-3 py-2 rounded-lg bg-violet-100/60 dark:bg-violet-900/20 text-violet-900 dark:text-violet-200"
+              className="text-sm font-['Manrope'] px-3 py-2 rounded-lg bg-stone-100 dark:bg-zinc-800 text-black dark:text-white border-l-2 border-black dark:border-white"
             >
               {bg ? ins.bg : ins.en}
             </li>
@@ -124,7 +134,9 @@ const GaiAssignmentAnalytics = ({ analytics, bg, loading }) => {
                     <td className="py-2 pr-4">
                       {row.student?.name || row.student?.email || '—'}
                       {row.isLate && (
-                        <span className="ml-1 text-xs text-amber-600">{bg ? 'късно' : 'late'}</span>
+                        <span className="ml-1 text-xs px-1.5 py-0.5 rounded bg-stone-100 dark:bg-zinc-800 text-neutral-500 dark:text-zinc-400">
+                          {bg ? 'късно' : 'late'}
+                        </span>
                       )}
                     </td>
                     <td className="py-2 pr-4 font-mono">

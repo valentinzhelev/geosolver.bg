@@ -7,6 +7,35 @@ import { ActionButton } from '../ui/ActionButton';
 import { classroomApi } from '../../../services/classroomApi';
 import { useTranslation } from '../../../hooks/useTranslation';
 
+const gradientStyle = {
+  backgroundImage: 'url(/images/gradient_wallpaper.jpg)',
+  backgroundSize: 'cover',
+  backgroundPosition: 'center',
+};
+
+const groupInitials = (name) =>
+  (name || '?')
+    .trim()
+    .split(/\s+/)
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+
+const PeopleIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+    <circle cx="9" cy="7" r="4" />
+    <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
+  </svg>
+);
+
+const CheckIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <path d="M5 13l4 4L19 7" />
+  </svg>
+);
+
 const GroupsPage = () => {
   const { language } = useTranslation();
   const bg = language === 'bg';
@@ -86,7 +115,14 @@ const GroupsPage = () => {
         }
       >
         {error && <Card className="p-4 text-sm text-red-600">{error}</Card>}
-        {message && <Card className="p-4 text-sm text-green-700 dark:text-green-400">{message}</Card>}
+        {message && (
+          <Card className="p-4 flex items-center gap-2 text-sm font-medium text-black dark:text-white font-['Manrope']">
+            <span className="shrink-0 w-7 h-7 rounded-full bg-stone-100 dark:bg-zinc-800 text-black dark:text-white flex items-center justify-center">
+              <CheckIcon />
+            </span>
+            {message}
+          </Card>
+        )}
 
         <div className="flex flex-wrap justify-end items-center gap-2">
           <ActionButton
@@ -177,25 +213,45 @@ const GroupsPage = () => {
           />
         )}
 
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
           {courses.map((c) => (
-            <Card key={c._id} className="p-5 h-full flex flex-col gap-3">
-              <div className="flex justify-between items-start gap-2">
-                <Link to={`/classroom/groups/${c._id}`} className="font-bold text-black dark:text-white font-['Manrope'] hover:underline">
-                  {c.name}
-                </Link>
-                <span className="text-xs font-mono px-2 py-1 bg-stone-100 dark:bg-zinc-800 rounded text-neutral-600 dark:text-zinc-300 shrink-0">
-                  {c.code}
+            <Card
+              key={c._id}
+              className="group relative p-5 h-full flex flex-col gap-3 overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:outline-gray-300 dark:hover:outline-zinc-600"
+            >
+              {/* Decorative brand-gradient top accent */}
+              <span className="absolute inset-x-0 top-0 h-1" style={gradientStyle} aria-hidden />
+
+              <div className="flex items-start gap-3">
+                <span
+                  className="shrink-0 w-11 h-11 rounded-xl bg-stone-100 dark:bg-zinc-800 text-black dark:text-white flex items-center justify-center text-sm font-bold font-['Manrope'] ring-1 ring-stone-200 dark:ring-zinc-700"
+                >
+                  {groupInitials(c.name)}
                 </span>
+                <div className="min-w-0 flex-1">
+                  <Link
+                    to={`/classroom/groups/${c._id}`}
+                    className="font-bold text-black dark:text-white font-['Manrope'] hover:underline block truncate"
+                  >
+                    {c.name}
+                  </Link>
+                  <span className="inline-block mt-1 text-[11px] font-mono px-2 py-0.5 bg-stone-100 dark:bg-zinc-800 rounded text-neutral-600 dark:text-zinc-300">
+                    {c.code}
+                  </span>
+                </div>
               </div>
+
               {c.description && (
                 <p className="text-sm text-neutral-600 dark:text-zinc-400 font-['Manrope'] line-clamp-2">
                   {c.description}
                 </p>
               )}
-              <p className="text-xs text-neutral-400 dark:text-zinc-400 font-['Manrope']">
+
+              <p className="inline-flex items-center gap-1.5 text-xs text-neutral-500 dark:text-zinc-400 font-['Manrope']">
+                <PeopleIcon />
                 {c.students?.length || 0} {bg ? 'ученици' : 'students'}
               </p>
+
               <div className="flex flex-wrap gap-2 mt-auto pt-1">
                 <ActionButton to={`/classroom/groups/${c._id}`} variant="primary">
                   {bg ? 'Отвори' : 'Open'}

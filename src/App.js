@@ -41,6 +41,10 @@ import Resection from './components/tasks/Resection';
 import FieldBook from './components/pages/FieldBook/FieldBook';
 import BillingSuccess from './components/pages/Billing/BillingSuccess';
 import BillingCancel from './components/pages/Billing/BillingCancel';
+import PrivacyPolicy from './components/pages/Legal/PrivacyPolicy';
+import TermsOfService from './components/pages/Legal/TermsOfService';
+import Disclaimer from './components/pages/Legal/Disclaimer';
+import NotFound from './components/pages/NotFound/NotFound';
 
 function App() {
   return (
@@ -86,9 +90,20 @@ function App() {
               <Route path="/for-students" element={<ForStudents />} />
               <Route path="/gai" element={<GaiPage />} />
               <Route path="/scientific-calculator" element={<ScientificCalculator />} />
-              <Route path="/fieldbook" element={<FieldBook />} />
+              <Route
+                path="/fieldbook"
+                element={
+                  <ProtectedRoute>
+                    <FieldBook />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/billing/success" element={<BillingSuccess />} />
               <Route path="/billing/cancel" element={<BillingCancel />} />
+              {/* Legal pages */}
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/terms" element={<TermsOfService />} />
+              <Route path="/disclaimer" element={<Disclaimer />} />
               {/* Post-MVP tools: code retained, routes show coming-soon */}
               <Route path="/polar-intersection" element={<ToolComingSoon />} />
               <Route path="/polar-intersection/docs" element={<ToolComingSoon />} />
@@ -181,6 +196,8 @@ function App() {
               <Route path="/teacher/students" element={<Navigate to="/classroom/groups" replace />} />
               <Route path="/teacher/scan-submissions" element={<Navigate to="/classroom/review" replace />} />
               <Route path="/teacher/templates/editor" element={<Navigate to="/classroom/dashboard" replace />} />
+              {/* 404 catch-all */}
+              <Route path="*" element={<NotFound />} />
             </Routes>
             <CookieConsent />
           </LanguageProvider>
