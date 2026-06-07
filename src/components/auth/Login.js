@@ -92,39 +92,29 @@ const Login = () => {
   );
 
   const googleClientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
+  const googleButtonRef = useRef(null);
 
   useEffect(() => {
     if (!googleClientId) return;
 
-    const initGoogleOAuth = () => {
+    let retryCount = 0;
+    const maxRetries = 80;
+
+    const initGoogleSignIn = () => {
+      const container = googleButtonRef.current;
+      if (!container) return;
+
       if (window.google?.accounts?.id) {
         window.google.accounts.id.initialize({
           client_id: googleClientId,
           callback: handleGoogleSignIn,
           auto_select: false,
           cancel_on_tap_outside: true,
-          ux_mode: 'popup',
         });
-      } else {
-        setTimeout(initGoogleOAuth, 100);
-      }
-    };
-    initGoogleOAuth();
-  }, [handleGoogleSignIn, googleClientId]);
 
-  useEffect(() => {
-    if (!googleClientId) return;
-
-    let retryCount = 0;
-    const maxRetries = 50;
-
-    const initHiddenGoogleButton = () => {
-      const container = document.getElementById('google-signin-button-hidden');
-      if (!container) return;
-
-      if (window.google?.accounts?.id) {
         container.innerHTML = '';
         try {
+          const width = Math.max(container.parentElement?.offsetWidth || 0, 200);
           window.google.accounts.id.renderButton(container, {
             type: 'standard',
             theme: 'outline',
@@ -132,18 +122,19 @@ const Login = () => {
             text: 'signin_with',
             shape: 'rectangular',
             logo_alignment: 'left',
+            width,
           });
         } catch (err) {
           console.error('Google button render error:', err);
         }
       } else if (retryCount < maxRetries) {
         retryCount += 1;
-        setTimeout(initHiddenGoogleButton, 100);
+        setTimeout(initGoogleSignIn, 100);
       }
     };
 
-    setTimeout(initHiddenGoogleButton, 100);
-  }, [googleClientId]);
+    initGoogleSignIn();
+  }, [handleGoogleSignIn, googleClientId]);
 
   useEffect(() => {
     if (user && loginSuccessRef.current) {
@@ -158,22 +149,6 @@ const Login = () => {
     if (ok) {
       setSuccess(true);
       setTimeout(() => navigate('/account', { replace: true }), 1000);
-    }
-  };
-
-  const handleCustomGoogleClick = () => {
-    if (!googleClientId) {
-      return;
-    }
-
-    const hiddenBtn = document.querySelector('#google-signin-button-hidden [role="button"]');
-    if (hiddenBtn) {
-      hiddenBtn.click();
-      return;
-    }
-
-    if (window.google?.accounts?.id) {
-      window.google.accounts.id.prompt();
     }
   };
 
@@ -286,15 +261,31 @@ const Login = () => {
               </p>
 
               <div className={`${cardClass} flex flex-row gap-2.5`}>
-                <button
-                  type="button"
-                  onClick={handleCustomGoogleClick}
-                  disabled={loading || !googleClientId}
-                  className="flex-1 min-h-[40px] px-3 py-2 bg-stone-100 dark:bg-zinc-800 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-600 flex justify-center items-center gap-2 text-black dark:text-white text-sm font-medium font-['Manrope'] hover:bg-stone-200/80 dark:hover:bg-zinc-700 transition-colors disabled:opacity-50"
-                >
-                  <GoogleGIcon />
-                  {t.loginWithGoogle}
-                </button>
+                <div className="relative flex-1 min-h-[40px]">
+                  {googleClientId ? (
+                    <div
+                      ref={googleButtonRef}
+                      className="absolute inset-0 z-10 flex items-center justify-center overflow-hidden opacity-[0.01]"
+                      aria-label={t.loginWithGoogle}
+                    />
+                  ) : (
+                    <button
+                      type="button"
+                      disabled
+                      className="w-full min-h-[40px] px-3 py-2 bg-stone-100 dark:bg-zinc-800 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-600 flex justify-center items-center gap-2 text-neutral-400 text-sm font-medium font-['Manrope'] opacity-50 cursor-not-allowed"
+                    >
+                      <GoogleGIcon />
+                      {t.loginWithGoogle}
+                    </button>
+                  )}
+                  <div
+                    className="pointer-events-none w-full min-h-[40px] px-3 py-2 bg-stone-100 dark:bg-zinc-800 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-600 flex justify-center items-center gap-2 text-black dark:text-white text-sm font-medium font-['Manrope']"
+                    aria-hidden={!!googleClientId}
+                  >
+                    <GoogleGIcon />
+                    {t.loginWithGoogle}
+                  </div>
+                </div>
                 <Link
                   to="/register"
                   className="flex-1 min-h-[40px] px-3 py-2 bg-black dark:bg-white rounded-lg flex justify-center items-center text-white dark:text-black text-sm font-medium font-['Manrope'] hover:opacity-90 transition-opacity"
@@ -302,12 +293,6 @@ const Login = () => {
                   {t.register}
                 </Link>
               </div>
-
-              <div
-                id="google-signin-button-hidden"
-                className="fixed left-[-9999px] top-0 w-px h-px overflow-hidden opacity-0"
-                aria-hidden
-              />
             </div>
           </div>
         </div>
