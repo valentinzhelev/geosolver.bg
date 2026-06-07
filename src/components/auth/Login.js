@@ -91,23 +91,30 @@ const Login = () => {
     [loginWithGoogle, rememberMe, navigate]
   );
 
+  const googleClientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
+
   useEffect(() => {
+    if (!googleClientId) return;
+
     const initGoogleOAuth = () => {
       if (window.google?.accounts?.id) {
         window.google.accounts.id.initialize({
-          client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
+          client_id: googleClientId,
           callback: handleGoogleSignIn,
           auto_select: false,
           cancel_on_tap_outside: true,
+          ux_mode: 'popup',
         });
       } else {
         setTimeout(initGoogleOAuth, 100);
       }
     };
     initGoogleOAuth();
-  }, [handleGoogleSignIn]);
+  }, [handleGoogleSignIn, googleClientId]);
 
   useEffect(() => {
+    if (!googleClientId) return;
+
     let retryCount = 0;
     const maxRetries = 50;
 
@@ -125,7 +132,6 @@ const Login = () => {
             text: 'signin_with',
             shape: 'rectangular',
             logo_alignment: 'left',
-            callback: handleGoogleSignIn,
           });
         } catch (err) {
           console.error('Google button render error:', err);
@@ -137,7 +143,7 @@ const Login = () => {
     };
 
     setTimeout(initHiddenGoogleButton, 100);
-  }, [handleGoogleSignIn]);
+  }, [googleClientId]);
 
   useEffect(() => {
     if (user && loginSuccessRef.current) {
@@ -156,9 +162,18 @@ const Login = () => {
   };
 
   const handleCustomGoogleClick = () => {
+    if (!googleClientId) {
+      return;
+    }
+
     const hiddenBtn = document.querySelector('#google-signin-button-hidden [role="button"]');
     if (hiddenBtn) {
       hiddenBtn.click();
+      return;
+    }
+
+    if (window.google?.accounts?.id) {
+      window.google.accounts.id.prompt();
     }
   };
 
@@ -274,7 +289,7 @@ const Login = () => {
                 <button
                   type="button"
                   onClick={handleCustomGoogleClick}
-                  disabled={loading}
+                  disabled={loading || !googleClientId}
                   className="flex-1 min-h-[40px] px-3 py-2 bg-stone-100 dark:bg-zinc-800 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-600 flex justify-center items-center gap-2 text-black dark:text-white text-sm font-medium font-['Manrope'] hover:bg-stone-200/80 dark:hover:bg-zinc-700 transition-colors disabled:opacity-50"
                 >
                   <GoogleGIcon />
