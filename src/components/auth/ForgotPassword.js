@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import SEO from '../shared/SEO';
 import Layout from '../layout/Layout';
+import { Link } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { useTranslation } from '../../hooks/useTranslation';
+import AuthShell, { authCardClass, authInputClass, authLabelClass } from './AuthShell';
 
 const ForgotPassword = () => {
   const { t } = useTranslation();
@@ -27,54 +29,79 @@ const ForgotPassword = () => {
         description={t.forgotPasswordDescription}
         canonical="/forgot-password"
       />
-      <div className="w-full min-h-screen bg-stone-50 dark:bg-zinc-950 transition-colors flex flex-col items-center justify-center">
-        <div className="w-[580px] inline-flex flex-col justify-start items-start gap-5">
-          <div className="self-stretch px-14 py-10 relative rounded-xl inline-flex justify-center items-center gap-4 overflow-hidden" style={{backgroundColor: '#000'}}>
-            <div className="absolute inset-0 w-full h-full" style={{backgroundImage: 'url(/images/gradient_wallpaper.jpg)', backgroundSize: 'cover', backgroundPosition: 'left', transform: 'scaleX(-1)', zIndex: 0}} />
-            <div className="absolute inset-0 bg-black opacity-30 pointer-events-none" style={{zIndex: 1}} />
-            <div className="relative w-full flex justify-center items-center" style={{zIndex: 2}}>
-              <span className="text-center text-white text-2xl font-semibold font-['Manrope']">{t.everyoneMakesMistakes}</span>
-            </div>
-          </div>
-          <div className="self-stretch px-10 flex flex-col justify-center items-center gap-2.5">
-            <div className="self-stretch p-4 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex flex-col justify-center items-center gap-6">
-              <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{t.forgotPasswordTitle}</div>
-              {success ? (
-                <div className="text-green-600 dark:text-green-400 text-center">{message || t.checkEmail}</div>
-              ) : (
-                <form className="self-stretch flex flex-col justify-start items-start gap-4" onSubmit={handleSubmit}>
-                  <div className="self-stretch flex flex-col justify-start items-start gap-2">
-                    <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{t.email}</div>
-                    <input
-                      type="email"
-                      className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-600 bg-white dark:bg-zinc-800 text-black dark:text-zinc-100 placeholder-neutral-400 dark:placeholder-zinc-500 text-sm font-medium font-['Manrope']"
-                      placeholder={t.enterEmail}
-                      value={email}
-                      onChange={e => setEmail(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <button 
-                    type="submit" 
-                    className="px-4 py-2 bg-black dark:bg-white rounded-lg inline-flex items-center gap-3 self-center hover:opacity-90 transition-opacity disabled:opacity-50"
-                    disabled={loading}
+      <AuthShell>
+        <form className="w-full" onSubmit={success ? (e) => e.preventDefault() : handleSubmit}>
+          <div className={`${authCardClass} flex flex-col gap-5`}>
+            {success ? (
+              <>
+                <div className="w-full flex flex-col gap-2">
+                  <h1 className="text-black dark:text-white text-base font-semibold font-['Manrope']">
+                    {t.forgotPasswordSuccessTitle}
+                  </h1>
+                  <p className="text-neutral-500 dark:text-zinc-400 text-sm font-medium font-['Manrope'] leading-relaxed">
+                    {message || t.forgotPasswordSuccessBody}
+                  </p>
+                </div>
+                <Link
+                  to="/login"
+                  className="w-full px-4 py-2 bg-black dark:bg-white rounded-lg flex justify-center items-center text-white dark:text-black text-sm font-medium font-['Manrope'] hover:opacity-90 transition-opacity"
+                >
+                  {t.backToLogin}
+                </Link>
+              </>
+            ) : (
+              <>
+                <div className="w-full flex flex-col gap-1.5">
+                  <h1 className="text-black dark:text-white text-base font-semibold font-['Manrope']">
+                    {t.forgotPasswordTitle}
+                  </h1>
+                  <p className="text-neutral-500 dark:text-zinc-400 text-sm font-medium font-['Manrope']">
+                    {t.forgotPasswordHint}
+                  </p>
+                </div>
+
+                <label className="w-full flex flex-col gap-1.5">
+                  <span className={authLabelClass}>{t.email}</span>
+                  <input
+                    type="email"
+                    className={authInputClass}
+                    placeholder={t.enterEmail}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    autoComplete="email"
+                  />
+                </label>
+
+                <button
+                  type="submit"
+                  className="w-full px-4 py-2 bg-black dark:bg-white rounded-lg text-white dark:text-black text-sm font-medium font-['Manrope'] hover:opacity-90 transition-opacity disabled:opacity-50"
+                  disabled={loading}
+                >
+                  {loading ? t.sending : t.sendResetLink}
+                </button>
+
+                {error && (
+                  <p className="w-full text-red-500 dark:text-red-400 text-sm font-medium font-['Manrope']">
+                    {error}
+                  </p>
+                )}
+
+                <p className="w-full text-center">
+                  <Link
+                    to="/login"
+                    className="text-neutral-400 dark:text-zinc-400 text-sm font-medium font-['Manrope'] hover:text-black dark:hover:text-white underline"
                   >
-                    <div className="justify-start text-white dark:text-black text-base font-medium font-['Manrope']">
-                      {loading ? t.sending : t.sendCode}
-                    </div>
-                    {loading && <div className="justify-start text-neutral-400 dark:text-zinc-400 text-base font-medium font-['Manrope']">59</div>}
-                  </button>
-                  {error && (
-                    <div className="text-red-500 dark:text-red-400 text-center text-sm">{error}</div>
-                  )}
-                </form>
-              )}
-            </div>
+                    {t.backToLogin}
+                  </Link>
+                </p>
+              </>
+            )}
           </div>
-        </div>
-      </div>
+        </form>
+      </AuthShell>
     </Layout>
   );
 };
 
-export default ForgotPassword; 
+export default ForgotPassword;

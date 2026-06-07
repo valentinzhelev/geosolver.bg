@@ -7,13 +7,16 @@ import {
 } from '../../utils/apiLanguage';
 import SEO from '../shared/SEO';
 import Layout from '../layout/Layout';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from '../../hooks/useTranslation';
+import AuthShell, { authCardClass, authInputClass, authLabelClass } from './AuthShell';
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
 }
 
 const ResetPassword = () => {
+  const { t } = useTranslation();
   const query = useQuery();
   const navigate = useNavigate();
   const [newPassword, setNewPassword] = useState('');
@@ -23,18 +26,21 @@ const ResetPassword = () => {
   const [success, setSuccess] = useState(false);
 
   const token = query.get('token');
+  const invalidLink = !token;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+
     if (!token) {
-      setError('Липсва токен.');
+      setError(t.missingResetToken);
       return;
     }
     if (newPassword !== repeatPassword) {
-      setError('Паролите не съвпадат.');
+      setError(t.passwordsDoNotMatch);
       return;
     }
+
     setLoading(true);
     try {
       const res = await fetch(`${API_BASE_URL}/auth/reset-password`, {
@@ -59,65 +65,118 @@ const ResetPassword = () => {
   return (
     <Layout>
       <SEO
-        title="Нова парола"
-        description="Задаване на нова парола за GeoSolver акаунт"
+        title={t.resetPasswordTitle}
+        description={t.resetPasswordDescription}
         canonical="/reset-password"
       />
-      <div className="w-full min-h-screen bg-stone-50 dark:bg-zinc-950 transition-colors duration-300 flex flex-col items-center justify-center px-4">
-        <div className="w-full max-w-[580px] inline-flex flex-col justify-start items-start gap-5">
-          <div className="self-stretch px-14 py-10 relative rounded-xl inline-flex justify-center items-center gap-4 overflow-hidden" style={{backgroundColor: '#000'}}>
-            <div className="absolute inset-0 w-full h-full" style={{backgroundImage: 'url(/images/gradient_wallpaper.jpg)', backgroundSize: 'cover', backgroundPosition: 'left', transform: 'scaleX(-1)', zIndex: 0}} />
-            <div className="absolute inset-0 bg-black opacity-30 pointer-events-none" style={{zIndex: 1}} />
-            <div className="relative w-full flex justify-center items-center" style={{zIndex: 2}}>
-              <span className="flex-1 text-center text-white text-2xl font-semibold font-['Manrope']">...важното е да се учим от тях.</span>
-            </div>
-          </div>
-          <div className="self-stretch px-10 flex flex-col justify-center items-center gap-2.5">
-            <div className="self-stretch p-4 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex flex-col justify-center items-center gap-6">
-              {success ? (
-                <div className="text-green-600 dark:text-green-400 text-center self-stretch">Паролата е сменена успешно! Пренасочване към вход...</div>
-              ) : (
-                <form className="self-stretch flex flex-col justify-start items-start gap-4" onSubmit={handleSubmit}>
-                  <div className="self-stretch flex flex-col justify-start items-start gap-2">
-                    <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">Нова парола</div>
-                    <input
-                      type="password"
-                      className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-600 bg-white dark:bg-zinc-800 text-black dark:text-zinc-100 placeholder-neutral-400 dark:placeholder-zinc-500 text-sm font-medium font-['Manrope']"
-                      placeholder="Нова парола"
-                      value={newPassword}
-                      onChange={e => setNewPassword(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="self-stretch flex flex-col justify-start items-start gap-2">
-                    <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">Повтори нова парола</div>
-                    <input
-                      type="password"
-                      className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-600 bg-white dark:bg-zinc-800 text-black dark:text-zinc-100 placeholder-neutral-400 dark:placeholder-zinc-500 text-sm font-medium font-['Manrope']"
-                      placeholder="Повтори нова парола"
-                      value={repeatPassword}
-                      onChange={e => setRepeatPassword(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-black dark:bg-white rounded-lg inline-flex items-center gap-3 self-center hover:opacity-90 transition-opacity disabled:opacity-50"
-                    disabled={loading}
+      <AuthShell>
+        <form
+          className="w-full"
+          onSubmit={invalidLink || success ? (e) => e.preventDefault() : handleSubmit}
+        >
+          <div className={`${authCardClass} flex flex-col gap-5`}>
+            {invalidLink ? (
+              <>
+                <div className="w-full flex flex-col gap-1.5">
+                  <h1 className="text-black dark:text-white text-base font-semibold font-['Manrope']">
+                    {t.resetPasswordTitle}
+                  </h1>
+                  <p className="text-red-500 dark:text-red-400 text-sm font-medium font-['Manrope']">
+                    {t.invalidResetToken}
+                  </p>
+                </div>
+                <Link
+                  to="/forgot-password"
+                  className="w-full px-4 py-2 bg-black dark:bg-white rounded-lg flex justify-center items-center text-white dark:text-black text-sm font-medium font-['Manrope'] hover:opacity-90 transition-opacity"
+                >
+                  {t.requestNewResetLink}
+                </Link>
+                <p className="w-full text-center">
+                  <Link
+                    to="/login"
+                    className="text-neutral-400 dark:text-zinc-400 text-sm font-medium font-['Manrope'] hover:text-black dark:hover:text-white underline"
                   >
-                    <div className="justify-start text-white dark:text-black text-base font-medium font-['Manrope']">
-                      {loading ? 'Записване...' : 'Потвърди'}
-                    </div>
-                  </button>
-                  {error && <div className="text-red-500 dark:text-red-400 text-center text-sm self-stretch">{error}</div>}
-                </form>
-              )}
-            </div>
+                    {t.backToLogin}
+                  </Link>
+                </p>
+              </>
+            ) : success ? (
+              <div className="w-full flex flex-col gap-2 text-center">
+                <h1 className="text-black dark:text-white text-base font-semibold font-['Manrope']">
+                  {t.passwordChangedSuccess}
+                </h1>
+                <p className="text-neutral-500 dark:text-zinc-400 text-sm font-medium font-['Manrope']">
+                  {t.redirectingToLogin}
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className="w-full flex flex-col gap-1.5">
+                  <h1 className="text-black dark:text-white text-base font-semibold font-['Manrope']">
+                    {t.resetPasswordTitle}
+                  </h1>
+                  <p className="text-neutral-500 dark:text-zinc-400 text-sm font-medium font-['Manrope']">
+                    {t.resetPasswordHint}
+                  </p>
+                </div>
+
+                <div className="w-full flex flex-col gap-3.5">
+                  <label className="w-full flex flex-col gap-1.5">
+                    <span className={authLabelClass}>{t.resetNewPassword}</span>
+                    <input
+                      type="password"
+                      className={authInputClass}
+                      placeholder={t.resetNewPassword}
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      required
+                      autoComplete="new-password"
+                    />
+                  </label>
+
+                  <label className="w-full flex flex-col gap-1.5">
+                    <span className={authLabelClass}>{t.resetConfirmPassword}</span>
+                    <input
+                      type="password"
+                      className={authInputClass}
+                      placeholder={t.resetConfirmPassword}
+                      value={repeatPassword}
+                      onChange={(e) => setRepeatPassword(e.target.value)}
+                      required
+                      autoComplete="new-password"
+                    />
+                  </label>
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full px-4 py-2 bg-black dark:bg-white rounded-lg text-white dark:text-black text-sm font-medium font-['Manrope'] hover:opacity-90 transition-opacity disabled:opacity-50"
+                  disabled={loading}
+                >
+                  {loading ? t.savingPassword : t.confirmBtn}
+                </button>
+
+                {error && (
+                  <p className="w-full text-red-500 dark:text-red-400 text-sm font-medium font-['Manrope']">
+                    {error}
+                  </p>
+                )}
+
+                <p className="w-full text-center">
+                  <Link
+                    to="/login"
+                    className="text-neutral-400 dark:text-zinc-400 text-sm font-medium font-['Manrope'] hover:text-black dark:hover:text-white underline"
+                  >
+                    {t.backToLogin}
+                  </Link>
+                </p>
+              </>
+            )}
           </div>
-        </div>
-      </div>
+        </form>
+      </AuthShell>
     </Layout>
   );
 };
 
-export default ResetPassword; 
+export default ResetPassword;
