@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import SEO from '../shared/SEO';
 import Layout from '../layout/Layout';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { useTranslation } from '../../hooks/useTranslation';
 
@@ -63,6 +63,8 @@ const Login = () => {
   const { t } = useTranslation();
   const { login, loginWithGoogle, loading, error, user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const verified = searchParams.get('verified');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
@@ -246,6 +248,11 @@ const Login = () => {
                     </div>
                   </div>
 
+                  {verified === '1' && (
+                    <p className="w-full text-green-600 dark:text-green-400 text-sm font-medium font-['Manrope']">
+                      {t.emailVerified || 'Имейлът е потвърден успешно. Можете да влезете.'}
+                    </p>
+                  )}
                   {error && (
                     <p className="w-full text-red-500 dark:text-red-400 text-sm font-medium font-['Manrope']">
                       {error}

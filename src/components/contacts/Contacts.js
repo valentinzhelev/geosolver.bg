@@ -99,8 +99,13 @@ const Contacts = () => {
                   }}
                 />
                 <div className="text-center text-neutral-400 dark:text-zinc-400 text-xs lg:text-sm font-medium font-['Manrope']">
-                  <span className="block lg:inline">{t.contactIntro}</span>
-                  <span className="block lg:inline">help@geosolver.bg</span>
+                  <span className="block lg:inline">{t.contactIntro} </span>
+                  <a
+                    href={`mailto:${t.contactEmail}`}
+                    className="block lg:inline text-neutral-600 dark:text-zinc-300 hover:text-black dark:hover:text-white underline-offset-2 hover:underline"
+                  >
+                    {t.contactEmail}
+                  </a>
                 </div>
               </div>
 
