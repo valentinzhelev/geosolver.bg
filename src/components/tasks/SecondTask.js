@@ -9,8 +9,12 @@ import { useTranslation } from '../../hooks/useTranslation';
 import { useSyncTaskLanguage } from '../../hooks/useSyncTaskLanguage';
 import { isTaskPlaceholderResult } from '../../utils/taskI18n';
 import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
+import { useCalculationRestore } from '../../hooks/useCalculationRestore';
+import { inputDataToFormStrings } from '../../utils/calculationRestore';
 import { useEduAssignmentBridge } from '../../hooks/useEduAssignmentBridge';
 import EduWorkBanner from '../classroom/ui/EduWorkBanner';
+import PointPicker from './PointPicker';
+import TwoPointSketch from './TwoPointSketch';
 
 // LocalStorage helpers
 const getHistory = () => {
@@ -150,12 +154,31 @@ function vtoraOsnovnaZadacha(x1, y1, x2, y2) {
 const SecondTask = () => {
   const { t, language } = useTranslation();
   const [form, setForm] = useState({ x1: '', y1: '', x2: '', y2: '' });
+  useCalculationRestore('second-basic-task', setForm, inputDataToFormStrings);
   const { runWithTracking, isAuthenticated } = useGuardedCalculation();
   const [lastCalcResult, setLastCalcResult] = useState(null);
   const { eduCtx, applyResultToAssignment, dismissEduBanner, canSaveToAssignment } = useEduAssignmentBridge(
     'second-basic-task',
     setForm
   );
+
+  const sketchData = useMemo(() => {
+    const y1 = parseFloat(form.y1);
+    const x1 = parseFloat(form.x1);
+    const y2 = parseFloat(form.y2);
+    const x2 = parseFloat(form.x2);
+    const hasP1 = !Number.isNaN(y1) && !Number.isNaN(x1);
+    const hasP2 = !Number.isNaN(y2) && !Number.isNaN(x2);
+    if (!hasP1 && !hasP2) return null;
+    return {
+      y1: hasP1 ? y1 : undefined,
+      x1: hasP1 ? x1 : undefined,
+      y2: hasP2 ? y2 : undefined,
+      x2: hasP2 ? x2 : undefined,
+      alphaGon: lastCalcResult?.alpha,
+      distance: lastCalcResult?.distance,
+    };
+  }, [form, lastCalcResult]);
   const [resultText, setResultText] = useState(t.secondTaskDefaultResultText);
   useSyncTaskLanguage(resultText, setResultText, (tr) => tr.secondTaskDefaultResultText);
   const [history, setHistory] = useState([]);
@@ -348,6 +371,18 @@ Check (atan2): ${result.alphaAtan2} grads
                 {/* Form Card */}
                 <div className="self-stretch p-3 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex flex-col justify-center items-end gap-3 w-full min-w-0 overflow-hidden">
                   <div className="self-stretch justify-start text-black dark:text-white text-base font-semibold font-['Manrope']">{t.inputData}</div>
+                  <div className="self-stretch grid grid-cols-2 gap-2 w-full">
+                    <PointPicker
+                      language={language}
+                      label="P₁"
+                      onSelect={(p) => setForm((f) => ({ ...f, y1: String(p.y), x1: String(p.x) }))}
+                    />
+                    <PointPicker
+                      language={language}
+                      label="P₂"
+                      onSelect={(p) => setForm((f) => ({ ...f, y2: String(p.y), x2: String(p.x) }))}
+                    />
+                  </div>
                   <div className="self-stretch flex flex-col justify-start items-start gap-4 w-full">
                     {/* X1 */}
                     <div className="self-stretch flex flex-col justify-start items-start gap-2 w-full">
@@ -391,6 +426,15 @@ Check (atan2): ${result.alphaAtan2} grads
                     </div>
                   </div>
                 </div>
+                <TwoPointSketch
+                  y1={sketchData?.y1}
+                  x1={sketchData?.x1}
+                  y2={sketchData?.y2}
+                  x2={sketchData?.x2}
+                  alphaGon={sketchData?.alphaGon}
+                  distance={sketchData?.distance}
+                  language={language}
+                />
               </div>
               {/* History Table */}
               <div className="self-stretch flex flex-col justify-start items-start gap-3 w-full">
@@ -496,6 +540,18 @@ Check (atan2): ${result.alphaAtan2} grads
               {/* Form Card */}
               <div className="flex-1 p-4 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 inline-flex flex-col justify-center items-end gap-4">
                 <div className="self-stretch justify-start text-black dark:text-white text-lg font-semibold font-['Manrope']">{t.inputData}</div>
+                <div className="self-stretch grid grid-cols-2 gap-2">
+                  <PointPicker
+                    language={language}
+                    label="P₁"
+                    onSelect={(p) => setForm((f) => ({ ...f, y1: String(p.y), x1: String(p.x) }))}
+                  />
+                  <PointPicker
+                    language={language}
+                    label="P₂"
+                    onSelect={(p) => setForm((f) => ({ ...f, y2: String(p.y), x2: String(p.x) }))}
+                  />
+                </div>
                 <div className="self-stretch flex flex-col justify-start items-start gap-4">
                   {/* X1 */}
                   <div className="self-stretch flex flex-col justify-start items-start gap-2">
@@ -561,6 +617,15 @@ Check (atan2): ${result.alphaAtan2} grads
                 </button>
               </div>
             </div>
+            <TwoPointSketch
+              y1={sketchData?.y1}
+              x1={sketchData?.x1}
+              y2={sketchData?.y2}
+              x2={sketchData?.x2}
+              alphaGon={sketchData?.alphaGon}
+              distance={sketchData?.distance}
+              language={language}
+            />
           </div>
           {/* History Table */}
           <div className="self-stretch flex flex-col justify-start items-start gap-4">

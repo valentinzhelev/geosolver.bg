@@ -41,7 +41,20 @@ const TermsOfService = () => {
           },
           {
             heading: 'Интелектуална собственост',
-            body: 'Платформата, дизайнът и съдържанието са собственост на GeoSolver/Wortexa™. Запазвате правата върху данните, които въвеждате (изчисления, карнети).',
+            body: (
+              <>
+                Платформата, дизайнът и съдържанието са собственост на GeoSolver /{' '}
+                <a
+                  href="https://wortexa.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline underline-offset-2 text-neutral-800 dark:text-zinc-200"
+                >
+                  Wortexa
+                </a>
+                . Запазвате правата върху данните, които въвеждате (изчисления, карнети).
+              </>
+            ),
           },
           {
             heading: 'Бета функции и точност',
@@ -99,7 +112,20 @@ const TermsOfService = () => {
           },
           {
             heading: 'Intellectual property',
-            body: 'The platform, design and content are owned by GeoSolver/Wortexa™. You retain rights to the data you enter (calculations, field books).',
+            body: (
+              <>
+                The platform, design and content are owned by GeoSolver /{' '}
+                <a
+                  href="https://wortexa.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline underline-offset-2 text-neutral-800 dark:text-zinc-200"
+                >
+                  Wortexa
+                </a>
+                . You retain rights to the data you enter (calculations, field books).
+              </>
+            ),
           },
           {
             heading: 'Beta features and accuracy',

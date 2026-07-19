@@ -7,6 +7,12 @@ import { initSentry, Sentry } from './config/sentry';
 
 initSentry();
 
+if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
+
 const Fallback = () => (
   <div style={{ minHeight: '60vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, padding: 24, textAlign: 'center', fontFamily: 'Manrope, sans-serif' }}>
     <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>Възникна неочаквана грешка</h1>

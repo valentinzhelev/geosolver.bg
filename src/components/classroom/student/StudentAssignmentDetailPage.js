@@ -118,6 +118,9 @@ const StudentAssignmentDetailPage = () => {
       inputData: variant?.inputData,
       returnPath: `/classroom/assignments/${id}`,
       calculatorPolicy,
+      linkedProjectId: assignment?.options?.linkedProjectId
+        ? String(assignment.options.linkedProjectId)
+        : null,
     });
     navigate(tool.route);
   };

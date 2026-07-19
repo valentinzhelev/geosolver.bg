@@ -109,6 +109,26 @@ class CalculationService {
     }
   }
 
+  // Fetch single calculation (full input/result)
+  static async getCalculationById(id) {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    if (!token) throw new Error('Authentication required');
+
+    const response = await fetch(`${API_BASE_URL}/calculations/${id}`, {
+      headers: getApiLanguageHeaders({
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      }),
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error || 'Failed to fetch calculation');
+    }
+
+    return response.json();
+  }
+
   // Fetch calculation statistics
   static async getCalculationStats() {
     try {

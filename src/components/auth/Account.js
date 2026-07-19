@@ -1358,7 +1358,15 @@ const Account = () => {
             </div>
             <div className="flex-1 w-full inline-flex flex-col justify-center items-start gap-5">
               <div className="self-stretch p-4 bg-white dark:bg-zinc-900 rounded-xl shadow-[0px_8px_24px_0px_rgba(0,0,0,0.04)] outline outline-1 outline-offset-[-0.50px] outline-gray-200 dark:outline-zinc-800 flex flex-col justify-start items-start gap-4 overflow-hidden">
-        <div className="justify-start text-black dark:text-white text-lg font-semibold font-['Manrope']">{t.usageHistory}</div>
+                <div className="self-stretch flex flex-wrap items-center justify-between gap-2">
+                  <div className="text-black dark:text-white text-lg font-semibold font-['Manrope']">{t.usageHistory}</div>
+                  <Link
+                    to="/calculations/history"
+                    className="text-sm font-semibold font-['Manrope'] underline text-neutral-600 dark:text-zinc-400 hover:text-black dark:hover:text-white"
+                  >
+                    {language === 'bg' ? 'Виж пълна история →' : 'Full history →'}
+                  </Link>
+                </div>
                 {/* Progress Bar - Different design for free vs paid plans */}
                 {!isProUser ? (
                   // Free Plan Progress Bar

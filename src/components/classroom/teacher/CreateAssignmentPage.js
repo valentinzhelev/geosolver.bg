@@ -5,6 +5,7 @@ import ClassroomLayout from '../ClassroomLayout';
 import { Card } from '../ui/Card';
 import Select from '../ui/Select';
 import { classroomApi } from '../../../services/classroomApi';
+import { fieldbooksApi } from '../../../services/fieldbookApi';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { EDU_TOOLS } from '../../../config/eduTools';
 import {
@@ -33,6 +34,7 @@ const CreateAssignmentPage = () => {
   const preselectedCourse = searchParams.get('course') || '';
 
   const [courses, setCourses] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [presets, setPresets] = useState([]);
   const [myTemplates, setMyTemplates] = useState([]);
   const [templateTitle, setTemplateTitle] = useState('');
@@ -49,6 +51,7 @@ const CreateAssignmentPage = () => {
     customToleranceType: 'absolute',
     publishAt: '',
     calculatorPolicy: DEFAULT_CALCULATOR_POLICY,
+    linkedProjectId: '',
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -60,6 +63,7 @@ const CreateAssignmentPage = () => {
   useEffect(() => {
     classroomApi.listCourses().then((res) => setCourses(res.data || []));
     classroomApi.getAssignmentPresets().then((res) => setPresets(res.data || [])).catch(() => {});
+    fieldbooksApi.listProjects().then((res) => setProjects(res.data || res.projects || [])).catch(() => setProjects([]));
     loadMyTemplates();
   }, []);
 
@@ -170,6 +174,7 @@ const CreateAssignmentPage = () => {
         customTolerance: Number(form.customTolerance),
         customToleranceType: form.customToleranceType,
         calculatorPolicy: form.calculatorPolicy,
+        linkedProjectId: form.linkedProjectId || null,
       },
     };
   };
@@ -413,6 +418,26 @@ const CreateAssignmentPage = () => {
                   options={CALCULATOR_POLICY_OPTIONS.map((opt) => ({ value: opt.value, label: bg ? opt.labelBg : opt.labelEn }))}
                 />
                 <p className="text-xs text-neutral-500 dark:text-zinc-400 font-['Manrope']">{policyMeta.teacherHint}</p>
+              </label>
+
+              <label className="flex flex-col gap-1.5">
+                <span className="text-sm font-medium font-['Manrope'] text-black dark:text-white">
+                  {bg ? 'Свързан обект (по избор)' : 'Linked survey project (optional)'}
+                </span>
+                <Select
+                  value={form.linkedProjectId}
+                  onChange={(v) => setForm({ ...form, linkedProjectId: v })}
+                  ariaLabel={bg ? 'Свързан обект' : 'Linked project'}
+                  options={[
+                    { value: '', label: bg ? 'Без връзка' : 'None' },
+                    ...projects.map((p) => ({ value: p._id, label: p.name })),
+                  ]}
+                />
+                <p className="text-xs text-neutral-500 dark:text-zinc-400 font-['Manrope']">
+                  {bg
+                    ? 'Учениците могат да ползват точките от този обект в PointPicker по време на задачата.'
+                    : 'Students can use points from this site in PointPicker during the assignment.'}
+                </p>
               </label>
             </div>
 

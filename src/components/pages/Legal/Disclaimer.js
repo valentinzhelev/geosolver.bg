@@ -29,7 +29,20 @@ const Disclaimer = () => {
           },
           {
             heading: 'Отговорност',
-            body: 'GeoSolver и Wortexa™ не носят отговорност за решения, действия или вреди, произтичащи от разчитане на резултати от платформата.',
+            body: (
+              <>
+                GeoSolver и{' '}
+                <a
+                  href="https://wortexa.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline underline-offset-2 text-neutral-800 dark:text-zinc-200"
+                >
+                  Wortexa
+                </a>{' '}
+                не носят отговорност за решения, действия или вреди, произтичащи от разчитане на резултати от платформата.
+              </>
+            ),
           },
           {
             heading: 'Контакт',
@@ -57,7 +70,20 @@ const Disclaimer = () => {
           },
           {
             heading: 'Liability',
-            body: 'GeoSolver and Wortexa™ are not liable for decisions, actions or damages arising from reliance on results from the platform.',
+            body: (
+              <>
+                GeoSolver and{' '}
+                <a
+                  href="https://wortexa.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline underline-offset-2 text-neutral-800 dark:text-zinc-200"
+                >
+                  Wortexa
+                </a>{' '}
+                are not liable for decisions, actions or damages arising from reliance on results from the platform.
+              </>
+            ),
           },
           {
             heading: 'Contact',

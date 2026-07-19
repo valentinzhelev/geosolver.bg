@@ -7,6 +7,9 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 import useTypewriter from '../../hooks/useTypewriter';
 import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
+import { useCalculationRestore } from '../../hooks/useCalculationRestore';
+import { getRestoreMapper } from '../../utils/calculationRestore';
+import PointPicker from './PointPicker';
 
 // Helpers for localStorage history for each input
 const getInputHistory = (key) => {
@@ -40,6 +43,7 @@ const saveHistory = (entry) => {
 
 const AreaCalculation = () => {
   const [form, setForm] = useState({ points: '', method: 'shoelace' });
+  useCalculationRestore('area-calculation', setForm, getRestoreMapper('area-calculation'));
   const { t, language } = useTranslation();
   const { runWithTracking, isAuthenticated } = useGuardedCalculation();
   const [resultText, setResultText] = useState(t.defaultResultText);
@@ -274,6 +278,11 @@ Check - area (alternative method): ${result.alternativeArea?.toFixed(2) || 'N/A'
                     {/* Points */}
                     <div className="self-stretch flex flex-col justify-start items-start gap-2 w-full">
                       <div className="justify-start text-black dark:text-white text-xs font-medium font-['Manrope']">Координати на точките (X Y)</div>
+                      
+                    <PointPicker language={language} label="+" onSelect={(p) => setForm((f) => ({
+                      ...f,
+                      points: f.points.trim() ? `${f.points.trim()}\n${p.x} ${p.y}` : `${p.x} ${p.y}`,
+                    }))} />
                       <textarea
                         id="points"
                         value={form.points}
@@ -424,6 +433,10 @@ Check - area (alternative method): ${result.alternativeArea?.toFixed(2) || 'N/A'
                   {/* Points */}
                   <div className="self-stretch flex flex-col justify-start items-start gap-2">
                     <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">Координати на точките (X Y)</div>
+                    <PointPicker language={language} label="+" onSelect={(p) => setForm((f) => ({
+                      ...f,
+                      points: f.points.trim() ? `${f.points.trim()}\n${p.x} ${p.y}` : `${p.x} ${p.y}`,
+                    }))} />
                     <textarea
                       id="points"
                       value={form.points}

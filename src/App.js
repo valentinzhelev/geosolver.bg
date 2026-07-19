@@ -5,7 +5,6 @@ import SecondTask from './components/tasks/SecondTask';
 import ForwardIntersection from './components/tasks/ForwardIntersection';
 import Prices from './components/pages/Prices/Prices';
 import ToolsPage from './components/pages/Tools/ToolsPage';
-import ToolComingSoon from './components/pages/Tools/ToolComingSoon';
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import Account from './components/auth/Account';
@@ -14,9 +13,12 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 import { AuthProvider } from './components/auth/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { SurveyPointsProvider } from './context/SurveyPointsContext';
 import ForgotPassword from './components/auth/ForgotPassword';
 import ResetPassword from './components/auth/ResetPassword';
 import CookieConsent from './components/shared/CookieConsent';
+import InstallPrompt from './components/shared/InstallPrompt';
+import OfflineBanner from './components/shared/OfflineBanner';
 import Contacts from './components/contacts/Contacts';
 import FirstTaskDocs from './components/tasks/FirstTaskDocs';
 import ForwardIntersectionDocs from './components/tasks/ForwardIntersectionDocs';
@@ -38,9 +40,37 @@ import StudentAssignmentsPage from './components/classroom/student/StudentAssign
 import StudentAssignmentDetailPage from './components/classroom/student/StudentAssignmentDetailPage';
 import JoinGroupPage from './components/classroom/student/JoinGroupPage';
 import Resection from './components/tasks/Resection';
+import PolarIntersection from './components/tasks/PolarIntersection';
+import HansenTask from './components/tasks/HansenTask';
+import CoordinateTransformation from './components/tasks/CoordinateTransformation';
+import AreaCalculation from './components/tasks/AreaCalculation';
+import DistanceBearing from './components/tasks/DistanceBearing';
+import PolarIntersectionDocs from './components/tasks/PolarIntersectionDocs';
+import HansenTaskDocs from './components/tasks/HansenTaskDocs';
+import CoordinateTransformationDocs from './components/tasks/CoordinateTransformationDocs';
+import AreaCalculationDocs from './components/tasks/AreaCalculationDocs';
+import DistanceBearingDocs from './components/tasks/DistanceBearingDocs';
+import LineIntersection from './components/tasks/LineIntersection';
+import OffsetPoint from './components/tasks/OffsetPoint';
+import SegmentDivision from './components/tasks/SegmentDivision';
+import LineIntersectionDocs from './components/tasks/LineIntersectionDocs';
+import OffsetPointDocs from './components/tasks/OffsetPointDocs';
+import SegmentDivisionDocs from './components/tasks/SegmentDivisionDocs';
 import FieldBook from './components/pages/FieldBook/FieldBook';
+import PointsPage from './components/pages/Points/PointsPage';
+import MapPage from './components/pages/Map/MapPage';
+import GnssImportPage from './components/pages/Gnss/GnssImportPage';
+import GnssLivePage from './components/pages/Gnss/GnssLivePage';
+import GnssPostProcessingPage from './components/pages/Gnss/GnssPostProcessingPage';
+import GnssFieldLogPage from './components/pages/Gnss/GnssFieldLogPage';
+import IntegrationsPage from './components/pages/Integrations/IntegrationsPage';
+import WorkspacePage from './components/pages/Workspace/WorkspacePage';
+import ProjectHubPage from './components/pages/Projects/ProjectHubPage';
+import StakeOutPage from './components/pages/StakeOut/StakeOutPage';
+import CalculationHistoryPage from './components/pages/Calculations/CalculationHistoryPage';
 import BillingSuccess from './components/pages/Billing/BillingSuccess';
 import BillingCancel from './components/pages/Billing/BillingCancel';
+import AboutPage from './components/pages/AboutPage/AboutPage';
 import PrivacyPolicy from './components/pages/Legal/PrivacyPolicy';
 import TermsOfService from './components/pages/Legal/TermsOfService';
 import Disclaimer from './components/pages/Legal/Disclaimer';
@@ -52,6 +82,7 @@ function App() {
       <Router>
         <AuthProvider>
           <LanguageProvider>
+            <SurveyPointsProvider>
             {/* Global meta tags are now in public/index.html */}
             <Routes>
               <Route path="/" element={<HomePage />} />
@@ -81,7 +112,16 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/calculations/history"
+                element={
+                  <ProtectedRoute>
+                    <CalculationHistoryPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/contacts" element={<Contacts />} />
+              <Route path="/about" element={<AboutPage />} />
               <Route path="/first-task/docs" element={<FirstTaskDocs />} />
               <Route path="/second-task/docs" element={<SecondTaskDocs />} />
               <Route path="/forward-intersection/docs" element={<ForwardIntersectionDocs />} />
@@ -98,23 +138,109 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/points"
+                element={
+                  <ProtectedRoute>
+                    <PointsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/map"
+                element={
+                  <ProtectedRoute>
+                    <MapPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/gnss"
+                element={
+                  <ProtectedRoute>
+                    <GnssImportPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/gnss/live"
+                element={
+                  <ProtectedRoute>
+                    <GnssLivePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/gnss/post-process"
+                element={
+                  <ProtectedRoute>
+                    <GnssPostProcessingPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/gnss/field-log"
+                element={
+                  <ProtectedRoute>
+                    <GnssFieldLogPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/integrations"
+                element={
+                  <ProtectedRoute>
+                    <IntegrationsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/workspace"
+                element={
+                  <ProtectedRoute>
+                    <WorkspacePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/projects"
+                element={
+                  <ProtectedRoute>
+                    <ProjectHubPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/stakeout"
+                element={
+                  <ProtectedRoute>
+                    <StakeOutPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/billing/success" element={<BillingSuccess />} />
               <Route path="/billing/cancel" element={<BillingCancel />} />
               {/* Legal pages */}
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/terms" element={<TermsOfService />} />
               <Route path="/disclaimer" element={<Disclaimer />} />
-              {/* Post-MVP tools: code retained, routes show coming-soon */}
-              <Route path="/polar-intersection" element={<ToolComingSoon />} />
-              <Route path="/polar-intersection/docs" element={<ToolComingSoon />} />
-              <Route path="/hansen-task" element={<ToolComingSoon />} />
-              <Route path="/hansen-task/docs" element={<ToolComingSoon />} />
-              <Route path="/coordinate-transformation" element={<ToolComingSoon />} />
-              <Route path="/coordinate-transformation/docs" element={<ToolComingSoon />} />
-              <Route path="/area-calculation" element={<ToolComingSoon />} />
-              <Route path="/area-calculation/docs" element={<ToolComingSoon />} />
-              <Route path="/distance-bearing" element={<ToolComingSoon />} />
-              <Route path="/distance-bearing/docs" element={<ToolComingSoon />} />
+              {/* Extended geodetic tools */}
+              <Route path="/polar-intersection" element={<PolarIntersection />} />
+              <Route path="/polar-intersection/docs" element={<PolarIntersectionDocs />} />
+              <Route path="/hansen-task" element={<HansenTask />} />
+              <Route path="/hansen-task/docs" element={<HansenTaskDocs />} />
+              <Route path="/coordinate-transformation" element={<CoordinateTransformation />} />
+              <Route path="/coordinate-transformation/docs" element={<CoordinateTransformationDocs />} />
+              <Route path="/area-calculation" element={<AreaCalculation />} />
+              <Route path="/area-calculation/docs" element={<AreaCalculationDocs />} />
+              <Route path="/distance-bearing" element={<DistanceBearing />} />
+              <Route path="/distance-bearing/docs" element={<DistanceBearingDocs />} />
+              <Route path="/line-intersection" element={<LineIntersection />} />
+              <Route path="/line-intersection/docs" element={<LineIntersectionDocs />} />
+              <Route path="/offset-point" element={<OffsetPoint />} />
+              <Route path="/offset-point/docs" element={<OffsetPointDocs />} />
+              <Route path="/segment-division" element={<SegmentDivision />} />
+              <Route path="/segment-division/docs" element={<SegmentDivisionDocs />} />
               {/* GeoSolver Edu — classroom */}
               <Route path="/classroom" element={<ClassroomHub />} />
               <Route
@@ -200,6 +326,9 @@ function App() {
               <Route path="*" element={<NotFound />} />
             </Routes>
             <CookieConsent />
+            <InstallPrompt />
+            <OfflineBanner />
+            </SurveyPointsProvider>
           </LanguageProvider>
         </AuthProvider>
       </Router>

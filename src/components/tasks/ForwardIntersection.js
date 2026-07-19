@@ -11,8 +11,11 @@ import useTypewriter from '../../hooks/useTypewriter';
 import { calculateForwardIntersection as calculateForwardIntersectionDomain } from '../../domain/geodesy';
 import { roundTo } from '../../domain/math';
 import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
+import { useCalculationRestore } from '../../hooks/useCalculationRestore';
+import { inputDataToFormStrings } from '../../utils/calculationRestore';
 import { useEduAssignmentBridge } from '../../hooks/useEduAssignmentBridge';
 import EduWorkBanner from '../classroom/ui/EduWorkBanner';
+import PointPicker from './PointPicker';
 
 // LocalStorage helpers
 const getHistory = () => {
@@ -96,6 +99,7 @@ function calculateForwardIntersection(yA, xA, yB, xB, beta1, beta2) {
 
 const ForwardIntersection = () => {
   const [form, setForm] = useState(initialForm);
+  useCalculationRestore('forward-intersection', setForm, inputDataToFormStrings);
   const { t, language } = useTranslation();
   const { runWithTracking, isAuthenticated } = useGuardedCalculation();
   const [lastCalcResult, setLastCalcResult] = useState(null);
@@ -282,6 +286,10 @@ Max diff: ${results.maxDiff} m
               {/* Form Card */}
               <div className="flex-1 p-4 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 inline-flex flex-col justify-center items-end gap-4">
                 <div className="self-stretch justify-start text-black dark:text-white text-lg font-semibold font-['Manrope']">{t.inputData}</div>
+                <div className="self-stretch grid grid-cols-2 gap-2">
+                  <PointPicker language={language} label="A" onSelect={(p) => setForm((f) => ({ ...f, yA: String(p.y), xA: String(p.x) }))} />
+                  <PointPicker language={language} label="B" onSelect={(p) => setForm((f) => ({ ...f, yB: String(p.y), xB: String(p.x) }))} />
+                </div>
                 <div className="self-stretch flex flex-col justify-start items-start gap-4">
                   {/* Yₐ */}
                   <div className="self-stretch flex flex-col justify-start items-start gap-2">

@@ -7,10 +7,14 @@ import { useSyncTaskLanguage } from '../../hooks/useSyncTaskLanguage';
 import { isTaskPlaceholderResult } from '../../utils/taskI18n';
 import useTypewriter from '../../hooks/useTypewriter';
 import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
+import { useCalculationRestore } from '../../hooks/useCalculationRestore';
+import { inputDataToFormStrings } from '../../utils/calculationRestore';
 import { useEduAssignmentBridge } from '../../hooks/useEduAssignmentBridge';
 import EduWorkBanner from '../classroom/ui/EduWorkBanner';
 import TaskActionBar from './TaskActionBar';
 import TaskMobileBackButton from './TaskMobileBackButton';
+import TaskGeometrySketch from './TaskGeometrySketch';
+import PointPicker from './PointPicker';
 import { useProScan } from '../../hooks/useProScan';
 import { calculateFirstTask as calculateFirstTaskDomain } from '../../domain/geodesy';
 import { roundTo } from '../../domain/math';
@@ -50,6 +54,7 @@ const LOW_CONFIDENCE = 0.75;
 
 const PurvaZadacha = () => {
   const [form, setForm] = useState({ y1: '', x1: '', alpha: '', s: '' });
+  useCalculationRestore('first-basic-task', setForm, inputDataToFormStrings);
   const [lowConfFields, setLowConfFields] = useState({});
   const [isScanning, setIsScanning] = useState(false);
   const fileInputRef = useRef(null);
@@ -70,6 +75,33 @@ const PurvaZadacha = () => {
     'first-basic-task',
     setForm
   );
+
+  const sketchData = useMemo(() => {
+    if (lastCalcResult) {
+      return {
+        y1: lastCalcResult.y1,
+        x1: lastCalcResult.x1,
+        y2: lastCalcResult.y2,
+        x2: lastCalcResult.x2,
+        alphaGon: lastCalcResult.alphaGon,
+        s: lastCalcResult.s,
+      };
+    }
+    const y1 = parseFloat(form.y1);
+    const x1 = parseFloat(form.x1);
+    const alpha = parseFloat(form.alpha);
+    const s = parseFloat(form.s);
+    if (!Number.isNaN(y1) && !Number.isNaN(x1) && !Number.isNaN(alpha) && !Number.isNaN(s)) {
+      try {
+        const r = calculateFirstTaskDomain(y1, x1, alpha, s);
+        return { y1, x1, y2: r.y2, x2: r.x2, alphaGon: alpha, s };
+      } catch {
+        return { y1, x1 };
+      }
+    }
+    if (!Number.isNaN(y1) && !Number.isNaN(x1)) return { y1, x1 };
+    return null;
+  }, [lastCalcResult, form]);
 
   // Debug: see what is being set
   useEffect(() => {
@@ -365,6 +397,12 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
                 {/* Form Card */}
                 <div className="self-stretch p-3 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex flex-col justify-center items-end gap-3 w-full min-w-0 overflow-hidden">
                   <div className="self-stretch justify-start text-black dark:text-white text-base font-semibold font-['Manrope']">{t.inputData}</div>
+                  <PointPicker
+                    language={language}
+                    label={language === 'bg' ? 'Точка 1 от библиотека' : 'Point 1 from library'}
+                    className="w-full"
+                    onSelect={(p) => setForm((f) => ({ ...f, y1: String(p.y), x1: String(p.x) }))}
+                  />
                   <div className="self-stretch flex flex-col justify-start items-start gap-4 w-full">
                     {/* Y1 */}
                     <div className="self-stretch flex flex-col justify-start items-start gap-2 w-full">
@@ -454,6 +492,15 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
                     </div>
                   </div>
                 </div>
+                <TaskGeometrySketch
+                  y1={sketchData?.y1}
+                  x1={sketchData?.x1}
+                  y2={sketchData?.y2}
+                  x2={sketchData?.x2}
+                  alphaGon={sketchData?.alphaGon}
+                  s={sketchData?.s}
+                  language={language}
+                />
               </div>
               {/* History Table */}
               <div className="self-stretch flex flex-col justify-start items-start gap-3 w-full">
@@ -568,6 +615,12 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
               {/* Form Card */}
               <div className="flex-1 p-4 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 inline-flex flex-col justify-center items-end gap-4">
                 <div className="self-stretch justify-start text-black dark:text-white text-lg font-semibold font-['Manrope']">{t.inputData}</div>
+                <PointPicker
+                  language={language}
+                  label={language === 'bg' ? 'Точка 1 от библиотека' : 'Point 1 from library'}
+                  className="self-stretch w-full"
+                  onSelect={(p) => setForm((f) => ({ ...f, y1: String(p.y), x1: String(p.x) }))}
+                />
                 <div className="self-stretch flex flex-col justify-start items-start gap-4">
                   {/* Y1 */}
                   <div className="self-stretch flex flex-col justify-start items-start gap-2">
@@ -677,6 +730,15 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
                 </button>
               </div>
             </div>
+            <TaskGeometrySketch
+              y1={sketchData?.y1}
+              x1={sketchData?.x1}
+              y2={sketchData?.y2}
+              x2={sketchData?.x2}
+              alphaGon={sketchData?.alphaGon}
+              s={sketchData?.s}
+              language={language}
+            />
           </div>
           {/* History Table */}
           <div className="self-stretch flex flex-col justify-start items-start gap-4">

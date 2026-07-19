@@ -9,8 +9,13 @@ import { useSyncTaskLanguage } from '../../hooks/useSyncTaskLanguage';
 import { isTaskPlaceholderResult } from '../../utils/taskI18n';
 import useTypewriter from '../../hooks/useTypewriter';
 import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
+import { useCalculationRestore } from '../../hooks/useCalculationRestore';
+import { inputDataToFormStrings } from '../../utils/calculationRestore';
 import { useEduAssignmentBridge } from '../../hooks/useEduAssignmentBridge';
 import EduWorkBanner from '../classroom/ui/EduWorkBanner';
+import { calculateResection as calculateResectionDomain } from '../../domain/geodesy';
+import { roundTo } from '../../domain/math';
+import PointPicker from './PointPicker';
 
 // LocalStorage helpers
 const getHistory = () => {
@@ -25,90 +30,19 @@ const saveHistory = (entry) => {
   localStorage.setItem('resectionHistory', JSON.stringify(history.slice(0, 20)));
 };
 
-/**
- * Изчисляване на обратна засечка (Resection):
- * Определяне на позиция на точка P по ъгли от известни точки A, B, C
- * 
- * Методи:
- * 1. Hansen Problem (три точки)
- * 2. Collins Point Method
- * 3. Cassini Method
- * 
- * @param {Object} points - Известни точки {xA, yA, xB, yB, xC, yC}
- * @param {Object} angles - Ъгли {beta1, beta2}
- * @returns {Object} Резултати от изчисленията
- */
 function calculateResection(points, angles) {
-  const { xA, yA, xB, yB, xC, yC } = points;
-  const { beta1, beta2 } = angles;
-
-  // Validate input data
-  if (!xA || !yA || !xB || !yB || !xC || !yC || !beta1 || !beta2) {
-    throw new Error('Всички координати и ъгли са задължителни');
-  }
-
-  // Gon to radians
-  const beta1Rad = (beta1 * Math.PI) / 200;
-  const beta2Rad = (beta2 * Math.PI) / 200;
-
-  // Hansen Problem - triangulation
-  const dxAB = xB - xA;
-  const dyAB = yB - yA;
-  const dxBC = xC - xB;
-  const dyBC = yC - yB;
-
-  // Triangle ABC angles
-  const angleA = Math.atan2(dyAB, dxAB);
-  const angleB = Math.atan2(dyBC, dxBC);
-
-  // Sides
-  const sideAB = Math.sqrt(dxAB * dxAB + dyAB * dyAB);
-  const sideBC = Math.sqrt(dxBC * dxBC + dyBC * dyBC);
-
-  // Solve for point P (law of sines)
-  const angleAPB = Math.PI - beta1Rad;
-  const angleBPC = Math.PI - beta2Rad;
-
-  // Distances P to A, B, C
-  const sideAP = (sideAB * Math.sin(beta1Rad)) / Math.sin(angleAPB);
-  const sideBP = (sideBC * Math.sin(beta2Rad)) / Math.sin(angleBPC);
-
-  // Point P coordinates (polar)
-  const xP1 = xA + sideAP * Math.cos(angleA + beta1Rad);
-  const yP1 = yA + sideAP * Math.sin(angleA + beta1Rad);
-  
-  const xP2 = xB + sideBP * Math.cos(angleB - beta2Rad);
-  const yP2 = yB + sideBP * Math.sin(angleB - beta2Rad);
-
-  // Average of both solutions
-  const xP = (xP1 + xP2) / 2;
-  const yP = (yP1 + yP2) / 2;
-
-  // Distances for verification
-  const distAP = Math.sqrt((xP - xA) * (xP - xA) + (yP - yA) * (yP - yA));
-  const distBP = Math.sqrt((xP - xB) * (xP - xB) + (yP - yB) * (yP - yB));
-  const distCP = Math.sqrt((xP - xC) * (xP - xC) + (yP - yC) * (yP - yC));
-
-  // Angles for verification
-  const calcBeta1 = Math.atan2(yB - yP, xB - xP) - Math.atan2(yA - yP, xA - xP);
-  const calcBeta2 = Math.atan2(yC - yP, xC - xP) - Math.atan2(yB - yP, xB - xP);
-
-  // Normalize angles
-  const normalizedBeta1 = ((calcBeta1 * 200) / Math.PI + 400) % 400;
-  const normalizedBeta2 = ((calcBeta2 * 200) / Math.PI + 400) % 400;
-
+  const result = calculateResectionDomain(points, angles);
   return {
-    xP: Math.round(xP * 1000) / 1000,
-    yP: Math.round(yP * 1000) / 1000,
-    distAP: Math.round(distAP * 1000) / 1000,
-    distBP: Math.round(distBP * 1000) / 1000,
-    distCP: Math.round(distCP * 1000) / 1000,
-    calcBeta1: Math.round(normalizedBeta1 * 1000) / 1000,
-    calcBeta2: Math.round(normalizedBeta2 * 1000) / 1000,
-    error1: Math.round(Math.abs(normalizedBeta1 - beta1) * 1000) / 1000,
-    error2: Math.round(Math.abs(normalizedBeta2 - beta2) * 1000) / 1000,
-    method: 'Hansen Problem',
-    calculationDetails: `Решение на триангулация с три точки и два ъгъла`
+    ...result,
+    xP: roundTo(result.xP, 3),
+    yP: roundTo(result.yP, 3),
+    distAP: roundTo(result.distAP, 3),
+    distBP: roundTo(result.distBP, 3),
+    distCP: roundTo(result.distCP, 3),
+    calcBeta1: roundTo(result.calcBeta1, 3),
+    calcBeta2: roundTo(result.calcBeta2, 3),
+    error1: roundTo(result.error1, 3),
+    error2: roundTo(result.error2, 3),
   };
 }
 
@@ -124,6 +58,7 @@ const Resection = () => {
     beta1: '',
     beta2: ''
   });
+  useCalculationRestore('resection', setForm, inputDataToFormStrings);
   const [resultText, setResultText] = useState(t.resectionDefaultResultText);
   useSyncTaskLanguage(resultText, setResultText, (tr) => tr.resectionDefaultResultText);
   const [history, setHistory] = useState([]);
@@ -143,7 +78,9 @@ const Resection = () => {
   };
 
   const isFormValid = () => {
-    return form.xA && form.yA && form.xB && form.yB && form.xC && form.yC && form.beta1 && form.beta2;
+    return ['xA', 'yA', 'xB', 'yB', 'xC', 'yC', 'beta1', 'beta2'].every(
+      (k) => form[k] !== '' && Number.isFinite(parseFloat(form[k]))
+    );
   };
 
   const handleCalculate = async () => {
@@ -308,6 +245,11 @@ Date: ${new Date().toLocaleString('en-US')}`;
                 {/* Form Card */}
                 <div className="self-stretch p-3 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex flex-col justify-center items-end gap-3 w-full min-w-0 overflow-hidden">
                   <div className="self-stretch justify-start text-black dark:text-white text-base font-semibold font-['Manrope']">{t.inputData}</div>
+                    <div className="self-stretch grid grid-cols-3 gap-2 mb-2">
+                      <PointPicker language={language} label="A" onSelect={(p) => setForm((f) => ({ ...f, yA: String(p.y), xA: String(p.x) }))} />
+                      <PointPicker language={language} label="B" onSelect={(p) => setForm((f) => ({ ...f, yB: String(p.y), xB: String(p.x) }))} />
+                      <PointPicker language={language} label="C" onSelect={(p) => setForm((f) => ({ ...f, yC: String(p.y), xC: String(p.x) }))} />
+                    </div>
                   <div className="self-stretch flex flex-col justify-start items-start gap-4 w-full">
                     {/* Point A */}
                     <div className="self-stretch flex flex-col justify-start items-start gap-2 w-full">

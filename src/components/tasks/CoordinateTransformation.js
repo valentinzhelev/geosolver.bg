@@ -7,6 +7,11 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 import useTypewriter from '../../hooks/useTypewriter';
 import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
+import { useCalculationRestore } from '../../hooks/useCalculationRestore';
+import { getRestoreMapper } from '../../utils/calculationRestore';
+import { calculateCoordinateTransformation as calculateCoordinateTransformationDomain } from '../../domain/geodesy';
+import { roundTo } from '../../domain/math';
+import PointPicker from './PointPicker';
 
 // Helpers for localStorage history for each input
 const getInputHistory = (key) => {
@@ -40,6 +45,7 @@ const saveHistory = (entry) => {
 
 const CoordinateTransformation = () => {
   const [form, setForm] = useState({ x: '', y: '', transformationType: 'translation', dx: '', dy: '' });
+  useCalculationRestore('coordinate-transformation', setForm, getRestoreMapper('coordinate-transformation'));
   const { t, language } = useTranslation();
   const { runWithTracking, isAuthenticated } = useGuardedCalculation();
   const [resultText, setResultText] = useState(t.defaultResultText);
@@ -146,52 +152,13 @@ Differences:
    * @returns {Object} Резултати от трансформацията
    */
   const calculateCoordinateTransformation = (x, y, transformationType, parameters) => {
-    let xNew, yNew;
-    let transformationDetails = '';
-
-    switch (transformationType) {
-      case 'translation':
-        // Translation
-        const dx = parameters.dx || 0;
-        const dy = parameters.dy || 0;
-        xNew = x + dx;
-        yNew = y + dy;
-        transformationDetails = `X' = X + ΔX = ${x} + ${dx} = ${xNew}\nY' = Y + ΔY = ${y} + ${dy} = ${yNew}`;
-        break;
-
-      case 'rotation':
-        // Rotation
-        const angle = (parameters.angle || 0) * Math.PI / 200;
-        const cosAngle = Math.cos(angle);
-        const sinAngle = Math.sin(angle);
-        xNew = x * cosAngle - y * sinAngle;
-        yNew = x * sinAngle + y * cosAngle;
-        transformationDetails = `X' = X·cos(α) - Y·sin(α) = ${x}·${cosAngle.toFixed(6)} - ${y}·${sinAngle.toFixed(6)} = ${xNew}\nY' = X·sin(α) + Y·cos(α) = ${x}·${sinAngle.toFixed(6)} + ${y}·${cosAngle.toFixed(6)} = ${yNew}`;
-        break;
-
-      case 'scaling':
-        // Scaling
-        const scaleX = parameters.scaleX || 1;
-        const scaleY = parameters.scaleY || 1;
-        xNew = x * scaleX;
-        yNew = y * scaleY;
-        transformationDetails = `X' = X·Sx = ${x}·${scaleX} = ${xNew}\nY' = Y·Sy = ${y}·${scaleY} = ${yNew}`;
-        break;
-
-      default:
-        throw new Error('Неизвестен тип трансформация');
-    }
-
+    const result = calculateCoordinateTransformationDomain(x, y, transformationType, parameters);
     return {
-      xOriginal: x,
-      yOriginal: y,
-      xTransformed: Math.round(xNew * 1000) / 1000,
-      yTransformed: Math.round(yNew * 1000) / 1000,
-      transformationType,
-      parameters,
-      transformationDetails,
-      deltaX: Math.round((xNew - x) * 1000) / 1000,
-      deltaY: Math.round((yNew - y) * 1000) / 1000
+      ...result,
+      xTransformed: roundTo(result.xTransformed, 3),
+      yTransformed: roundTo(result.yTransformed, 3),
+      deltaX: roundTo(result.deltaX, 3),
+      deltaY: roundTo(result.deltaY, 3),
     };
   };
 
@@ -359,6 +326,9 @@ Differences:
                 {/* Form Card */}
                 <div className="self-stretch p-3 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex flex-col justify-center items-end gap-3 w-full min-w-0 overflow-hidden">
                   <div className="self-stretch justify-start text-black dark:text-white text-base font-semibold font-['Manrope']">Входни данни</div>
+                  <div className="self-stretch">
+                    <PointPicker language={language} label="P" onSelect={(p) => setForm((f) => ({ ...f, y: String(p.y), x: String(p.x) }))} />
+                  </div>
                   <div className="self-stretch flex flex-col justify-start items-start gap-4 w-full">
                     {/* X */}
                     <div className="self-stretch flex flex-col justify-start items-start gap-2 w-full">
@@ -536,6 +506,9 @@ Differences:
               {/* Form Card */}
               <div className="flex-1 p-4 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 inline-flex flex-col justify-center items-end gap-4">
                 <div className="self-stretch justify-start text-black dark:text-white text-lg font-semibold font-['Manrope']">Входни данни</div>
+                <div className="self-stretch">
+                  <PointPicker language={language} label="P" onSelect={(p) => setForm((f) => ({ ...f, y: String(p.y), x: String(p.x) }))} />
+                </div>
                 <div className="self-stretch flex flex-col justify-start items-start gap-4">
                   {/* X */}
                   <div className="self-stretch flex flex-col justify-start items-start gap-2">

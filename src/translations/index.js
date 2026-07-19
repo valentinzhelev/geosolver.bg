@@ -4,6 +4,7 @@ export const translations = {
     home: 'Начало',
     tools: 'Инструменти',
     prices: 'Цени',
+    about: 'За нас',
     contacts: 'Контакти',
     forTeachers: 'За преподаватели',
     gai: 'GAI',
@@ -23,7 +24,7 @@ export const translations = {
     socialNetworks: 'Социални мрежи',
     language: 'Български език',
     theme: 'Светъл режим',
-    copyright: '© GEOSOLVER, 2025.\nВсички права запазени.\nТекуща версия: v3.2.5-beta.2',
+    copyright: '© GEOSOLVER, 2025.\nВсички права запазени.\nТекуща версия: v4.0.0-beta.1',
     wortexaFooterBefore: 'е част от продуктовото семейство на ',
     wortexaFooterAfter: '',
     // FirstTask translations
@@ -100,7 +101,7 @@ export const translations = {
 
     // Tools page translations
     toolsTitle: 'Инструменти',
-    toolsDescription: 'Четири основни инструмента за координатни изчисления и класически засечки в геодезията.',
+    toolsDescription: 'Инструменти за координатни изчисления, засечки, трансформации и площ в геодезията.',
     toolsInDevelopment: 'Инструменти в разработка',
 
     // Prices page translations
@@ -250,7 +251,7 @@ export const translations = {
 
     // Contacts page
     contactsTitle: 'Контакти',
-    contactsDescription: 'Свържете се с нас за всякакви въпроси относно GeoSolver - вашият надежден партньор за геодезически изчисления.',
+    contactsDescription: 'Свържете се с екипа на Wortexa за въпроси относно GeoSolver — платформата, която разработваме и поддържаме.',
     contactIntro: 'На среща сме за всякакви въпроси.',
     contactEmail: 'team@geosolver.bg',
     emailLabel: 'Имейл',
@@ -270,6 +271,68 @@ export const translations = {
       { question: 'Как мога да се абонирам?', answer: 'Изберете професионален план и следвайте стъпките за плащане. След потвърждение ще имате неограничен достъп.' },
       { question: 'Има ли мобилна версия на GeoSolver?', answer: 'GeoSolver е направен специално за да се използва на малки устройства.' }
     ],
+
+    // About page
+    aboutPage: {
+      seoTitle: 'За нас – GeoSolver',
+      seoDescription:
+        'GeoSolver — българска дигитална платформа за геодезически изчисления, разработвана и поддържана от екипа на Wortexa.',
+      title: 'За нас',
+      headline: 'Дигитална платформа за геодезия, образование и професионална практика',
+      intro:
+        'GeoSolver е български софтуерен продукт за онлайн геодезически изчисления. Развиваме инструменти за преподаватели, студенти и практикуващи геодезисти — с фокус върху точност, дигитализация и ефективност в ежедневната работа.',
+      missionTitle: 'Мисия',
+      missionText:
+        'Да осигурим надеждна и достъпна дигитална среда за геодезически изчисления и обучение — съвместима с изискванията на учебния процес и на професионалната практика.',
+      companyTitle: 'Разработка и поддръжка',
+      companyTextBefore:
+        'GeoSolver се разработва и поддържа от екипа на ',
+      companyTextAfter:
+        ' — компанията зад платформата. Имаме опит в инженерната геодезия, образованието и софтуерните продукти. Платформата интегрира калкулатори, класна стая за преподаватели и специализирани модули в единна облачна екосистема, достъпна от всяко устройство с браузър.',
+      companyLinkLabel: 'Wortexa',
+      focusTitle: 'Основни направления',
+      focusAreas: [
+        {
+          title: 'Образование',
+          desc: 'GeoSolver Edu предоставя на преподавателите класна стая, задания, автоматична проверка и управление на достъпа до калкулатора. Инструментите са съобразени с учебните програми по геодезия.',
+        },
+        {
+          title: 'Дигитализация',
+          desc: 'Преминаването към структурирани цифрови процеси намалява риска от грешки и подобрява проследимостта на изчисленията — в учебна среда и в професионална дейност.',
+        },
+        {
+          title: 'Професионална практика',
+          desc: 'Калкулаторите и модулите покриват стандартни геодезически задачи — от основни задачи и засечки до електронни карнети и специализирани инструменти.',
+        },
+        {
+          title: 'Достъпност',
+          desc: 'Безплатен план за запознаване с платформата, двуезичен интерфейс и ясни условия за ползване. Целта е професионални средства да са достъпни за ученици, студенти и млади специалисти.',
+        },
+      ],
+      valuesTitle: 'Принципи на работа',
+      values: [
+        {
+          title: 'Точност и надеждност',
+          text: 'Изчисленията следват установени геодезически методи; интерфейсът е ясен и предвидим.',
+        },
+        {
+          title: 'Свързаност на процесите',
+          text: 'Единни инструменти за учебна зала и за терен — без разминаване между обучение и практика.',
+        },
+        {
+          title: 'Практична стойност',
+          text: 'Всяка функция решава конкретен проблем в учебния или работния процес.',
+        },
+        {
+          title: 'Устойчиво развитие',
+          text: 'Продуктът се развива от екипа на Wortexa в диалог с преподаватели и практикуващи специалисти.',
+        },
+      ],
+      ctaTitle: 'Научете повече',
+      ctaTeachers: 'За преподаватели',
+      ctaStudents: 'За ученици и студенти',
+      ctaContact: 'Контакти',
+    },
 
     // For Teachers page
     forTeachersTitle: 'За преподаватели',
@@ -616,6 +679,7 @@ export const translations = {
     home: 'Home',
     tools: 'Tools',
     prices: 'Prices',
+    about: 'About',
     contacts: 'Contacts',
     forTeachers: 'For Teachers',
     gai: 'GAI',
@@ -635,7 +699,7 @@ export const translations = {
     socialNetworks: 'Social Networks',
     language: 'English',
     theme: 'Light Mode',
-    copyright: '© GEOSOLVER, 2025.\nAll rights reserved.\nCurrent version: v3.2.5-beta.2',
+    copyright: '© GEOSOLVER, 2025.\nAll rights reserved.\nCurrent version: v4.0.0-beta.1',
     wortexaFooterBefore: 'is part of the ',
     wortexaFooterAfter: ' product family',
 
@@ -713,7 +777,7 @@ export const translations = {
 
     // Tools page translations
     toolsTitle: 'Tools',
-    toolsDescription: 'Four core tools for coordinate calculations and classic geodetic intersections.',
+    toolsDescription: 'Tools for coordinate calculations, intersections, transformations and area in geodesy.',
     toolsInDevelopment: 'Tools in Development',
 
     // Prices page translations
@@ -863,7 +927,7 @@ export const translations = {
 
     // Contacts page
     contactsTitle: 'Contacts',
-    contactsDescription: 'Contact us for any questions about GeoSolver - your trusted partner for geodetic calculations.',
+    contactsDescription: 'Contact the Wortexa team about GeoSolver — the platform we develop and maintain.',
     contactIntro: 'We are here for any questions.',
     contactEmail: 'team@geosolver.bg',
     emailLabel: 'Email',
@@ -883,6 +947,68 @@ export const translations = {
       { question: 'How can I subscribe?', answer: 'Choose a professional plan and follow the payment steps. After confirmation you will have unlimited access.' },
       { question: 'Is there a mobile version of GeoSolver?', answer: 'GeoSolver is designed specifically for use on small devices.' }
     ],
+
+    // About page
+    aboutPage: {
+      seoTitle: 'About Us – GeoSolver',
+      seoDescription:
+        'GeoSolver — a Bulgarian digital platform for geodetic calculations, developed and maintained by the Wortexa team.',
+      title: 'About us',
+      headline: 'A digital platform for geodesy, education, and professional practice',
+      intro:
+        'GeoSolver is a Bulgarian software product for online geodetic calculations. We develop tools for teachers, students, and practicing surveyors — with a focus on accuracy, digitalization, and efficiency in daily work.',
+      missionTitle: 'Mission',
+      missionText:
+        'To provide a reliable and accessible digital environment for geodetic calculations and learning — aligned with the requirements of education and professional practice.',
+      companyTitle: 'Development and maintenance',
+      companyTextBefore:
+        'GeoSolver is developed and maintained by the ',
+      companyTextAfter:
+        ' team — the company behind the platform. We bring experience in engineering geodesy, education, and software products. The platform integrates calculators, a teacher classroom, and specialized modules into a single cloud ecosystem, accessible from any browser-enabled device.',
+      companyLinkLabel: 'Wortexa',
+      focusTitle: 'Core areas',
+      focusAreas: [
+        {
+          title: 'Education',
+          desc: 'GeoSolver Edu provides teachers with a classroom, assignments, automatic grading, and calculator access control. Tools are aligned with geodesy curricula.',
+        },
+        {
+          title: 'Digitalization',
+          desc: 'Moving to structured digital workflows reduces error risk and improves traceability of calculations — in education and in professional work.',
+        },
+        {
+          title: 'Professional practice',
+          desc: 'Calculators and modules cover standard geodetic tasks — from basic tasks and intersections to electronic field books and specialized tools.',
+        },
+        {
+          title: 'Accessibility',
+          desc: 'A free plan to explore the platform, bilingual interface, and clear terms of use. Professional tools should be available to students and young specialists.',
+        },
+      ],
+      valuesTitle: 'Operating principles',
+      values: [
+        {
+          title: 'Accuracy and reliability',
+          text: 'Calculations follow established geodetic methods; the interface is clear and predictable.',
+        },
+        {
+          title: 'Process continuity',
+          text: 'Unified tools for the classroom and the field — without a gap between training and practice.',
+        },
+        {
+          title: 'Practical value',
+          text: 'Every feature addresses a specific need in the learning or work process.',
+        },
+        {
+          title: 'Sustainable development',
+          text: 'The product is developed by the Wortexa team in dialogue with teachers and practicing professionals.',
+        },
+      ],
+      ctaTitle: 'Learn more',
+      ctaTeachers: 'For teachers',
+      ctaStudents: 'For students',
+      ctaContact: 'Contact',
+    },
 
     // For Teachers page
     forTeachersTitle: 'For Teachers',

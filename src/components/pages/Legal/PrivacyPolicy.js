@@ -17,7 +17,20 @@ const PrivacyPolicy = () => {
         sections: [
           {
             heading: 'Кои сме ние',
-            body: `GeoSolver е онлайн платформа за геодезически изчисления и обучение, поддържана от Wortexa™. За въпроси относно личните данни се свържете с нас на ${CONTACT}.`,
+            body: (
+              <>
+                GeoSolver е онлайн платформа за геодезически изчисления и обучение, разработвана и поддържана от екипа на{' '}
+                <a
+                  href="https://wortexa.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline underline-offset-2 text-neutral-800 dark:text-zinc-200"
+                >
+                  Wortexa
+                </a>
+                . За въпроси относно личните данни се свържете с нас на {CONTACT}.
+              </>
+            ),
           },
           {
             heading: 'Какви данни събираме',
@@ -73,7 +86,20 @@ const PrivacyPolicy = () => {
         sections: [
           {
             heading: 'Who we are',
-            body: `GeoSolver is an online platform for geodetic calculations and education, operated by Wortexa™. For data questions contact us at ${CONTACT}.`,
+            body: (
+              <>
+                GeoSolver is an online platform for geodetic calculations and education, developed and maintained by the{' '}
+                <a
+                  href="https://wortexa.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline underline-offset-2 text-neutral-800 dark:text-zinc-200"
+                >
+                  Wortexa
+                </a>{' '}
+                team. For data questions contact us at {CONTACT}.
+              </>
+            ),
           },
           {
             heading: 'What we collect',

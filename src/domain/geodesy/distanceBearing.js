@@ -1,17 +1,13 @@
 /**
- * Разстояние и посока:
- * Изчислява разстоянието и посоката между две точки.
- * Същата логика като SecondTask, но с различна структура на резултата.
- * 
+ * Разстояние и посока между две точки.
+ * Същата конвенция като Second Task: α = atan2(ΔY, ΔX) в гради [0, 400).
+ *
  * @param {number} x1 - X координата на първа точка
  * @param {number} y1 - Y координата на първа точка
  * @param {number} x2 - X координата на втора точка
  * @param {number} y2 - Y координата на втора точка
- * @returns {Object} Резултати от изчисленията
- * @throws {Error} При невалидни входни данни
  */
 export function calculateDistanceBearing(x1, y1, x2, y2) {
-  // Validate input data
   if (typeof x1 !== 'number' || isNaN(x1) || !isFinite(x1)) {
     throw new Error('X1 трябва да е валидно число');
   }
@@ -24,27 +20,24 @@ export function calculateDistanceBearing(x1, y1, x2, y2) {
   if (typeof y2 !== 'number' || isNaN(y2) || !isFinite(y2)) {
     throw new Error('Y2 трябва да е валидно число');
   }
+  if (x1 === x2 && y1 === y2) {
+    throw new Error('Точките не могат да съвпадат');
+  }
 
-  // Coordinate differences
   const deltaY = y2 - y1;
   const deltaX = x2 - x1;
-
-  // Distance
   const distance = Math.sqrt(deltaY * deltaY + deltaX * deltaX);
 
-  // Bearing (azimuth)
-  let bearingRad = Math.atan2(deltaX, deltaY);
-  
-  // Normalize angle (0 to 2pi)
+  // Same as secondTask: α = atan2(ΔY, ΔX)
+  let bearingRad = Math.atan2(deltaY, deltaX);
   if (bearingRad < 0) {
     bearingRad += 2 * Math.PI;
   }
 
-  // Convert to gon and degrees
   const bearingGon = (bearingRad * 200) / Math.PI;
   const bearingDeg = (bearingRad * 180) / Math.PI;
 
-  // Quadrants aligned with secondTask / surveying convention (ΔX east, ΔY north)
+  // Quadrants: X north-ish / Y east-ish (BG grid): ΔX>0, ΔY≥0 → I
   let quadrantName = 'I';
   if (deltaX > 0 && deltaY >= 0) quadrantName = 'I';
   else if (deltaX <= 0 && deltaY > 0) quadrantName = 'II';
@@ -65,6 +58,6 @@ export function calculateDistanceBearing(x1, y1, x2, y2) {
     bearingRad,
     bearingGon,
     bearingDeg,
-    quadrant
+    quadrant,
   };
 }

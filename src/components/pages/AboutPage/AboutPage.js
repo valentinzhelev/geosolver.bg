@@ -1,105 +1,147 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import Layout from '../../layout/Layout';
-import './AboutPage.css';
 import SEO from '../../shared/SEO';
 import { useTranslation } from '../../../hooks/useTranslation';
 
 const AboutPage = () => {
-    const [activeIndex, setActiveIndex] = useState(0);
-    const { t, language } = useTranslation();
+  const { t } = useTranslation();
+  const ap = t.aboutPage || {};
+  const focusAreas = ap.focusAreas || [];
+  const values = ap.values || [];
 
-    const events = [
-        {
-            year: '2023',
-            description: language === 'bg'
-                ? 'Идеята за GeoSolver се заражда – необходимостта от уеб базирано приложение за геодезически изчисления.'
-                : 'The idea for GeoSolver is born – the need for a web-based application for geodetic calculations.'
-        },
-        {
-            year: '2024',
-            description: language === 'bg'
-                ? 'Стартиране на активната разработка: изградени са основите на фронтенда и бекенда.'
-                : 'Active development begins: frontend and backend foundations are built.'
-        },
-        {
-            year: '2025',
-            description: language === 'bg'
-                ? 'Публична версия 1.0 с основните функции: трансформации, засечки, базова история на изчисленията.'
-                : 'Public version 1.0 with core features: transformations, intersections, basic calculation history.'
-        }
-    ];
+  return (
+    <>
+      <SEO
+        title={ap.seoTitle}
+        description={ap.seoDescription}
+        keywords="GeoSolver, Wortexa, за нас, геодезия, образование, дигитализация, about us, geodesy"
+        canonical="/about"
+      />
+      <Layout>
+        <div className="w-full min-h-screen bg-stone-50 dark:bg-zinc-950 transition-colors">
+          <div className="w-full max-w-[1180px] mx-auto px-4 lg:px-6 pt-6 lg:pt-16 pb-12 flex flex-col gap-10 lg:gap-14">
+            <div className="max-w-[640px] flex flex-col gap-2">
+              <h1 className="text-black dark:text-white text-2xl lg:text-3xl font-bold font-['Manrope']">
+                {ap.title}
+              </h1>
+              <p className="text-neutral-500 dark:text-zinc-400 text-sm lg:text-base font-semibold font-['Manrope']">
+                {ap.headline}
+              </p>
+              <p className="text-neutral-700 dark:text-zinc-300 text-sm lg:text-base font-['Manrope'] leading-relaxed mt-1">
+                {ap.intro}
+              </p>
+            </div>
 
-    const progressPercent = (activeIndex) / (events.length - 1) * 100;
+            <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 lg:p-5 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700 flex flex-col gap-2 transition-colors">
+                <h2 className="text-black dark:text-white text-base font-semibold font-['Manrope']">
+                  {ap.missionTitle}
+                </h2>
+                <p className="text-neutral-600 dark:text-zinc-400 text-sm font-['Manrope'] leading-relaxed">
+                  {ap.missionText}
+                </p>
+              </div>
+              <div className="p-4 lg:p-5 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700 flex flex-col gap-2 transition-colors">
+                <h2 className="text-black dark:text-white text-base font-semibold font-['Manrope']">
+                  {ap.companyTitle}
+                </h2>
+                <p className="text-neutral-600 dark:text-zinc-400 text-sm font-['Manrope'] leading-relaxed">
+                  {ap.companyTextBefore}
+                  <a
+                    href="https://wortexa.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-black dark:text-white font-semibold underline underline-offset-2 hover:opacity-80"
+                  >
+                    {ap.companyLinkLabel || 'Wortexa'}
+                  </a>
+                  {ap.companyTextAfter}
+                </p>
+              </div>
+            </section>
 
-    return (
-        <>
-            <SEO
-                title={language === 'bg' ? 'За нас - История на GeoSolver' : 'About Us - GeoSolver History'}
-                description={language === 'bg'
-                    ? "Научете историята на GeoSolver – онлайн платформа за геодезически изчисления с лесен и интуитивен интерфейс, предназначена за професионални геодезисти."
-                    : "Learn about GeoSolver's history – an online platform for geodetic calculations with an easy and intuitive interface, designed for professional surveyors."
-                }
-                keywords={language === 'bg'
-                    ? "GeoSolver, геодезия, история на GeoSolver, онлайн геодезически калкулатор, геодезически изчисления, права засечка, трансформации"
-                    : "GeoSolver, geodesy, GeoSolver history, online geodetic calculator, geodetic calculations, forward intersection, transformations"
-                }
-                canonical="/about"
-            />
-            <Layout>
-                <div className="about-section">
-                    <div className="about-container">
-                        <h1 className="about-title">
-                            {language === 'bg' ? 'История на ' : 'History of '}
-                            <span className="blue">GeoSolver</span>
-                        </h1>
-                        <p className="about-intro">
-                            {language === 'bg'
-                                ? 'GeoSolver е проект, роден от желанието да се улесни ежедневната работа на геодезисти чрез достъпен онлайн инструмент. Платформата предоставя прецизни изчисления, интуитивен интерфейс и възможност за съхраняване на история на изчисленията.'
-                                : 'GeoSolver is a project born from the desire to simplify the daily work of surveyors through an accessible online tool. The platform provides precise calculations, an intuitive interface, and the ability to store calculation history.'
-                            }
-                        </p>
+            <section className="flex flex-col gap-4">
+              <h2 className="text-black dark:text-white text-lg font-bold font-['Manrope']">
+                {ap.focusTitle}
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {focusAreas.map((item) => (
+                  <div
+                    key={item.title}
+                    className="p-4 lg:p-5 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700 flex flex-col gap-2 transition-colors"
+                  >
+                    <h3 className="text-black dark:text-white text-base font-semibold font-['Manrope']">
+                      {item.title}
+                    </h3>
+                    <p className="text-neutral-600 dark:text-zinc-400 text-sm font-['Manrope'] leading-relaxed">
+                      {item.desc}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </section>
 
-                        <div className="timeline-arrow-wrapper">
-                            <div className="timeline-arrow-line">
-                                {/* Base line in light blue */}
-                                <div className="timeline-arrow-base" />
+            <section className="flex flex-col gap-4">
+              <h2 className="text-black dark:text-white text-lg font-bold font-['Manrope']">
+                {ap.valuesTitle}
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {values.map((item) => (
+                  <div
+                    key={item.title}
+                    className="p-4 lg:p-5 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700 flex flex-col gap-2 transition-colors"
+                  >
+                    <h3 className="text-black dark:text-white text-base font-semibold font-['Manrope']">
+                      {item.title}
+                    </h3>
+                    <p className="text-neutral-600 dark:text-zinc-400 text-sm font-['Manrope'] leading-relaxed">
+                      {item.text}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </section>
 
-                                {/* Progress line in blue */}
-                                <div
-                                    className="timeline-arrow-progress"
-                                    style={{ width: `max(${progressPercent}%, 17.9%)` }}
-                                />
-
-                                {/* Points */}
-                                {events.map((event, index) => (
-                                    <div
-                                        key={index}
-                                        className={`timeline-arrow-point ${index <= activeIndex ? 'filled' : ''}`}
-                                        onClick={() => setActiveIndex(index)}
-                                    >
-                                        <span>{event.year}</span>
-                                    </div>
-                                ))}
-
-                                {/* Arrow */}
-                                <div
-                                    className={`timeline-arrow-head ${activeIndex === events.length - 1 ? 'full' : ''}`}
-                                />
-                            </div>
-                        </div>
-                        <div className="timeline-description">
-                            {events[activeIndex] && (
-                                <>
-                                    <h2>{events[activeIndex].year}</h2>
-                                    <p>{events[activeIndex].description}</p>
-                                </>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            </Layout>
-        </>
-    );
+            <section className="flex flex-col gap-3">
+              <h2 className="text-black dark:text-white text-lg font-bold font-['Manrope']">
+                {ap.ctaTitle}
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                <Link
+                  to="/for-teachers"
+                  className="p-4 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700 flex justify-between items-center hover:shadow-md transition-shadow"
+                >
+                  <span className="text-black dark:text-white text-sm font-semibold font-['Manrope']">
+                    {ap.ctaTeachers}
+                  </span>
+                  <img src="/icons/hero_buttons_arrow.svg" alt="" className="w-2 h-3 dark:invert" />
+                </Link>
+                <Link
+                  to="/for-students"
+                  className="p-4 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700 flex justify-between items-center hover:shadow-md transition-shadow"
+                >
+                  <span className="text-black dark:text-white text-sm font-semibold font-['Manrope']">
+                    {ap.ctaStudents}
+                  </span>
+                  <img src="/icons/hero_buttons_arrow.svg" alt="" className="w-2 h-3 dark:invert" />
+                </Link>
+                <Link
+                  to="/contacts"
+                  className="p-4 bg-black dark:bg-white rounded-xl flex justify-between items-center hover:opacity-90 transition-opacity"
+                >
+                  <span className="text-white dark:text-black text-sm font-semibold font-['Manrope']">
+                    {ap.ctaContact}
+                  </span>
+                  <img src="/icons/homepage_arrow_icon.svg" alt="" className="w-2 h-3" />
+                </Link>
+              </div>
+            </section>
+          </div>
+        </div>
+      </Layout>
+    </>
+  );
 };
 
 export default AboutPage;

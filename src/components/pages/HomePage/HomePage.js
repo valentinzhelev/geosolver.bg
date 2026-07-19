@@ -57,6 +57,16 @@ const HomePage = () => {
     "url": "https://www.geosolver.bg",
     "applicationCategory": "BusinessApplication",
     "operatingSystem": "Web Browser",
+    "creator": {
+      "@type": "Organization",
+      "name": "Wortexa",
+      "url": "https://wortexa.com/"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Wortexa",
+      "url": "https://wortexa.com/"
+    },
     "offers": {
       "@type": "Offer",
       "price": "0",

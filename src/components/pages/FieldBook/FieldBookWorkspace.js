@@ -4,6 +4,7 @@ import SEO from '../../shared/SEO';
 import Layout from '../../layout/Layout';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { fieldbooksApi } from '../../../services/fieldbookApi';
+import { surveyPointsApi } from '../../../services/surveyPointsApi';
 import { emptyLevelingRow, rowFromApi, rowToApi } from '../../../utils/levelingCarnet';
 import {
   emptyCoordinateRow,
@@ -12,8 +13,11 @@ import {
   defaultCoordinateSettings,
 } from '../../../utils/coordinateCarnet';
 import { downloadLevelingCsv, downloadCoordinateCsv } from '../../../utils/exportLevelingCsv';
+import { downloadFieldbookPdf } from '../../../utils/exportFieldbookPdf';
 import LevelingCarnetTable from './LevelingCarnetTable';
 import CoordinateCarnetTable from './CoordinateCarnetTable';
+import FieldBookEducationPanel from '../../modules/FieldBookEducationPanel';
+import { getTemplatesForType } from '../../../config/fieldbookTemplates';
 
 const gradientStyle = {
   backgroundImage: 'url(/images/gradient_wallpaper.jpg)',
@@ -83,6 +87,8 @@ const FieldBookWorkspace = () => {
   const [saving, setSaving] = useState(false);
   const [savedAt, setSavedAt] = useState(null);
   const [calculating, setCalculating] = useState(false);
+  const [exportingPdf, setExportingPdf] = useState(false);
+  const [syncingPoints, setSyncingPoints] = useState(false);
   const [creatingProject, setCreatingProject] = useState(false);
   const [error, setError] = useState('');
   const [formHint, setFormHint] = useState('');
@@ -90,7 +96,7 @@ const FieldBookWorkspace = () => {
   const [showProjectForm, setShowProjectForm] = useState(false);
   const [projectForm, setProjectForm] = useState({ name: '', year: '', team: '', site: '' });
   const [showBookForm, setShowBookForm] = useState(false);
-  const [bookForm, setBookForm] = useState({ name: '', date: '', crew: '', type: 'coordinate' });
+  const [bookForm, setBookForm] = useState({ name: '', date: '', crew: '', type: 'coordinate', templateId: '' });
 
   const [bookSearch, setBookSearch] = useState('');
   const [showArchived, setShowArchived] = useState(false);
@@ -234,18 +240,52 @@ const FieldBookWorkspace = () => {
   const handleCreateBook = async () => {
     if (!bookForm.name.trim() || !selectedProjectId) return;
     const type = bookForm.type === 'coordinate' ? 'coordinate' : 'leveling';
+    const helpers = rowHelpersFor(type);
+    const tpl = bookForm.templateId
+      ? getTemplatesForType(type).find((t) => t.id === bookForm.templateId)
+      : null;
+    const settings = tpl ? { ...defaultSettingsFor(type), ...tpl.settings } : defaultSettingsFor(type);
     try {
       const res = await fieldbooksApi.createBook(selectedProjectId, {
         name: bookForm.name.trim(),
         date: bookForm.date || new Date().toISOString().slice(0, 10),
         crew: bookForm.crew,
         type,
-        settings: defaultSettingsFor(type),
+        settings,
       });
-      setBookForm({ name: '', date: '', crew: '', type });
+      let book = res.data;
+      if (tpl?.rows?.length) {
+        const seedRows = tpl.rows.map((r) => ({ ...helpers.empty(), ...r }));
+        const patched = await fieldbooksApi.updateBook(book._id, {
+          rows: seedRows.map(helpers.toApi),
+          settings,
+        });
+        book = patched.data;
+      }
+      setBookForm({ name: '', date: '', crew: '', type, templateId: '' });
       setShowBookForm(false);
       await loadBooks(selectedProjectId);
-      setSelectedBookId(res.data._id);
+      setSelectedBookId(book._id);
+    } catch (e) {
+      setError(e.message);
+    }
+  };
+
+  const handleApplyTemplate = async (templateId) => {
+    if (!selectedBookId || locked || rows.length > 0) return;
+    const tpl = getTemplatesForType(bookType).find((t) => t.id === templateId);
+    if (!tpl) return;
+    const helpers = rowHelpersFor(bookType);
+    const nextSettings = { ...settings, ...tpl.settings };
+    const seedRows = tpl.rows.map((r) => ({ ...helpers.empty(), ...r }));
+    try {
+      await fieldbooksApi.updateBook(selectedBookId, {
+        rows: seedRows.map(helpers.toApi),
+        settings: nextSettings,
+      });
+      setSettings(nextSettings);
+      setRows(seedRows);
+      setFormHint(bg ? 'Шаблонът е приложен.' : 'Template applied.');
     } catch (e) {
       setError(e.message);
     }
@@ -384,6 +424,74 @@ const FieldBookWorkspace = () => {
     }
   };
 
+  const handleSyncToPoints = async () => {
+    if (!rows.length || bookType !== 'coordinate' || syncingPoints) return;
+    setSyncingPoints(true);
+    setError('');
+    try {
+      const points = rows
+        .filter((r) => r.y != null && r.y !== '' && r.x != null && r.x !== '')
+        .map((r) => ({
+          name: String(r.pointNo || r.station || 'Pt'),
+          code: String(r.pointNo || ''),
+          y: Number(r.y),
+          x: Number(r.x),
+          h: null,
+          pointClass: 'traverse',
+          layer: 'polygon',
+          notes: bookMeta?.name ? `Карнет: ${bookMeta.name}` : '',
+        }));
+      if (!points.length) {
+        setError(bg ? 'Няма редове с Y/X координати.' : 'No rows with Y/X coordinates.');
+        return;
+      }
+      const existingRes = await surveyPointsApi.list(
+        selectedProjectId ? { projectId: selectedProjectId } : {}
+      );
+      const existing = existingRes.data || [];
+      const near = (a, b) => a != null && b != null && Math.abs(Number(a) - Number(b)) < 0.001;
+      const fresh = points.filter(
+        (p) =>
+          !existing.some(
+            (e) =>
+              String(e.name) === String(p.name) &&
+              near(e.x, p.x) &&
+              near(e.y, p.y)
+          )
+      );
+      if (!fresh.length) {
+        setError(bg ? 'Всички точки вече са в библиотеката.' : 'All points are already in the library.');
+        return;
+      }
+      await surveyPointsApi.importMany({ points: fresh, projectId: selectedProjectId || null });
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setSyncingPoints(false);
+    }
+  };
+
+  const handleExportPdf = async () => {
+    if (!rows.length || exportingPdf) return;
+    setExportingPdf(true);
+    setError('');
+    try {
+      await downloadFieldbookPdf({
+        bookType,
+        rows,
+        settings,
+        summary,
+        bookName: bookMeta?.name,
+        bookMeta,
+        language,
+      });
+    } catch (e) {
+      setError(e.message || (bg ? 'Грешка при PDF export.' : 'PDF export failed.'));
+    } finally {
+      setExportingPdf(false);
+    }
+  };
+
   const selectedProject = projects.find((p) => p._id === selectedProjectId);
 
   if (loading) {
@@ -438,6 +546,7 @@ const FieldBookWorkspace = () => {
           </div>
 
           <div className="w-full max-w-[1280px] mx-auto px-4 lg:px-6 pt-5 pb-16 flex flex-col gap-5">
+            <FieldBookEducationPanel language={language} />
             {error && (
               <Banner tone="error" onClose={() => setError('')}>
                 {error}
@@ -571,6 +680,16 @@ const FieldBookWorkspace = () => {
                             </button>
                           ))}
                         </div>
+                        <select
+                          className={inputClass}
+                          value={bookForm.templateId}
+                          onChange={(e) => setBookForm({ ...bookForm, templateId: e.target.value })}
+                        >
+                          <option value="">{bg ? 'Без шаблон' : 'No template'}</option>
+                          {getTemplatesForType(bookForm.type).map((t) => (
+                            <option key={t.id} value={t.id}>{t.label[bg ? 'bg' : 'en']}</option>
+                          ))}
+                        </select>
                         <button type="button" onClick={handleCreateBook} className={btnPrimary}>
                           {bg ? 'Създай карнет' : 'Create field book'}
                         </button>
@@ -672,6 +791,20 @@ const FieldBookWorkspace = () => {
                                 <button type="button" onClick={handleExport} disabled={!rows.length} className={btnGhost}>
                                   <Icon d={ICONS.download} /> CSV
                                 </button>
+                                <button type="button" onClick={handleExportPdf} disabled={!rows.length || exportingPdf} className={btnGhost}>
+                                  <Icon d={ICONS.download} /> {exportingPdf ? 'PDF...' : 'PDF'}
+                                </button>
+                                {bookType === 'coordinate' && (
+                                  <button
+                                    type="button"
+                                    onClick={handleSyncToPoints}
+                                    disabled={!rows.length || syncingPoints}
+                                    className={btnGhost}
+                                    title={bg ? 'Копирай точки в библиотеката' : 'Copy points to library'}
+                                  >
+                                    {syncingPoints ? (bg ? 'Точки...' : 'Points...') : bg ? '→ Точки' : '→ Points'}
+                                  </button>
+                                )}
                                 <button type="button" onClick={handleCopyBook} className={btnGhost} title={bg ? 'Копирай' : 'Copy'}>
                                   <Icon d={ICONS.copy} />
                                 </button>
@@ -721,6 +854,23 @@ const FieldBookWorkspace = () => {
 
                       {/* Table */}
                       <div className="flex flex-col gap-3">
+                        {!locked && !rows.length && getTemplatesForType(bookType).length > 0 && (
+                          <div className="flex flex-wrap items-center gap-2 p-3 rounded-lg bg-stone-50 dark:bg-zinc-800/50 border border-gray-100 dark:border-zinc-800">
+                            <span className="text-sm font-['Manrope'] text-neutral-600 dark:text-zinc-400">
+                              {bg ? 'Стартирай с шаблон:' : 'Start from template:'}
+                            </span>
+                            {getTemplatesForType(bookType).map((t) => (
+                              <button
+                                key={t.id}
+                                type="button"
+                                onClick={() => handleApplyTemplate(t.id)}
+                                className="px-3 py-1.5 rounded-lg text-xs font-semibold font-['Manrope'] bg-white dark:bg-zinc-900 outline outline-1 outline-gray-200 dark:outline-zinc-700 hover:bg-stone-100 dark:hover:bg-zinc-800"
+                              >
+                                {t.label[bg ? 'bg' : 'en']}
+                              </button>
+                            ))}
+                          </div>
+                        )}
                         {bookType === 'coordinate' ? (
                           <CoordinateCarnetTable rows={rows} summary={summary} locked={locked} bg={bg} onUpdateRow={updateRow} onDuplicate={handleDuplicateRow} onRemove={handleRemoveRow} />
                         ) : (

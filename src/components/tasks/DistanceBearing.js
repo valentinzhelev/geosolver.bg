@@ -1,14 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import SEO from '../shared/SEO';
 import Layout from '../layout/Layout';
 import TaskActionBar from './TaskActionBar';
 import TaskMobileBackButton from './TaskMobileBackButton';
+import PointPicker from './PointPicker';
+import TwoPointSketch from './TwoPointSketch';
 import { Link } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 import useTypewriter from '../../hooks/useTypewriter';
 import { calculateDistanceBearing as calculateDistanceBearingDomain } from '../../domain/geodesy';
 import { roundTo } from '../../domain/math';
 import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
+import { useCalculationRestore } from '../../hooks/useCalculationRestore';
+import { inputDataToFormStrings } from '../../utils/calculationRestore';
 
 // Helpers for localStorage history for each input
 const getInputHistory = (key) => {
@@ -42,9 +46,11 @@ const saveHistory = (entry) => {
 
 const DistanceBearing = () => {
   const [form, setForm] = useState({ y1: '', x1: '', y2: '', x2: '' });
+  useCalculationRestore('distance-bearing', setForm, inputDataToFormStrings);
   const { t, language } = useTranslation();
   const { runWithTracking, isAuthenticated } = useGuardedCalculation();
   const [resultText, setResultText] = useState(t.defaultResultText);
+  const [lastCalcResult, setLastCalcResult] = useState(null);
   const [history, setHistory] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
@@ -79,6 +85,7 @@ const DistanceBearing = () => {
       run: () => calculateDistanceBearing(x1, y1, x2, y2),
     });
     if (!result) return;
+    setLastCalcResult(result);
     const output = language === 'bg' 
       ? `--------- Разстояние и посока (Enhanced) ---------
 Y₁ = ${result.y1}, X₁ = ${result.x1}
@@ -156,7 +163,26 @@ Quadrant: ${result.quadrant}
   const resetForm = () => {
     setForm({ y1: '', x1: '', y2: '', x2: '' });
     setResultText(t.defaultResultText);
+    setLastCalcResult(null);
   };
+
+  const sketchData = useMemo(() => {
+    const y1 = parseFloat(form.y1);
+    const x1 = parseFloat(form.x1);
+    const y2 = parseFloat(form.y2);
+    const x2 = parseFloat(form.x2);
+    const hasP1 = !Number.isNaN(y1) && !Number.isNaN(x1);
+    const hasP2 = !Number.isNaN(y2) && !Number.isNaN(x2);
+    if (!hasP1 && !hasP2) return null;
+    return {
+      y1: hasP1 ? y1 : undefined,
+      x1: hasP1 ? x1 : undefined,
+      y2: hasP2 ? y2 : undefined,
+      x2: hasP2 ? x2 : undefined,
+      alphaGon: lastCalcResult?.bearingGon,
+      distance: lastCalcResult?.distance,
+    };
+  }, [form, lastCalcResult]);
 
   const handleDownload = (entry) => {
     const text = language === 'bg'
@@ -218,6 +244,10 @@ Quadrant: ${result.quadrant}
                 {/* Form Card */}
                 <div className="self-stretch p-3 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex flex-col justify-center items-end gap-3 w-full min-w-0 overflow-hidden">
                   <div className="self-stretch justify-start text-black dark:text-white text-base font-semibold font-['Manrope']">Входни данни</div>
+                  <div className="self-stretch grid grid-cols-2 gap-2 w-full">
+                    <PointPicker language={language} label="P₁" onSelect={(p) => setForm((f) => ({ ...f, y1: String(p.y), x1: String(p.x) }))} />
+                    <PointPicker language={language} label="P₂" onSelect={(p) => setForm((f) => ({ ...f, y2: String(p.y), x2: String(p.x) }))} />
+                  </div>
                   <div className="self-stretch flex flex-col justify-start items-start gap-4 w-full">
                     {/* Y1 */}
                     <div className="self-stretch flex flex-col justify-start items-start gap-2 w-full">
@@ -305,6 +335,15 @@ Quadrant: ${result.quadrant}
                     </div>
                   </div>
                 </div>
+                <TwoPointSketch
+                  y1={sketchData?.y1}
+                  x1={sketchData?.x1}
+                  y2={sketchData?.y2}
+                  x2={sketchData?.x2}
+                  alphaGon={sketchData?.alphaGon}
+                  distance={sketchData?.distance}
+                  language={language}
+                />
               </div>
               {/* History Table */}
               <div className="self-stretch flex flex-col justify-start items-start gap-3 w-full">
@@ -419,6 +458,10 @@ Quadrant: ${result.quadrant}
               {/* Form Card */}
               <div className="flex-1 p-4 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 inline-flex flex-col justify-center items-end gap-4">
                 <div className="self-stretch justify-start text-black dark:text-white text-lg font-semibold font-['Manrope']">Входни данни</div>
+                <div className="self-stretch grid grid-cols-2 gap-2">
+                  <PointPicker language={language} label="P₁" onSelect={(p) => setForm((f) => ({ ...f, y1: String(p.y), x1: String(p.x) }))} />
+                  <PointPicker language={language} label="P₂" onSelect={(p) => setForm((f) => ({ ...f, y2: String(p.y), x2: String(p.x) }))} />
+                </div>
                 <div className="self-stretch flex flex-col justify-start items-start gap-4">
                   {/* Y1 */}
                   <div className="self-stretch flex flex-col justify-start items-start gap-2">
@@ -525,6 +568,15 @@ Quadrant: ${result.quadrant}
                 </button>
               </div>
             </div>
+            <TwoPointSketch
+              y1={sketchData?.y1}
+              x1={sketchData?.x1}
+              y2={sketchData?.y2}
+              x2={sketchData?.x2}
+              alphaGon={sketchData?.alphaGon}
+              distance={sketchData?.distance}
+              language={language}
+            />
           </div>
           {/* History Table */}
           <div className="self-stretch flex flex-col justify-start items-start gap-4">

@@ -5,6 +5,7 @@ import { useTranslation } from '../../hooks/useTranslation';
 import { useTheme } from '../../context/ThemeContext';
 import { canAccessTeacherClassroom, canAccessStudentClassroom } from '../../utils/eduRoles';
 import { useFieldBookPilotAccess } from '../../hooks/useFieldBookPilotAccess';
+import ToolsNavMenu from './ToolsNavMenu';
 
 const Header = () => {
   const location = useLocation();
@@ -15,12 +16,6 @@ const Header = () => {
   const showTeacherClassroom = canAccessTeacherClassroom(user, { loading });
   const showStudentClassroom = canAccessStudentClassroom(user, { loading });
   const { isLoggedIn: showFieldBooks } = useFieldBookPilotAccess();
-
-  const fieldBookNavClass = `px-3 py-1 rounded-lg flex justify-center items-center gap-1.5 ${
-    location.pathname.startsWith('/fieldbook')
-      ? 'text-black dark:text-white'
-      : 'text-neutral-400 dark:text-zinc-400'
-  } text-base font-medium font-['Manrope'] hover:text-black dark:hover:text-white`;
 
   const Loader = () => (
     <div className="px-4 py-2 flex items-center gap-2">
@@ -49,33 +44,18 @@ const Header = () => {
           >
             {t.home}
           </Link>
-          <Link
-            to="/tools"
-            className={`px-3 py-1 rounded-lg flex justify-center items-center gap-2.5 ${
-              location.pathname === '/tools' ||
-              location.pathname.startsWith('/first-task') ||
-              location.pathname.startsWith('/second-task') ||
-              location.pathname.startsWith('/forward-intersection') ||
-              location.pathname.startsWith('/resection')
-                ? 'text-black dark:text-white'
-                : 'text-neutral-400 dark:text-zinc-400'
-            } text-base font-medium font-['Manrope'] hover:text-black dark:hover:text-white`}
-          >
-            {t.tools}
-          </Link>
-          {showFieldBooks && (
-            <Link to="/fieldbook" className={fieldBookNavClass}>
-              {t.fieldBooks}
-              <span className="px-3 py-1 bg-gray-200 dark:bg-zinc-900 rounded text-black dark:text-white text-xs font-bold font-['Manrope']">
-                {t.beta}
-              </span>
-            </Link>
-          )}
+          <ToolsNavMenu t={t} language={language} user={user} showFieldBooks={showFieldBooks} />
           <Link
             to="/prices"
             className={`px-3 py-1 rounded-lg flex justify-center items-center gap-2.5 ${location.pathname === '/prices' ? 'text-black dark:text-white' : 'text-neutral-400 dark:text-zinc-400'} text-base font-medium font-['Manrope'] hover:text-black dark:hover:text-white`}
           >
             {t.prices}
+          </Link>
+          <Link
+            to="/about"
+            className={`px-3 py-1 rounded-lg flex justify-center items-center gap-2.5 ${location.pathname === '/about' ? 'text-black dark:text-white' : 'text-neutral-400 dark:text-zinc-400'} text-base font-medium font-['Manrope'] hover:text-black dark:hover:text-white`}
+          >
+            {t.about}
           </Link>
           <Link
             to="/contacts"
@@ -185,23 +165,20 @@ const Header = () => {
                 <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{t.home}</div>
                 <img src="/icons/small_header_icon.svg" alt="Arrow" className="w-3 h-3" />
               </Link>
-              <Link to="/tools" onClick={() => setMobileMenuOpen(false)} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700 inline-flex justify-start items-center gap-3">
-                <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{t.tools}</div>
-                <img src="/icons/small_header_icon.svg" alt="Arrow" className="w-3 h-3" />
-              </Link>
-              {showFieldBooks && (
-                <Link to="/fieldbook" onClick={() => setMobileMenuOpen(false)} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700 inline-flex justify-between items-center gap-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-black dark:text-white text-sm font-medium font-['Manrope']">{t.fieldBooks}</span>
-                    <span className="px-3 py-1 bg-gray-200 dark:bg-zinc-900 rounded text-black dark:text-white text-xs font-bold font-['Manrope']">
-                      {t.beta}
-                    </span>
-                  </div>
-                  <img src="/icons/small_header_icon.svg" alt="" className="w-3 h-3" />
-                </Link>
-              )}
+              <ToolsNavMenu
+                t={t}
+                language={language}
+                user={user}
+                showFieldBooks={showFieldBooks}
+                variant="mobile"
+                onNavigate={() => setMobileMenuOpen(false)}
+              />
               <Link to="/prices" onClick={() => setMobileMenuOpen(false)} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700 inline-flex justify-start items-center gap-3">
                 <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{t.prices}</div>
+                <img src="/icons/small_header_icon.svg" alt="Arrow" className="w-3 h-3" />
+              </Link>
+              <Link to="/about" onClick={() => setMobileMenuOpen(false)} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700 inline-flex justify-start items-center gap-3">
+                <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{t.about}</div>
                 <img src="/icons/small_header_icon.svg" alt="Arrow" className="w-3 h-3" />
               </Link>
               <Link to="/contacts" onClick={() => setMobileMenuOpen(false)} className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-700 inline-flex justify-start items-center gap-3">

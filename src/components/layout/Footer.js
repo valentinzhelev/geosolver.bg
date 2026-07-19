@@ -11,6 +11,7 @@ const Footer = () => {
 
   const quickLinks = [
     { text: t.tools, path: '/tools' },
+    { text: t.about, path: '/about' },
     { text: t.prices, path: '/prices' },
     { text: t.contacts, path: '/contacts' },
     { text: t.privacyPolicy, path: '/privacy-policy' },

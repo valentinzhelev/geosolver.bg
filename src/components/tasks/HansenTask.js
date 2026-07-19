@@ -7,6 +7,10 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 import useTypewriter from '../../hooks/useTypewriter';
 import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
+import { useCalculationRestore } from '../../hooks/useCalculationRestore';
+import { inputDataToFormStrings } from '../../utils/calculationRestore';
+import { calculateHansenTask as calculateHansenTaskDomain } from '../../domain/geodesy';
+import PointPicker from './PointPicker';
 
 // Helpers for localStorage history for each input
 const getInputHistory = (key) => {
@@ -40,6 +44,7 @@ const saveHistory = (entry) => {
 
 const HansenTask = () => {
   const [form, setForm] = useState({ yA: '', xA: '', yB: '', xB: '', alpha: '', beta: '' });
+  useCalculationRestore('hansen-task', setForm, inputDataToFormStrings);
   const { t, language } = useTranslation();
   const { runWithTracking, isAuthenticated } = useGuardedCalculation();
   const [resultText, setResultText] = useState(t.defaultResultText);
@@ -76,57 +81,40 @@ const HansenTask = () => {
       toolDisplayName: { bg: 'Задача на Хансен', en: 'Hansen Task' },
       inputData: { yA, xA, yB, xB, alpha, beta },
       getResultData: (r) => ({ xP: r.xP, yP: r.yP }),
-      run: () => calculateHansenTask(xA, yA, xB, yB, alpha, beta),
+      run: () => calculateHansenTaskDomain(xA, yA, xB, yB, alpha, beta),
     });
     if (!result) return;
     const output = language === 'bg' 
-      ? `--------- Задача на Хансен (Enhanced) ---------
+      ? `--------- Задача на Хансен (права засечка) ---------
 YA = ${result.yA}, XA = ${result.xA}
 YB = ${result.yB}, XB = ${result.xB}
-α = ${result.alpha} gon, β = ${result.beta} gon
+α (при A) = ${result.alpha} gon, β (при B) = ${result.beta} gon
 ------------------------------------------------------
 Разстояние AB = ${result.distanceAB.toFixed(3)} м
-Ъгъл AB = ${result.angleAB.toFixed(6)} rad
 ------------------------------------------------------
-sin(α) = ${result.sinAlpha}
-sin(α + β) = ${result.sinAlphaBeta}
-Коефициент = ${result.coefficient}
-------------------------------------------------------
-Координатни разлики:
-ΔX = ${result.deltaX.toFixed(3)} м
-ΔY = ${result.deltaY.toFixed(3)} м
-------------------------------------------------------
-YP = YA + ΔY = ${result.yA} + ${result.deltaY.toFixed(3)} = ${result.yP} м
-XP = XA + ΔX = ${result.xA} + ${result.deltaX.toFixed(3)} = ${result.xP} м
+Координати на точка P:
+YP = ${result.yP.toFixed(3)} м
+XP = ${result.xP.toFixed(3)} м
 ------------------------------------------------------
 Проверка - разстояние AP: ${result.distanceAP.toFixed(3)} м
 Проверка - разстояние BP: ${result.distanceBP.toFixed(3)} м
 ------------------------------------------------------`
-      : `--------- Hansen Task (Enhanced) ---------
+      : `--------- Hansen Task (forward intersection) ---------
 YA = ${result.yA}, XA = ${result.xA}
 YB = ${result.yB}, XB = ${result.xB}
-α = ${result.alpha} gon, β = ${result.beta} gon
+α (at A) = ${result.alpha} gon, β (at B) = ${result.beta} gon
 ------------------------------------------------------
 Distance AB = ${result.distanceAB.toFixed(3)} m
-Angle AB = ${result.angleAB.toFixed(6)} rad
 ------------------------------------------------------
-sin(α) = ${result.sinAlpha}
-sin(α + β) = ${result.sinAlphaBeta}
-Coefficient = ${result.coefficient}
-------------------------------------------------------
-Coordinate differences:
-ΔX = ${result.deltaX.toFixed(3)} m
-ΔY = ${result.deltaY.toFixed(3)} m
-------------------------------------------------------
-YP = YA + ΔY = ${result.yA} + ${result.deltaY.toFixed(3)} = ${result.yP} m
-XP = XA + ΔX = ${result.xA} + ${result.deltaX.toFixed(3)} = ${result.xP} m
+Point P coordinates:
+YP = ${result.yP.toFixed(3)} m
+XP = ${result.xP.toFixed(3)} m
 ------------------------------------------------------
 Check - distance AP: ${result.distanceAP.toFixed(3)} m
 Check - distance BP: ${result.distanceBP.toFixed(3)} m
 ------------------------------------------------------`;
     
     setResultText(output ? String(output) : "");
-    // Save to local history
     const entry = {
       yA: result.yA,
       xA: result.xA,
@@ -140,72 +128,6 @@ Check - distance BP: ${result.distanceBP.toFixed(3)} m
     };
     saveHistory(entry);
     setHistory(getHistory());
-  };
-
-  /**
-   * Задача на Хансен (Enhanced):
-   * Изчислява координатите на неизвестна точка чрез ъглово преместване от две известни точки
-   * 
-   * Формули:
-   * P = A + (B - A) * (sin(α) / sin(α + β))
-   * 
-   * @param {number} xA - X координата на точка A
-   * @param {number} yA - Y координата на точка A
-   * @param {number} xB - X координата на точка B
-   * @param {number} yB - Y координата на точка B
-   * @param {number} alpha - Ъгъл α в гради
-   * @param {number} beta - Ъгъл β в гради
-   * @returns {Object} Резултати от изчисленията
-   */
-  const calculateHansenTask = (xA, yA, xB, yB, alpha, beta) => {
-    // Validate input data
-    if (xA === xB && yA === yB) {
-      throw new Error('Точките A и B не могат да съвпадат');
-    }
-
-    // Gon to radians
-    const alphaRad = alpha * Math.PI / 200;
-    const betaRad = beta * Math.PI / 200;
-
-    // Distance A-B
-    const distanceAB = Math.sqrt((xB - xA) ** 2 + (yB - yA) ** 2);
-
-    // Line AB angle
-    const angleAB = Math.atan2(yB - yA, xB - xA);
-
-    // Trig functions
-    const sinAlpha = Math.sin(alphaRad);
-    const sinAlphaBeta = Math.sin(alphaRad + betaRad);
-
-    // Coefficient
-    const coefficient = sinAlpha / sinAlphaBeta;
-
-    // Coordinate differences
-    const deltaX = (xB - xA) * coefficient;
-    const deltaY = (yB - yA) * coefficient;
-
-    // Point P coordinates
-    const xP = xA + deltaX;
-    const yP = yA + deltaY;
-
-    // Verification - distances
-    const distanceAP = Math.sqrt((xP - xA) ** 2 + (yP - yA) ** 2);
-    const distanceBP = Math.sqrt((xP - xB) ** 2 + (yP - yB) ** 2);
-
-    return {
-      xA, yA, xB, yB, alpha, beta,
-      distanceAB,
-      angleAB,
-      sinAlpha: Math.round(sinAlpha * 1000000) / 1000000,
-      sinAlphaBeta: Math.round(sinAlphaBeta * 1000000) / 1000000,
-      coefficient: Math.round(coefficient * 1000000) / 1000000,
-      deltaX: Math.round(deltaX * 1000) / 1000,
-      deltaY: Math.round(deltaY * 1000) / 1000,
-      xP: Math.round(xP * 1000) / 1000,
-      yP: Math.round(yP * 1000) / 1000,
-      distanceAP: Math.round(distanceAP * 1000) / 1000,
-      distanceBP: Math.round(distanceBP * 1000) / 1000
-    };
   };
 
   const resetForm = () => {
@@ -277,6 +199,10 @@ Check - distance BP: ${result.distanceBP.toFixed(3)} m
                 {/* Form Card */}
                 <div className="self-stretch p-3 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex flex-col justify-center items-end gap-3 w-full min-w-0 overflow-hidden">
                   <div className="self-stretch justify-start text-black dark:text-white text-base font-semibold font-['Manrope']">Входни данни</div>
+                  <div className="self-stretch grid grid-cols-2 gap-2">
+                    <PointPicker language={language} label="A" onSelect={(p) => setForm((f) => ({ ...f, yA: String(p.y), xA: String(p.x) }))} />
+                    <PointPicker language={language} label="B" onSelect={(p) => setForm((f) => ({ ...f, yB: String(p.y), xB: String(p.x) }))} />
+                  </div>
                   <div className="self-stretch flex flex-col justify-start items-start gap-4 w-full">
                     {/* YA */}
                     <div className="self-stretch flex flex-col justify-start items-start gap-2 w-full">
@@ -524,6 +450,10 @@ Check - distance BP: ${result.distanceBP.toFixed(3)} m
               {/* Form Card */}
               <div className="flex-1 p-4 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 inline-flex flex-col justify-center items-end gap-4">
                 <div className="self-stretch justify-start text-black dark:text-white text-lg font-semibold font-['Manrope']">Входни данни</div>
+                <div className="self-stretch grid grid-cols-2 gap-2">
+                  <PointPicker language={language} label="A" onSelect={(p) => setForm((f) => ({ ...f, yA: String(p.y), xA: String(p.x) }))} />
+                  <PointPicker language={language} label="B" onSelect={(p) => setForm((f) => ({ ...f, yB: String(p.y), xB: String(p.x) }))} />
+                </div>
                 <div className="self-stretch flex flex-col justify-start items-start gap-4">
                   {/* YA */}
                   <div className="self-stretch flex flex-col justify-start items-start gap-2">

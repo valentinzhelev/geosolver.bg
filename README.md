@@ -31,22 +31,22 @@ GeoSolver is a full-stack web application that combines advanced geodetic algori
 ## Core Features
 
 ### Geodetic Calculations
-- Forward intersection (1st Geodetic Task)
-- Angular resection (Back Intersection)
-- Polar intersection methods
-- Hansen's problem solutions
-- Coordinate transformations
-- Area and distance calculations
-- Scientific calculator with geodetic functions
+- First / second basic task, forward & reverse intersections, polar, Hansen
+- Line intersection, orthogonal offset, segment division
+- Affine coordinate transforms + **BGS2005 CRS** (CCS2005 / UTM 34N–35N via proj4)
+- Area and distance/bearing tools
+
+### Survey workspace
+- Points library, map (plan / profile / OSM), project hub
+- GNSS import (CSV/GPX/RINEX header), NMEA live, field log (cloud)
+- Stake-out with CRS transform from WGS84
+- Firm workspaces (roles: viewer / editor / admin)
 
 ### User Experience
-- Responsive design optimized for desktop and mobile
-- Dark/light theme toggle
-- Real-time calculation validation
-- Step-by-step solution visualization
-- PDF export functionality
-- Calculation history and persistence
-- Multi-language support (Bulgarian/English)
+- Responsive design, dark/light theme, BG/EN
+- PWA install + offline shell caching
+- PDF / DXF / GeoJSON / ZIP exports
+- Developed and maintained by [Wortexa](https://wortexa.com/)
 
 ### Security & Authentication
 - JWT-based authentication system
