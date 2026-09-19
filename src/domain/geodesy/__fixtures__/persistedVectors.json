@@ -1,0 +1,388 @@
+{
+  "_about": "Golden persisted vectors for the port (Milestone 2.0B): input = exactly what the calculator saves as inputData; result = exactly what it saves as resultData (contract rounding applied). Rounded fields compare exactly; unrounded (decimals null) fields compare within 1e-9. second-basic-task and area-calculation vectors live in their own *.shipped.vectors.json. Offset vectors are engine v2 (LEFT); legacy v1 vectors: orthogonalOffset.v1.legacy.vectors.json. Hand-labelled vectors are independently verifiable; \"general\" ones are regression baselines only.",
+  "tools": {
+    "first-basic-task": {
+      "engineVersion": 1,
+      "vectors": [
+        {
+          "name": "hand: due +X 100 m",
+          "input": {
+            "y1": 100,
+            "x1": 200,
+            "alpha": 0,
+            "s": 100
+          },
+          "result": {
+            "y2": 100,
+            "x2": 300,
+            "deltaX": 100,
+            "deltaY": 0
+          }
+        },
+        {
+          "name": "hand: 3-4-5 (dX=60,dY=80)",
+          "input": {
+            "y1": 200,
+            "x1": 100,
+            "alpha": 59.03344706017331,
+            "s": 100
+          },
+          "result": {
+            "y2": 280,
+            "x2": 160,
+            "deltaX": 60,
+            "deltaY": 80
+          }
+        },
+        {
+          "name": "general",
+          "input": {
+            "y1": 1234.5,
+            "x1": 6789.25,
+            "alpha": 123.456,
+            "s": 250.125
+          },
+          "result": {
+            "y2": 1467.839,
+            "x2": 6699.163,
+            "deltaX": -90.087,
+            "deltaY": 233.339
+          }
+        }
+      ]
+    },
+    "forward-intersection": {
+      "engineVersion": 1,
+      "vectors": [
+        {
+          "name": "hand: isosceles A=(X0,Y0) B=(X0,Y100) 50/50 gon -> P=(50,50)",
+          "input": {
+            "yA": 0,
+            "xA": 0,
+            "yB": 100,
+            "xB": 0,
+            "beta1": 50,
+            "beta2": 50
+          },
+          "result": {
+            "xP": 50,
+            "yP": 50,
+            "sAP": 70.711,
+            "sBP": 70.711
+          }
+        },
+        {
+          "name": "general",
+          "input": {
+            "yA": 200,
+            "xA": 100,
+            "yB": 300,
+            "xB": 250,
+            "beta1": 61.5,
+            "beta2": 48.25
+          },
+          "result": {
+            "xP": 216.538,
+            "yP": 153.718,
+            "sAP": 125.391,
+            "sBP": 150.06
+          }
+        }
+      ]
+    },
+    "resection": {
+      "engineVersion": 2,
+      "vectors": [
+        {
+          "name": "well-conditioned interior station (50,35)",
+          "input": {
+            "xA": 0,
+            "yA": 0,
+            "xB": 100,
+            "yB": 0,
+            "xC": 50,
+            "yC": 80,
+            "beta1": 122.2399551143141,
+            "beta2": 138.88002244284294
+          },
+          "result": {
+            "xP": 50,
+            "yP": 35,
+            "method": "circle-intersection"
+          }
+        }
+      ]
+    },
+    "polar-intersection": {
+      "engineVersion": 1,
+      "vectors": [
+        {
+          "name": "hand: 3-4-5",
+          "input": {
+            "yA": 200,
+            "xA": 100,
+            "angle": 59.03344706017331,
+            "distance": 100
+          },
+          "result": {
+            "xP": 160,
+            "yP": 280
+          }
+        },
+        {
+          "name": "general",
+          "input": {
+            "yA": 800.25,
+            "xA": 500.5,
+            "angle": 271.125,
+            "distance": 500
+          },
+          "result": {
+            "xP": 281.412,
+            "yP": 350.805
+          }
+        }
+      ]
+    },
+    "coordinate-transformation": {
+      "engineVersion": 1,
+      "vectors": [
+        {
+          "name": "hand: translation (100,200)+(10,-5)",
+          "input": {
+            "x": 100,
+            "y": 200,
+            "transformationType": "translation",
+            "parameters": {
+              "dx": 10,
+              "dy": -5
+            }
+          },
+          "result": {
+            "xTransformed": 110,
+            "yTransformed": 195
+          }
+        },
+        {
+          "name": "hand: rotation (100,0) by 100 gon -> (0,100)",
+          "input": {
+            "x": 100,
+            "y": 0,
+            "transformationType": "rotation",
+            "parameters": {
+              "angle": 100
+            }
+          },
+          "result": {
+            "xTransformed": 0,
+            "yTransformed": 100
+          }
+        },
+        {
+          "name": "hand: scaling (100,200) x(2,0.5)",
+          "input": {
+            "x": 100,
+            "y": 200,
+            "transformationType": "scaling",
+            "parameters": {
+              "scaleX": 2,
+              "scaleY": 0.5
+            }
+          },
+          "result": {
+            "xTransformed": 200,
+            "yTransformed": 100
+          }
+        }
+      ]
+    },
+    "hansen-task": {
+      "engineVersion": 1,
+      "vectors": [
+        {
+          "name": "hand: isosceles 50/50 gon -> P=(50,50)",
+          "input": {
+            "yA": 0,
+            "xA": 0,
+            "yB": 100,
+            "xB": 0,
+            "alpha": 50,
+            "beta": 50
+          },
+          "result": {
+            "xP": 50.000000000000014,
+            "yP": 50.00000000000002
+          }
+        }
+      ]
+    },
+    "distance-bearing": {
+      "engineVersion": 1,
+      "vectors": [
+        {
+          "name": "hand: due +Y 100 m -> 100 gon",
+          "input": {
+            "y1": 0,
+            "x1": 0,
+            "y2": 100,
+            "x2": 0
+          },
+          "result": {
+            "distance": 100,
+            "bearingGon": 100
+          }
+        },
+        {
+          "name": "hand: 3-4-5",
+          "input": {
+            "y1": 200,
+            "x1": 100,
+            "y2": 280,
+            "x2": 160
+          },
+          "result": {
+            "distance": 100,
+            "bearingGon": 59.03
+          }
+        },
+        {
+          "name": "general",
+          "input": {
+            "y1": 340.25,
+            "x1": 120.5,
+            "y2": 88.125,
+            "x2": 410.75
+          },
+          "result": {
+            "distance": 384.463,
+            "bearingGon": 354.47
+          }
+        }
+      ]
+    },
+    "line-intersection": {
+      "engineVersion": 1,
+      "vectors": [
+        {
+          "name": "hand: orthogonal crossing at (50,0)",
+          "input": {
+            "y1": 0,
+            "x1": 0,
+            "y2": 0,
+            "x2": 100,
+            "y3": -50,
+            "x3": 50,
+            "y4": 50,
+            "x4": 50
+          },
+          "result": {
+            "yI": 0,
+            "xI": 50
+          }
+        },
+        {
+          "name": "hand: (2.4, 3.8)",
+          "input": {
+            "y1": 1,
+            "x1": 1,
+            "y2": 7,
+            "x2": 4,
+            "y3": 5,
+            "x3": 0,
+            "y4": 2,
+            "x4": 6
+          },
+          "result": {
+            "yI": 3.8,
+            "xI": 2.4
+          }
+        }
+      ]
+    },
+    "offset-point": {
+      "engineVersion": 2,
+      "vectors": [
+        {
+          "name": "v2 hand: north axis d=+10 -> Y=-10 (LEFT)",
+          "input": {
+            "yA": 0,
+            "xA": 0,
+            "yB": 0,
+            "xB": 100,
+            "s": 50,
+            "d": 10
+          },
+          "result": {
+            "yP": -10,
+            "xP": 50
+          }
+        },
+        {
+          "name": "v2 hand: east axis d=+10 -> X=+10 (LEFT)",
+          "input": {
+            "yA": 0,
+            "xA": 0,
+            "yB": 100,
+            "xB": 0,
+            "s": 50,
+            "d": 10
+          },
+          "result": {
+            "yP": 50,
+            "xP": 10
+          }
+        },
+        {
+          "name": "v2 hand: diagonal d=-10 (RIGHT)",
+          "input": {
+            "yA": 0,
+            "xA": 0,
+            "yB": 100,
+            "xB": 100,
+            "s": 70.71067811865476,
+            "d": -10
+          },
+          "result": {
+            "yP": 57.071067811865476,
+            "xP": 42.928932188134524
+          }
+        }
+      ]
+    },
+    "segment-division": {
+      "engineVersion": 1,
+      "vectors": [
+        {
+          "name": "hand: distance mode midpoint",
+          "input": {
+            "yA": 0,
+            "xA": 0,
+            "yB": 0,
+            "xB": 100,
+            "value": 50,
+            "mode": "distance"
+          },
+          "result": {
+            "yP": 0,
+            "xP": 50
+          }
+        },
+        {
+          "name": "hand: ratio mode 0.25 of 3-4-5",
+          "input": {
+            "yA": 0,
+            "xA": 0,
+            "yB": 40,
+            "xB": 30,
+            "value": 0.25,
+            "mode": "ratio"
+          },
+          "result": {
+            "yP": 10,
+            "xP": 7.5
+          }
+        }
+      ]
+    }
+  }
+}

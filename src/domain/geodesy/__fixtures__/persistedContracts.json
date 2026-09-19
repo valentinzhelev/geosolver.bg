@@ -1,0 +1,415 @@
+{
+  "_about": "Persisted-result CONTRACT of the 12 professional tools as SHIPPED (Milestone 2.0B baseline for the future canonical backend port). persistedInput = the exact key set the calculator saves as Calculation.inputData (all finite Numbers, plus enums/objects where noted). persistedResult = the exact Calculation.resultData keys, with `decimals` = the rounding the shipped UI applies BEFORE saving (null = full floating-point precision, not rounded). `argOrder` records the domain function's positional argument order, which differs between tools (Y-first vs X-first) and must not be 'normalized' during a port. persistedContracts.test.js verifies these declarations against the actual component sources so a silent change to rounding or to the saved key set fails a test.",
+  "tools": {
+    "first-basic-task": {
+      "engineVersion": 1,
+      "component": "FirstTask.js",
+      "roundingSource": "component",
+      "argOrder": [
+        "y1",
+        "x1",
+        "alpha",
+        "s"
+      ],
+      "persistedInput": [
+        "y1",
+        "x1",
+        "alpha",
+        "s"
+      ],
+      "persistedResult": [
+        [
+          "y2",
+          3
+        ],
+        [
+          "x2",
+          3
+        ],
+        [
+          "deltaX",
+          3
+        ],
+        [
+          "deltaY",
+          3
+        ]
+      ],
+      "legacyVersions": [
+        1
+      ]
+    },
+    "second-basic-task": {
+      "engineVersion": 1,
+      "component": "SecondTask.js",
+      "roundingSource": "shipped-module",
+      "argOrder": [
+        "x1",
+        "y1",
+        "x2",
+        "y2"
+      ],
+      "persistedInput": [
+        "x1",
+        "y1",
+        "x2",
+        "y2"
+      ],
+      "persistedResult": [
+        [
+          "alpha",
+          3
+        ],
+        [
+          "distance",
+          3
+        ],
+        [
+          "deltaX",
+          3
+        ],
+        [
+          "deltaY",
+          3
+        ]
+      ],
+      "legacyVersions": [
+        1
+      ]
+    },
+    "forward-intersection": {
+      "engineVersion": 1,
+      "component": "ForwardIntersection.js",
+      "roundingSource": "component",
+      "argOrder": [
+        "yA",
+        "xA",
+        "yB",
+        "xB",
+        "beta1",
+        "beta2"
+      ],
+      "persistedInput": [
+        "yA",
+        "xA",
+        "yB",
+        "xB",
+        "beta1",
+        "beta2"
+      ],
+      "persistedResult": [
+        [
+          "xP",
+          3
+        ],
+        [
+          "yP",
+          3
+        ],
+        [
+          "sAP",
+          3
+        ],
+        [
+          "sBP",
+          3
+        ]
+      ],
+      "legacyVersions": [
+        1
+      ]
+    },
+    "resection": {
+      "engineVersion": 2,
+      "component": "Resection.js",
+      "roundingSource": "component",
+      "argOrder": [
+        "points{xA,yA,xB,yB,xC,yC}",
+        "angles{beta1,beta2}"
+      ],
+      "persistedInput": [
+        "xA",
+        "yA",
+        "xB",
+        "yB",
+        "xC",
+        "yC",
+        "beta1",
+        "beta2"
+      ],
+      "persistedResult": [
+        [
+          "xP",
+          3
+        ],
+        [
+          "yP",
+          3
+        ],
+        [
+          "method",
+          "string"
+        ]
+      ],
+      "legacyVersions": [
+        1,
+        2
+      ],
+      "legacyNote": "v1 = historical unsigned/complement-search solver (frozen in resection.v1.js, resection.v1.legacy.vectors.json); v2 = directed clockwise angles, deterministic circle intersection. method label changed from Tienstra to circle-intersection."
+    },
+    "polar-intersection": {
+      "engineVersion": 1,
+      "component": "PolarIntersection.js",
+      "roundingSource": "component",
+      "argOrder": [
+        "xA",
+        "yA",
+        "angle",
+        "distance"
+      ],
+      "persistedInput": [
+        "yA",
+        "xA",
+        "angle",
+        "distance"
+      ],
+      "persistedResult": [
+        [
+          "xP",
+          3
+        ],
+        [
+          "yP",
+          3
+        ]
+      ],
+      "legacyVersions": [
+        1
+      ]
+    },
+    "coordinate-transformation": {
+      "engineVersion": 1,
+      "component": "CoordinateTransformation.js",
+      "roundingSource": "component",
+      "argOrder": [
+        "x",
+        "y",
+        "transformationType",
+        "parameters"
+      ],
+      "persistedInput": [
+        "x",
+        "y",
+        "transformationType",
+        "parameters"
+      ],
+      "persistedResult": [
+        [
+          "xTransformed",
+          3
+        ],
+        [
+          "yTransformed",
+          3
+        ]
+      ],
+      "legacyVersions": [
+        1
+      ]
+    },
+    "hansen-task": {
+      "engineVersion": 1,
+      "component": "HansenTask.js",
+      "roundingSource": "none",
+      "argOrder": [
+        "xA",
+        "yA",
+        "xB",
+        "yB",
+        "alpha",
+        "beta"
+      ],
+      "persistedInput": [
+        "yA",
+        "xA",
+        "yB",
+        "xB",
+        "alpha",
+        "beta"
+      ],
+      "persistedResult": [
+        [
+          "xP",
+          null
+        ],
+        [
+          "yP",
+          null
+        ]
+      ],
+      "legacyVersions": [
+        1
+      ]
+    },
+    "area-calculation": {
+      "engineVersion": 1,
+      "component": "AreaCalculation.js",
+      "roundingSource": "none",
+      "argOrder": [
+        "points[{x,y}]",
+        "method"
+      ],
+      "persistedInput": [
+        "points",
+        "method"
+      ],
+      "persistedResult": [
+        [
+          "area",
+          null
+        ]
+      ],
+      "legacyVersions": [
+        1
+      ]
+    },
+    "distance-bearing": {
+      "engineVersion": 1,
+      "component": "DistanceBearing.js",
+      "roundingSource": "component",
+      "argOrder": [
+        "x1",
+        "y1",
+        "x2",
+        "y2"
+      ],
+      "persistedInput": [
+        "y1",
+        "x1",
+        "y2",
+        "x2"
+      ],
+      "persistedResult": [
+        [
+          "distance",
+          3
+        ],
+        [
+          "bearingGon",
+          2
+        ]
+      ],
+      "legacyVersions": [
+        1
+      ]
+    },
+    "line-intersection": {
+      "engineVersion": 1,
+      "component": "LineIntersection.js",
+      "roundingSource": "none",
+      "argOrder": [
+        "x1",
+        "y1",
+        "x2",
+        "y2",
+        "x3",
+        "y3",
+        "x4",
+        "y4"
+      ],
+      "persistedInput": [
+        "y1",
+        "x1",
+        "y2",
+        "x2",
+        "y3",
+        "x3",
+        "y4",
+        "x4"
+      ],
+      "persistedResult": [
+        [
+          "yI",
+          null
+        ],
+        [
+          "xI",
+          null
+        ]
+      ],
+      "legacyVersions": [
+        1
+      ]
+    },
+    "offset-point": {
+      "engineVersion": 2,
+      "component": "OffsetPoint.js",
+      "roundingSource": "none",
+      "argOrder": [
+        "yA",
+        "xA",
+        "yB",
+        "xB",
+        "s",
+        "d"
+      ],
+      "persistedInput": [
+        "yA",
+        "xA",
+        "yB",
+        "xB",
+        "s",
+        "d"
+      ],
+      "persistedResult": [
+        [
+          "yP",
+          null
+        ],
+        [
+          "xP",
+          null
+        ]
+      ],
+      "legacyVersions": [
+        1,
+        2
+      ],
+      "legacyNote": "v1 = historical RIGHT-side behavior (orthogonalOffset.v1.legacy.vectors.json); v2 = LEFT per product convention."
+    },
+    "segment-division": {
+      "engineVersion": 1,
+      "component": "SegmentDivision.js",
+      "roundingSource": "none",
+      "argOrder": [
+        "yA",
+        "xA",
+        "yB",
+        "xB",
+        "value",
+        "mode"
+      ],
+      "persistedInput": [
+        "yA",
+        "xA",
+        "yB",
+        "xB",
+        "value",
+        "mode"
+      ],
+      "persistedResult": [
+        [
+          "yP",
+          null
+        ],
+        [
+          "xP",
+          null
+        ]
+      ],
+      "legacyVersions": [
+        1
+      ]
+    }
+  }
+}
