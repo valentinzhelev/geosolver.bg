@@ -2,6 +2,10 @@
  * Ортогонален offset от отсечка A→B.
  * s — разстояние по отсечката от A (m)
  * d — перпендикулярен отстъп (m), положителен = наляво от A→B
+ *     (наляво при гледане от A към B; X = север, Y = изток)
+ *
+ * engineVersion 2 (Milestone 2.0B): positive d = LEFT. Engine v1 placed positive d
+ * on the right; those results are historical and are NOT rewritten.
  */
 
 export function calculateOrthogonalOffset(yA, xA, yB, xB, s, d) {
@@ -22,8 +26,12 @@ export function calculateOrthogonalOffset(yA, xA, yB, xB, s, d) {
 
   const uy = dy / len;
   const ux = dx / len;
-  const nx = -uy;
-  const ny = ux;
+  // Engine v2: LEFT of A→B in the geodetic frame (X = north, Y = east, bearings
+  // clockwise from X) is bearing (α − 100 gon), i.e. (cos, sin) = (uy, −ux).
+  // Engine v1 (historical, shipped before Milestone 2.0B) used (−uy, ux), which
+  // is the RIGHT side in this frame; see __fixtures__/orthogonalOffset.v1.legacy.vectors.json.
+  const nx = uy;
+  const ny = -ux;
 
   const yOn = yA + s * uy;
   const xOn = xA + s * ux;

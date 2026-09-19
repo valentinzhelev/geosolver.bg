@@ -1,0 +1,170 @@
+{
+  "_about": "LEGACY offset-point engine v1 — the SHIPPED behavior before Milestone 2.0B: positive d lands on the RIGHT of A->B in the X-north/Y-east frame (perpendicular (-uy, ux)). These are HISTORICAL results and must stay reproducible: rows stamped/created with offset-point engineVersion 1 (and any earlier unversioned rows) contain this behavior, and legacy Save-as-point recompute must verify them against v1, not v2. Values are full-precision (offset results were never rounded). Generated from the unmodified shipped function; NOT proof of correctness — v1 is known to contradict the documented convention.",
+  "toolName": "offset-point",
+  "engineVersion": 1,
+  "convention": "positive d = RIGHT of A->B (mirrored vs documentation)",
+  "persistedInput": [
+    "yA",
+    "xA",
+    "yB",
+    "xB",
+    "s",
+    "d"
+  ],
+  "persistedResult": [
+    "yP",
+    "xP"
+  ],
+  "vectors": [
+    {
+      "name": "north axis, d=+10",
+      "input": {
+        "xA": 0,
+        "yA": 0,
+        "xB": 100,
+        "yB": 0,
+        "s": 50,
+        "d": 10
+      },
+      "result": {
+        "xP": 50,
+        "yP": 10
+      }
+    },
+    {
+      "name": "north axis, d=-10",
+      "input": {
+        "xA": 0,
+        "yA": 0,
+        "xB": 100,
+        "yB": 0,
+        "s": 50,
+        "d": -10
+      },
+      "result": {
+        "xP": 50,
+        "yP": -10
+      }
+    },
+    {
+      "name": "east axis, d=+10",
+      "input": {
+        "xA": 0,
+        "yA": 0,
+        "xB": 0,
+        "yB": 100,
+        "s": 50,
+        "d": 10
+      },
+      "result": {
+        "xP": -10,
+        "yP": 50
+      }
+    },
+    {
+      "name": "east axis, d=-10",
+      "input": {
+        "xA": 0,
+        "yA": 0,
+        "xB": 0,
+        "yB": 100,
+        "s": 50,
+        "d": -10
+      },
+      "result": {
+        "xP": 10,
+        "yP": 50
+      }
+    },
+    {
+      "name": "diagonal 50 gon, d=+10",
+      "input": {
+        "xA": 0,
+        "yA": 0,
+        "xB": 100,
+        "yB": 100,
+        "s": 70.71067811865476,
+        "d": 10
+      },
+      "result": {
+        "xP": 42.928932188134524,
+        "yP": 57.071067811865476
+      }
+    },
+    {
+      "name": "diagonal 50 gon, d=-10",
+      "input": {
+        "xA": 0,
+        "yA": 0,
+        "xB": 100,
+        "yB": 100,
+        "s": 70.71067811865476,
+        "d": -10
+      },
+      "result": {
+        "xP": 57.071067811865476,
+        "yP": 42.928932188134524
+      }
+    },
+    {
+      "name": "d=0 on the segment",
+      "input": {
+        "xA": 0,
+        "yA": 0,
+        "xB": 100,
+        "yB": 100,
+        "s": 70.71067811865476,
+        "d": 0
+      },
+      "result": {
+        "xP": 50,
+        "yP": 50
+      }
+    },
+    {
+      "name": "s=0, d=+10",
+      "input": {
+        "xA": 0,
+        "yA": 0,
+        "xB": 100,
+        "yB": 0,
+        "s": 0,
+        "d": 10
+      },
+      "result": {
+        "xP": 0,
+        "yP": 10
+      }
+    },
+    {
+      "name": "s=len, d=+10",
+      "input": {
+        "xA": 0,
+        "yA": 0,
+        "xB": 100,
+        "yB": 0,
+        "s": 100,
+        "d": 10
+      },
+      "result": {
+        "xP": 100,
+        "yP": 10
+      }
+    },
+    {
+      "name": "general, d=+13.25",
+      "input": {
+        "xA": 12.5,
+        "yA": -40,
+        "xB": 88,
+        "yB": 61,
+        "s": 40,
+        "d": 13.25
+      },
+      "result": {
+        "xP": 25.836620814878334,
+        "yP": -0.028797300554565197
+      }
+    }
+  ]
+}
