@@ -17,6 +17,7 @@ import { inputDataToFormStrings } from '../../utils/calculationRestore';
 import { useEduAssignmentBridge } from '../../hooks/useEduAssignmentBridge';
 import EduWorkBanner from '../classroom/ui/EduWorkBanner';
 import PointPicker from './PointPicker';
+import { buildForwardIntersectionInput } from '../../utils/forwardIntersectionInput';
 
 // LocalStorage helpers
 const getHistory = () => {
@@ -135,19 +136,20 @@ const ForwardIntersection = () => {
       return;
     }
     const { yA, xA, yB, xB, beta1, beta2 } = form;
+    const input = buildForwardIntersectionInput(form);
     const results = await runWithTracking({
       toolName: 'forward-intersection',
       toolDisplayName: { bg: 'Права засечка', en: 'Forward Intersection' },
-      inputData: { yA, xA, yB, xB, beta1, beta2 },
+      inputData: input,
       getResultData: (r) => ({ xP: r.xP, yP: r.yP, sAP: r.sAP, sBP: r.sBP }),
       run: () =>
         calculateForwardIntersection(
-          Number(yA),
-          Number(xA),
-          Number(yB),
-          Number(xB),
-          Number(beta1),
-          Number(beta2)
+          input.yA,
+          input.xA,
+          input.yB,
+          input.xB,
+          input.beta1,
+          input.beta2
         ),
       pointReferences: getPointReferences(),
     });
