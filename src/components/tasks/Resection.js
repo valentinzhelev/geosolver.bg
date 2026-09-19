@@ -18,6 +18,31 @@ import { calculateResection as calculateResectionDomain } from '../../domain/geo
 import { roundTo } from '../../domain/math';
 import PointPicker from './PointPicker';
 
+// Resection v2 contract: beta1/beta2 are DIRECTED CLOCKWISE angles at the station P.
+const ANGLE_TEXT = {
+  bg: {
+    beta1Label: 'Ъгъл β₁ (гради, по часовниковата стрелка)',
+    beta1Help: 'Насочен ъгъл по часовниковата стрелка от P→A към P→B',
+    beta1Placeholder: 'Въведете β₁ (0–400 гради)',
+    beta2Label: 'Ъгъл β₂ (гради, по часовниковата стрелка)',
+    beta2Help: 'Насочен ъгъл по часовниковата стрелка от P→B към P→C',
+    beta2Placeholder: 'Въведете β₂ (0–400 гради)',
+    method: 'Пресичане на окръжности (насочени ъгли)',
+    details: 'Обратна засечка по насочени ъгли (по часовниковата стрелка): P е втората пресечна точка на две окръжности — през A и B при β₁ и през B и C при β₂.',
+  },
+  en: {
+    beta1Label: 'Angle β₁ (gon, clockwise)',
+    beta1Help: 'Directed clockwise angle from ray P→A to ray P→B',
+    beta1Placeholder: 'Enter β₁ (0–400 gon)',
+    beta2Label: 'Angle β₂ (gon, clockwise)',
+    beta2Help: 'Directed clockwise angle from ray P→B to ray P→C',
+    beta2Placeholder: 'Enter β₂ (0–400 gon)',
+    method: 'Circle intersection (directed angles)',
+    details: 'Resection from directed clockwise angles: P is the second intersection of two circles — through A and B for β₁, and through B and C for β₂.',
+  },
+};
+
+
 // LocalStorage helpers
 const getHistory = () => {
   try {
@@ -49,6 +74,7 @@ function calculateResection(points, angles) {
 
 const Resection = () => {
   const { t, language } = useTranslation();
+  const angleText = ANGLE_TEXT[language === 'bg' ? 'bg' : 'en'];
   const [form, setForm] = useState({
     xA: '',
     yA: '',
@@ -119,7 +145,7 @@ const Resection = () => {
 
       const output = language === 'bg'
         ? `--------- Обратна засечка (Resection) ---------
-Метод: ${result.method}
+Метод: ${angleText.method}
 Входни данни: 3 точки, 2 ъгъла
 
 --------- Координати на известни точки ---------
@@ -127,9 +153,9 @@ const Resection = () => {
 Точка B: (${points.xB}, ${points.yB})
 Точка C: (${points.xC}, ${points.yC})
 
---------- Измерени ъгли ---------
-β₁ (A-P-B): ${angles.beta1} гради
-β₂ (B-P-C): ${angles.beta2} гради
+--------- Въведени насочени ъгли (по часовниковата стрелка) ---------
+β₁ (P→A към P→B): ${angles.beta1} гради
+β₂ (P→B към P→C): ${angles.beta2} гради
 
 --------- Резултати ---------
 Координати на точка P: (${result.xP}, ${result.yP})
@@ -150,7 +176,7 @@ ${result.calculationDetails}
 
 Дата: ${new Date().toLocaleString('bg-BG')}`
         : `--------- Resection ---------
-Method: ${result.method}
+Method: ${angleText.method}
 Input data: 3 points, 2 angles
 
 --------- Known Point Coordinates ---------
@@ -158,9 +184,9 @@ Point A: (${points.xA}, ${points.yA})
 Point B: (${points.xB}, ${points.yB})
 Point C: (${points.xC}, ${points.yC})
 
---------- Measured Angles ---------
-β₁ (A-P-B): ${angles.beta1} grads
-β₂ (B-P-C): ${angles.beta2} grads
+--------- Entered Directed Angles (clockwise) ---------
+β₁ (P→A to P→B): ${angles.beta1} grads
+β₂ (P→B to P→C): ${angles.beta2} grads
 
 --------- Results ---------
 Point P coordinates: (${result.xP}, ${result.yP})
@@ -177,7 +203,7 @@ Error β₁: ${result.error1} grads
 Error β₂: ${result.error2} grads
 
 --------- Calculation Details ---------
-${result.calculationDetails}
+${angleText.details}
 
 Date: ${new Date().toLocaleString('en-US')}`;
 
@@ -330,7 +356,8 @@ Date: ${new Date().toLocaleString('en-US')}`;
                     </div>
                     {/* Beta 1 */}
                     <div className="self-stretch flex flex-col justify-start items-start gap-2 w-full">
-                      <div className="justify-start text-black dark:text-white text-xs font-medium font-['Manrope']">Ъгъл β₁ (в гради)</div>
+                      <div className="justify-start text-black dark:text-white text-xs font-medium font-['Manrope']">{angleText.beta1Label}</div>
+                    <div className="text-neutral-500 dark:text-zinc-400 text-xs font-['Manrope']">{angleText.beta1Help}</div>
                       <input
                         type="number"
                         id="beta1"
@@ -338,12 +365,13 @@ Date: ${new Date().toLocaleString('en-US')}`;
                         onChange={handleChange}
                         step="any"
                         className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-600 bg-white dark:bg-zinc-800 text-black dark:text-zinc-100 placeholder:text-neutral-400 dark:placeholder:text-zinc-500 text-xs font-medium font-['Manrope']"
-                        placeholder="Въведете ъгъл β₁"
+                        placeholder={angleText.beta1Placeholder}
                       />
                     </div>
                     {/* Beta 2 */}
                     <div className="self-stretch flex flex-col justify-start items-start gap-2 w-full">
-                      <div className="justify-start text-black dark:text-white text-xs font-medium font-['Manrope']">Ъгъл β₂ (в гради)</div>
+                      <div className="justify-start text-black dark:text-white text-xs font-medium font-['Manrope']">{angleText.beta2Label}</div>
+                    <div className="text-neutral-500 dark:text-zinc-400 text-xs font-['Manrope']">{angleText.beta2Help}</div>
                       <input
                         type="number"
                         id="beta2"
@@ -351,7 +379,7 @@ Date: ${new Date().toLocaleString('en-US')}`;
                         onChange={handleChange}
                         step="any"
                         className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-600 bg-white dark:bg-zinc-800 text-black dark:text-zinc-100 placeholder:text-neutral-400 dark:placeholder:text-zinc-500 text-xs font-medium font-['Manrope']"
-                        placeholder="Въведете ъгъл β₂"
+                        placeholder={angleText.beta2Placeholder}
                       />
                     </div>
                   </div>
@@ -595,7 +623,8 @@ Date: ${new Date().toLocaleString('en-US')}`;
                   </div>
                   {/* Beta 1 */}
                   <div className="self-stretch flex flex-col justify-start items-start gap-2">
-                    <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">Ъгъл β₁ (в гради)</div>
+                    <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{angleText.beta1Label}</div>
+                    <div className="text-neutral-500 dark:text-zinc-400 text-xs font-['Manrope']">{angleText.beta1Help}</div>
                     <input
                       type="number"
                       id="beta1"
@@ -603,12 +632,13 @@ Date: ${new Date().toLocaleString('en-US')}`;
                       onChange={handleChange}
                       step="any"
                       className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-600 bg-white dark:bg-zinc-800 text-black dark:text-zinc-100 placeholder:text-neutral-400 dark:placeholder:text-zinc-500 text-sm font-medium font-['Manrope']"
-                      placeholder="Въведете ъгъл β₁"
+                      placeholder={angleText.beta1Placeholder}
                     />
                   </div>
                   {/* Beta 2 */}
                   <div className="self-stretch flex flex-col justify-start items-start gap-2">
-                    <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">Ъгъл β₂ (в гради)</div>
+                    <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">{angleText.beta2Label}</div>
+                    <div className="text-neutral-500 dark:text-zinc-400 text-xs font-['Manrope']">{angleText.beta2Help}</div>
                     <input
                       type="number"
                       id="beta2"
@@ -616,7 +646,7 @@ Date: ${new Date().toLocaleString('en-US')}`;
                       onChange={handleChange}
                       step="any"
                       className="self-stretch p-3 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-600 bg-white dark:bg-zinc-800 text-black dark:text-zinc-100 placeholder:text-neutral-400 dark:placeholder:text-zinc-500 text-sm font-medium font-['Manrope']"
-                      placeholder="Въведете ъгъл β₂"
+                      placeholder={angleText.beta2Placeholder}
                     />
                   </div>
                 </div>

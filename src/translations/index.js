@@ -43,11 +43,11 @@ export const translations = {
     forwardIntersectionKeywords:
       'геодезия, права засечка, триангулация, координати, геодезически калкулатор',
     resectionDescription:
-      'Обратна засечка — определяне на позиция по ъгли от три известни точки с онлайн калкулатор.',
+      'Обратна засечка — определяне на позиция по насочени ъгли (по часовниковата стрелка) от три известни точки с онлайн калкулатор.',
     resectionKeywords:
-      'геодезия, обратна засечка, Hansen, координати, геодезически калкулатор',
+      'геодезия, обратна засечка, насочени ъгли, координати, геодезически калкулатор',
     resectionDefaultResultText:
-      'Въведете координатите на трите точки и двата ъгъла, след което натиснете „Изчисли“.',
+      'Въведете координатите на трите точки и двата насочени ъгъла (по часовниковата стрелка), след което натиснете „Изчисли“.',
     fillAllFields: 'Моля, попълнете всички полета.',
     enterX1Short: 'Въведете X₁',
     enterY1Short: 'Въведете Y₁',
@@ -66,9 +66,9 @@ export const translations = {
     docsForwardIntersectionSeoKeywords:
       'права засечка, документация, триангулация, геодезия, GeoSolver',
     docsResectionSeoDescription:
-      'Документация за обратна засечка: три контролни точки, ъгли в станция P, метод на Хансен и контрол на ъглите.',
+      'Документация за обратна засечка: три контролни точки, насочени ъгли по часовниковата стрелка в станция P, проверка на ъглите и условия за устойчивост.',
     docsResectionSeoKeywords:
-      'обратна засечка, документация, Hansen, триангулация, геодезия, GeoSolver',
+      'обратна засечка, документация, насочени ъгли, опасна окръжност, геодезия, GeoSolver',
     inputData: 'Входни данни',
     results: 'Резултати',
     y1Coordinate: 'Y₁ (координата)',
@@ -719,11 +719,11 @@ export const translations = {
     forwardIntersectionKeywords:
       'geodesy, forward intersection, triangulation, coordinates, geodetic calculator',
     resectionDescription:
-      'Resection — determine station position from angles at three known points.',
+      'Resection — determine station position from directed clockwise angles at three known points.',
     resectionKeywords:
-      'geodesy, resection, Hansen, coordinates, geodetic calculator',
+      'geodesy, resection, directed angles, coordinates, geodetic calculator',
     resectionDefaultResultText:
-      'Enter the coordinates of the three points and two angles, then click "Calculate".',
+      'Enter the coordinates of the three points and the two directed clockwise angles, then click "Calculate".',
     fillAllFields: 'Please fill in all fields.',
     enterX1Short: 'Enter X₁',
     enterY1Short: 'Enter Y₁',
@@ -742,9 +742,9 @@ export const translations = {
     docsForwardIntersectionSeoKeywords:
       'forward intersection, documentation, triangulation, geodesy, GeoSolver',
     docsResectionSeoDescription:
-      'Documentation for resection: three control points, angles at station P, Hansen method, and angle verification.',
+      'Documentation for resection: three control points, directed clockwise angles at station P, angle verification, and stability conditions.',
     docsResectionSeoKeywords:
-      'resection, documentation, Hansen, triangulation, geodesy, GeoSolver',
+      'resection, documentation, directed angles, danger circle, geodesy, GeoSolver',
     inputData: 'Input Data',
     results: 'Results',
     y1Coordinate: 'Y₁ (coordinate)',

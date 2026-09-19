@@ -1,0 +1,647 @@
+{
+  "_about": "HISTORICAL resection engine v1 (Tienstra + 4-way angle/complement candidate search), frozen BEFORE any v2 decision from the UNMODIFIED shipped domain/geodesy/resection.js on Node 22. HISTORICAL BEHAVIOR, NOT CORRECTNESS EVIDENCE. category=deterministic: exactly one station is consistent with the entered pair under v1 rules, so the value is stable; noiseDependent=true: several exact stations tie at ~1e-14 residual and v1 picks one by floating-point noise / candidate order — those values are recorded for information and must be compared by geometric consistency, never by identity. trueDirectedStation = the unique station under directed-clockwise semantics (independent circle-intersection oracle). Persisted rounding for resection: xP,yP 3 dp + method string.",
+  "engineVersion": 1,
+  "controlPoints": {
+    "xA": 0,
+    "yA": 0,
+    "xB": 100,
+    "yB": 0,
+    "xC": 50,
+    "yC": 80
+  },
+  "vectors": [
+    {
+      "name": "station (50, 35)",
+      "category": "deterministic",
+      "noiseDependent": false,
+      "input": {
+        "xA": 0,
+        "yA": 0,
+        "xB": 100,
+        "yB": 0,
+        "xC": 50,
+        "yC": 80,
+        "beta1": 122.2399551143141,
+        "beta2": 138.88002244284294
+      },
+      "trueDirectedStation": {
+        "xP": 50,
+        "yP": 34.999999999999986
+      },
+      "candidateStationCount": 1,
+      "v1": {
+        "ok": true,
+        "xP": 50,
+        "yP": 34.999999999999986,
+        "calcBeta1": 122.2399551143141,
+        "calcBeta2": 138.88002244284294,
+        "error1": 0,
+        "error2": 0,
+        "distAP": 61.03277807866851,
+        "distBP": 61.03277807866851,
+        "distCP": 45.000000000000014,
+        "method": "Tienstra"
+      }
+    },
+    {
+      "name": "station (40.5, 30.25)",
+      "category": "deterministic",
+      "noiseDependent": false,
+      "input": {
+        "xA": 0,
+        "yA": 0,
+        "xB": 100,
+        "yB": 0,
+        "xC": 50,
+        "yC": 80,
+        "beta1": 129.2161224669133,
+        "beta2": 117.93131159355798
+      },
+      "trueDirectedStation": {
+        "xP": 40.5,
+        "yP": 30.249999999999986
+      },
+      "candidateStationCount": 1,
+      "v1": {
+        "ok": true,
+        "xP": 40.50000000000002,
+        "yP": 30.250000000000004,
+        "calcBeta1": 129.2161224669133,
+        "calcBeta2": 117.93131159355802,
+        "error1": 0,
+        "error2": 4.263256414560601e-14,
+        "distAP": 50.55009891187159,
+        "distBP": 66.74812731455465,
+        "distCP": 50.648914104845325,
+        "method": "Tienstra"
+      }
+    },
+    {
+      "name": "station (60.125, 30)",
+      "category": "deterministic",
+      "noiseDependent": false,
+      "input": {
+        "xA": 0,
+        "yA": 0,
+        "xB": 100,
+        "yB": 0,
+        "xC": 50,
+        "yC": 80,
+        "beta1": 129.47400263079922,
+        "beta2": 153.7817886063949
+      },
+      "trueDirectedStation": {
+        "xP": 60.125,
+        "yP": 30.000000000000036
+      },
+      "candidateStationCount": 1,
+      "v1": {
+        "ok": true,
+        "xP": 60.12500000000001,
+        "yP": 30,
+        "calcBeta1": 129.47400263079922,
+        "calcBeta2": 153.78178860639494,
+        "error1": 0,
+        "error2": 2.842170943040401e-14,
+        "distAP": 67.1938659774834,
+        "distBP": 49.90005636269362,
+        "distCP": 51.01485690463122,
+        "method": "Tienstra"
+      }
+    },
+    {
+      "name": "station (45.75, 20.5)",
+      "category": "deterministic",
+      "noiseDependent": false,
+      "input": {
+        "xA": 0,
+        "yA": 0,
+        "xB": 100,
+        "yB": 0,
+        "xC": 50,
+        "yC": 80,
+        "beta1": 150.18095912080616,
+        "beta2": 118.46107604952974
+      },
+      "trueDirectedStation": {
+        "xP": 45.75,
+        "yP": 20.5
+      },
+      "candidateStationCount": 1,
+      "v1": {
+        "ok": true,
+        "xP": 45.74999999999998,
+        "yP": 20.500000000000018,
+        "calcBeta1": 150.18095912080614,
+        "calcBeta2": 118.46107604952974,
+        "error1": 2.842170943040401e-14,
+        "error2": 0,
+        "distAP": 50.1329482476345,
+        "distBP": 57.994072973020295,
+        "distCP": 59.651592602377335,
+        "method": "Tienstra"
+      }
+    },
+    {
+      "name": "station (55, 60.25)",
+      "category": "ambiguous-but-returned-directed-station",
+      "noiseDependent": true,
+      "input": {
+        "xA": 0,
+        "yA": 0,
+        "xB": 100,
+        "yB": 0,
+        "xC": 50,
+        "yC": 80,
+        "beta1": 87.94156790776283,
+        "beta2": 174.94572790509477
+      },
+      "trueDirectedStation": {
+        "xP": 54.99999999999997,
+        "yP": 60.25
+      },
+      "candidateStationCount": 2,
+      "v1": {
+        "ok": true,
+        "xP": 54.999999999999986,
+        "yP": 60.25000000000003,
+        "calcBeta1": 87.94156790776285,
+        "calcBeta2": 174.94572790509477,
+        "error1": 1.4210854715202004e-14,
+        "error2": 0,
+        "distAP": 81.5785664252566,
+        "distBP": 75.20014960091505,
+        "distCP": 20.373082731879304,
+        "method": "Tienstra"
+      }
+    },
+    {
+      "name": "station (37.5, 22.25)",
+      "category": "deterministic",
+      "noiseDependent": false,
+      "input": {
+        "xA": 0,
+        "yA": 0,
+        "xB": 100,
+        "yB": 0,
+        "xC": 50,
+        "yC": 80,
+        "beta1": 144.1357798501711,
+        "beta2": 108.20272550170506
+      },
+      "trueDirectedStation": {
+        "xP": 37.5,
+        "yP": 22.250000000000014
+      },
+      "candidateStationCount": 1,
+      "v1": {
+        "ok": true,
+        "xP": 37.50000000000002,
+        "yP": 22.249999999999996,
+        "calcBeta1": 144.1357798501711,
+        "calcBeta2": 108.20272550170509,
+        "error1": 0,
+        "error2": 2.842170943040401e-14,
+        "distAP": 43.6040422438104,
+        "distBP": 66.34238841042728,
+        "distCP": 59.08732943702904,
+        "method": "Tienstra"
+      }
+    },
+    {
+      "name": "station (61.75, 48.5)",
+      "category": "ambiguous-but-returned-directed-station",
+      "noiseDependent": true,
+      "input": {
+        "xA": 0,
+        "yA": 0,
+        "xB": 100,
+        "yB": 0,
+        "xC": 50,
+        "yC": 80,
+        "beta1": 100.12715970810319,
+        "beta2": 180.21654384987355
+      },
+      "trueDirectedStation": {
+        "xP": 61.75,
+        "yP": 48.499999999999986
+      },
+      "candidateStationCount": 2,
+      "v1": {
+        "ok": true,
+        "xP": 61.74999999999999,
+        "yP": 48.50000000000001,
+        "calcBeta1": 100.12715970810319,
+        "calcBeta2": 180.21654384987355,
+        "error1": 0,
+        "error2": 0,
+        "distAP": 78.51950394647179,
+        "distBP": 61.76821593667735,
+        "distCP": 33.6201204637937,
+        "method": "Tienstra"
+      }
+    },
+    {
+      "name": "station (-60, 20)",
+      "category": "ambiguous-but-returned-directed-station",
+      "noiseDependent": true,
+      "input": {
+        "xA": 0,
+        "yA": 0,
+        "xB": 100,
+        "yB": 0,
+        "xC": 50,
+        "yC": 80,
+        "beta1": 12.566591637800236,
+        "beta2": 39.706084460963346
+      },
+      "trueDirectedStation": {
+        "xP": -59.99999999999999,
+        "yP": 19.999999999999886
+      },
+      "candidateStationCount": 4,
+      "v1": {
+        "ok": true,
+        "xP": -59.999999999999964,
+        "yP": 19.999999999999993,
+        "calcBeta1": 12.566591637800244,
+        "calcBeta2": 39.70608446096336,
+        "error1": 7.105427357601002e-15,
+        "error2": 1.4210854715202004e-14,
+        "distAP": 63.24555320336755,
+        "distBP": 161.24515496597095,
+        "distCP": 125.29964086141665,
+        "method": "Tienstra"
+      }
+    },
+    {
+      "name": "station (67, 48)",
+      "category": "ambiguous-returned-ALTERNATIVE-station",
+      "noiseDependent": true,
+      "input": {
+        "xA": 0,
+        "yA": 0,
+        "xB": 100,
+        "yB": 0,
+        "xC": 50,
+        "yC": 80,
+        "beta1": 98.76670349824073,
+        "beta2": 192.7455015564575
+      },
+      "trueDirectedStation": {
+        "xP": 67.00000000000006,
+        "yP": 47.999999999999986
+      },
+      "candidateStationCount": 2,
+      "v1": {
+        "ok": true,
+        "xP": 75.76890978574181,
+        "yP": 43.82784197611166,
+        "calcBeta1": 98.76670349824073,
+        "calcBeta2": 207.2544984435425,
+        "error1": 0,
+        "error2": 0,
+        "distAP": 87.53175093874734,
+        "distBP": 50.08019034762681,
+        "distCP": 44.41240510995605,
+        "method": "Tienstra"
+      }
+    },
+    {
+      "name": "station (26.643758798791634, 75.40931808059139)",
+      "category": "ambiguous-returned-ALTERNATIVE-station",
+      "noiseDependent": true,
+      "input": {
+        "xA": 0,
+        "yA": 0,
+        "xB": 100,
+        "yB": 0,
+        "xC": 50,
+        "yC": 80,
+        "beta1": 70.7430578818236,
+        "beta2": 63.233826710019116
+      },
+      "trueDirectedStation": {
+        "xP": 26.643758798791822,
+        "yP": 75.40931808059146
+      },
+      "candidateStationCount": 3,
+      "v1": {
+        "ok": true,
+        "xP": -1.0392291148803878,
+        "yP": -2.221362630037622,
+        "calcBeta1": 329.25694211817637,
+        "calcBeta2": 63.23382671001913,
+        "error1": 5.684341886080802e-14,
+        "error2": 1.4210854715202004e-14,
+        "distAP": 2.452437376844256,
+        "distBP": 101.06364466049807,
+        "distCP": 96.77476624296955,
+        "method": "Tienstra"
+      }
+    },
+    {
+      "name": "station (140, 90)",
+      "category": "deterministic",
+      "noiseDependent": false,
+      "input": {
+        "xA": 0,
+        "yA": 0,
+        "xB": 100,
+        "yB": 0,
+        "xC": 50,
+        "yC": 80,
+        "beta1": 37.002538614793565,
+        "beta2": 333.6696452449868
+      },
+      "trueDirectedStation": {
+        "xP": 140.00000000000003,
+        "yP": 90
+      },
+      "candidateStationCount": 1,
+      "v1": {
+        "ok": true,
+        "xP": 140,
+        "yP": 89.99999999999999,
+        "calcBeta1": 37.00253861479355,
+        "calcBeta2": 333.6696452449868,
+        "error1": 1.4210854715202004e-14,
+        "error2": 0,
+        "distAP": 166.43316977093235,
+        "distBP": 98.48857801796103,
+        "distCP": 90.55385138137417,
+        "method": "Tienstra"
+      }
+    },
+    {
+      "name": "station (30, -40)",
+      "category": "deterministic",
+      "noiseDependent": false,
+      "input": {
+        "xA": 0,
+        "yA": 0,
+        "xB": 100,
+        "yB": 0,
+        "xC": 50,
+        "yC": 80,
+        "beta1": 292.08331516788684,
+        "beta2": 56.43644055003574
+      },
+      "trueDirectedStation": {
+        "xP": 30,
+        "yP": -40
+      },
+      "candidateStationCount": 1,
+      "v1": {
+        "ok": true,
+        "xP": 30.00000000000021,
+        "yP": -39.99999999999995,
+        "calcBeta1": 292.0833151678867,
+        "calcBeta2": 56.43644055003578,
+        "error1": 1.1368683772161603e-13,
+        "error2": 4.263256414560601e-14,
+        "distAP": 50.000000000000085,
+        "distBP": 80.62257748298529,
+        "distCP": 121.6552506059643,
+        "method": "Tienstra"
+      }
+    },
+    {
+      "name": "station (11, 6)",
+      "category": "ambiguous-returned-ALTERNATIVE-station",
+      "noiseDependent": true,
+      "input": {
+        "xA": 0,
+        "yA": 0,
+        "xB": 100,
+        "yB": 0,
+        "xC": 50,
+        "yC": 80,
+        "beta1": 163.9252659427166,
+        "beta2": 73.40706500681972
+      },
+      "trueDirectedStation": {
+        "xP": 11.000000000000028,
+        "yP": 6.000000000000028
+      },
+      "candidateStationCount": 2,
+      "v1": {
+        "ok": true,
+        "xP": 24.53032137684064,
+        "yP": -11.008160395763277,
+        "calcBeta1": 236.0747340572834,
+        "calcBeta2": 73.40706500681972,
+        "error1": 0,
+        "error2": 0,
+        "distAP": 26.887102152331995,
+        "distBP": 76.26828952311575,
+        "distCP": 94.50497229134558,
+        "method": "Tienstra"
+      }
+    },
+    {
+      "name": "station (32, 13)",
+      "category": "ambiguous-returned-ALTERNATIVE-station",
+      "noiseDependent": true,
+      "input": {
+        "xA": 0,
+        "yA": 0,
+        "xB": 100,
+        "yB": 0,
+        "xC": 50,
+        "yC": 80,
+        "beta1": 163.40837825560138,
+        "beta2": 95.31688369180539
+      },
+      "trueDirectedStation": {
+        "xP": 32,
+        "yP": 12.999999999999972
+      },
+      "candidateStationCount": 2,
+      "v1": {
+        "ok": true,
+        "xP": 90.3103072096497,
+        "yP": -5.474079065113671,
+        "calcBeta1": 236.59162174439865,
+        "calcBeta2": 95.31688369180536,
+        "error1": 2.842170943040401e-14,
+        "error2": 2.842170943040401e-14,
+        "distAP": 90.47605832435684,
+        "distBP": 11.129047038380351,
+        "distCP": 94.5025875802649,
+        "method": "Tienstra"
+      }
+    },
+    {
+      "name": "station (53, 62)",
+      "category": "ambiguous-returned-ALTERNATIVE-station",
+      "noiseDependent": true,
+      "input": {
+        "xA": 0,
+        "yA": 0,
+        "xB": 100,
+        "yB": 0,
+        "xC": 50,
+        "yC": 80,
+        "beta1": 86.32175376362818,
+        "beta2": 169.21983034946018
+      },
+      "trueDirectedStation": {
+        "xP": 53,
+        "yP": 61.999999999999986
+      },
+      "candidateStationCount": 2,
+      "v1": {
+        "ok": true,
+        "xP": 81.43342717059205,
+        "yP": 51.29688073320517,
+        "calcBeta1": 86.3217537636282,
+        "calcBeta2": 230.78016965053982,
+        "error1": 1.4210854715202004e-14,
+        "error2": 0,
+        "distAP": 96.2433012406827,
+        "distBP": 54.55352967119896,
+        "distCP": 42.56676402233042,
+        "method": "Tienstra"
+      }
+    },
+    {
+      "name": "station (81, 27)",
+      "category": "ambiguous-returned-ALTERNATIVE-station",
+      "noiseDependent": true,
+      "input": {
+        "xA": 0,
+        "yA": 0,
+        "xB": 100,
+        "yB": 0,
+        "xC": 50,
+        "yC": 80,
+        "beta1": 118.55471581554848,
+        "beta2": 194.65490422848262
+      },
+      "trueDirectedStation": {
+        "xP": 81.00000000000003,
+        "yP": 26.99999999999996
+      },
+      "candidateStationCount": 2,
+      "v1": {
+        "ok": true,
+        "xP": 90.09280472910577,
+        "yP": 18.430031542817833,
+        "calcBeta1": 118.55471581554848,
+        "calcBeta2": 205.34509577151738,
+        "error1": 0,
+        "error2": 0,
+        "distAP": 91.95857505760974,
+        "distBP": 20.92411481532467,
+        "distCP": 73.47308355353417,
+        "method": "Tienstra"
+      }
+    }
+  ],
+  "specials": [
+    {
+      "name": "angles sum to 400 gon: v1 returns a solution with a huge residual instead of an error",
+      "input": {
+        "xA": 0,
+        "yA": 0,
+        "xB": 100,
+        "yB": 0,
+        "xC": 50,
+        "yC": 80,
+        "beta1": 250,
+        "beta2": 200
+      },
+      "v1": {
+        "ok": true,
+        "xP": 116.85393258426967,
+        "yP": -26.966292134831445,
+        "calcBeta1": 349.99999999999994,
+        "calcBeta2": 0,
+        "error1": 99.99999999999994,
+        "error2": 200,
+        "distAP": 119.92507023933783,
+        "distBP": 31.79993640019079,
+        "distCP": 126.13974772075684,
+        "method": "Tienstra"
+      }
+    },
+    {
+      "name": "nearly collinear controls (C 1 mm off the A-B line): poor solution, no error",
+      "input": {
+        "xA": 0,
+        "yA": 0,
+        "xB": 100,
+        "yB": 0,
+        "xC": 200,
+        "yC": 0.001,
+        "beta1": 75.77621168183131,
+        "beta2": 75.77676049387235
+      },
+      "v1": {
+        "ok": true,
+        "xP": 100.00014757238766,
+        "yP": 29.514503372560036,
+        "calcBeta1": 81.72892555569278,
+        "calcBeta2": 81.73009677186464,
+        "error1": 5.9527138738614696,
+        "error2": 5.9533362779922925,
+        "distAP": 104.2647372021249,
+        "distBP": 29.514503372928967,
+        "distCP": 104.26417106017942,
+        "method": "Tienstra"
+      }
+    },
+    {
+      "name": "collinear controls: throws",
+      "input": {
+        "xA": 0,
+        "yA": 0,
+        "xB": 100,
+        "yB": 0,
+        "xC": 200,
+        "yC": 0,
+        "beta1": 50,
+        "beta2": 60
+      },
+      "v1": {
+        "ok": false,
+        "message": "Неуспешно решаване на обратната засечка (опасен кръг или невалидни ъгли)"
+      }
+    },
+    {
+      "name": "duplicate control points (A = B): throws",
+      "input": {
+        "xA": 0,
+        "yA": 0,
+        "xB": 0,
+        "yB": 0,
+        "xC": 50,
+        "yC": 80,
+        "beta1": 50,
+        "beta2": 60
+      },
+      "v1": {
+        "ok": false,
+        "message": "Точките A, B, C не могат да съвпадат"
+      }
+    },
+    {
+      "name": "station exactly on the circumscribed circle: throws",
+      "input": {
+        "xA": 0,
+        "yA": 0,
+        "xB": 100,
+        "yB": 0,
+        "xC": 50,
+        "yC": 80,
+        "beta1": 71.1230737957411,
+        "beta2": 64.43846310212943
+      },
+      "v1": {
+        "ok": false,
+        "message": "Неуспешно решаване на обратната засечка (опасен кръг или невалидни ъгли)"
+      }
+    }
+  ]
+}
