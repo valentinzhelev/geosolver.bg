@@ -6,6 +6,7 @@ import { useCalculationTracking } from './useCalculationTracking';
 import { hasUnlimitedCalculations } from '../utils/calculationAccess';
 import { getEduWorkContext } from '../utils/eduCalculatorBridge';
 import { allowsCalculatorAccess } from '../config/eduCalculatorPolicy';
+import { useProjectContext } from '../context/ProjectContext';
 
 /**
  * Auth gate + shared free-plan limit (5 total across all tools) + backend tracking.
@@ -15,6 +16,14 @@ export function useGuardedCalculation() {
   const navigate = useNavigate();
   const { language } = useTranslation();
   const { trackCalculation, checkLimits } = useCalculationTracking();
+  // Milestone 1 follow-up §4: key off `requestedProjectId` (the raw
+  // ?projectId= value), NOT `currentProject`. An explicitly-requested
+  // project association must never be silently dropped just because the
+  // frontend's convenience lookup hasn't resolved it yet or failed — the
+  // backend is the actual authorization boundary and will correctly reject
+  // an invalid/inaccessible id (fail closed), rather than this hook quietly
+  // saving the calculation as standalone instead.
+  const { requestedProjectId, error: projectError } = useProjectContext();
 
   const getActiveEduContext = useCallback(() => {
     const ctx = getEduWorkContext();
@@ -55,9 +64,21 @@ export function useGuardedCalculation() {
   }, [user, navigate, checkLimits, language, getActiveEduContext]);
 
   const runWithTracking = useCallback(
-    async ({ toolName, toolDisplayName, inputData, resultData, getResultData, run }) => {
+    async ({ toolName, toolDisplayName, inputData, resultData, getResultData, run, pointReferences }) => {
       const limits = await requireAuthAndLimits();
       if (!limits) return null;
+
+      // A project was explicitly requested (via ?projectId=) but could not
+      // be confirmed (not found, no access, lookup failed, not logged in)
+      // — refuse to save rather than silently falling back to standalone.
+      if (requestedProjectId && projectError) {
+        alert(
+          language === 'bg'
+            ? 'Проектът не може да бъде зареден — изчислението не е запазено, за да не бъде свързано погрешно.'
+            : 'The project could not be loaded — the calculation was not saved, to avoid attaching it to the wrong place.'
+        );
+        return null;
+      }
 
       const start = performance.now();
       const runResult = await run();
@@ -72,7 +93,9 @@ export function useGuardedCalculation() {
           inputData,
           savedResult,
           calculationTime,
-          limits.eduContext
+          limits.eduContext,
+          requestedProjectId || null,
+          pointReferences || []
         );
       } catch (err) {
         const message = err?.message || '';
@@ -94,7 +117,7 @@ export function useGuardedCalculation() {
 
       return runResult;
     },
-    [requireAuthAndLimits, trackCalculation, navigate, language]
+    [requireAuthAndLimits, trackCalculation, navigate, language, requestedProjectId, projectError]
   );
 
   return {

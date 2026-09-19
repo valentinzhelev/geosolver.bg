@@ -1,16 +1,34 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useSharedSurveyPoints } from '../../context/SurveyPointsContext';
+import { useProjectContext } from '../../context/ProjectContext';
 import { getEduWorkContext } from '../../utils/eduCalculatorBridge';
+import { resolveEffectiveProjectId } from '../../utils/projectScoping';
 
 /**
  * Dropdown to fill coordinate fields from the points library.
  * @param {function} onSelect - (point) => void
+ *
+ * Project scoping precedence (Milestone 1 §9): an explicit classroom
+ * assignment's linkedProjectId always wins over the general "current
+ * project" context — an assignment is a narrower, teacher-defined scope
+ * that must not be silently widened by whatever project a student's URL
+ * happens to carry. An explicit `projectId` prop (if a caller ever passes
+ * one) is honored next, then the general ProjectContext (set via
+ * ?projectId= on the calculator route), then no scoping at all. This
+ * preserves today's edu behavior exactly — no current caller passes an
+ * explicit projectId prop, so this ordering changes nothing observable
+ * until ProjectContext starts being populated.
  */
 const PointPicker = ({ language = 'bg', label, onSelect, className = '', projectId } = {}) => {
   const bg = language === 'bg';
   const eduProjectId = getEduWorkContext()?.linkedProjectId;
-  const effectiveProjectId = projectId || eduProjectId || undefined;
+  const { currentProject } = useProjectContext();
+  const effectiveProjectId = resolveEffectiveProjectId({
+    eduProjectId,
+    projectId,
+    currentProjectId: currentProject?._id,
+  });
   const { points, loading, hasPoints } = useSharedSurveyPoints(
     effectiveProjectId ? { projectId: effectiveProjectId } : {}
   );

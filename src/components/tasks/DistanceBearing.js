@@ -11,6 +11,7 @@ import useTypewriter from '../../hooks/useTypewriter';
 import { calculateDistanceBearing as calculateDistanceBearingDomain } from '../../domain/geodesy';
 import { roundTo } from '../../domain/math';
 import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
+import { usePointReferences } from '../../hooks/usePointReferences';
 import { useCalculationRestore } from '../../hooks/useCalculationRestore';
 import { inputDataToFormStrings } from '../../utils/calculationRestore';
 
@@ -49,6 +50,7 @@ const DistanceBearing = () => {
   useCalculationRestore('distance-bearing', setForm, inputDataToFormStrings);
   const { t, language } = useTranslation();
   const { runWithTracking, isAuthenticated } = useGuardedCalculation();
+  const { recordSelection, noteFieldChange, getPointReferences, resetPointReferences } = usePointReferences();
   const [resultText, setResultText] = useState(t.defaultResultText);
   const [lastCalcResult, setLastCalcResult] = useState(null);
   const [history, setHistory] = useState([]);
@@ -65,6 +67,7 @@ const DistanceBearing = () => {
   const handleChange = (e) => {
     setForm({ ...form, [e.target.id]: e.target.value });
     saveInputHistory(e.target.id, e.target.value);
+    noteFieldChange(e.target.id, e.target.value);
   };
 
   const calculate = async () => {
@@ -83,6 +86,7 @@ const DistanceBearing = () => {
       inputData: { y1, x1, y2, x2 },
       getResultData: (r) => ({ distance: r.distance, bearingGon: r.bearingGon }),
       run: () => calculateDistanceBearing(x1, y1, x2, y2),
+      pointReferences: getPointReferences(),
     });
     if (!result) return;
     setLastCalcResult(result);
@@ -164,6 +168,7 @@ Quadrant: ${result.quadrant}
     setForm({ y1: '', x1: '', y2: '', x2: '' });
     setResultText(t.defaultResultText);
     setLastCalcResult(null);
+    resetPointReferences();
   };
 
   const sketchData = useMemo(() => {
@@ -245,8 +250,8 @@ Quadrant: ${result.quadrant}
                 <div className="self-stretch p-3 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex flex-col justify-center items-end gap-3 w-full min-w-0 overflow-hidden">
                   <div className="self-stretch justify-start text-black dark:text-white text-base font-semibold font-['Manrope']">Входни данни</div>
                   <div className="self-stretch grid grid-cols-2 gap-2 w-full">
-                    <PointPicker language={language} label="P₁" onSelect={(p) => setForm((f) => ({ ...f, y1: String(p.y), x1: String(p.x) }))} />
-                    <PointPicker language={language} label="P₂" onSelect={(p) => setForm((f) => ({ ...f, y2: String(p.y), x2: String(p.x) }))} />
+                    <PointPicker language={language} label="P₁" onSelect={(p) => { const fields = { y1: String(p.y), x1: String(p.x) }; setForm((f) => ({ ...f, ...fields })); recordSelection('point1', p, fields); }} />
+                    <PointPicker language={language} label="P₂" onSelect={(p) => { const fields = { y2: String(p.y), x2: String(p.x) }; setForm((f) => ({ ...f, ...fields })); recordSelection('point2', p, fields); }} />
                   </div>
                   <div className="self-stretch flex flex-col justify-start items-start gap-4 w-full">
                     {/* Y1 */}
@@ -459,8 +464,8 @@ Quadrant: ${result.quadrant}
               <div className="flex-1 p-4 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 inline-flex flex-col justify-center items-end gap-4">
                 <div className="self-stretch justify-start text-black dark:text-white text-lg font-semibold font-['Manrope']">Входни данни</div>
                 <div className="self-stretch grid grid-cols-2 gap-2">
-                  <PointPicker language={language} label="P₁" onSelect={(p) => setForm((f) => ({ ...f, y1: String(p.y), x1: String(p.x) }))} />
-                  <PointPicker language={language} label="P₂" onSelect={(p) => setForm((f) => ({ ...f, y2: String(p.y), x2: String(p.x) }))} />
+                  <PointPicker language={language} label="P₁" onSelect={(p) => { const fields = { y1: String(p.y), x1: String(p.x) }; setForm((f) => ({ ...f, ...fields })); recordSelection('point1', p, fields); }} />
+                  <PointPicker language={language} label="P₂" onSelect={(p) => { const fields = { y2: String(p.y), x2: String(p.x) }; setForm((f) => ({ ...f, ...fields })); recordSelection('point2', p, fields); }} />
                 </div>
                 <div className="self-stretch flex flex-col justify-start items-start gap-4">
                   {/* Y1 */}

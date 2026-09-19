@@ -109,6 +109,39 @@ class CalculationService {
     }
   }
 
+  // Fetch a project's shared calculation history (all contributors, not just the caller)
+  static async getProjectCalculationHistory(projectId, page = 1, limit = 10) {
+    try {
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      if (!token) {
+        return {
+          calculations: [],
+          pagination: { current: 1, total: 0, totalItems: 0, hasNext: false, hasPrev: false },
+        };
+      }
+
+      const url = `${API_BASE_URL}/projects/${projectId}/calculations?page=${page}&limit=${limit}`;
+      const response = await fetch(url, {
+        headers: getApiLanguageHeaders({
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch project calculation history: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching project calculation history:', error);
+      return {
+        calculations: [],
+        pagination: { current: 1, total: 0, totalItems: 0, hasNext: false, hasPrev: false },
+      };
+    }
+  }
+
   // Fetch single calculation (full input/result)
   static async getCalculationById(id) {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');

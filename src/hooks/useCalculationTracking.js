@@ -1,24 +1,36 @@
 import { useState, useCallback } from 'react';
 import CalculationService from '../services/calculationService';
+import { buildCalculationPayload } from '../utils/calculationPayload';
 
 export const useCalculationTracking = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const trackCalculation = useCallback(
-    async (toolName, toolDisplayName, inputData, resultData, calculationTime = 0, eduContext = null) => {
+    async (
+      toolName,
+      toolDisplayName,
+      inputData,
+      resultData,
+      calculationTime = 0,
+      eduContext = null,
+      projectId = null,
+      pointReferences = []
+    ) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const calculationData = {
+      const calculationData = buildCalculationPayload({
         toolName,
         toolDisplayName,
         inputData,
         resultData,
         calculationTime,
-        ...(eduContext?.assignmentId ? { eduContext: { assignmentId: eduContext.assignmentId } } : {}),
-      };
+        eduContext,
+        projectId,
+        pointReferences,
+      });
 
       // Save to database only - no local storage fallback
       const result = await CalculationService.saveCalculation(calculationData);

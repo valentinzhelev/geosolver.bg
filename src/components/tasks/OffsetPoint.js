@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
+import { usePointReferences } from '../../hooks/usePointReferences';
 import { useCalculationRestore } from '../../hooks/useCalculationRestore';
 import { inputDataToFormStrings } from '../../utils/calculationRestore';
 import { calculateOrthogonalOffset } from '../../domain/geodesy/orthogonalOffset';
@@ -11,11 +12,15 @@ const OffsetPoint = () => {
   const { language } = useTranslation();
   const bg = language === 'bg';
   const { runWithTracking } = useGuardedCalculation();
+  const { recordSelection, noteFieldChange, getPointReferences, resetPointReferences } = usePointReferences();
   const [form, setForm] = useState({ yA: '', xA: '', yB: '', xB: '', s: '', d: '' });
   const [resultText, setResultText] = useState(bg ? 'Въведи отсечка A→B, s и d.' : 'Enter segment A→B, s and d.');
   useCalculationRestore('offset-point', setForm, inputDataToFormStrings);
 
-  const handle = (e) => setForm((f) => ({ ...f, [e.target.id]: e.target.value }));
+  const handle = (e) => {
+    setForm((f) => ({ ...f, [e.target.id]: e.target.value }));
+    noteFieldChange(e.target.id, e.target.value);
+  };
 
   const isValid = ['yA', 'xA', 'yB', 'xB', 's', 'd'].every((k) => form[k] !== '' && Number.isFinite(parseFloat(form[k])));
 
@@ -32,6 +37,7 @@ const OffsetPoint = () => {
       inputData: { yA, xA, yB, xB, s, d },
       getResultData: (r) => ({ yP: r.yP, xP: r.xP }),
       run: () => calculateOrthogonalOffset(yA, xA, yB, xB, s, d),
+      pointReferences: getPointReferences(),
     });
     if (!result) return;
     setResultText(
@@ -51,7 +57,7 @@ const OffsetPoint = () => {
         description: bg ? 'Точка перпендикулярно на отсечка' : 'Point perpendicular to a segment',
       }}
       onCalculate={calculate}
-      onReset={() => { setForm({ yA: '', xA: '', yB: '', xB: '', s: '', d: '' }); setResultText(bg ? 'Въведи данни.' : 'Enter data.'); }}
+      onReset={() => { setForm({ yA: '', xA: '', yB: '', xB: '', s: '', d: '' }); setResultText(bg ? 'Въведи данни.' : 'Enter data.'); resetPointReferences(); }}
       isValid={isValid}
       resultText={resultText}
       docsExtra
@@ -60,8 +66,8 @@ const OffsetPoint = () => {
         {bg ? 'd > 0 = наляво от A→B · s = разстояние по отсечката от A' : 'd > 0 = left of A→B · s = chainage from A'}
       </p>
       <div className="grid grid-cols-2 gap-2">
-        <PointPicker language={language} label="A" onSelect={(p) => setForm((f) => ({ ...f, yA: String(p.y), xA: String(p.x) }))} />
-        <PointPicker language={language} label="B" onSelect={(p) => setForm((f) => ({ ...f, yB: String(p.y), xB: String(p.x) }))} />
+        <PointPicker language={language} label="A" onSelect={(p) => { const fields = { yA: String(p.y), xA: String(p.x) }; setForm((f) => ({ ...f, ...fields })); recordSelection('pointA', p, fields); }} />
+        <PointPicker language={language} label="B" onSelect={(p) => { const fields = { yB: String(p.y), xB: String(p.x) }; setForm((f) => ({ ...f, ...fields })); recordSelection('pointB', p, fields); }} />
       </div>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
         <CoordInput id="yA" label="Y_A" value={form.yA} onChange={handle} />

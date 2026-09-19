@@ -14,11 +14,13 @@ import { AuthProvider } from './components/auth/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { SurveyPointsProvider } from './context/SurveyPointsContext';
+import { ProjectProvider } from './context/ProjectContext';
 import ForgotPassword from './components/auth/ForgotPassword';
 import ResetPassword from './components/auth/ResetPassword';
 import CookieConsent from './components/shared/CookieConsent';
 import InstallPrompt from './components/shared/InstallPrompt';
 import OfflineBanner from './components/shared/OfflineBanner';
+import ProjectContextBanner from './components/shared/ProjectContextBanner';
 import Contacts from './components/contacts/Contacts';
 import FirstTaskDocs from './components/tasks/FirstTaskDocs';
 import ForwardIntersectionDocs from './components/tasks/ForwardIntersectionDocs';
@@ -83,6 +85,7 @@ function App() {
         <AuthProvider>
           <LanguageProvider>
             <SurveyPointsProvider>
+            <ProjectProvider>
             {/* Global meta tags are now in public/index.html */}
             <Routes>
               <Route path="/" element={<HomePage />} />
@@ -328,6 +331,8 @@ function App() {
             <CookieConsent />
             <InstallPrompt />
             <OfflineBanner />
+            <ProjectContextBanner />
+            </ProjectProvider>
             </SurveyPointsProvider>
           </LanguageProvider>
         </AuthProvider>

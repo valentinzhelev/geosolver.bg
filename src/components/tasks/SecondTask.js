@@ -9,6 +9,7 @@ import { useTranslation } from '../../hooks/useTranslation';
 import { useSyncTaskLanguage } from '../../hooks/useSyncTaskLanguage';
 import { isTaskPlaceholderResult } from '../../utils/taskI18n';
 import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
+import { usePointReferences } from '../../hooks/usePointReferences';
 import { useCalculationRestore } from '../../hooks/useCalculationRestore';
 import { inputDataToFormStrings } from '../../utils/calculationRestore';
 import { useEduAssignmentBridge } from '../../hooks/useEduAssignmentBridge';
@@ -156,6 +157,7 @@ const SecondTask = () => {
   const [form, setForm] = useState({ x1: '', y1: '', x2: '', y2: '' });
   useCalculationRestore('second-basic-task', setForm, inputDataToFormStrings);
   const { runWithTracking, isAuthenticated } = useGuardedCalculation();
+  const { recordSelection, noteFieldChange, getPointReferences, resetPointReferences } = usePointReferences();
   const [lastCalcResult, setLastCalcResult] = useState(null);
   const { eduCtx, applyResultToAssignment, dismissEduBanner, canSaveToAssignment } = useEduAssignmentBridge(
     'second-basic-task',
@@ -193,6 +195,7 @@ const SecondTask = () => {
   const handleChange = (e) => {
     setForm({ ...form, [e.target.id]: e.target.value });
     saveInputHistory(e.target.id, e.target.value);
+    noteFieldChange(e.target.id, e.target.value);
   };
 
   const isFormValid = () => {
@@ -221,6 +224,7 @@ const SecondTask = () => {
         deltaY: r.deltaY,
       }),
       run: () => vtoraOsnovnaZadacha(X1, Y1, X2, Y2),
+      pointReferences: getPointReferences(),
     });
     if (!result) return;
     setLastCalcResult(result);
@@ -293,6 +297,7 @@ Check (atan2): ${result.alphaAtan2} grads
     setForm({ x1: '', y1: '', x2: '', y2: '' });
     setResultText(t.secondTaskDefaultResultText);
     setLastCalcResult(null);
+    resetPointReferences();
   };
 
   const handleDownload = (entry) => {
@@ -375,12 +380,20 @@ Check (atan2): ${result.alphaAtan2} grads
                     <PointPicker
                       language={language}
                       label="P₁"
-                      onSelect={(p) => setForm((f) => ({ ...f, y1: String(p.y), x1: String(p.x) }))}
+                      onSelect={(p) => {
+                      const fields = { y1: String(p.y), x1: String(p.x) };
+                      setForm((f) => ({ ...f, ...fields }));
+                      recordSelection('point1', p, fields);
+                    }}
                     />
                     <PointPicker
                       language={language}
                       label="P₂"
-                      onSelect={(p) => setForm((f) => ({ ...f, y2: String(p.y), x2: String(p.x) }))}
+                      onSelect={(p) => {
+                      const fields = { y2: String(p.y), x2: String(p.x) };
+                      setForm((f) => ({ ...f, ...fields }));
+                      recordSelection('point2', p, fields);
+                    }}
                     />
                   </div>
                   <div className="self-stretch flex flex-col justify-start items-start gap-4 w-full">
@@ -544,12 +557,20 @@ Check (atan2): ${result.alphaAtan2} grads
                   <PointPicker
                     language={language}
                     label="P₁"
-                    onSelect={(p) => setForm((f) => ({ ...f, y1: String(p.y), x1: String(p.x) }))}
+                    onSelect={(p) => {
+                      const fields = { y1: String(p.y), x1: String(p.x) };
+                      setForm((f) => ({ ...f, ...fields }));
+                      recordSelection('point1', p, fields);
+                    }}
                   />
                   <PointPicker
                     language={language}
                     label="P₂"
-                    onSelect={(p) => setForm((f) => ({ ...f, y2: String(p.y), x2: String(p.x) }))}
+                    onSelect={(p) => {
+                      const fields = { y2: String(p.y), x2: String(p.x) };
+                      setForm((f) => ({ ...f, ...fields }));
+                      recordSelection('point2', p, fields);
+                    }}
                   />
                 </div>
                 <div className="self-stretch flex flex-col justify-start items-start gap-4">

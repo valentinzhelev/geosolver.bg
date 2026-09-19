@@ -8,6 +8,7 @@ import { useTranslation } from '../../../hooks/useTranslation';
 import { fieldbooksApi } from '../../../services/fieldbookApi';
 import { surveyPointsApi } from '../../../services/surveyPointsApi';
 import { workspaceApi } from '../../../services/workspaceApi';
+import CalculationService from '../../../services/calculationService';
 import { downloadProjectReportPdf } from '../../../utils/exportProjectReportPdf';
 import { downloadProjectPackage } from '../../../utils/exportProjectPackage';
 import CrsSelect from '../../shared/CrsSelect';
@@ -27,6 +28,7 @@ const ProjectHubPage = () => {
   const [projects, setProjects] = useState([]);
   const [pointCounts, setPointCounts] = useState({});
   const [bookCounts, setBookCounts] = useState({});
+  const [calcCounts, setCalcCounts] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [exportingId, setExportingId] = useState('');
@@ -42,23 +44,28 @@ const ProjectHubPage = () => {
       setProjects(list);
       const counts = {};
       const books = {};
+      const calcs = {};
       await Promise.all(
         list.map(async (p) => {
           try {
-            const [pts, bks] = await Promise.all([
+            const [pts, bks, calcHistory] = await Promise.all([
               surveyPointsApi.list({ projectId: p._id }),
               fieldbooksApi.listBooks(p._id),
+              CalculationService.getProjectCalculationHistory(p._id, 1, 1),
             ]);
             counts[p._id] = (pts.data || []).length;
             books[p._id] = (bks.data || bks.books || []).length;
+            calcs[p._id] = calcHistory?.pagination?.totalItems ?? 0;
           } catch {
             counts[p._id] = 0;
             books[p._id] = 0;
+            calcs[p._id] = 0;
           }
         })
       );
       setPointCounts(counts);
       setBookCounts(books);
+      setCalcCounts(calcs);
       try {
         const wsRes = await workspaceApi.list();
         setWorkspaces([...(wsRes.data?.owned || []), ...(wsRes.data?.memberOf || [])]);
@@ -206,6 +213,12 @@ const ProjectHubPage = () => {
                       <div className="flex flex-wrap gap-3 mt-2 text-xs font-semibold font-['Manrope'] text-neutral-600 dark:text-zinc-400">
                         <span>{pointCounts[p._id] ?? 0} {bg ? 'точки' : 'points'}</span>
                         <span>{bookCounts[p._id] ?? 0} {bg ? 'карнета' : 'field books'}</span>
+                        <Link
+                          to={`/calculations/history?projectId=${p._id}`}
+                          className="underline hover:text-black dark:hover:text-white"
+                        >
+                          {calcCounts[p._id] ?? 0} {bg ? 'изчисления' : 'calculations'}
+                        </Link>
                         {p.workspace && (
                           <span className="text-orange-600">
                             {workspaces.find((w) => w._id === String(p.workspace?._id || p.workspace))?.name || 'Workspace'}
@@ -262,6 +275,12 @@ const ProjectHubPage = () => {
                       className="px-3 py-2 rounded-lg text-sm font-medium font-['Manrope'] bg-white dark:bg-zinc-900 outline outline-1 outline-gray-200 dark:outline-zinc-700"
                     >
                       {bg ? 'Карнети' : 'Field books'}
+                    </Link>
+                    <Link
+                      to={`/calculations/history?projectId=${p._id}`}
+                      className="px-3 py-2 rounded-lg text-sm font-medium font-['Manrope'] bg-white dark:bg-zinc-900 outline outline-1 outline-gray-200 dark:outline-zinc-700"
+                    >
+                      {bg ? 'Изчисления' : 'Calculations'}
                     </Link>
                     <button
                       type="button"

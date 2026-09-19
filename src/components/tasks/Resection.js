@@ -9,6 +9,7 @@ import { useSyncTaskLanguage } from '../../hooks/useSyncTaskLanguage';
 import { isTaskPlaceholderResult } from '../../utils/taskI18n';
 import useTypewriter from '../../hooks/useTypewriter';
 import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
+import { usePointReferences } from '../../hooks/usePointReferences';
 import { useCalculationRestore } from '../../hooks/useCalculationRestore';
 import { inputDataToFormStrings } from '../../utils/calculationRestore';
 import { useEduAssignmentBridge } from '../../hooks/useEduAssignmentBridge';
@@ -68,6 +69,7 @@ const Resection = () => {
   const paginatedHistory = history.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
   const { displayText, isTyping } = useTypewriter(resultText);
   const { runWithTracking, isAuthenticated } = useGuardedCalculation();
+  const { recordSelection, noteFieldChange, getPointReferences, resetPointReferences } = usePointReferences();
   const [lastCalcResult, setLastCalcResult] = useState(null);
   const { eduCtx, applyResultToAssignment, dismissEduBanner, canSaveToAssignment } = useEduAssignmentBridge('resection', setForm);
 
@@ -75,6 +77,7 @@ const Resection = () => {
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.id]: e.target.value });
+    noteFieldChange(e.target.id, e.target.value);
   };
 
   const isFormValid = () => {
@@ -109,6 +112,7 @@ const Resection = () => {
         inputData: { ...points, ...angles },
         getResultData: (r) => ({ xP: r.xP, yP: r.yP, method: r.method }),
         run: () => calculateResection(points, angles),
+        pointReferences: getPointReferences(),
       });
       if (!result) return;
       setLastCalcResult(result);
@@ -204,6 +208,7 @@ Date: ${new Date().toLocaleString('en-US')}`;
     });
     setResultText(t.resectionDefaultResultText);
     setLastCalcResult(null);
+    resetPointReferences();
   };
 
   return (
@@ -246,9 +251,9 @@ Date: ${new Date().toLocaleString('en-US')}`;
                 <div className="self-stretch p-3 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex flex-col justify-center items-end gap-3 w-full min-w-0 overflow-hidden">
                   <div className="self-stretch justify-start text-black dark:text-white text-base font-semibold font-['Manrope']">{t.inputData}</div>
                     <div className="self-stretch grid grid-cols-3 gap-2 mb-2">
-                      <PointPicker language={language} label="A" onSelect={(p) => setForm((f) => ({ ...f, yA: String(p.y), xA: String(p.x) }))} />
-                      <PointPicker language={language} label="B" onSelect={(p) => setForm((f) => ({ ...f, yB: String(p.y), xB: String(p.x) }))} />
-                      <PointPicker language={language} label="C" onSelect={(p) => setForm((f) => ({ ...f, yC: String(p.y), xC: String(p.x) }))} />
+                      <PointPicker language={language} label="A" onSelect={(p) => { const fields = { yA: String(p.y), xA: String(p.x) }; setForm((f) => ({ ...f, ...fields })); recordSelection('pointA', p, fields); }} />
+                      <PointPicker language={language} label="B" onSelect={(p) => { const fields = { yB: String(p.y), xB: String(p.x) }; setForm((f) => ({ ...f, ...fields })); recordSelection('pointB', p, fields); }} />
+                      <PointPicker language={language} label="C" onSelect={(p) => { const fields = { yC: String(p.y), xC: String(p.x) }; setForm((f) => ({ ...f, ...fields })); recordSelection('pointC', p, fields); }} />
                     </div>
                   <div className="self-stretch flex flex-col justify-start items-start gap-4 w-full">
                     {/* Point A */}

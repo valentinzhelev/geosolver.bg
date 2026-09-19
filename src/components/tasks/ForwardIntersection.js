@@ -11,6 +11,7 @@ import useTypewriter from '../../hooks/useTypewriter';
 import { calculateForwardIntersection as calculateForwardIntersectionDomain } from '../../domain/geodesy';
 import { roundTo } from '../../domain/math';
 import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
+import { usePointReferences } from '../../hooks/usePointReferences';
 import { useCalculationRestore } from '../../hooks/useCalculationRestore';
 import { inputDataToFormStrings } from '../../utils/calculationRestore';
 import { useEduAssignmentBridge } from '../../hooks/useEduAssignmentBridge';
@@ -102,6 +103,7 @@ const ForwardIntersection = () => {
   useCalculationRestore('forward-intersection', setForm, inputDataToFormStrings);
   const { t, language } = useTranslation();
   const { runWithTracking, isAuthenticated } = useGuardedCalculation();
+  const { recordSelection, noteFieldChange, getPointReferences, resetPointReferences } = usePointReferences();
   const [lastCalcResult, setLastCalcResult] = useState(null);
   const { eduCtx, applyResultToAssignment, dismissEduBanner, canSaveToAssignment } = useEduAssignmentBridge(
     'forward-intersection',
@@ -121,6 +123,7 @@ const ForwardIntersection = () => {
   const handleChange = (e) => {
     setForm({ ...form, [e.target.id]: e.target.value });
     saveInputHistory(e.target.id, e.target.value);
+    noteFieldChange(e.target.id, e.target.value);
   };
 
   const isFormValid = () => Object.values(form).every(v => v !== '' && !isNaN(parseFloat(v)));
@@ -146,6 +149,7 @@ const ForwardIntersection = () => {
           Number(beta1),
           Number(beta2)
         ),
+      pointReferences: getPointReferences(),
     });
     if (!results) return;
     setLastCalcResult(results);
@@ -216,6 +220,7 @@ Max diff: ${results.maxDiff} m
     setForm(initialForm);
     setResultText(t.defaultResultText);
     setLastCalcResult(null);
+    resetPointReferences();
   };
 
   const handleDownload = (entry) => {
@@ -287,8 +292,8 @@ Max diff: ${results.maxDiff} m
               <div className="flex-1 p-4 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 inline-flex flex-col justify-center items-end gap-4">
                 <div className="self-stretch justify-start text-black dark:text-white text-lg font-semibold font-['Manrope']">{t.inputData}</div>
                 <div className="self-stretch grid grid-cols-2 gap-2">
-                  <PointPicker language={language} label="A" onSelect={(p) => setForm((f) => ({ ...f, yA: String(p.y), xA: String(p.x) }))} />
-                  <PointPicker language={language} label="B" onSelect={(p) => setForm((f) => ({ ...f, yB: String(p.y), xB: String(p.x) }))} />
+                  <PointPicker language={language} label="A" onSelect={(p) => { const fields = { yA: String(p.y), xA: String(p.x) }; setForm((f) => ({ ...f, ...fields })); recordSelection('pointA', p, fields); }} />
+                  <PointPicker language={language} label="B" onSelect={(p) => { const fields = { yB: String(p.y), xB: String(p.x) }; setForm((f) => ({ ...f, ...fields })); recordSelection('pointB', p, fields); }} />
                 </div>
                 <div className="self-stretch flex flex-col justify-start items-start gap-4">
                   {/* Yₐ */}

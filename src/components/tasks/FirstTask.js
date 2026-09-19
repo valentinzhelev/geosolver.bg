@@ -7,6 +7,7 @@ import { useSyncTaskLanguage } from '../../hooks/useSyncTaskLanguage';
 import { isTaskPlaceholderResult } from '../../utils/taskI18n';
 import useTypewriter from '../../hooks/useTypewriter';
 import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
+import { usePointReferences } from '../../hooks/usePointReferences';
 import { useCalculationRestore } from '../../hooks/useCalculationRestore';
 import { inputDataToFormStrings } from '../../utils/calculationRestore';
 import { useEduAssignmentBridge } from '../../hooks/useEduAssignmentBridge';
@@ -55,6 +56,7 @@ const LOW_CONFIDENCE = 0.75;
 const PurvaZadacha = () => {
   const [form, setForm] = useState({ y1: '', x1: '', alpha: '', s: '' });
   useCalculationRestore('first-basic-task', setForm, inputDataToFormStrings);
+  const { recordSelection, noteFieldChange, getPointReferences, resetPointReferences } = usePointReferences();
   const [lowConfFields, setLowConfFields] = useState({});
   const [isScanning, setIsScanning] = useState(false);
   const fileInputRef = useRef(null);
@@ -116,6 +118,7 @@ const PurvaZadacha = () => {
     const id = e.target.id;
     setForm({ ...form, [id]: e.target.value });
     saveInputHistory(id, e.target.value);
+    noteFieldChange(id, e.target.value);
     if (lowConfFields[id]) setLowConfFields((prev) => ({ ...prev, [id]: false }));
   };
 
@@ -138,8 +141,8 @@ const PurvaZadacha = () => {
           s: d.s != null ? String(d.s) : form.s
         };
         setForm(newForm);
-        if (d.y1 != null) saveInputHistory('y1', String(d.y1));
-        if (d.x1 != null) saveInputHistory('x1', String(d.x1));
+        if (d.y1 != null) { saveInputHistory('y1', String(d.y1)); noteFieldChange('y1', String(d.y1)); }
+        if (d.x1 != null) { saveInputHistory('x1', String(d.x1)); noteFieldChange('x1', String(d.x1)); }
         if (d.alpha != null) saveInputHistory('alpha', String(d.alpha));
         if (d.s != null) saveInputHistory('s', String(d.s));
         const conf = result.confidence || {};
@@ -193,6 +196,7 @@ const PurvaZadacha = () => {
         deltaY: r.deltaY,
       }),
       run: () => purvaOsnovnaZadacha(y1, x1, alpha, s),
+      pointReferences: getPointReferences(),
     });
     if (!result) return;
     setLastCalcResult(result);
@@ -284,6 +288,7 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
     setResultText(t.defaultResultText);
     setLastCalcResult(null);
     setLowConfFields({});
+    resetPointReferences();
   };
 
   const inputClass = (fieldId) => {
@@ -401,7 +406,11 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
                     language={language}
                     label={language === 'bg' ? 'Точка 1 от библиотека' : 'Point 1 from library'}
                     className="w-full"
-                    onSelect={(p) => setForm((f) => ({ ...f, y1: String(p.y), x1: String(p.x) }))}
+                    onSelect={(p) => {
+                      const fields = { y1: String(p.y), x1: String(p.x) };
+                      setForm((f) => ({ ...f, ...fields }));
+                      recordSelection('station', p, fields);
+                    }}
                   />
                   <div className="self-stretch flex flex-col justify-start items-start gap-4 w-full">
                     {/* Y1 */}
@@ -619,7 +628,11 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
                   language={language}
                   label={language === 'bg' ? 'Точка 1 от библиотека' : 'Point 1 from library'}
                   className="self-stretch w-full"
-                  onSelect={(p) => setForm((f) => ({ ...f, y1: String(p.y), x1: String(p.x) }))}
+                  onSelect={(p) => {
+                      const fields = { y1: String(p.y), x1: String(p.x) };
+                      setForm((f) => ({ ...f, ...fields }));
+                      recordSelection('station', p, fields);
+                    }}
                 />
                 <div className="self-stretch flex flex-col justify-start items-start gap-4">
                   {/* Y1 */}

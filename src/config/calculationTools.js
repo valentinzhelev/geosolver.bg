@@ -15,8 +15,29 @@ export const CALCULATION_TOOLS = {
   'scientific-calculator': { path: '/scientific-calculator', label: { bg: 'Научен калкулатор', en: 'Scientific calculator' } },
 };
 
-export function getToolPath(toolName) {
-  return CALCULATION_TOOLS[toolName]?.path || '/tools';
+/** Not a Project calculation — general utility with no server persistence. */
+const PROJECT_EXCLUDED_TOOLS = new Set(['scientific-calculator']);
+
+/** Appends ?projectId= to a calculator path when a project context is given. */
+export function withProjectId(path, projectId) {
+  if (!projectId) return path;
+  return `${path}${path.includes('?') ? '&' : '?'}projectId=${encodeURIComponent(projectId)}`;
+}
+
+export function getToolPath(toolName, projectId) {
+  return withProjectId(CALCULATION_TOOLS[toolName]?.path || '/tools', projectId);
+}
+
+/** Professional calculators that can be opened inside a Project (registry minus excluded utilities). */
+export function getProjectCalculationTools() {
+  return Object.entries(CALCULATION_TOOLS)
+    .filter(([id]) => !PROJECT_EXCLUDED_TOOLS.has(id))
+    .map(([id, meta]) => ({ id, ...meta }));
+}
+
+/** True when pathname is a professional (Project-capable) calculator route. */
+export function isCalculatorPath(pathname) {
+  return getProjectCalculationTools().some((t) => t.path === pathname);
 }
 
 export function getToolLabel(toolName, language = 'bg', fallback) {

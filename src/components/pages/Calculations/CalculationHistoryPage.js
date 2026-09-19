@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import Layout from '../../layout/Layout';
 import SEO from '../../shared/SEO';
 import { useTranslation } from '../../../hooks/useTranslation';
 import CalculationService from '../../../services/calculationService';
-import { getToolLabel, getToolPath, toolFilterOptions } from '../../../config/calculationTools';
+import { getToolLabel, getToolPath, toolFilterOptions, getProjectCalculationTools } from '../../../config/calculationTools';
 import { formatCalcPayload, setCalculationRestore } from '../../../utils/calculationRestore';
+import { useProjectContext } from '../../../context/ProjectContext';
 
 const selectClass =
   "px-3 py-2 rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm font-['Manrope'] text-black dark:text-white outline-none";
@@ -20,6 +21,9 @@ const CalculationHistoryPage = () => {
   const { language } = useTranslation();
   const bg = language === 'bg';
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const projectId = searchParams.get('projectId') || '';
+  const { currentProject } = useProjectContext();
 
   const [items, setItems] = useState([]);
   const [page, setPage] = useState(1);
@@ -34,12 +38,15 @@ const CalculationHistoryPage = () => {
   const [stats, setStats] = useState(null);
   const [limits, setLimits] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [showNewCalc, setShowNewCalc] = useState(false);
 
   const loadList = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
-      const data = await CalculationService.getCalculationHistory(page, PAGE_SIZE, toolFilter || null);
+      const data = projectId
+        ? await CalculationService.getProjectCalculationHistory(projectId, page, PAGE_SIZE)
+        : await CalculationService.getCalculationHistory(page, PAGE_SIZE, toolFilter || null);
       setItems(data.calculations || []);
       setTotalPages(data.pagination?.total || 1);
       setTotalItems(data.pagination?.totalItems || 0);
@@ -49,16 +56,21 @@ const CalculationHistoryPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [page, toolFilter]);
+  }, [page, toolFilter, projectId]);
 
   useEffect(() => {
     loadList();
   }, [loadList]);
 
+  // Personal stats/limits/top-tools are the viewer's own account totals —
+  // showing them in project mode would misleadingly look like project
+  // totals (a project's calculations are contributed by everyone with
+  // access, not just the current viewer), so skip fetching them there.
   useEffect(() => {
+    if (projectId) return;
     CalculationService.getCalculationStats().then(setStats).catch(() => {});
     CalculationService.checkLimits().then(setLimits).catch(() => {});
-  }, []);
+  }, [projectId]);
 
   useEffect(() => {
     if (!selectedId) {
@@ -74,7 +86,7 @@ const CalculationHistoryPage = () => {
 
   useEffect(() => {
     setPage(1);
-  }, [toolFilter]);
+  }, [toolFilter, projectId]);
 
   const topTools = useMemo(() => {
     if (!stats?.calculationsByTool?.length) return [];
@@ -84,7 +96,9 @@ const CalculationHistoryPage = () => {
   const repeatCalculation = () => {
     if (!detail) return;
     setCalculationRestore(detail.toolName, detail.inputData);
-    navigate(getToolPath(detail.toolName));
+    // In project mode keep the project context so a repeated run is saved
+    // back into the same project rather than silently as a standalone entry.
+    navigate(getToolPath(detail.toolName, projectId));
   };
 
   const copyInput = async () => {
@@ -125,21 +139,56 @@ const CalculationHistoryPage = () => {
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold font-['Manrope'] text-black dark:text-white">
-                  {bg ? 'История на изчисления' : 'Calculation history'}
+                  {projectId
+                    ? (bg ? `Изчисления · ${currentProject?.name || 'проект'}` : `Calculations · ${currentProject?.name || 'project'}`)
+                    : (bg ? 'История на изчисления' : 'Calculation history')}
                 </h1>
                 <p className="mt-2 text-sm text-neutral-500 dark:text-zinc-400 font-['Manrope'] max-w-xl">
-                  {bg
-                    ? 'Всички запазени изчисления от калкулаторите. Избери запис за детайли и „Повтори“ за попълване на входа.'
-                    : 'All saved calculator runs. Select a record for details and use Repeat to restore inputs.'}
+                  {projectId
+                    ? (bg
+                        ? 'Всички изчисления, запазени в този проект от всички, които имат достъп до него.'
+                        : 'Every calculation saved to this project by anyone with access to it.')
+                    : (bg
+                        ? 'Всички запазени изчисления от калкулаторите. Избери запис за детайли и „Повтори“ за попълване на входа.'
+                        : 'All saved calculator runs. Select a record for details and use Repeat to restore inputs.')}
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
+                {projectId && (
+                  <button type="button" className={btnPrimary} onClick={() => setShowNewCalc((v) => !v)} aria-expanded={showNewCalc}>
+                    {bg ? 'Ново изчисление' : 'New calculation'}
+                  </button>
+                )}
+                {projectId && (
+                  <Link to="/projects" className={btnGhost}>{bg ? 'Проекти' : 'Projects'}</Link>
+                )}
                 <Link to="/tools" className={btnGhost}>{bg ? 'Калкулатори' : 'Tools'}</Link>
-                <Link to="/account" className={btnGhost}>{bg ? 'Акаунт' : 'Account'}</Link>
+                {!projectId && (
+                  <Link to="/account" className={btnGhost}>{bg ? 'Акаунт' : 'Account'}</Link>
+                )}
               </div>
             </div>
 
-            {(limits || stats) && (
+            {projectId && showNewCalc && (
+              <div className="p-4 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-gray-200 dark:outline-zinc-800">
+                <div className="text-sm font-semibold font-['Manrope'] text-black dark:text-white mb-3">
+                  {bg ? 'Избери калкулатор — изчислението ще се запази в този проект' : 'Choose a calculator — the result will be saved to this project'}
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                  {getProjectCalculationTools().map((tool) => (
+                    <Link
+                      key={tool.id}
+                      to={getToolPath(tool.id, projectId)}
+                      className="px-3 py-2.5 rounded-lg text-sm font-medium font-['Manrope'] bg-stone-50 dark:bg-zinc-800 outline outline-1 outline-gray-200 dark:outline-zinc-700 text-black dark:text-white hover:bg-stone-100 dark:hover:bg-zinc-700"
+                    >
+                      {tool.label[bg ? 'bg' : 'en']}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {!projectId && (limits || stats) && (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <StatCard label={bg ? 'Общо' : 'Total'} value={stats?.totalCalculations ?? '—'} />
                 <StatCard label={bg ? 'Този месец' : 'This month'} value={stats?.monthlyCalculations ?? '—'} />
@@ -175,13 +224,15 @@ const CalculationHistoryPage = () => {
               </div>
             )}
 
-            <div className="flex flex-wrap gap-2 items-center">
-              <select className={selectClass} value={toolFilter} onChange={(e) => setToolFilter(e.target.value)}>
-                {toolFilterOptions(language).map((o) => (
-                  <option key={o.value || 'all'} value={o.value}>{o.label}</option>
-                ))}
-              </select>
-            </div>
+            {!projectId && (
+              <div className="flex flex-wrap gap-2 items-center">
+                <select className={selectClass} value={toolFilter} onChange={(e) => setToolFilter(e.target.value)}>
+                  {toolFilterOptions(language).map((o) => (
+                    <option key={o.value || 'all'} value={o.value}>{o.label}</option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             {error && (
               <div className="p-3 rounded-lg bg-red-50 dark:bg-red-950/40 text-red-700 text-sm font-['Manrope']">{error}</div>
@@ -195,7 +246,13 @@ const CalculationHistoryPage = () => {
                   <div className="p-12 text-center text-neutral-500 font-['Manrope']">
                     {bg ? 'Няма записи за избрания филтър.' : 'No records for this filter.'}
                     <div className="mt-4">
-                      <Link to="/tools" className={btnPrimary}>{bg ? 'Към калкулатори' : 'Go to tools'}</Link>
+                      {projectId ? (
+                        <button type="button" className={btnPrimary} onClick={() => setShowNewCalc(true)}>
+                          {bg ? 'Ново изчисление' : 'New calculation'}
+                        </button>
+                      ) : (
+                        <Link to="/tools" className={btnPrimary}>{bg ? 'Към калкулатори' : 'Go to tools'}</Link>
+                      )}
                     </div>
                   </div>
                 ) : (
@@ -282,7 +339,7 @@ const CalculationHistoryPage = () => {
                       <button type="button" className={btnGhost} onClick={copyInput}>
                         {copied ? (bg ? 'Копирано' : 'Copied') : (bg ? 'Копирай вход' : 'Copy input')}
                       </button>
-                      <Link to={getToolPath(detail.toolName)} className={btnGhost}>
+                      <Link to={getToolPath(detail.toolName, projectId)} className={btnGhost}>
                         {bg ? 'Инструмент' : 'Open tool'}
                       </Link>
                     </div>

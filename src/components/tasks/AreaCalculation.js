@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 import useTypewriter from '../../hooks/useTypewriter';
 import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
+import { usePointReferences } from '../../hooks/usePointReferences';
 import { useCalculationRestore } from '../../hooks/useCalculationRestore';
 import { getRestoreMapper } from '../../utils/calculationRestore';
 import PointPicker from './PointPicker';
@@ -46,6 +47,18 @@ const AreaCalculation = () => {
   useCalculationRestore('area-calculation', setForm, getRestoreMapper('area-calculation'));
   const { t, language } = useTranslation();
   const { runWithTracking, isAuthenticated } = useGuardedCalculation();
+  // Area Calculation is a special case (Milestone 1 follow-up §2): points
+  // are appended as text lines into a single shared textarea, not discrete
+  // x/y fields. There is no reliable way to know, from a textarea's onChange
+  // event, which specific line a manual edit touched — so every vertex role
+  // is tracked against the SAME field id ('points'), meaning any manual
+  // edit anywhere in the textarea clears ALL vertex references at once
+  // (conservative provenance loss, never false provenance). Picks made
+  // after that point start tracking fresh. The backend independently
+  // re-verifies each surviving vertex:N role against inputData.points[N]
+  // regardless (utils/toolPointRoles.js), so this is a UX nicety, not the
+  // integrity boundary.
+  const { recordSelection, noteFieldChange, getPointReferences, resetPointReferences } = usePointReferences();
   const [resultText, setResultText] = useState(t.defaultResultText);
   const [history, setHistory] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -61,6 +74,7 @@ const AreaCalculation = () => {
   const handleChange = (e) => {
     setForm({ ...form, [e.target.id]: e.target.value });
     saveInputHistory(e.target.id, e.target.value);
+    noteFieldChange(e.target.id, e.target.value);
   };
 
   const parsePoints = (pointsText) => {
@@ -102,6 +116,7 @@ const AreaCalculation = () => {
       inputData: { points: parsedPoints, method: form.method },
       getResultData: (r) => ({ area: r.area }),
       run: () => calculateArea(parsedPoints, form.method),
+      pointReferences: getPointReferences(),
     });
     if (!result) return;
     const output = language === 'bg' 
@@ -208,6 +223,7 @@ Check - area (alternative method): ${result.alternativeArea?.toFixed(2) || 'N/A'
   const resetForm = () => {
     setForm({ points: '', method: 'shoelace' });
     setResultText(t.defaultResultText);
+    resetPointReferences();
   };
 
   const handleDownload = (entry) => {
@@ -279,10 +295,13 @@ Check - area (alternative method): ${result.alternativeArea?.toFixed(2) || 'N/A'
                     <div className="self-stretch flex flex-col justify-start items-start gap-2 w-full">
                       <div className="justify-start text-black dark:text-white text-xs font-medium font-['Manrope']">Координати на точките (X Y)</div>
                       
-                    <PointPicker language={language} label="+" onSelect={(p) => setForm((f) => ({
-                      ...f,
-                      points: f.points.trim() ? `${f.points.trim()}\n${p.x} ${p.y}` : `${p.x} ${p.y}`,
-                    }))} />
+                    <PointPicker language={language} label="+" onSelect={(p) => {
+                      const trimmed = form.points.trim();
+                      const index = trimmed ? trimmed.split('\n').length : 0;
+                      const newPoints = trimmed ? `${trimmed}\n${p.x} ${p.y}` : `${p.x} ${p.y}`;
+                      setForm((f) => ({ ...f, points: newPoints }));
+                      recordSelection(`vertex:${index}`, p, { points: newPoints });
+                    }} />
                       <textarea
                         id="points"
                         value={form.points}
@@ -433,10 +452,13 @@ Check - area (alternative method): ${result.alternativeArea?.toFixed(2) || 'N/A'
                   {/* Points */}
                   <div className="self-stretch flex flex-col justify-start items-start gap-2">
                     <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">Координати на точките (X Y)</div>
-                    <PointPicker language={language} label="+" onSelect={(p) => setForm((f) => ({
-                      ...f,
-                      points: f.points.trim() ? `${f.points.trim()}\n${p.x} ${p.y}` : `${p.x} ${p.y}`,
-                    }))} />
+                    <PointPicker language={language} label="+" onSelect={(p) => {
+                      const trimmed = form.points.trim();
+                      const index = trimmed ? trimmed.split('\n').length : 0;
+                      const newPoints = trimmed ? `${trimmed}\n${p.x} ${p.y}` : `${p.x} ${p.y}`;
+                      setForm((f) => ({ ...f, points: newPoints }));
+                      recordSelection(`vertex:${index}`, p, { points: newPoints });
+                    }} />
                     <textarea
                       id="points"
                       value={form.points}

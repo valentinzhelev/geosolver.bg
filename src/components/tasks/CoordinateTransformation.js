@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 import useTypewriter from '../../hooks/useTypewriter';
 import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
+import { usePointReferences } from '../../hooks/usePointReferences';
 import { useCalculationRestore } from '../../hooks/useCalculationRestore';
 import { getRestoreMapper } from '../../utils/calculationRestore';
 import { calculateCoordinateTransformation as calculateCoordinateTransformationDomain } from '../../domain/geodesy';
@@ -48,6 +49,7 @@ const CoordinateTransformation = () => {
   useCalculationRestore('coordinate-transformation', setForm, getRestoreMapper('coordinate-transformation'));
   const { t, language } = useTranslation();
   const { runWithTracking, isAuthenticated } = useGuardedCalculation();
+  const { recordSelection, noteFieldChange, getPointReferences, resetPointReferences } = usePointReferences();
   const [resultText, setResultText] = useState(t.defaultResultText);
   const [history, setHistory] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -63,6 +65,7 @@ const CoordinateTransformation = () => {
   const handleChange = (e) => {
     setForm({ ...form, [e.target.id]: e.target.value });
     saveInputHistory(e.target.id, e.target.value);
+    noteFieldChange(e.target.id, e.target.value);
   };
 
   const calculate = async () => {
@@ -95,6 +98,7 @@ const CoordinateTransformation = () => {
       inputData: { x, y, transformationType, parameters },
       getResultData: (r) => ({ xTransformed: r.xTransformed, yTransformed: r.yTransformed }),
       run: () => calculateCoordinateTransformation(x, y, transformationType, parameters),
+      pointReferences: getPointReferences(),
     });
     if (!result) return;
     const output = language === 'bg' 
@@ -165,6 +169,7 @@ Differences:
   const resetForm = () => {
     setForm({ x: '', y: '', transformationType: 'translation', dx: '', dy: '' });
     setResultText(t.defaultResultText);
+    resetPointReferences();
   };
 
   const handleDownload = (entry) => {
@@ -327,7 +332,7 @@ Differences:
                 <div className="self-stretch p-3 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex flex-col justify-center items-end gap-3 w-full min-w-0 overflow-hidden">
                   <div className="self-stretch justify-start text-black dark:text-white text-base font-semibold font-['Manrope']">Входни данни</div>
                   <div className="self-stretch">
-                    <PointPicker language={language} label="P" onSelect={(p) => setForm((f) => ({ ...f, y: String(p.y), x: String(p.x) }))} />
+                    <PointPicker language={language} label="P" onSelect={(p) => { const fields = { y: String(p.y), x: String(p.x) }; setForm((f) => ({ ...f, ...fields })); recordSelection('pointP', p, fields); }} />
                   </div>
                   <div className="self-stretch flex flex-col justify-start items-start gap-4 w-full">
                     {/* X */}
@@ -507,7 +512,7 @@ Differences:
               <div className="flex-1 p-4 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 inline-flex flex-col justify-center items-end gap-4">
                 <div className="self-stretch justify-start text-black dark:text-white text-lg font-semibold font-['Manrope']">Входни данни</div>
                 <div className="self-stretch">
-                  <PointPicker language={language} label="P" onSelect={(p) => setForm((f) => ({ ...f, y: String(p.y), x: String(p.x) }))} />
+                  <PointPicker language={language} label="P" onSelect={(p) => { const fields = { y: String(p.y), x: String(p.x) }; setForm((f) => ({ ...f, ...fields })); recordSelection('pointP', p, fields); }} />
                 </div>
                 <div className="self-stretch flex flex-col justify-start items-start gap-4">
                   {/* X */}
