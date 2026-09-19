@@ -1,0 +1,21 @@
+{
+  "_about": "Golden CHARACTERIZATION vectors for the SHIPPED Second Basic Task (SecondTask.js inline implementation, extracted verbatim to secondTaskShipped.js). They record what production does today, incl. its rounding (3dp; 6dp for trig/tangens). They are a regression baseline for the future backend port, NOT proof of correctness — the 3-4-5 cases are additionally independently verifiable by hand (atan(4/3) = 59.0334 gon). Coordinates: X north, Y east; alpha = clockwise bearing from X in gon.",
+  "engineVersion": 1,
+  "toolName": "second-basic-task",
+  "persistedInput": ["x1", "y1", "x2", "y2"],
+  "persistedResult": ["alpha", "distance", "deltaX", "deltaY"],
+  "vectors": [
+    { "name": "axis: due +X (0 gon)", "input": { "x1": 0, "y1": 0, "x2": 100, "y2": 0 }, "result": { "alpha": 0, "distance": 100, "deltaX": 100, "deltaY": 0 }, "quadrantName": "I" },
+    { "name": "axis: due +Y (100 gon, dx=0 -> tan=Infinity)", "input": { "x1": 0, "y1": 0, "x2": 0, "y2": 100 }, "result": { "alpha": 100, "distance": 100, "deltaX": 0, "deltaY": 100 }, "quadrantName": "II" },
+    { "name": "axis: due -X (200 gon)", "input": { "x1": 0, "y1": 0, "x2": -100, "y2": 0 }, "result": { "alpha": 200, "distance": 100, "deltaX": -100, "deltaY": 0 }, "quadrantName": "III" },
+    { "name": "axis: due -Y (300 gon, dx=0 -> tan=-Infinity)", "input": { "x1": 0, "y1": 0, "x2": 0, "y2": -100 }, "result": { "alpha": 300, "distance": 100, "deltaX": 0, "deltaY": -100 }, "quadrantName": "IV" },
+    { "name": "quadrant I, 3-4-5", "input": { "x1": 100, "y1": 200, "x2": 160, "y2": 280 }, "result": { "alpha": 59.033, "distance": 100, "deltaX": 60, "deltaY": 80 }, "quadrantName": "I" },
+    { "name": "quadrant II, 3-4-5", "input": { "x1": 100, "y1": 200, "x2": 40, "y2": 280 }, "result": { "alpha": 140.967, "distance": 100, "deltaX": -60, "deltaY": 80 }, "quadrantName": "II" },
+    { "name": "quadrant III, 3-4-5", "input": { "x1": 100, "y1": 200, "x2": 40, "y2": 120 }, "result": { "alpha": 259.033, "distance": 100, "deltaX": -60, "deltaY": -80 }, "quadrantName": "III" },
+    { "name": "quadrant IV, 3-4-5", "input": { "x1": 100, "y1": 200, "x2": 160, "y2": 120 }, "result": { "alpha": 340.967, "distance": 100, "deltaX": 60, "deltaY": -80 }, "quadrantName": "IV" },
+    { "name": "general decimals", "input": { "x1": 1000.123, "y1": 2000.456, "x2": 1234.567, "y2": 2345.678 }, "result": { "alpha": 62.021, "distance": 417.304, "deltaX": 234.444, "deltaY": 345.222 }, "quadrantName": "I" }
+  ],
+  "errors": [
+    { "name": "coincident points", "input": { "x1": 5, "y1": 5, "x2": 5, "y2": 5 }, "message": "Точките не могат да съвпадат" }
+  ]
+}

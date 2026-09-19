@@ -1,0 +1,34 @@
+{
+  "_about": "Golden CHARACTERIZATION vectors for the SHIPPED Area Calculation (AreaCalculation.js inline parsePoints/calculateArea, extracted verbatim to areaCalculationShipped.js). They record what production does today; they are a regression baseline for the future backend port, NOT proof of correctness. Rectangle/triangle areas and the triangle perimeter (100 + 2*sqrt(12500)) are independently verifiable by hand. Area is NOT rounded; only `area` is persisted (perimeter is display-only).",
+  "engineVersion": 1,
+  "toolName": "area-calculation",
+  "persistedInput": ["points", "method"],
+  "persistedResult": ["area"],
+  "parse": [
+    { "name": "space separated", "text": "0 0\n100 0\n100 100\n0 100", "points": [{ "x": 0, "y": 0 }, { "x": 100, "y": 0 }, { "x": 100, "y": 100 }, { "x": 0, "y": 100 }] },
+    { "name": "comma separated", "text": "0,0\n100,0\n50,100", "points": [{ "x": 0, "y": 0 }, { "x": 100, "y": 0 }, { "x": 50, "y": 100 }] },
+    { "name": "CRLF line endings", "text": "1 2\r\n3 4\r\n5 6", "points": [{ "x": 1, "y": 2 }, { "x": 3, "y": 4 }, { "x": 5, "y": 6 }] },
+    { "name": "signs, exponent, tab", "text": "-1.5 -2.5\n+3 +4\n1e2 1e2\n0.5\t0.5", "points": [{ "x": -1.5, "y": -2.5 }, { "x": 3, "y": 4 }, { "x": 100, "y": 100 }, { "x": 0.5, "y": 0.5 }] },
+    { "name": "MALFORMED lines are silently dropped (blank, text, single token, ';' separator)", "text": " 0 0 \n\n10,0\nabc def\n5\n3;4\n1e2 1e2", "points": [{ "x": 0, "y": 0 }, { "x": 10, "y": 0 }, { "x": 100, "y": 100 }] },
+    { "name": "extra tokens ignored (third value dropped)", "text": "10 10 99", "points": [{ "x": 10, "y": 10 }] },
+    { "name": "partial numeric prefix accepted (parseFloat)", "text": "12abc 3", "points": [{ "x": 12, "y": 3 }] },
+    { "name": "KNOWN HAZARD: decimal comma is read as a separator ('10,5 20,5' is NOT (10.5, 20.5))", "text": "10,5 20,5", "points": [{ "x": 10, "y": 5 }] },
+    { "name": "empty", "text": "", "points": [] },
+    { "name": "whitespace only", "text": "   ", "points": [] }
+  ],
+  "calc": [
+    { "name": "rectangle CCW-ish", "points": [[0, 0], [100, 0], [100, 100], [0, 100]], "area": 10000, "perimeter": 400 },
+    { "name": "rectangle reversed order (orientation-independent: area is |signed|/2)", "points": [[0, 100], [100, 100], [100, 0], [0, 0]], "area": 10000, "perimeter": 400 },
+    { "name": "triangle", "points": [[0, 0], [100, 0], [50, 100]], "area": 5000, "perimeter": 323.60679774997897 },
+    { "name": "triangle reversed", "points": [[50, 100], [100, 0], [0, 0]], "area": 5000, "perimeter": 323.60679774997897 },
+    { "name": "large offset coordinates (Gauss-Krueger-like magnitude)", "points": [[500000, 4700000], [500100, 4700000], [500100, 4700100], [500000, 4700100]], "area": 10000, "perimeter": 400 },
+    { "name": "minimum 3 points, collinear -> area 0, no error", "points": [[0, 0], [50, 0], [100, 0]], "area": 0, "perimeter": 200 },
+    { "name": "3 coincident points -> area 0, no error", "points": [[0, 0], [0, 0], [0, 0]], "area": 0, "perimeter": 0 },
+    { "name": "KNOWN LIMITATION: self-intersecting bow-tie is not detected, area cancels to 0", "points": [[0, 0], [100, 100], [100, 0], [0, 100]], "area": 0, "perimeter": 482.842712474619 }
+  ],
+  "methods": ["shoelace", "trapezoidal"],
+  "errors": [
+    { "name": "fewer than 3 points", "points": [[0, 0], [1, 1]], "method": "shoelace", "message": "Необходими са поне 3 точки за изчисляване на площ" },
+    { "name": "unknown method", "points": [[0, 0], [100, 0], [50, 100]], "method": "gauss", "message": "Неизвестен метод за изчисление" }
+  ]
+}
