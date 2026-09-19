@@ -7,6 +7,7 @@ import { hasUnlimitedCalculations } from '../utils/calculationAccess';
 import { getEduWorkContext } from '../utils/eduCalculatorBridge';
 import { allowsCalculatorAccess } from '../config/eduCalculatorPolicy';
 import { useProjectContext } from '../context/ProjectContext';
+import { applyAuthoritativeResult, classifySaveError, refreshRequiredMessage, validationMessage } from '../utils/authoritativeResult';
 
 /**
  * Auth gate + shared free-plan limit (5 total across all tools) + backend tracking.
@@ -86,8 +87,9 @@ export function useGuardedCalculation() {
       const savedResult =
         typeof getResultData === 'function' ? getResultData(runResult) : resultData;
 
+      let saved;
       try {
-        await trackCalculation(
+        saved = await trackCalculation(
           toolName,
           toolDisplayName,
           inputData,
@@ -98,12 +100,17 @@ export function useGuardedCalculation() {
           pointReferences || []
         );
       } catch (err) {
-        const message = err?.message || '';
-        if (message.includes('Authentication required') || message.includes('401')) {
+        const failure = classifySaveError(err);
+        if (failure.kind === 'auth') {
           navigate('/login');
           return null;
         }
-        if (message.includes('limit') || message.includes('403')) {
+        if (failure.kind === 'refresh_required') {
+          // Zero silent divergence: this browser would display a result the backend is not going to store.
+          alert(refreshRequiredMessage(language));
+          return null;
+        }
+        if (failure.kind === 'limit') {
           alert(
             language === 'bg'
               ? 'Лимитът за изчисления е изчерпан.'
@@ -111,11 +118,18 @@ export function useGuardedCalculation() {
           );
           return null;
         }
+        if (failure.kind === 'validation') {
+          alert(validationMessage(err, language));
+          return null;
+        }
         console.error('Failed to track calculation:', err);
         return null;
       }
 
-      return runResult;
+      // The backend computed and stored the authoritative result: never display one coordinate while
+      // another is persisted. Persisted fields come from the server; local intermediate fields stay.
+      return applyAuthoritativeResult(runResult, saved);
+
     },
     [requireAuthAndLimits, trackCalculation, navigate, language, requestedProjectId, projectError]
   );

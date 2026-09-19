@@ -23,13 +23,20 @@ class CalculationService {
           /* ignore */
         }
         const message = errorData.error || 'Failed to save calculation';
+        // Carry the backend's structured failure (status / code / field) so the shared calculation
+        // path can react to CLIENT_REFRESH_REQUIRED and validation codes instead of a bare message.
+        const failure = (text) => Object.assign(new Error(text), {
+          status: response.status,
+          code: errorData.code,
+          field: errorData.field,
+        });
         if (response.status === 401) {
-          throw new Error('Authentication required');
+          throw failure('Authentication required');
         }
         if (response.status === 403) {
-          throw new Error(message || 'Calculation limit reached');
+          throw failure(message || 'Calculation limit reached');
         }
-        throw new Error(message);
+        throw failure(message);
       }
       
       return await response.json();

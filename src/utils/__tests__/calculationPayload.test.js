@@ -14,9 +14,9 @@ describe('buildCalculationPayload (Milestone 1 §10)', () => {
     expect(payload).not.toHaveProperty('projectId');
     expect(payload).not.toHaveProperty('pointReferences');
     expect(payload).not.toHaveProperty('eduContext');
-    // Exactly the same shape the backend already accepted before this milestone.
+    // The previous shape plus the centrally added clientContractVersion (Milestone 2); all other optional keys stay omitted.
     expect(Object.keys(payload).sort()).toEqual(
-      ['calculationTime', 'inputData', 'resultData', 'toolDisplayName', 'toolName'].sort()
+      ['calculationTime', 'clientContractVersion', 'inputData', 'resultData', 'toolDisplayName', 'toolName'].sort()
     );
   });
 

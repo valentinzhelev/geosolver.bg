@@ -1,0 +1,14 @@
+{
+  "_about": "SHA-256 integrity manifest of the calculation contract fixtures (line endings normalized to LF before hashing). The SAME manifest lives in GEOSOLVER.BG/src/domain/geodesy/__fixtures__/ and geosolver-backend/engines/fixtures/; each repo tests its own fixture files against it, and the combined hash is pinned in both test suites. This detects fixture DRIFT at review time — it does not protect calculated floating-point output and is not a network-level cross-repo test. To change a fixture deliberately: edit it in BOTH repos, regenerate this manifest in both, and update the pinned combined hash in both fixtureIntegrity tests.",
+  "algorithm": "sha256",
+  "lineEndings": "normalized to LF",
+  "files": {
+    "areaCalculation.shipped.vectors.json": "e068f55f19f5ec43d63e691aa6c60095fe70f05517ee70c3a9cc7022127d2c57",
+    "orthogonalOffset.v1.legacy.vectors.json": "81f498d8c6cd19e7d108f5cc95d3c9d339d84ef5b7c1201a4a080b9d79c65c10",
+    "persistedContracts.json": "35ab91ce170bf2f755eee2a32e7016d363359da03b2e0d23ec2333eb3404ce1a",
+    "persistedVectors.json": "7666e9ac2ccf4bdbd3efb9427f36ec8946cb7cc4bc67d16395f0e7cf0caba5ab",
+    "resection.v1.legacy.vectors.json": "ec948a928e70049bb96c62e2c128b5f5544277021b73aa5d2a8aeaf11eb5912f",
+    "secondTask.shipped.vectors.json": "83b84c3a7eb78e0bd9b3c64a339b12d65e2a5114a8db4d30aa47301bc2e0884b"
+  },
+  "combined": "c3bd52dec679e63887a06594b61af52368f6d709295c7237cfdb5e45b1767d9a"
+}
