@@ -142,6 +142,22 @@ class CalculationService {
     }
   }
 
+  // Explicit "Save as point" — returns { status, body } (does not throw on
+  // 4xx) so the caller can distinguish already-created / CRS mismatch / forbidden.
+  static async createPointFromCalculation(calculationId, payload) {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    const response = await fetch(`${API_BASE_URL}/calculations/${calculationId}/create-point`, {
+      method: 'POST',
+      headers: getApiLanguageHeaders({
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        'Content-Type': 'application/json',
+      }),
+      body: JSON.stringify(payload),
+    });
+    const body = await response.json().catch(() => ({}));
+    return { status: response.status, body };
+  }
+
   // Fetch single calculation (full input/result)
   static async getCalculationById(id) {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');

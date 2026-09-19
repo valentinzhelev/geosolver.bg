@@ -7,6 +7,8 @@ import CalculationService from '../../../services/calculationService';
 import { getToolLabel, getToolPath, toolFilterOptions, getProjectCalculationTools } from '../../../config/calculationTools';
 import { formatCalcPayload, setCalculationRestore } from '../../../utils/calculationRestore';
 import { useProjectContext } from '../../../context/ProjectContext';
+import { canOfferSaveAsPoint } from '../../../utils/calculationPointCapability';
+import SaveCalculationAsPoint from './SaveCalculationAsPoint';
 
 const selectClass =
   "px-3 py-2 rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm font-['Manrope'] text-black dark:text-white outline-none";
@@ -343,6 +345,9 @@ const CalculationHistoryPage = () => {
                         {bg ? 'Инструмент' : 'Open tool'}
                       </Link>
                     </div>
+                    {canOfferSaveAsPoint(detail) && (
+                      <SaveCalculationAsPoint key={detail._id} calculation={detail} language={language} />
+                    )}
                   </div>
                 ) : null}
               </div>
