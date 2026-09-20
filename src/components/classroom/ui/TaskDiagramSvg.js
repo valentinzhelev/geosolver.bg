@@ -69,6 +69,54 @@ function DiagramFrame({ children, bg, caption }) {
   );
 }
 
+// Fixed illustrative layout (screen coordinates, bearings clockwise from "up"). Not derived from any task.
+const SCHEMA_P = { x: 150, y: 175 };
+const SCHEMA_BEARINGS = { A: 315, B: 15, C: 100 }; // degrees, sweeping clockwise A -> B -> C as seen from P
+const SCHEMA_DIST = { A: 100, B: 110, C: 95 };
+const polar = (deg, r) => ({
+  x: SCHEMA_P.x + r * Math.sin((deg * Math.PI) / 180),
+  y: SCHEMA_P.y - r * Math.cos((deg * Math.PI) / 180),
+});
+function clockwiseArc(fromDeg, toDeg, r) {
+  const a = polar(fromDeg, r);
+  const b = polar(toDeg, r);
+  const sweep = (((toDeg - fromDeg) % 360) + 360) % 360;
+  return `M ${a.x.toFixed(1)} ${a.y.toFixed(1)} A ${r} ${r} 0 ${sweep > 180 ? 1 : 0} 1 ${b.x.toFixed(1)} ${b.y.toFixed(1)}`;
+}
+
+function ResectionConventionSchematic({ bg }) {
+  const markerId = useId();
+  const pts = Object.fromEntries(Object.keys(SCHEMA_BEARINGS).map((k) => [k, polar(SCHEMA_BEARINGS[k], SCHEMA_DIST[k])]));
+  const mid1 = polar((SCHEMA_BEARINGS.A + 360 + SCHEMA_BEARINGS.B + 360) / 2, 58);
+  const mid2 = polar((SCHEMA_BEARINGS.B + SCHEMA_BEARINGS.C) / 2, 70);
+  return (
+    <g>
+      <defs>
+        <marker id={markerId} markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <polygon points="0 0, 6 3, 0 6" fill="#8b5cf6" />
+        </marker>
+      </defs>
+      {['A', 'B', 'C'].map((k) => (
+        <line key={k} x1={SCHEMA_P.x} y1={SCHEMA_P.y} x2={pts[k].x} y2={pts[k].y} className="stroke-neutral-400" strokeWidth="1" strokeDasharray="4 3" />
+      ))}
+      <path d={clockwiseArc(SCHEMA_BEARINGS.A, SCHEMA_BEARINGS.B, 40)} fill="none" stroke="#8b5cf6" strokeWidth="1.8" markerEnd={`url(#${markerId})`} />
+      <path d={clockwiseArc(SCHEMA_BEARINGS.B, SCHEMA_BEARINGS.C, 52)} fill="none" stroke="#8b5cf6" strokeWidth="1.8" markerEnd={`url(#${markerId})`} />
+      <text x={mid1.x - 8} y={mid1.y} textAnchor="middle" className="text-[11px] fill-violet-600 font-mono">β₁</text>
+      <text x={mid2.x + 6} y={mid2.y} textAnchor="middle" className="text-[11px] fill-violet-600 font-mono">β₂</text>
+      <Point cx={pts.A.x} cy={pts.A.y} label="A" />
+      <Point cx={pts.B.x} cy={pts.B.y} label="B" />
+      <Point cx={pts.C.x} cy={pts.C.y} label="C" />
+      <Point cx={SCHEMA_P.x} cy={SCHEMA_P.y} label="P" sublabel="?" dashed />
+      <text x="14" y="22" className="text-[9px] fill-neutral-500 font-['Manrope']">
+        {bg ? 'β₁: P→A към P→B' : 'β₁: P→A to P→B'}
+      </text>
+      <text x="14" y="34" className="text-[9px] fill-neutral-500 font-['Manrope']">
+        {bg ? 'β₂: P→B към P→C' : 'β₂: P→B to P→C'}
+      </text>
+    </g>
+  );
+}
+
 const TaskDiagramSvg = ({ toolKey, inputData, answers, bg }) => {
   const arrowId = useId();
   const caption = bg ? 'Схема (ориентировъчна)' : 'Diagram (schematic)';
@@ -217,59 +265,17 @@ const TaskDiagramSvg = ({ toolKey, inputData, answers, bg }) => {
   }
 
   if (toolKey === 'resection') {
-    const xA = num(inputData.xA);
-    const yA = num(inputData.yA);
-    const xB = num(inputData.xB);
-    const yB = num(inputData.yB);
-    const xC = num(inputData.xC);
-    const yC = num(inputData.yC);
-    const b1 = num(inputData.beta1);
-    const b2 = num(inputData.beta2);
-    const xP = num(answers?.xP);
-    const yP = num(answers?.yP);
-    const hasP = xP != null && yP != null;
-    const mapper = createGeoMapper(
-      [
-        { x: xA, y: yA },
-        { x: xB, y: yB },
-        { x: xC, y: yC },
-        hasP ? { x: xP, y: yP } : null,
-      ].filter(Boolean),
-      W,
-      H
-    );
-    const ax = mapper.sx(xA ?? 0);
-    const ay = mapper.sy(yA ?? 0);
-    const bx = mapper.sx(xB ?? 80);
-    const by = mapper.sy(yB ?? 120);
-    const cx = mapper.sx(xC ?? 160);
-    const cy = mapper.sy(yC ?? 40);
-    const px = hasP ? mapper.sx(xP) : (ax + bx + cx) / 3;
-    const py = hasP ? mapper.sy(yP) : (ay + by + cy) / 3;
-    const rA = rayEnd(ax, ay, b1 ?? 0, 75);
-    const rB = rayEnd(bx, by, b2 ?? 0, 75);
-
+    // Resection v2 convention SCHEMATIC. The station P is the unknown, so this diagram deliberately uses
+    // NO task data at all (no coordinates, no student answer): it only illustrates that both measured
+    // angles have their vertex at P and are directed, clockwise sweeps P->A to P->B (beta1) and
+    // P->B to P->C (beta2). Nothing about the real geometry, and never the answer, can appear here.
     return (
-      <DiagramFrame bg={bg} caption={caption}>
-        <Grid mapper={mapper} w={W} h={H} />
-        <polygon
-          points={`${ax},${ay} ${bx},${by} ${cx},${cy}`}
-          fill="none"
-          className="stroke-neutral-200 dark:stroke-zinc-600"
-          strokeWidth="1"
-        />
-        <line x1={ax} y1={ay} x2={rA.x} y2={rA.y} className="stroke-violet-400" strokeWidth="1.5" strokeDasharray="5 3" />
-        <line x1={bx} y1={by} x2={rB.x} y2={rB.y} className="stroke-violet-400" strokeWidth="1.5" strokeDasharray="5 3" />
-        <line x1={ax} y1={ay} x2={px} y2={py} className="stroke-neutral-300" strokeWidth="1" />
-        <line x1={bx} y1={by} x2={px} y2={py} className="stroke-neutral-300" strokeWidth="1" />
-        <line x1={cx} y1={cy} x2={px} y2={py} className="stroke-neutral-300" strokeWidth="1" />
-        <Point cx={ax} cy={ay} label="A" />
-        <Point cx={bx} cy={by} label="B" />
-        <Point cx={cx} cy={cy} label="C" />
-        <Point cx={px} cy={py} label="P" accent={hasP} dashed={!hasP} />
+      <DiagramFrame bg={bg} caption={bg ? 'Схема на конвенцията: ъглите са по ч. стр. в P' : 'Convention schematic: clockwise angles at P'}>
+        <ResectionConventionSchematic bg={bg} />
       </DiagramFrame>
     );
   }
+
 
   return (
     <div className="w-full max-w-[340px] h-[140px] mx-auto rounded-xl border border-dashed border-stone-200 dark:border-zinc-700 flex items-center justify-center text-xs text-neutral-400 dark:text-zinc-400 font-['Manrope']">
