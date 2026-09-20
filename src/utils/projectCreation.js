@@ -41,6 +41,7 @@ export function nextStepLinks(projectId, language = 'bg') {
   const bg = language === 'bg';
   return [
     { key: 'points', primary: true, to: `/points?projectId=${projectId}`, label: bg ? 'Добави точки' : 'Add points' },
+    { key: 'capture', to: `/capture?projectId=${projectId}`, label: bg ? 'Сканирай таблица' : 'Capture a table' },
     { key: 'calculations', to: `/calculations/history?projectId=${projectId}`, label: bg ? 'Изчисления' : 'Calculations' },
     { key: 'map', to: `/map?projectId=${projectId}`, label: bg ? 'Карта' : 'Map' },
     { key: 'gnss', to: `/gnss?projectId=${projectId}`, label: bg ? 'GNSS импорт' : 'GNSS import' },

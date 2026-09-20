@@ -293,6 +293,12 @@ const ProjectHubPage = () => {
                       {bg ? 'Точки' : 'Points'}
                     </Link>
                     <Link
+                      to={`/capture?projectId=${p._id}`}
+                      className="px-3 py-2 rounded-lg text-sm font-medium font-['Manrope'] bg-white dark:bg-zinc-900 outline outline-1 outline-gray-200 dark:outline-zinc-700"
+                    >
+                      {bg ? 'Сканиране' : 'Capture'}
+                    </Link>
+                    <Link
                       to={`/stakeout?projectId=${p._id}`}
                       className="px-3 py-2 rounded-lg text-sm font-medium font-['Manrope'] bg-white dark:bg-zinc-900 outline outline-1 outline-gray-200 dark:outline-zinc-700"
                     >
