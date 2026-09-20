@@ -1,5 +1,6 @@
 import API_BASE_URL from '../config/api';
 import { getApiLanguageHeaders, getApiErrorFallback } from '../utils/apiLanguage';
+import { notifySurveyPointsChanged } from '../utils/surveyPointsEvents';
 
 function getToken() {
   return localStorage.getItem('token') || sessionStorage.getItem('token');
@@ -41,16 +42,23 @@ async function request(path, options = {}) {
   return data;
 }
 
+// Every successful mutation invalidates the shared SurveyPointsContext cache (QA-05): the next PointPicker use is fresh.
+const mutating = (promise) =>
+  promise.then((res) => {
+    notifySurveyPointsChanged();
+    return res;
+  });
+
 export const surveyPointsApi = {
   list: (params = {}) => {
     const q = new URLSearchParams(params).toString();
     return request(`/points${q ? `?${q}` : ''}`);
   },
   create: (body) =>
-    request('/points', { method: 'POST', body: JSON.stringify(body) }),
+    mutating(request('/points', { method: 'POST', body: JSON.stringify(body) })),
   importMany: (body) =>
-    request('/points/import', { method: 'POST', body: JSON.stringify(body) }),
+    mutating(request('/points/import', { method: 'POST', body: JSON.stringify(body) })),
   update: (id, body) =>
-    request(`/points/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
-  remove: (id) => request(`/points/${id}`, { method: 'DELETE' }),
+    mutating(request(`/points/${id}`, { method: 'PUT', body: JSON.stringify(body) })),
+  remove: (id) => mutating(request(`/points/${id}`, { method: 'DELETE' })),
 };

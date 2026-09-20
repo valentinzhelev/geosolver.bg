@@ -548,6 +548,11 @@ Date: ${new Date().toLocaleString('en-US')}`;
               {/* Form Card */}
               <div className="flex-1 p-4 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 inline-flex flex-col justify-center items-end gap-4">
                 <div className="self-stretch justify-start text-black dark:text-white text-lg font-semibold font-['Manrope']">{t.inputData}</div>
+                <div className="self-stretch grid grid-cols-3 gap-2">
+                  <PointPicker language={language} label="A" onSelect={(p) => { const fields = { yA: String(p.y), xA: String(p.x) }; setForm((f) => ({ ...f, ...fields })); recordSelection('pointA', p, fields); }} />
+                  <PointPicker language={language} label="B" onSelect={(p) => { const fields = { yB: String(p.y), xB: String(p.x) }; setForm((f) => ({ ...f, ...fields })); recordSelection('pointB', p, fields); }} />
+                  <PointPicker language={language} label="C" onSelect={(p) => { const fields = { yC: String(p.y), xC: String(p.x) }; setForm((f) => ({ ...f, ...fields })); recordSelection('pointC', p, fields); }} />
+                </div>
                 <div className="self-stretch flex flex-col justify-start items-start gap-4">
                   {/* Point A */}
                   <div className="self-stretch flex flex-col justify-start items-start gap-2">

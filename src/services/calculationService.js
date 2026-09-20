@@ -1,5 +1,6 @@
 import API_BASE_URL from '../config/api';
 import { getApiLanguageHeaders } from '../utils/apiLanguage';
+import { notifySurveyPointsChanged } from '../utils/surveyPointsEvents';
 
 class CalculationService {
   // Save calculation
@@ -162,6 +163,10 @@ class CalculationService {
       body: JSON.stringify(payload),
     });
     const body = await response.json().catch(() => ({}));
+    // a created point (or an "already created" one, possibly made elsewhere) makes the shared points cache stale
+    if (response.status === 201 || (response.status === 409 && body?.code === 'ALREADY_CREATED')) {
+      notifySurveyPointsChanged();
+    }
     return { status: response.status, body };
   }
 
