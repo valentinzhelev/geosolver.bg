@@ -2,13 +2,13 @@ import JSZip from 'jszip';
 import { generateProjectReportPdfBlob } from './exportProjectReportPdf';
 import { pointsToCsvString } from './parseGnssImport';
 import { pointsToDxf } from './exportDxf';
-import { pointsToGeoJson } from './exportGeoJson';
+import { pointsToGeoJson, GeoJsonCrsError } from './exportGeoJson';
 
 function safeName(name) {
   return String(name || 'project').replace(/[^\w\u0400-\u04FF.-]+/g, '_').slice(0, 40);
 }
 
-function readmeText({ project, points, books, language }) {
+function readmeText({ project, points, books, language, geojsonIncluded = true }) {
   const bg = language === 'bg';
   const generatedAt = new Date().toLocaleString(bg ? 'bg-BG' : 'en-GB');
   return bg
@@ -20,7 +20,7 @@ function readmeText({ project, points, books, language }) {
 - client_report.pdf — отчет с точки и обобщение
 - points.csv — координати (Y, X, H)
 - points.dxf — точки за CAD
-- points.geojson — обмен с GIS
+${geojsonIncluded ? '- points.geojson — обмен с GIS (WGS84, [дължина, ширина])' : '- (GeoJSON не е включен: проектът няма зададена координатна система)'}
 - README.txt — този файл
 
 Точки: ${points.length} · Карнети: ${books.length}
@@ -34,7 +34,7 @@ Contents:
 - client_report.pdf — report with points summary
 - points.csv — coordinates (Y, X, H)
 - points.dxf — points for CAD
-- points.geojson — GIS exchange
+${geojsonIncluded ? '- points.geojson — GIS exchange (WGS84, [longitude, latitude])' : '- (GeoJSON not included: the project has no coordinate system set)'}
 - README.txt — this file
 
 Points: ${points.length} · Field books: ${books.length}
@@ -54,8 +54,15 @@ export async function downloadProjectPackage({ project, points = [], books = [],
   zip.file(`${base}_client_report.pdf`, pdfBlob);
   zip.file(`${base}_points.csv`, pointsToCsvString(points, language));
   zip.file(`${base}_points.dxf`, pointsToDxf(points));
-  zip.file(`${base}_points.geojson`, JSON.stringify(pointsToGeoJson(points, { name: project?.name }), null, 2));
-  zip.file('README.txt', readmeText({ project, points, books, language }));
+  // GeoJSON only with the project's own coordinate system; never raw projected metres as if they were lon/lat
+  let geojsonIncluded = true;
+  try {
+    zip.file(`${base}_points.geojson`, JSON.stringify(pointsToGeoJson(points, { name: project?.name, crs: project?.crs || null }), null, 2));
+  } catch (e) {
+    if (!(e instanceof GeoJsonCrsError)) throw e;
+    geojsonIncluded = false;
+  }
+  zip.file('README.txt', readmeText({ project, points, books, language, geojsonIncluded }));
 
   const blob = await zip.generateAsync({ type: 'blob' });
   const url = URL.createObjectURL(blob);

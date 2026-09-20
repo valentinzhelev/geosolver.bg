@@ -1,4 +1,9 @@
-/** Minimal ASCII DXF (R12) export — POINT entities on layer POINTS. */
+/**
+ * Minimal ASCII DXF (R12) export — POINT entities on layer POINTS.
+ * Cartesian CAD convention (QA-02): CAD X (group 10) is the horizontal axis = Easting = internal y;
+ * CAD Y (group 20) is the vertical axis = Northing = internal x. Elevation (group 30) is unchanged.
+ * Only the export axes are mapped; stored values are never modified.
+ */
 
 function dxfNum(v) {
   const n = Number(v);
@@ -14,7 +19,7 @@ export function pointsToDxf(points = []) {
   points
     .filter((p) => p.x != null && p.y != null)
     .forEach((p) => {
-      lines.push('0', 'POINT', '8', p.layer || 'POINTS', '10', dxfNum(p.x), '20', dxfNum(p.y));
+      lines.push('0', 'POINT', '8', p.layer || 'POINTS', '10', dxfNum(p.y), '20', dxfNum(p.x));
       if (p.h != null && Number.isFinite(Number(p.h))) {
         lines.push('30', dxfNum(p.h));
       }

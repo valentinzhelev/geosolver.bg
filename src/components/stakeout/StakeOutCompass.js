@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * Field stake-out compass: north up, arrow shows bearing to target (gon, 0 = north/Y+).
+ * Field stake-out compass: north up, arrow shows bearing to target (gon, 0 = north = +X, 100 = east = +Y).
  */
 const StakeOutCompass = ({
   bearingGon = 0,

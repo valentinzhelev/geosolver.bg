@@ -278,13 +278,16 @@ const Login = () => {
                       {t.loginWithGoogle}
                     </button>
                   )}
-                  <div
-                    className="pointer-events-none w-full min-h-[40px] px-3 py-2 bg-stone-100 dark:bg-zinc-800 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-600 flex justify-center items-center gap-2 text-black dark:text-white text-sm font-medium font-['Manrope']"
-                    aria-hidden={!!googleClientId}
-                  >
-                    <GoogleGIcon />
-                    {t.loginWithGoogle}
-                  </div>
+                  {/* Decorative skin for the invisible real Google button: only when Google sign-in is configured. */}
+                  {googleClientId && (
+                    <div
+                      className="pointer-events-none w-full min-h-[40px] px-3 py-2 bg-stone-100 dark:bg-zinc-800 rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-600 flex justify-center items-center gap-2 text-black dark:text-white text-sm font-medium font-['Manrope']"
+                      aria-hidden={!!googleClientId}
+                    >
+                      <GoogleGIcon />
+                      {t.loginWithGoogle}
+                    </div>
+                  )}
                 </div>
                 <Link
                   to="/register"

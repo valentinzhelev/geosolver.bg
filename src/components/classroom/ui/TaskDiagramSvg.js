@@ -10,7 +10,7 @@ function NorthArrow({ x, y, bg }) {
       <line x1="0" y1="8" x2="0" y2="-14" stroke="currentColor" strokeWidth="1.5" className="text-neutral-400 dark:text-zinc-400" />
       <polygon points="0,-18 -4,-10 4,-10" className="fill-neutral-500" />
       <text x="0" y="-22" textAnchor="middle" className="text-[9px] fill-neutral-500 font-['Manrope']">
-        Y
+        X
       </text>
     </g>
   );
@@ -137,10 +137,10 @@ const TaskDiagramSvg = ({ toolKey, inputData, answers, bg }) => {
       W,
       H
     );
-    const px1 = mapper.sx(x1 ?? 0);
-    const py1 = mapper.sy(y1 ?? 0);
-    const px2 = hasP2 ? mapper.sx(x2) : rayEnd(px1, py1, alpha ?? 0, 55).x;
-    const py2 = hasP2 ? mapper.sy(y2) : rayEnd(px1, py1, alpha ?? 0, 55).y;
+    const { sx: px1, sy: py1 } = mapper.toScreen(x1 ?? 0, y1 ?? 0);
+    const p2 = hasP2 ? mapper.toScreen(x2, y2) : rayEnd(px1, py1, alpha ?? 0, 55);
+    const px2 = hasP2 ? p2.sx : p2.x;
+    const py2 = hasP2 ? p2.sy : p2.y;
     const ray = rayEnd(px1, py1, alpha ?? 0, Math.hypot(px2 - px1, py2 - py1) * 0.85);
 
     return (
@@ -186,10 +186,8 @@ const TaskDiagramSvg = ({ toolKey, inputData, answers, bg }) => {
       W,
       H
     );
-    const px1 = mapper.sx(x1 ?? 0);
-    const py1 = mapper.sy(y1 ?? 0);
-    const px2 = mapper.sx(x2 ?? 100);
-    const py2 = mapper.sy(y2 ?? 100);
+    const { sx: px1, sy: py1 } = mapper.toScreen(x1 ?? 0, y1 ?? 0);
+    const { sx: px2, sy: py2 } = mapper.toScreen(x2 ?? 100, y2 ?? 100);
     const midX = (px1 + px2) / 2;
     const midY = (py1 + py2) / 2;
     const ang = Math.atan2(py2 - py1, px2 - px1);
@@ -235,22 +233,24 @@ const TaskDiagramSvg = ({ toolKey, inputData, answers, bg }) => {
       W,
       H
     );
-    const ax = mapper.sx(xA ?? 0);
-    const ay = mapper.sy(yA ?? 0);
-    const bx = mapper.sx(xB ?? 120);
-    const by = mapper.sy(yB ?? 0);
-    const px = hasP ? mapper.sx(xP) : (ax + bx) / 2;
-    const py = hasP ? mapper.sy(yP) : Math.min(ay, by) - 40;
-    const rA = rayEnd(ax, ay, b1 ?? 50, 90);
-    const rB = rayEnd(bx, by, b2 ?? 310, 90);
+    const { sx: ax, sy: ay } = mapper.toScreen(xA ?? 0, yA ?? 0);
+    const { sx: bx, sy: by } = mapper.toScreen(xB ?? 0, yB ?? 120);
+    const pScreen = hasP ? mapper.toScreen(xP, yP) : null;
+    // Real directions from the given data (never the answer): alpha_AP = alpha_AB - beta1 (P on the LEFT of A->B),
+    // alpha_BP = alpha_BA + beta2, bearings in gon clockwise from north (+X).
+    const alphaAB = (((Math.atan2((yB ?? 120) - (yA ?? 0), (xB ?? 0) - (xA ?? 0)) * 200) / Math.PI) + 400) % 400;
+    const alphaBA = (alphaAB + 200) % 400;
+    const rA = rayEnd(ax, ay, alphaAB - (b1 ?? 50), 90);
+    const rB = rayEnd(bx, by, alphaBA + (b2 ?? 50), 90);
 
     return (
       <DiagramFrame bg={bg} caption={caption}>
         <Grid mapper={mapper} w={W} h={H} />
         <line x1={ax} y1={ay} x2={rA.x} y2={rA.y} className="stroke-violet-400" strokeWidth="1.5" strokeDasharray="6 4" />
         <line x1={bx} y1={by} x2={rB.x} y2={rB.y} className="stroke-violet-400" strokeWidth="1.5" strokeDasharray="6 4" />
-        <line x1={ax} y1={ay} x2={px} y2={py} className="stroke-neutral-300" strokeWidth="1" />
-        <line x1={bx} y1={by} x2={px} y2={py} className="stroke-neutral-300" strokeWidth="1" />
+        <line x1={ax} y1={ay} x2={bx} y2={by} className="stroke-neutral-300" strokeWidth="1" />
+        {pScreen && <line x1={ax} y1={ay} x2={pScreen.sx} y2={pScreen.sy} className="stroke-neutral-300" strokeWidth="1" />}
+        {pScreen && <line x1={bx} y1={by} x2={pScreen.sx} y2={pScreen.sy} className="stroke-neutral-300" strokeWidth="1" />}
         <text x={rA.x - 10} y={rA.y} className="text-[9px] fill-violet-500 font-mono">
           β₁
         </text>
@@ -259,7 +259,7 @@ const TaskDiagramSvg = ({ toolKey, inputData, answers, bg }) => {
         </text>
         <Point cx={ax} cy={ay} label="A" />
         <Point cx={bx} cy={by} label="B" />
-        <Point cx={px} cy={py} label="P" accent={hasP} dashed={!hasP} />
+        {pScreen && <Point cx={pScreen.sx} cy={pScreen.sy} label="P" accent />}
       </DiagramFrame>
     );
   }

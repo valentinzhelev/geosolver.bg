@@ -8,7 +8,7 @@ import { useTranslation } from '../../../hooks/useTranslation';
 import { surveyPointsApi } from '../../../services/surveyPointsApi';
 import { fieldbooksApi } from '../../../services/fieldbookApi';
 import { downloadPointsCsv } from '../../../utils/parseGnssImport';
-import { downloadGeoJson } from '../../../utils/exportGeoJson';
+import { downloadGeoJson, geoJsonErrorMessage } from '../../../utils/exportGeoJson';
 import { downloadDxf } from '../../../utils/exportDxf';
 import { findNearbyPoints } from '../../../utils/findNearbyPoints';
 
@@ -150,6 +150,17 @@ const PointsPage = () => {
     }
   };
 
+  // GeoJSON needs the selected PROJECT's own coordinate system (never a guess); otherwise explain why it is unavailable
+  const handleGeoJson = () => {
+    const crs = projects.find((p) => String(p._id) === String(projectFilter))?.crs || null;
+    try {
+      downloadGeoJson(points, 'geosolver_points', { crs });
+      setError('');
+    } catch (e) {
+      setError(geoJsonErrorMessage(e, language));
+    }
+  };
+
   const handleImportCsv = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -208,7 +219,7 @@ const PointsPage = () => {
               <button
                 type="button"
                 disabled={!points.length}
-                onClick={() => downloadGeoJson(points, 'geosolver_points')}
+                onClick={handleGeoJson}
                 className="px-3 py-2 rounded-lg text-sm font-semibold font-['Manrope'] bg-white dark:bg-zinc-900 outline outline-1 outline-gray-200 dark:outline-zinc-700 disabled:opacity-50"
               >
                 GeoJSON
@@ -305,8 +316,8 @@ const PointsPage = () => {
 
           <div className="p-3 rounded-lg bg-stone-100 dark:bg-zinc-800/60 text-xs text-neutral-600 dark:text-zinc-400 font-['Manrope'] leading-relaxed">
             {bg
-              ? 'Координатна конвенция: Y = север (Northing), X = изток (Easting), единици — метри. Точките се преизползват в калкулаторите чрез PointPicker.'
-              : 'Coordinate convention: Y = north (Northing), X = east (Easting), units — metres. Points are reused in calculators via PointPicker.'}
+              ? 'Координатна конвенция: X = север (Northing), Y = изток (Easting), единици — метри. 0 gon = север (+X). Точките се преизползват в калкулаторите чрез PointPicker.'
+              : 'Coordinate convention: X = north (Northing), Y = east (Easting), units — metres. 0 gon = north (+X). Points are reused in calculators via PointPicker.'}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-5">
@@ -324,10 +335,10 @@ const PointsPage = () => {
                   <input className={inputClass} value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value })} />
                 </Field>
                 <div className="grid grid-cols-2 gap-2">
-                  <Field label="Y (m)">
+                  <Field label={bg ? 'Y — изток / Easting (m)' : 'Y — east / Easting (m)'}>
                     <input type="number" step="any" className={inputClass} value={form.y} onChange={(e) => setForm({ ...form, y: e.target.value })} />
                   </Field>
-                  <Field label="X (m)">
+                  <Field label={bg ? 'X — север / Northing (m)' : 'X — north / Northing (m)'}>
                     <input type="number" step="any" className={inputClass} value={form.x} onChange={(e) => setForm({ ...form, x: e.target.value })} />
                   </Field>
                 </div>
@@ -354,7 +365,7 @@ const PointsPage = () => {
                   )}
                 </div>
                 <label className="mt-2 pt-3 border-t border-gray-200 dark:border-zinc-800 cursor-pointer text-sm font-medium font-['Manrope'] text-neutral-600 dark:text-zinc-400 hover:text-black dark:hover:text-white">
-                  {bg ? 'Import CSV (име, код, Y, X, H, бележки)' : 'Import CSV (name, code, Y, X, H, notes)'}
+                  {bg ? 'Import CSV (име, код, Y=изток, X=север, H, бележки)' : 'Import CSV (name, code, Y=east, X=north, H, notes)'}
                   <input type="file" accept=".csv,.txt" className="hidden" onChange={handleImportCsv} />
                 </label>
               </form>

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { planPosition } from '../../domain/geodesy/coordinateConvention';
 
 const PAD = 48;
 const MIN_ZOOM = 0.4;
@@ -38,7 +39,8 @@ function niceScaleMeters(raw) {
 }
 
 /**
- * Interactive 2D plan view (Y north, X east) for survey points.
+ * Interactive 2D plan view for survey points. Official convention (QA-02): X = Northing is the VERTICAL
+ * (up) axis and Y = Easting is the HORIZONTAL (right) axis - see domain/geodesy/coordinateConvention.js.
  */
 const SurveyPlanMap = ({
   points = [],
@@ -76,10 +78,8 @@ const SurveyPlanMap = ({
     const innerW = width - 2 * PAD;
     const innerH = height - 2 * PAD;
 
-    const toSvg = (x, y) => ({
-      sx: PAD + innerW / 2 + ((x - cx) / span) * innerW,
-      sy: PAD + innerH / 2 - ((y - cy) / span) * innerH,
-    });
+    // cx = centre Northing (x), cy = centre Easting (y)
+    const toSvg = (x, y) => planPosition(x, y, { cx, cy, span, innerW, innerH, pad: PAD });
 
     return { toSvg, span, cx, cy };
   }, [bbox, width, height]);
@@ -127,15 +127,16 @@ const SurveyPlanMap = ({
     const startY = Math.floor((bbox.minY - span * 0.1) / step) * step;
     const endY = Math.ceil((bbox.maxY + span * 0.1) / step) * step;
     const lines = [];
+    // constant Northing (x) => a horizontal line; constant Easting (y) => a vertical line
     for (let x = startX; x <= endX; x += step) {
       const a = toSvg(x, cy - span);
       const b = toSvg(x, cy + span);
-      lines.push({ x1: a.sx, y1: a.sy, x2: b.sx, y2: b.sy, label: x });
+      lines.push({ x1: a.sx, y1: a.sy, x2: b.sx, y2: b.sy, label: x, horizontal: true });
     }
     for (let y = startY; y <= endY; y += step) {
       const a = toSvg(cx - span, y);
       const b = toSvg(cx + span, y);
-      lines.push({ x1: a.sx, y1: a.sy, x2: b.sx, y2: b.sy, label: y, horizontal: true });
+      lines.push({ x1: a.sx, y1: a.sy, x2: b.sx, y2: b.sy, label: y });
     }
     return lines;
   }, [showGrid, bbox, view]);
@@ -169,11 +170,11 @@ const SurveyPlanMap = ({
         <div className="text-xs text-neutral-500 dark:text-zinc-400 font-['Manrope']">
           {measureOn
             ? bg
-              ? 'Линийка: кликни 2 точки · Y ↑ север'
-              : 'Ruler: click 2 points · Y ↑ north'
+              ? 'Линийка: кликни 2 точки · X ↑ север, Y → изток'
+              : 'Ruler: click 2 points · X ↑ north, Y → east'
             : bg
-              ? 'Zoom: колело · Pan: drag · Y ↑ север'
-              : 'Zoom: wheel · Pan: drag · Y ↑ north'}
+              ? 'Zoom: колело · Pan: drag · X ↑ север, Y → изток'
+              : 'Zoom: wheel · Pan: drag · X ↑ north, Y → east'}
         </div>
         <div className="flex flex-wrap gap-2">
           <button
@@ -308,7 +309,7 @@ const SurveyPlanMap = ({
           <g transform={`translate(${width - PAD - 8}, ${PAD + 20})`}>
             <line x1="0" y1="16" x2="0" y2="-12" stroke="currentColor" className="text-neutral-500" strokeWidth="1.5" markerEnd="url(#north-arrow)" />
             <text x="0" y="-18" textAnchor="middle" fontSize="10" fill="currentColor" className="text-neutral-500" fontFamily="Manrope, sans-serif">
-              Y
+              X
             </text>
           </g>
           <defs>

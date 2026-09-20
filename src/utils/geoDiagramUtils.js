@@ -1,4 +1,9 @@
-/** Shared helpers for geodesy SVG diagrams (Y north, X east). */
+import { bearingScreenVector } from '../domain/geodesy/coordinateConvention';
+
+/**
+ * Shared helpers for geodesy SVG diagrams. Official convention (QA-02): X = Northing is the VERTICAL (up) axis,
+ * Y = Easting is the HORIZONTAL (right) axis; bearings run clockwise from north (0 gon = up, 100 gon = right).
+ */
 
 export function num(v) {
   const n = Number(v);
@@ -8,10 +13,10 @@ export function num(v) {
 export function createGeoMapper(points, width, height, pad = 36) {
   const valid = points.filter((p) => p.x != null && p.y != null);
   if (valid.length === 0) {
-    return { sx: () => width / 2, sy: () => height / 2, valid: false };
+    return { toScreen: () => ({ sx: width / 2, sy: height / 2 }), valid: false };
   }
-  const xs = valid.map((p) => p.x);
-  const ys = valid.map((p) => p.y);
+  const xs = valid.map((p) => p.x); // Northing
+  const ys = valid.map((p) => p.y); // Easting
   let minX = Math.min(...xs);
   let maxX = Math.max(...xs);
   let minY = Math.min(...ys);
@@ -26,10 +31,17 @@ export function createGeoMapper(points, width, height, pad = 36) {
   maxY += padY;
   const innerW = width - pad * 2;
   const innerH = height - pad * 2;
+  // ONE scale for both axes so directions/angles on screen equal the real ones
+  const scale = Math.min(innerW / (maxY - minY), innerH / (maxX - minX));
+  const midN = (minX + maxX) / 2;
+  const midE = (minY + maxY) / 2;
   return {
     valid: true,
-    sx: (x) => pad + ((x - minX) / (maxX - minX)) * innerW,
-    sy: (y) => height - pad - ((y - minY) / (maxY - minY)) * innerH,
+    // internal (x = Northing, y = Easting) -> screen: Easting to the right, Northing up
+    toScreen: (x, y) => ({
+      sx: width / 2 + (y - midE) * scale,
+      sy: height / 2 - (x - midN) * scale,
+    }),
     minX,
     maxX,
     minY,
@@ -37,25 +49,24 @@ export function createGeoMapper(points, width, height, pad = 36) {
   };
 }
 
-/** Direction angle in gon → math angle for SVG (radians, 0 = east, CCW). */
-export function gonToSvgAngle(gon) {
+/** Bearing in gon → screen step (north up): 0 gon = up, 100 gon = right. Missing bearing falls back to north. */
+export function gonToScreenVector(gon) {
   const g = num(gon);
-  if (g == null) return -Math.PI / 2;
-  return ((90 - (g * 360) / 400) * Math.PI) / 180;
+  return bearingScreenVector(g == null ? 0 : g);
 }
 
 export function rayEnd(sx, sy, gon, length = 70) {
-  const a = gonToSvgAngle(gon);
-  return { x: sx + Math.cos(a) * length, y: sy + Math.sin(a) * length };
+  const v = gonToScreenVector(gon);
+  return { x: sx + v.dx * length, y: sy + v.dy * length };
 }
 
 export function arcPath(cx, cy, r, startGon, sweepGon = 50) {
-  const a0 = gonToSvgAngle(startGon);
-  const a1 = gonToSvgAngle(startGon + sweepGon);
-  const x0 = cx + r * Math.cos(a0);
-  const y0 = cy + r * Math.sin(a0);
-  const x1 = cx + r * Math.cos(a1);
-  const y1 = cy + r * Math.sin(a1);
+  const v0 = gonToScreenVector(startGon);
+  const v1 = gonToScreenVector(startGon + sweepGon);
+  const x0 = cx + r * v0.dx;
+  const y0 = cy + r * v0.dy;
+  const x1 = cx + r * v1.dx;
+  const y1 = cy + r * v1.dy;
   const large = Math.abs(sweepGon) > 200 ? 1 : 0;
   return `M ${x0} ${y0} A ${r} ${r} 0 ${large} 1 ${x1} ${y1}`;
 }

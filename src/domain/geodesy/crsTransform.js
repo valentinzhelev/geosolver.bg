@@ -112,3 +112,61 @@ export function crsLabel(crsId, language = 'bg') {
   const opt = CRS_OPTIONS.find((o) => o.id === crsId);
   return opt ? opt.label[language === 'bg' ? 'bg' : 'en'] : crsId;
 }
+
+/**
+ * EXPLICIT provenance test for a stored point that holds WGS84 DEGREES (x = latitude, y = longitude):
+ * only points tagged by the GNSS importer (layer AND pointClass both 'gnss') qualify, and their values must be valid
+ * geographic ranges. An ordinary survey point (any other layer/class) is NEVER reinterpreted, whatever its numbers
+ * are: x = 50, y = 20 is 50 m Northing / 20 m Easting, exactly like x = 500000, y = 4700000.
+ * (The range check only guards an already GNSS-tagged point; it is not used to decide what an ordinary point is.)
+ */
+export function isExplicitGeographicGnssPoint(point) {
+  if (!point || point.layer !== 'gnss' || point.pointClass !== 'gnss') return false;
+  const x = Number(point.x);
+  const y = Number(point.y);
+  return Number.isFinite(x) && Number.isFinite(y) && Math.abs(x) <= 90 && Math.abs(y) <= 180;
+}
+
+/** CRS ids GeoSolver can transform to WGS84 (plus EPSG:4326 itself, where x = latitude, y = longitude). */
+export function isSupportedCrs(crsId) {
+  return typeof crsId === 'string' && (crsId === WGS84 || CRS_OPTIONS.some((o) => o.id === crsId));
+}
+
+/**
+ * Point for the 2D PLAN: stored survey coordinates stay survey coordinates (X Northing, Y Easting).
+ * Only an explicitly GNSS-tagged geographic point is projected into the selected CRS so it can share the plan.
+ */
+export function toPlanPoint(point, crsId = DEFAULT_CRS) {
+  if (isExplicitGeographicGnssPoint(point)) {
+    const proj = wgs84ToProjected(Number(point.x), Number(point.y), crsId);
+    return { ...point, x: proj.x, y: proj.y, crs: crsId, transformed: true, sourceWgs84: { lat: Number(point.x), lon: Number(point.y) } };
+  }
+  return { ...point, x: Number(point.x), y: Number(point.y), crs: point.crs || null, transformed: false };
+}
+
+/**
+ * Prepare one survey-library point for the OSM basemap (GnssOsmMap), or null when it cannot be placed.
+ * The result is in the "OSM frame": fields are named by GEOGRAPHIC role - y = LATITUDE, x = LONGITUDE - which is
+ * deliberately the reverse of the survey meaning (X = Northing, Y = Easting). Stored points are never modified.
+ *
+ *  1. explicit GNSS geographic point (see isExplicitGeographicGnssPoint): x = latitude, y = longitude -> swapped in
+ *  2. every other point is a PROJECTED survey point in the selected CRS: projectedToWgs84(x, y, crs), lat -> y, lon -> x
+ * There is no numeric guessing and no "stored swapped" interpretation.
+ */
+export function toOsmFramePoint(point, crsId = DEFAULT_CRS) {
+  if (isExplicitGeographicGnssPoint(point)) {
+    return { ...point, y: Number(point.x), x: Number(point.y), layer: 'gnss', pointClass: 'gnss' };
+  }
+  try {
+    const wgs = projectedToWgs84(Number(point.x), Number(point.y), crsId);
+    if (!Number.isFinite(wgs.lat) || !Number.isFinite(wgs.lon)) return null;
+    return { ...point, y: wgs.lat, x: wgs.lon, layer: 'gnss', pointClass: 'gnss', code: point.code || 'CRS' };
+  } catch {
+    return null;
+  }
+}
+
+/** The single place where the OSM frame becomes Leaflet's [lat, lon]. */
+export function osmFrameToLatLon(point) {
+  return { lat: point.y, lon: point.x };
+}

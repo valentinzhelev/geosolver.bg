@@ -12,14 +12,13 @@ import { useTranslation } from '../../../hooks/useTranslation';
 import { surveyPointsApi } from '../../../services/surveyPointsApi';
 import { fieldbooksApi } from '../../../services/fieldbookApi';
 import { downloadPointsCsv } from '../../../utils/parseGnssImport';
-import { downloadGeoJson } from '../../../utils/exportGeoJson';
+import { downloadGeoJson, geoJsonErrorMessage } from '../../../utils/exportGeoJson';
 import { downloadDxf } from '../../../utils/exportDxf';
 import CrsSelect from '../../shared/CrsSelect';
 import {
   DEFAULT_CRS,
-  ensureProjectedPoint,
-  projectedToWgs84,
-  looksLikeWgs84,
+  toPlanPoint,
+  toOsmFramePoint,
 } from '../../../domain/geodesy/crsTransform';
 
 const selectClass =
@@ -27,8 +26,8 @@ const selectClass =
 
 const VIEW_HELP = {
   plan: {
-    bg: 'Планът използва Y↑ север в избраната CRS. Zoom с колелцето, пан с влачене. Кликни точка за координати — сравни с втора основна задача между две точки.',
-    en: 'Plan uses Y↑ north in the selected CRS. Zoom with wheel, pan by drag. Click a point for coordinates — compare with second basic task between two points.',
+    bg: 'Планът показва X↑ север и Y→ изток в избраната CRS. Zoom с колелцето, пан с влачене. Кликни точка за координати — сравни с втора основна задача между две точки.',
+    en: 'Plan shows X↑ north and Y→ east in the selected CRS. Zoom with wheel, pan by drag. Click a point for coordinates — compare with second basic task between two points.',
   },
   profile: {
     bg: 'Профилът изчислява разстояние по ред на точките (chainage) спрямо котата H. Нужни са минимум 2 точки с H. Подреди точките логично по трасето преди анализ.',
@@ -109,36 +108,28 @@ const MapPage = () => {
   const mapPoints = useMemo(() => points.filter((p) => p.x != null && p.y != null), [points]);
 
   const planPoints = useMemo(
-    () => mapPoints.map((p) => ensureProjectedPoint(p, crsId)),
+    // stored survey x/y stay survey coordinates; only explicitly GNSS-tagged degrees are projected (see toPlanPoint)
+    () => mapPoints.map((p) => toPlanPoint(p, crsId)),
     [mapPoints, crsId]
   );
 
+  // GeoJSON needs the PROJECT's own coordinate system (never a guess): none selected => the export explains why
+  const exportProjectCrs = useMemo(
+    () => projects.find((x) => String(x._id) === String(projectId))?.crs || null,
+    [projects, projectId]
+  );
+  const handleGeoJson = () => {
+    try {
+      downloadGeoJson(mapPoints, 'geosolver_map', { crs: exportProjectCrs });
+      setError('');
+    } catch (e) {
+      setError(geoJsonErrorMessage(e, language));
+    }
+  };
+
   const osmPoints = useMemo(
-    () =>
-      mapPoints.map((p) => {
-        const x = Number(p.x);
-        const y = Number(p.y);
-        if (looksLikeWgs84(x, y)) {
-          // platform GNSS: x≈lat, y≈lon → OSM expects y=lat, x=lon
-          return { ...p, y: x, x: y, layer: 'gnss', pointClass: 'gnss' };
-        }
-        if (looksLikeWgs84(y, x)) {
-          return { ...p, layer: 'gnss', pointClass: 'gnss' };
-        }
-        try {
-          const wgs = projectedToWgs84(x, y, crsId);
-          return {
-            ...p,
-            y: wgs.lat,
-            x: wgs.lon,
-            layer: 'gnss',
-            pointClass: 'gnss',
-            code: p.code || 'CRS',
-          };
-        } catch {
-          return p;
-        }
-      }),
+    // "OSM frame" for GnssOsmMap: y = latitude, x = longitude (geographic roles, see toOsmFramePoint)
+    () => mapPoints.map((p) => toOsmFramePoint(p, crsId)).filter(Boolean),
     [mapPoints, crsId]
   );
 
@@ -186,8 +177,8 @@ const MapPage = () => {
               </button>
               <button
                 type="button"
-                onClick={() => downloadGeoJson(planPoints, 'geosolver_map')}
-                disabled={!planPoints.length}
+                onClick={handleGeoJson}
+                disabled={!mapPoints.length}
                 className="px-3 py-2 rounded-lg text-sm font-semibold font-['Manrope'] bg-white dark:bg-zinc-900 outline outline-1 outline-gray-200 dark:outline-zinc-700 disabled:opacity-50"
               >
                 GeoJSON

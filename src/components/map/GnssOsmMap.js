@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { osmFrameToLatLon } from '../../domain/geodesy/crsTransform';
 
 import iconRetina from 'leaflet/dist/images/marker-icon-2x.png';
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -22,7 +23,9 @@ function looksLikeWgs84(lat, lon) {
 }
 
 /**
- * OSM basemap for GNSS / WGS84 points (lat = Y, lon = X in library).
+ * OSM basemap for GNSS / WGS84 points. INPUT CONTRACT: the points it receives are already in the "OSM frame"
+ * prepared by MapPage (y = latitude, x = longitude — named by geographic role, NOT by the survey X/Y meaning).
+ * In the survey library WGS84 GNSS points are stored as x = latitude, y = longitude; MapPage swaps them before this.
  */
 const GnssOsmMap = ({
   points = [],
@@ -40,7 +43,7 @@ const GnssOsmMap = ({
     return points
       .filter((p) => Number.isFinite(p.y) && Number.isFinite(p.x))
       .filter((p) => isGnssLike(p) || looksLikeWgs84(p.y, p.x))
-      .map((p) => ({ ...p, lat: p.y, lon: p.x }));
+      .map((p) => ({ ...p, ...osmFrameToLatLon(p) })); // OSM frame: y = latitude, x = longitude
   }, [points]);
 
   useEffect(() => {
@@ -94,8 +97,8 @@ const GnssOsmMap = ({
     <div className="w-full flex flex-col gap-2">
       <p className="text-xs text-amber-800 dark:text-amber-200 font-['Manrope'] p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900/50">
         {bg
-          ? 'OSM подложка е за GNSS/WGS84 точки (ширина ≈ Y, дължина ≈ X). Координатни точки в BGS2005 не се показват тук — използвайте План.'
-          : 'OSM basemap is for GNSS/WGS84 points (lat ≈ Y, lon ≈ X). BGS2005 survey points belong on Plan view.'}
+          ? 'OSM подложка е за GNSS/WGS84 точки (в библиотеката: X = ширина, Y = дължина). Координатни точки в BGS2005 се преобразуват през избраната CRS.'
+          : 'OSM basemap is for GNSS/WGS84 points (in the library: X = latitude, Y = longitude). BGS2005 survey points are converted through the selected CRS.'}
       </p>
       <div
         ref={containerRef}

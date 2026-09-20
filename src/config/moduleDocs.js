@@ -191,12 +191,12 @@ const MODULE_DOCS = {
     ],
     quickTips: {
       bg: [
-        'Y е север (Northing), X е изток (Easting) — българска координатна конвенция.',
+        'X е север (Northing), Y е изток (Easting) — българска координатна конвенция.',
         'Търсенето работи по име и код с кратко забавяне.',
         'CSV import: име, код, Y, X, H, бележки (ред на колоните).',
       ],
       en: [
-        'Y is north (Northing), X is east (Easting) — Bulgarian coordinate convention.',
+        'X is north (Northing), Y is east (Easting) — Bulgarian coordinate convention.',
         'Search matches name and code with a short debounce.',
         'CSV import: name, code, Y, X, H, notes (column order).',
       ],
@@ -210,7 +210,7 @@ const MODULE_DOCS = {
       {
         title: { bg: 'Координатна система', en: 'Coordinate system' },
         content: {
-          bg: 'GeoSolver работи в плоска координатна система с метри. Y сочи към север, X към изток. Котата H е над морското равнище (или относителна, ако така е дефинирана в обекта). При учебни задачи винаги проверявай дали Y и X не са разменени — това е най-честата грешка на студенти.',
+          bg: 'GeoSolver работи в плоска координатна система с метри. X сочи към север (Northing), Y към изток (Easting). Котата H е над морското равнище (или относителна, ако така е дефинирана в обекта). При учебни задачи винаги проверявай дали X и Y не са разменени — това е най-честата грешка на студенти.',
           en: 'GeoSolver uses a plane coordinate system in metres. Y points north, X points east. Elevation H is above sea level (or relative, as defined for the site). In coursework always check Y and X are not swapped — the most common student mistake.',
         },
       },
@@ -267,12 +267,12 @@ const MODULE_DOCS = {
     ],
     quickTips: {
       bg: [
-        'На плана Y↑ е север — линийката мери S между две точки.',
+        'На плана X↑ е север, Y→ е изток — линийката мери S между две точки.',
         'OSM табът е само за GNSS/WGS84 (не BGS2005 план).',
         '3D preview е ориентировъчен, не замества CAD.',
       ],
       en: [
-        'On the plan Y↑ is north — ruler measures S between two points.',
+        'On the plan X↑ is north, Y→ is east — ruler measures S between two points.',
         'OSM tab is for GNSS/WGS84 only (not BGS2005 plan).',
         '3D preview is indicative, not a CAD replacement.',
       ],
@@ -389,12 +389,12 @@ const MODULE_DOCS = {
     ],
     quickTips: {
       bg: [
-        'α е в гради (0–400 gon), 0 gon ≈ север (+Y).',
+        'α е в гради (0–400 gon), 0 gon = север (+X), 100 gon = изток (+Y).',
         'Допускът е за учебно сравнение — не замества RTK.',
         'ΔY и ΔX трябва да съвпадат с втора основна задача.',
       ],
       en: [
-        'α is in gon (0–400), 0 gon ≈ north (+Y).',
+        'α is in gon (0–400), 0 gon = north (+X), 100 gon = east (+Y).',
         'Tolerance is for learning comparison — not RTK.',
         'ΔY and ΔX should match the second basic task.',
       ],

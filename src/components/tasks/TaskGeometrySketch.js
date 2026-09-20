@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { bearingScreenVector } from '../../domain/geodesy/coordinateConvention';
 
 const PAD = 36;
 const W = 320;
@@ -6,7 +7,8 @@ const H = 220;
 
 /**
  * Simple SVG sketch for first basic task: P1 → P2 with bearing α and distance S.
- * X is horizontal (East), Y is vertical (North).
+ * Official convention (QA-02): Y (Easting) is horizontal, X (Northing) is vertical (up); alpha is a bearing
+ * clockwise from north (0 gon = up, 100 gon = right).
  */
 const TaskGeometrySketch = ({ y1, x1, y2, x2, alphaGon, s, language = 'bg' }) => {
   const bg = language === 'bg';
@@ -29,9 +31,10 @@ const TaskGeometrySketch = ({ y1, x1, y2, x2, alphaGon, s, language = 'bg' }) =>
     const cx = (minX + maxX) / 2;
     const cy = (minY + maxY) / 2;
 
+    // cx = centre Northing (x), cy = centre Easting (y)
     const toSvg = (x, y) => ({
-      sx: PAD + ((x - cx) / span + 0.5) * (W - 2 * PAD),
-      sy: H - PAD - ((y - cy) / span + 0.5) * (H - 2 * PAD),
+      sx: PAD + ((y - cy) / span + 0.5) * (W - 2 * PAD),
+      sy: H - PAD - ((x - cx) / span + 0.5) * (H - 2 * PAD),
     });
 
     const p1 = toSvg(x1, y1);
@@ -40,9 +43,9 @@ const TaskGeometrySketch = ({ y1, x1, y2, x2, alphaGon, s, language = 'bg' }) =>
     let arc = null;
     if (p2 && Number.isFinite(alphaGon)) {
       const refLen = Math.min(48, Math.hypot(p2.sx - p1.sx, p2.sy - p1.sy) * 0.35);
-      const alphaRad = (alphaGon / 200) * Math.PI;
-      const ex = p1.sx + refLen * Math.cos(alphaRad);
-      const ey = p1.sy - refLen * Math.sin(alphaRad);
+      const v = bearingScreenVector(alphaGon);
+      const ex = p1.sx + refLen * v.dx;
+      const ey = p1.sy + refLen * v.dy;
       arc = { ex, ey, alphaGon };
     }
 
@@ -93,10 +96,10 @@ const TaskGeometrySketch = ({ y1, x1, y2, x2, alphaGon, s, language = 'bg' }) =>
         <g className="text-neutral-500 dark:text-zinc-400">
           <line x1={W - PAD + 8} y1={H - PAD} x2={W - PAD + 8} y2={PAD - 4} stroke="currentColor" strokeWidth="1.5" markerEnd="url(#sketch-arrow)" />
           <text x={W - PAD + 8} y={PAD - 8} textAnchor="middle" fontSize="10" fill="currentColor" fontFamily="Manrope, sans-serif">
-            Y
+            X (N)
           </text>
           <text x={W - PAD - 2} y={H - PAD + 14} textAnchor="end" fontSize="10" fill="currentColor" fontFamily="Manrope, sans-serif">
-            X →
+            Y (E) →
           </text>
         </g>
         {hasP2 && (

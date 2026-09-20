@@ -6,6 +6,7 @@ const H = 220;
 
 /**
  * SVG sketch for two-point tasks: segment P1—P2 with optional bearing label.
+ * Official convention (QA-02): Y (Easting) is the horizontal axis, X (Northing) the vertical (up) axis.
  */
 const TwoPointSketch = ({
   y1,
@@ -42,9 +43,10 @@ const TwoPointSketch = ({
     const cx = (minX + maxX) / 2;
     const cy = (minY + maxY) / 2;
 
+    // cx = centre Northing (x), cy = centre Easting (y)
     const toSvg = (x, y) => ({
-      sx: PAD + ((x - cx) / span + 0.5) * (W - 2 * PAD),
-      sy: H - PAD - ((y - cy) / span + 0.5) * (H - 2 * PAD),
+      sx: PAD + ((y - cy) / span + 0.5) * (W - 2 * PAD),
+      sy: H - PAD - ((x - cx) / span + 0.5) * (H - 2 * PAD),
     });
 
     return {
@@ -133,7 +135,7 @@ const TwoPointSketch = ({
           </text>
         )}
         <text x={W - PAD} y={PAD - 4} textAnchor="end" fontSize="10" fill="currentColor" className="text-neutral-500" fontFamily="Manrope, sans-serif">
-          Y ↑
+          X ↑ N · Y → E
         </text>
       </svg>
     </div>

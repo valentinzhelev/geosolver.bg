@@ -1,6 +1,11 @@
 import React, { useMemo } from 'react';
+import { isoPosition } from '../../domain/geodesy/coordinateConvention';
 
-/** Simple isometric 3D preview of points (X east, Y north, H up). */
+/**
+ * Simple isometric preview of points (an SVG projection, not a 3D engine). Official convention (QA-02):
+ * X = Northing, Y = Easting, H up; the viewer looks north-east from the south-west, so Easting runs to the
+ * right/away and Northing to the left/away (see isoPosition in domain/geodesy/coordinateConvention.js).
+ */
 const Points3DPreview = ({ points = [], language = 'bg', size = 280 }) => {
   const bg = language === 'bg';
 
@@ -22,14 +27,8 @@ const Points3DPreview = ({ points = [], language = 'bg', size = 280 }) => {
     const cx = (minX + maxX) / 2;
     const cy = (minY + maxY) / 2;
 
-    const iso = (x, y, h) => {
-      const dx = (x - cx) / spanXY;
-      const dy = (y - cy) / spanXY;
-      const dz = ((h - minH) / spanH) * 0.35;
-      const sx = size / 2 + (dx - dy) * (size * 0.32);
-      const sy = size / 2 + (dx + dy) * (size * 0.16) - dz * (size * 0.5);
-      return { sx, sy };
-    };
+    // cx = centre Northing (x), cy = centre Easting (y)
+    const iso = (x, y, h) => isoPosition(x, y, h, { cx, cy, spanXY, minH, spanH, size });
 
     return { valid, iso, minH, maxH };
   }, [points, size]);
@@ -62,6 +61,15 @@ const Points3DPreview = ({ points = [], language = 'bg', size = 280 }) => {
             </g>
           );
         })}
+        {/* axis key: shows the visible convention (Northing X, Easting Y, Height H) */}
+        <g className="text-neutral-500" fill="currentColor" stroke="currentColor" fontSize="9" fontFamily="Manrope, sans-serif">
+          <line x1="30" y1={size - 24} x2="8" y2={size - 35} strokeWidth="1.2" />
+          <text x="0" y={size - 39} stroke="none">X (N)</text>
+          <line x1="30" y1={size - 24} x2="52" y2={size - 35} strokeWidth="1.2" />
+          <text x="46" y={size - 39} stroke="none">Y (E)</text>
+          <line x1="30" y1={size - 24} x2="30" y2={size - 50} strokeWidth="1.2" />
+          <text x="34" y={size - 50} stroke="none">H</text>
+        </g>
       </svg>
     </div>
   );
