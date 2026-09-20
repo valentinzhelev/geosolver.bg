@@ -13,6 +13,9 @@ import { downloadProjectReportPdf } from '../../../utils/exportProjectReportPdf'
 import { downloadProjectPackage } from '../../../utils/exportProjectPackage';
 import CrsSelect from '../../shared/CrsSelect';
 import { DEFAULT_CRS } from '../../../domain/geodesy/crsTransform';
+import ProjectCreateForm from './ProjectCreateForm';
+import { ProjectHubEmptyState, ProjectNextSteps } from './ProjectHubParts';
+import { addCreatedProject, loadProjectSummaries } from '../../../utils/projectCreation';
 
 const StatCard = ({ label, value }) => (
   <div className="p-3 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-gray-200 dark:outline-zinc-800">
@@ -34,6 +37,11 @@ const ProjectHubPage = () => {
   const [exportingId, setExportingId] = useState('');
   const [packagingId, setPackagingId] = useState('');
   const [workspaces, setWorkspaces] = useState([]);
+  const [showCreate, setShowCreate] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState('');
+  const [createdId, setCreatedId] = useState('');
+  const [booksAvailable, setBooksAvailable] = useState(true);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -42,30 +50,16 @@ const ProjectHubPage = () => {
       const projRes = await fieldbooksApi.listProjects();
       const list = projRes.data || projRes.projects || [];
       setProjects(list);
-      const counts = {};
-      const books = {};
-      const calcs = {};
-      await Promise.all(
-        list.map(async (p) => {
-          try {
-            const [pts, bks, calcHistory] = await Promise.all([
-              surveyPointsApi.list({ projectId: p._id }),
-              fieldbooksApi.listBooks(p._id),
-              CalculationService.getProjectCalculationHistory(p._id, 1, 1),
-            ]);
-            counts[p._id] = (pts.data || []).length;
-            books[p._id] = (bks.data || bks.books || []).length;
-            calcs[p._id] = calcHistory?.pagination?.totalItems ?? 0;
-          } catch {
-            counts[p._id] = 0;
-            books[p._id] = 0;
-            calcs[p._id] = 0;
-          }
-        })
-      );
-      setPointCounts(counts);
-      setBookCounts(books);
-      setCalcCounts(calcs);
+      // every source is independent: Field Books need pilot access and must not wipe the point/calculation counts
+      const summary = await loadProjectSummaries(list, {
+        listPoints: (id) => surveyPointsApi.list({ projectId: id }),
+        listBooks: (id) => fieldbooksApi.listBooks(id),
+        getCalcHistory: (id) => CalculationService.getProjectCalculationHistory(id, 1, 1),
+      });
+      setPointCounts(summary.pointCounts);
+      setBookCounts(summary.bookCounts);
+      setCalcCounts(summary.calcCounts);
+      setBooksAvailable(summary.booksAvailable);
       try {
         const wsRes = await workspaceApi.list();
         setWorkspaces([...(wsRes.data?.owned || []), ...(wsRes.data?.memberOf || [])]);
@@ -82,6 +76,26 @@ const ProjectHubPage = () => {
   useEffect(() => {
     load();
   }, [load]);
+
+  const handleCreate = async (payload) => {
+    setCreating(true);
+    setCreateError('');
+    try {
+      const res = await fieldbooksApi.createProject(payload);
+      const created = res.data || res.project;
+      // appears immediately, without a reload; the new project is selected and shows what to do next
+      setProjects((prev) => addCreatedProject(prev, created));
+      setPointCounts((prev) => ({ ...prev, [created._id]: 0 }));
+      setBookCounts((prev) => ({ ...prev, [created._id]: 0 }));
+      setCalcCounts((prev) => ({ ...prev, [created._id]: 0 }));
+      setCreatedId(String(created._id));
+      setShowCreate(false);
+    } catch (e) {
+      setCreateError(e.message);
+    } finally {
+      setCreating(false);
+    }
+  };
 
   const assignWorkspace = async (projectId, workspaceId) => {
     try {
@@ -106,7 +120,7 @@ const ProjectHubPage = () => {
     try {
       const [ptsRes, bksRes] = await Promise.all([
         surveyPointsApi.list({ projectId: project._id }),
-        fieldbooksApi.listBooks(project._id),
+        fieldbooksApi.listBooks(project._id).catch(() => ({ data: [] })), // field books need pilot access: optional
       ]);
       await downloadProjectPackage({
         project,
@@ -126,7 +140,7 @@ const ProjectHubPage = () => {
     try {
       const [ptsRes, bksRes] = await Promise.all([
         surveyPointsApi.list({ projectId: project._id }),
-        fieldbooksApi.listBooks(project._id),
+        fieldbooksApi.listBooks(project._id).catch(() => ({ data: [] })), // field books need pilot access: optional
       ]);
       await downloadProjectReportPdf({
         project,
@@ -159,50 +173,64 @@ const ProjectHubPage = () => {
           stats={
             !loading && projects.length > 0 ? (
               <div className="grid grid-cols-3 gap-2">
-                <StatCard label={bg ? 'Обекти' : 'Sites'} value={projects.length} />
+                <StatCard label={bg ? 'Проекти' : 'Projects'} value={projects.length} />
                 <StatCard label={bg ? 'Точки' : 'Points'} value={totalPoints} />
-                <StatCard label={bg ? 'Карнети' : 'Field books'} value={totalBooks} />
+                <StatCard label={bg ? 'Карнети' : 'Field books'} value={booksAvailable ? totalBooks : '—'} />
               </div>
             ) : null
           }
           toolbar={
-            <Link
-              to="/workspace"
-              className="px-3 py-2 rounded-lg text-sm font-semibold font-['Manrope'] bg-white dark:bg-zinc-900 outline outline-1 outline-gray-200 dark:outline-zinc-700"
-            >
-              Workspace
-            </Link>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setCreateError('');
+                  setShowCreate(true);
+                }}
+                className="px-3 py-2 rounded-lg text-sm font-semibold font-['Manrope'] bg-black dark:bg-white text-white dark:text-black"
+              >
+                {bg ? 'Нов проект' : 'New project'}
+              </button>
+              <Link
+                to="/workspace"
+                className="px-3 py-2 rounded-lg text-sm font-semibold font-['Manrope'] bg-white dark:bg-zinc-900 outline outline-1 outline-gray-200 dark:outline-zinc-700"
+              >
+                {bg ? 'Работно пространство' : 'Workspace'}
+              </Link>
+            </div>
           }
         >
           {error && (
             <div className="p-3 rounded-lg bg-red-50 text-red-700 text-sm font-['Manrope']">{error}</div>
           )}
 
+          {showCreate && (
+            <ProjectCreateForm
+              workspaces={workspaces}
+              language={language}
+              busy={creating}
+              error={createError}
+              onSubmit={handleCreate}
+              onCancel={() => setShowCreate(false)}
+            />
+          )}
+
+          {createdId && projects.find((p) => String(p._id) === createdId) && (
+            <ProjectNextSteps project={projects.find((p) => String(p._id) === createdId)} language={language} />
+          )}
+
           {loading ? (
             <div className="py-16 text-center text-neutral-500 font-['Manrope']">{bg ? 'Зареждане...' : 'Loading...'}</div>
           ) : projects.length === 0 ? (
-            <div className="p-8 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-gray-200 dark:outline-zinc-800 text-center">
-              <p className="text-neutral-500 font-['Manrope'] mb-2">
-                {bg ? 'Няма проекти още.' : 'No projects yet.'}
-              </p>
-              <p className="text-sm text-neutral-400 font-['Manrope'] mb-4 max-w-md mx-auto">
-                {bg
-                  ? 'Създай първия обект от полевите карнети — това е стъпка 1 в учебния workflow „терен → план → отчет“.'
-                  : 'Create your first site from field books — step 1 in the “field → plan → report” learning workflow.'}
-              </p>
-              <Link
-                to="/fieldbook"
-                className="inline-block px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg text-sm font-semibold font-['Manrope']"
-              >
-                {bg ? 'Отвори карнети →' : 'Open field books →'}
-              </Link>
-            </div>
+            showCreate ? null : <ProjectHubEmptyState language={language} onCreate={() => setShowCreate(true)} />
           ) : (
             <div className="flex flex-col gap-3">
               {projects.map((p) => (
                 <div
                   key={p._id}
-                  className="p-4 md:p-5 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-gray-200 dark:outline-zinc-800 flex flex-col gap-4"
+                  className={`p-4 md:p-5 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 flex flex-col gap-4 ${
+                    String(p._id) === createdId ? 'outline-2 outline-orange-400' : 'outline-gray-200 dark:outline-zinc-800'
+                  }`}
                 >
                   <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
                     <div>
@@ -212,7 +240,7 @@ const ProjectHubPage = () => {
                       </p>
                       <div className="flex flex-wrap gap-3 mt-2 text-xs font-semibold font-['Manrope'] text-neutral-600 dark:text-zinc-400">
                         <span>{pointCounts[p._id] ?? 0} {bg ? 'точки' : 'points'}</span>
-                        <span>{bookCounts[p._id] ?? 0} {bg ? 'карнета' : 'field books'}</span>
+                        {booksAvailable && <span>{bookCounts[p._id] ?? 0} {bg ? 'карнета' : 'field books'}</span>}
                         <Link
                           to={`/calculations/history?projectId=${p._id}`}
                           className="underline hover:text-black dark:hover:text-white"
@@ -221,7 +249,7 @@ const ProjectHubPage = () => {
                         </Link>
                         {p.workspace && (
                           <span className="text-orange-600">
-                            {workspaces.find((w) => w._id === String(p.workspace?._id || p.workspace))?.name || 'Workspace'}
+                            {workspaces.find((w) => w._id === String(p.workspace?._id || p.workspace))?.name || (bg ? 'Работно пространство' : 'Workspace')}
                           </span>
                         )}
                       </div>
@@ -231,7 +259,7 @@ const ProjectHubPage = () => {
                           value={String(p.workspace?._id || p.workspace || '')}
                           onChange={(e) => assignWorkspace(p._id, e.target.value)}
                         >
-                          <option value="">{bg ? 'Без workspace' : 'No workspace'}</option>
+                          <option value="">{bg ? 'Без работно пространство' : 'No workspace'}</option>
                           {workspaces.map((w) => (
                             <option key={w._id} value={w._id}>{w.name}</option>
                           ))}
@@ -274,7 +302,7 @@ const ProjectHubPage = () => {
                       to="/fieldbook"
                       className="px-3 py-2 rounded-lg text-sm font-medium font-['Manrope'] bg-white dark:bg-zinc-900 outline outline-1 outline-gray-200 dark:outline-zinc-700"
                     >
-                      {bg ? 'Карнети' : 'Field books'}
+                      {bg ? 'Карнети (пилот)' : 'Field books (pilot)'}
                     </Link>
                     <Link
                       to={`/calculations/history?projectId=${p._id}`}

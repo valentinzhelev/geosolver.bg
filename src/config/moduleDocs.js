@@ -16,14 +16,14 @@ export function getModuleBadgeLabel(language = 'bg') {
 export const MODULE_META = {
   projects: {
     path: '/projects',
-    title: { bg: 'Проектен hub', en: 'Project hub' },
+    title: { bg: 'Проекти', en: 'Projects' },
     subtitle: {
-      bg: 'Обектът е „контейнер“ за точки, карнети и карта — както в реална геодезическа практика и в учебна работа.',
+      bg: 'Проектът е „контейнер“ за точки, изчисления, карнети и карта — както в реална геодезическа практика и в учебна работа.',
       en: 'A site is a container for points, field books and map — as in real survey practice and coursework.',
     },
     seo: {
-      bg: 'Управление на геодезически обекти, точки и карнети',
-      en: 'Manage survey sites, points and field books',
+      bg: 'Управление на геодезически проекти, точки, изчисления и карнети',
+      en: 'Manage survey projects, points, calculations and field books',
     },
   },
   points: {
@@ -115,8 +115,8 @@ const MODULE_DOCS = {
   projects: {
     workflow: [
       {
-        title: { bg: '1. Създай обект', en: '1. Create a site' },
-        body: { bg: 'В карнетите или при import задай име, година и екип.', en: 'In field books or on import set name, year and team.' },
+        title: { bg: '1. Създай проект', en: '1. Create a project' },
+        body: { bg: 'Натисни „Нов проект“: задай име, координатна система и (по избор) работно пространство.', en: 'Press “New project”: set a name, a coordinate system and (optionally) a workspace.' },
       },
       {
         title: { bg: '2. Събери точки', en: '2. Collect points' },
@@ -128,18 +128,18 @@ const MODULE_DOCS = {
       },
       {
         title: { bg: '4. Отчет', en: '4. Report' },
-        body: { bg: 'Клиентски PDF с обобщение на точките и обекта.', en: 'Client PDF summarizing points and the site.' },
+        body: { bg: 'Клиентски PDF с обобщение на точките и проекта.', en: 'Client PDF summarizing points and the project.' },
       },
     ],
     quickTips: {
       bg: [
-        'Обектът не е кадастрална партида — това е учебен/работен контейнер в GeoSolver.',
-        'Един обект може да има много карнети (различни дни на измерване).',
+        'Проектът не е кадастрална партида — това е учебен/работен контейнер в GeoSolver.',
+        'Един проект може да има много карнети (различни дни на измерване). Карнетите са по желание и изискват пилотен достъп.',
         'Филтрирай точките по проект преди трасиране.',
       ],
       en: [
-        'A site is not a cadastral parcel — it is a learning/work container in GeoSolver.',
-        'One site can have many field books (different survey days).',
+        'A project is not a cadastral parcel — it is a learning/work container in GeoSolver.',
+        'One project can have many field books (different survey days). Field books are optional and need pilot access.',
         'Filter points by project before stake-out.',
       ],
     },
@@ -150,10 +150,10 @@ const MODULE_DOCS = {
     ],
     sections: [
       {
-        title: { bg: 'Какво е „обект“ в GeoSolver?', en: 'What is a “site” in GeoSolver?' },
+        title: { bg: 'Какво е „проект“ в GeoSolver?', en: 'What is a “project” in GeoSolver?' },
         content: {
-          bg: 'В професионалната геодезия един обект (строителен, кадастрален, инженерен) обединява измерванията, точките и документацията. В GeoSolver проектният hub прави същото за учебни и теренни задачи: виждаш колко точки и карнета имаш, и преминаваш към карта, трасиране или PDF отчет.',
-          en: 'In professional surveying, a site (construction, cadastral, engineering) bundles measurements, points and documentation. GeoSolver’s project hub does the same for coursework and field work: see point and field book counts, then open map, stake-out or a PDF report.',
+          bg: 'В професионалната геодезия един проект (строителен, кадастрален, инженерен) обединява измерванията, точките и документацията. В GeoSolver списъкът с проекти прави същото за учебни и теренни задачи: виждаш колко точки и карнета имаш, и преминаваш към карта, трасиране или PDF отчет.',
+          en: 'In professional surveying, a project (construction, cadastral, engineering) bundles measurements, points and documentation. GeoSolver’s project list does the same for coursework and field work: see point and field book counts, then open map, stake-out or a PDF report.',
         },
       },
       {
@@ -162,12 +162,12 @@ const MODULE_DOCS = {
         list: {
           bg: [
             'Практика „от терен до план“ — събиране → проверка → отчет.',
-            'Подходящо за курсови работи и дипломни обекти с екип и година.',
+            'Подходящо за курсови работи и дипломни проекти с екип и година.',
             'Комбинирай с класната стая за предаване на резултати.',
           ],
           en: [
             '“Field to plan” practice — collect → verify → report.',
-            'Suitable for coursework and thesis sites with team and year.',
+            'Suitable for coursework and thesis projects with team and year.',
             'Combine with the classroom for submitting results.',
           ],
         },
@@ -175,8 +175,8 @@ const MODULE_DOCS = {
       {
         title: { bg: 'Клиентски PDF', en: 'Client PDF' },
         content: {
-          bg: 'Отчетът включва метаданни на обекта, брой точки с координати, таблица (до 80 точки) и дата на генериране. Подходящ за демонстрация пред преподавател или възложител — не замества официален кадастрален документ.',
-          en: 'The report includes site metadata, count of points with coordinates, a table (up to 80 points) and generation date. Suitable to show a teacher or client — not a substitute for official cadastral documents.',
+          bg: 'Отчетът включва метаданни на проекта, брой точки с координати, таблица (до 80 точки) и дата на генериране. Подходящ за демонстрация пред преподавател или възложител — не замества официален кадастрален документ.',
+          en: 'The report includes project metadata, count of points with coordinates, a table (up to 80 points) and generation date. Suitable to show a teacher or client — not a substitute for official cadastral documents.',
         },
       },
     ],

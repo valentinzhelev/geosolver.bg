@@ -257,6 +257,9 @@ const PointsPage = () => {
                 </option>
               ))}
             </select>
+            <Link to="/projects" className="px-3 py-2 rounded-lg text-sm font-medium font-['Manrope'] outline outline-1 outline-gray-200 dark:outline-zinc-700">
+              {bg ? '+ Нов проект' : '+ New project'}
+            </Link>
             <Link to="/gnss" className="px-3 py-2 rounded-lg text-sm font-medium font-['Manrope'] outline outline-1 outline-gray-200 dark:outline-zinc-700">
               GNSS import
             </Link>
