@@ -20,7 +20,7 @@ import { resolveEffectiveProjectId } from '../../utils/projectScoping';
  * explicit projectId prop, so this ordering changes nothing observable
  * until ProjectContext starts being populated.
  */
-const PointPicker = ({ language = 'bg', label, onSelect, className = '', projectId } = {}) => {
+const PointPicker = ({ language = 'bg', label, onSelect, className = '', projectId, selectedId } = {}) => {
   const bg = language === 'bg';
   const eduProjectId = getEduWorkContext()?.linkedProjectId;
   const { currentProject } = useProjectContext();
@@ -89,14 +89,16 @@ const PointPicker = ({ language = 'bg', label, onSelect, className = '', project
         </span>
       )}
       <select
-        defaultValue=""
+        // Controlled (QA-07): shows the point that is currently this role's provenance reference (`selectedId`, from
+        // usePointReferences.getSelectedPointId) and the placeholder once the reference is cleared. A caller that does not
+        // pass selectedId keeps the previous "pick to fill" behaviour (the value returns to the placeholder).
+        value={selectedId && points.some((pt) => pt._id === selectedId) ? selectedId : ''}
         disabled={false}
         onChange={(e) => {
           const id = e.target.value;
           if (!id) return;
           const p = points.find((pt) => pt._id === id);
           if (p) onSelect(p);
-          e.target.value = '';
         }}
         className="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-800 text-xs font-medium font-['Manrope'] text-black dark:text-white outline-none focus:ring-2 focus:ring-black/10 dark:focus:ring-white/20 disabled:opacity-50"
       >

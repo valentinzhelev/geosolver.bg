@@ -43,7 +43,10 @@ export function calculateForwardIntersection(yA, xA, yB, xB, beta1, beta2) {
     throw new Error('Ъглите трябва да бъдат положителни');
   }
   if (beta1 + beta2 >= 200) {
-    throw new Error('Сумата от ъглите не може да бъде по-голяма от 200 гради');
+    throw new Error(
+      'Сумата от ъглите не може да бъде по-голяма от 200 гради — β₁ + β₂ трябва да е по-малка от 200 гради, ' +
+        'иначе лъчите от A и B не се пресичат.'
+    );
   }
   if (xA === xB && yA === yB) {
     throw new Error('Точките A и B не могат да съвпадат');

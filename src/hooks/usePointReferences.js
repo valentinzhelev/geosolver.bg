@@ -11,7 +11,8 @@ import { applySelection, applyFieldChange, toPointReferences } from '../utils/po
  * this hook is just the React state wiring around them.
  *
  * Usage in a calculator component:
- *   const { recordSelection, noteFieldChange, getPointReferences, resetPointReferences } = usePointReferences();
+ *   const { recordSelection, noteFieldChange, getPointReferences, resetPointReferences, getSelectedPointId } = usePointReferences();
+ *   // <PointPicker selectedId={getSelectedPointId('station')} onSelect={...} />  — shows the referenced point
  *
  *   // in the PointPicker's onSelect:
  *   onSelect={(p) => {
@@ -52,5 +53,10 @@ export function usePointReferences() {
 
   const resetPointReferences = useCallback(() => setRefsByRole({}), []);
 
-  return { recordSelection, noteFieldChange, getPointReferences, resetPointReferences };
+  // QA-07: the picker's visible selection is DRIVEN BY the provenance state (one source of truth): the role's
+  // referenced point id while the reference exists, '' (placeholder / manual mode) once it is cleared or was never set.
+  // Reads state (not the ref), so consumers re-render when a reference is recorded or cleared.
+  const getSelectedPointId = useCallback((role) => refsByRole[role]?.pointId || '', [refsByRole]);
+
+  return { recordSelection, noteFieldChange, getPointReferences, resetPointReferences, getSelectedPointId };
 }

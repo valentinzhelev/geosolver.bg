@@ -7,6 +7,7 @@ import { useSyncTaskLanguage } from '../../hooks/useSyncTaskLanguage';
 import { isTaskPlaceholderResult } from '../../utils/taskI18n';
 import useTypewriter from '../../hooks/useTypewriter';
 import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
+import { failureResultText } from '../../utils/calculationErrors';
 import { usePointReferences } from '../../hooks/usePointReferences';
 import { useCalculationRestore } from '../../hooks/useCalculationRestore';
 import { inputDataToFormStrings } from '../../utils/calculationRestore';
@@ -56,7 +57,7 @@ const LOW_CONFIDENCE = 0.75;
 const PurvaZadacha = () => {
   const [form, setForm] = useState({ y1: '', x1: '', alpha: '', s: '' });
   useCalculationRestore('first-basic-task', setForm, inputDataToFormStrings);
-  const { recordSelection, noteFieldChange, getPointReferences, resetPointReferences } = usePointReferences();
+  const { recordSelection, noteFieldChange, getPointReferences, resetPointReferences, getSelectedPointId } = usePointReferences();
   const [lowConfFields, setLowConfFields] = useState({});
   const [isScanning, setIsScanning] = useState(false);
   const fileInputRef = useRef(null);
@@ -71,7 +72,13 @@ const PurvaZadacha = () => {
   const totalPages = Math.ceil(history.length / itemsPerPage);
   const paginatedHistory = history.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
   const { displayText, isTyping } = useTypewriter(resultText);
-  const { runWithTracking, isAuthenticated } = useGuardedCalculation();
+  const { runWithTracking, isAuthenticated } = useGuardedCalculation({
+    // QA-06: an expected calculation failure replaces the previous result with the message (nothing is saved)
+    onCalculationFailed: (failure) => {
+      setResultText(failureResultText(failure));
+      setLastCalcResult(null);
+    },
+  });
   const [lastCalcResult, setLastCalcResult] = useState(null);
   const { eduCtx, applyResultToAssignment, dismissEduBanner, canSaveToAssignment } = useEduAssignmentBridge(
     'first-basic-task',
@@ -402,7 +409,7 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
                 {/* Form Card */}
                 <div className="self-stretch p-3 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex flex-col justify-center items-end gap-3 w-full min-w-0 overflow-hidden">
                   <div className="self-stretch justify-start text-black dark:text-white text-base font-semibold font-['Manrope']">{t.inputData}</div>
-                  <PointPicker
+                  <PointPicker selectedId={getSelectedPointId('station')}
                     language={language}
                     label={language === 'bg' ? 'Точка 1 от библиотека' : 'Point 1 from library'}
                     className="w-full"
@@ -624,7 +631,7 @@ X2 = ${formatNumber(result.x1, 2)} + ${formatNumber(result.s, 2)} * ${formatNumb
               {/* Form Card */}
               <div className="flex-1 p-4 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 inline-flex flex-col justify-center items-end gap-4">
                 <div className="self-stretch justify-start text-black dark:text-white text-lg font-semibold font-['Manrope']">{t.inputData}</div>
-                <PointPicker
+                <PointPicker selectedId={getSelectedPointId('station')}
                   language={language}
                   label={language === 'bg' ? 'Точка 1 от библиотека' : 'Point 1 from library'}
                   className="self-stretch w-full"

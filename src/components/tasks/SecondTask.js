@@ -9,6 +9,7 @@ import { useTranslation } from '../../hooks/useTranslation';
 import { useSyncTaskLanguage } from '../../hooks/useSyncTaskLanguage';
 import { isTaskPlaceholderResult } from '../../utils/taskI18n';
 import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
+import { failureResultText } from '../../utils/calculationErrors';
 import { usePointReferences } from '../../hooks/usePointReferences';
 import { useCalculationRestore } from '../../hooks/useCalculationRestore';
 import { inputDataToFormStrings } from '../../utils/calculationRestore';
@@ -54,8 +55,14 @@ const SecondTask = () => {
   const { t, language } = useTranslation();
   const [form, setForm] = useState({ x1: '', y1: '', x2: '', y2: '' });
   useCalculationRestore('second-basic-task', setForm, inputDataToFormStrings);
-  const { runWithTracking, isAuthenticated } = useGuardedCalculation();
-  const { recordSelection, noteFieldChange, getPointReferences, resetPointReferences } = usePointReferences();
+  const { runWithTracking, isAuthenticated } = useGuardedCalculation({
+    // QA-06: an expected calculation failure replaces the previous result with the message (nothing is saved)
+    onCalculationFailed: (failure) => {
+      setResultText(failureResultText(failure));
+      setLastCalcResult(null);
+    },
+  });
+  const { recordSelection, noteFieldChange, getPointReferences, resetPointReferences, getSelectedPointId } = usePointReferences();
   const [lastCalcResult, setLastCalcResult] = useState(null);
   const { eduCtx, applyResultToAssignment, dismissEduBanner, canSaveToAssignment } = useEduAssignmentBridge(
     'second-basic-task',
@@ -275,7 +282,7 @@ Check (atan2): ${result.alphaAtan2} grads
                 <div className="self-stretch p-3 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex flex-col justify-center items-end gap-3 w-full min-w-0 overflow-hidden">
                   <div className="self-stretch justify-start text-black dark:text-white text-base font-semibold font-['Manrope']">{t.inputData}</div>
                   <div className="self-stretch grid grid-cols-2 gap-2 w-full">
-                    <PointPicker
+                    <PointPicker selectedId={getSelectedPointId('point1')}
                       language={language}
                       label="P₁"
                       onSelect={(p) => {
@@ -284,7 +291,7 @@ Check (atan2): ${result.alphaAtan2} grads
                       recordSelection('point1', p, fields);
                     }}
                     />
-                    <PointPicker
+                    <PointPicker selectedId={getSelectedPointId('point2')}
                       language={language}
                       label="P₂"
                       onSelect={(p) => {
@@ -452,7 +459,7 @@ Check (atan2): ${result.alphaAtan2} grads
               <div className="flex-1 p-4 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 inline-flex flex-col justify-center items-end gap-4">
                 <div className="self-stretch justify-start text-black dark:text-white text-lg font-semibold font-['Manrope']">{t.inputData}</div>
                 <div className="self-stretch grid grid-cols-2 gap-2">
-                  <PointPicker
+                  <PointPicker selectedId={getSelectedPointId('point1')}
                     language={language}
                     label="P₁"
                     onSelect={(p) => {
@@ -461,7 +468,7 @@ Check (atan2): ${result.alphaAtan2} grads
                       recordSelection('point1', p, fields);
                     }}
                   />
-                  <PointPicker
+                  <PointPicker selectedId={getSelectedPointId('point2')}
                     language={language}
                     label="P₂"
                     onSelect={(p) => {

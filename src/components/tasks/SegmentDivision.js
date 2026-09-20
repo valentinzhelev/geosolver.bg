@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
+import { failureResultText } from '../../utils/calculationErrors';
 import { usePointReferences } from '../../hooks/usePointReferences';
 import { consumeCalculationRestore, inputDataToFormStrings } from '../../utils/calculationRestore';
 import { calculateSegmentPoint } from '../../domain/geodesy/segmentDivision';
@@ -10,8 +11,13 @@ import PointPicker from './PointPicker';
 const SegmentDivision = () => {
   const { language } = useTranslation();
   const bg = language === 'bg';
-  const { runWithTracking } = useGuardedCalculation();
-  const { recordSelection, noteFieldChange, getPointReferences, resetPointReferences } = usePointReferences();
+  const { runWithTracking } = useGuardedCalculation({
+    // QA-06: an expected calculation failure replaces the previous result with the message (nothing is saved)
+    onCalculationFailed: (failure) => {
+      setResultText(failureResultText(failure));
+    },
+  });
+  const { recordSelection, noteFieldChange, getPointReferences, resetPointReferences, getSelectedPointId } = usePointReferences();
   const [mode, setMode] = useState('distance');
   const [form, setForm] = useState({ yA: '', xA: '', yB: '', xB: '', value: '' });
   const [resultText, setResultText] = useState(bg ? 'Въведи отсечка и s или k.' : 'Enter segment and s or k.');
@@ -76,8 +82,8 @@ const SegmentDivision = () => {
         </button>
       </div>
       <div className="grid grid-cols-2 gap-2">
-        <PointPicker language={language} label="A" onSelect={(p) => { const fields = { yA: String(p.y), xA: String(p.x) }; setForm((f) => ({ ...f, ...fields })); recordSelection('pointA', p, fields); }} />
-        <PointPicker language={language} label="B" onSelect={(p) => { const fields = { yB: String(p.y), xB: String(p.x) }; setForm((f) => ({ ...f, ...fields })); recordSelection('pointB', p, fields); }} />
+        <PointPicker selectedId={getSelectedPointId('pointA')} language={language} label="A" onSelect={(p) => { const fields = { yA: String(p.y), xA: String(p.x) }; setForm((f) => ({ ...f, ...fields })); recordSelection('pointA', p, fields); }} />
+        <PointPicker selectedId={getSelectedPointId('pointB')} language={language} label="B" onSelect={(p) => { const fields = { yB: String(p.y), xB: String(p.x) }; setForm((f) => ({ ...f, ...fields })); recordSelection('pointB', p, fields); }} />
       </div>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
         <CoordInput id="yA" label="Y_A" value={form.yA} onChange={handle} />

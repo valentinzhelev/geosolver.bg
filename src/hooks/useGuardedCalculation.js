@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../components/auth/AuthContext';
 import { useTranslation } from './useTranslation';
@@ -7,12 +7,22 @@ import { hasUnlimitedCalculations } from '../utils/calculationAccess';
 import { getEduWorkContext } from '../utils/eduCalculatorBridge';
 import { allowsCalculatorAccess } from '../config/eduCalculatorPolicy';
 import { useProjectContext } from '../context/ProjectContext';
-import { applyAuthoritativeResult, classifySaveError, refreshRequiredMessage, validationMessage } from '../utils/authoritativeResult';
+import { applyAuthoritativeResult, classifySaveError, refreshRequiredMessage } from '../utils/authoritativeResult';
+import { isExpectedCalculationError, toCalculationFailure } from '../utils/calculationErrors';
 
 /**
  * Auth gate + shared free-plan limit (5 total across all tools) + backend tracking.
+ *
+ * QA-06: expected calculation failures (local domain validation, structured backend 400) never escape as uncaught
+ * exceptions and never save anything. They are normalized (utils/calculationErrors.js), published as `calculationError`
+ * and passed to the optional `onCalculationFailed(failure)` callback, which the calculator uses to replace its previous
+ * result with the message. Programming errors are re-thrown.
  */
-export function useGuardedCalculation() {
+export function useGuardedCalculation({ onCalculationFailed } = {}) {
+  const [calculationError, setCalculationError] = useState(null);
+  const failedRef = useRef(onCalculationFailed);
+  failedRef.current = onCalculationFailed;
+  const clearCalculationError = useCallback(() => setCalculationError(null), []);
   const { user } = useAuth();
   const navigate = useNavigate();
   const { language } = useTranslation();
@@ -81,8 +91,23 @@ export function useGuardedCalculation() {
         return null;
       }
 
+      setCalculationError(null);
+      const reportFailure = (failure) => {
+        setCalculationError(failure);
+        if (typeof failedRef.current === 'function') failedRef.current(failure);
+      };
+
       const start = performance.now();
-      const runResult = await run();
+      let runResult;
+      try {
+        runResult = await run();
+      } catch (err) {
+        // Programming errors (TypeError, ...) must stay observable; only expected domain/input errors are user messages.
+        if (!isExpectedCalculationError(err)) throw err;
+        // Rejected before anything is sent: no Calculation is created and no free-plan usage is consumed.
+        reportFailure(toCalculationFailure(err, language, 'local'));
+        return null;
+      }
       const calculationTime = performance.now() - start;
       const savedResult =
         typeof getResultData === 'function' ? getResultData(runResult) : resultData;
@@ -119,7 +144,8 @@ export function useGuardedCalculation() {
           return null;
         }
         if (failure.kind === 'validation') {
-          alert(validationMessage(err, language));
+          // structured backend rejection: the same inline experience as a local one (nothing was saved)
+          reportFailure(toCalculationFailure(err, language, 'server'));
           return null;
         }
         console.error('Failed to track calculation:', err);
@@ -138,5 +164,7 @@ export function useGuardedCalculation() {
     runWithTracking,
     requireAuthAndLimits,
     isAuthenticated: !!user,
+    calculationError,
+    clearCalculationError,
   };
 }

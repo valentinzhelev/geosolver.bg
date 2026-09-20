@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 import useTypewriter from '../../hooks/useTypewriter';
 import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
+import { failureResultText } from '../../utils/calculationErrors';
 import { usePointReferences } from '../../hooks/usePointReferences';
 import { useCalculationRestore } from '../../hooks/useCalculationRestore';
 import { getRestoreMapper } from '../../utils/calculationRestore';
@@ -47,7 +48,12 @@ const AreaCalculation = () => {
   const [form, setForm] = useState({ points: '', method: 'shoelace' });
   useCalculationRestore('area-calculation', setForm, getRestoreMapper('area-calculation'));
   const { t, language } = useTranslation();
-  const { runWithTracking, isAuthenticated } = useGuardedCalculation();
+  const { runWithTracking, isAuthenticated } = useGuardedCalculation({
+    // QA-06: an expected calculation failure replaces the previous result with the message (nothing is saved)
+    onCalculationFailed: (failure) => {
+      setResultText(failureResultText(failure));
+    },
+  });
   // Area Calculation is a special case (Milestone 1 follow-up §2): points
   // are appended as text lines into a single shared textarea, not discrete
   // x/y fields. There is no reliable way to know, from a textarea's onChange
@@ -211,6 +217,7 @@ Check - area (alternative method): ${result.alternativeArea?.toFixed(2) || 'N/A'
                     <div className="self-stretch flex flex-col justify-start items-start gap-2 w-full">
                       <div className="justify-start text-black dark:text-white text-xs font-medium font-['Manrope']">Координати на точките (X Y)</div>
                       
+                    {/* "+" APPENDS a vertex on every pick (vertex:N = the appended row), so it stays an action picker: no retained selection */}
                     <PointPicker language={language} label="+" onSelect={(p) => {
                       const trimmed = form.points.trim();
                       const index = trimmed ? trimmed.split('\n').length : 0;
@@ -368,6 +375,7 @@ Check - area (alternative method): ${result.alternativeArea?.toFixed(2) || 'N/A'
                   {/* Points */}
                   <div className="self-stretch flex flex-col justify-start items-start gap-2">
                     <div className="justify-start text-black dark:text-white text-sm font-medium font-['Manrope']">Координати на точките (X Y)</div>
+                    {/* "+" APPENDS a vertex on every pick (vertex:N = the appended row), so it stays an action picker: no retained selection */}
                     <PointPicker language={language} label="+" onSelect={(p) => {
                       const trimmed = form.points.trim();
                       const index = trimmed ? trimmed.split('\n').length : 0;

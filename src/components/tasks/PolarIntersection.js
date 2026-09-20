@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from '../../hooks/useTranslation';
 import useTypewriter from '../../hooks/useTypewriter';
 import { useGuardedCalculation } from '../../hooks/useGuardedCalculation';
+import { failureResultText } from '../../utils/calculationErrors';
 import { usePointReferences } from '../../hooks/usePointReferences';
 import { useCalculationRestore } from '../../hooks/useCalculationRestore';
 import { inputDataToFormStrings } from '../../utils/calculationRestore';
@@ -48,8 +49,13 @@ const PolarIntersection = () => {
   const [form, setForm] = useState({ yA: '', xA: '', angle: '', distance: '' });
   useCalculationRestore('polar-intersection', setForm, inputDataToFormStrings);
   const { t, language } = useTranslation();
-  const { runWithTracking, isAuthenticated } = useGuardedCalculation();
-  const { recordSelection, noteFieldChange, getPointReferences, resetPointReferences } = usePointReferences();
+  const { runWithTracking, isAuthenticated } = useGuardedCalculation({
+    // QA-06: an expected calculation failure replaces the previous result with the message (nothing is saved)
+    onCalculationFailed: (failure) => {
+      setResultText(failureResultText(failure));
+    },
+  });
+  const { recordSelection, noteFieldChange, getPointReferences, resetPointReferences, getSelectedPointId } = usePointReferences();
   const [resultText, setResultText] = useState(t.defaultResultText);
   const [history, setHistory] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -249,7 +255,7 @@ Check - angle: ${result.calculatedAngle} gon
                 <div className="self-stretch p-3 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 flex flex-col justify-center items-end gap-3 w-full min-w-0 overflow-hidden">
                   <div className="self-stretch justify-start text-black dark:text-white text-base font-semibold font-['Manrope']">Входни данни</div>
                   <div className="self-stretch grid grid-cols-1 gap-2">
-                    <PointPicker language={language} label="A" onSelect={(p) => { const fields = { yA: String(p.y), xA: String(p.x) }; setForm((f) => ({ ...f, ...fields })); recordSelection('pointA', p, fields); }} />
+                    <PointPicker selectedId={getSelectedPointId('pointA')} language={language} label="A" onSelect={(p) => { const fields = { yA: String(p.y), xA: String(p.x) }; setForm((f) => ({ ...f, ...fields })); recordSelection('pointA', p, fields); }} />
                   </div>
                   <div className="self-stretch flex flex-col justify-start items-start gap-4 w-full">
                     {/* YA */}
@@ -453,7 +459,7 @@ Check - angle: ${result.calculatedAngle} gon
               <div className="flex-1 p-4 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-offset-[-1px] outline-gray-200 dark:outline-zinc-800 inline-flex flex-col justify-center items-end gap-4">
                 <div className="self-stretch justify-start text-black dark:text-white text-lg font-semibold font-['Manrope']">Входни данни</div>
                 <div className="self-stretch grid grid-cols-1 gap-2">
-                  <PointPicker language={language} label="A" onSelect={(p) => { const fields = { yA: String(p.y), xA: String(p.x) }; setForm((f) => ({ ...f, ...fields })); recordSelection('pointA', p, fields); }} />
+                  <PointPicker selectedId={getSelectedPointId('pointA')} language={language} label="A" onSelect={(p) => { const fields = { yA: String(p.y), xA: String(p.x) }; setForm((f) => ({ ...f, ...fields })); recordSelection('pointA', p, fields); }} />
                 </div>
                 <div className="self-stretch flex flex-col justify-start items-start gap-4">
                   {/* YA */}
