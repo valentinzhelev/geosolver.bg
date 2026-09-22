@@ -52,6 +52,8 @@ export const captureApi = {
     return request('/capture/jobs', { method: 'POST', formData: form }).then((r) => r.data);
   },
   getJob: (id) => request(`/capture/jobs/${id}`).then((r) => r.data),
+  /** V2.2 Capture history: recent jobs for a project (summaries only). */
+  listJobs: (projectId) => request(`/capture/jobs?projectId=${encodeURIComponent(projectId)}`).then((r) => r.data),
   /** @param {{edits?: {row:number,col:number,value:string|null}[], columns?: {index:number,semantic:string|null}[], baseRevision?: number}} body */
   patchJob: (id, body) => request(`/capture/jobs/${id}/cells`, { method: 'PATCH', body }).then((r) => r.data),
   // a confirmed capture creates SurveyPoints on the server: the shared points cache (PointPickers) must refresh

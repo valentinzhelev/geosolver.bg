@@ -1,6 +1,6 @@
 import React from 'react';
 import CaptureCellInput from './CaptureCellInput';
-import { SEMANTIC_OPTIONS, dataRows } from '../../../utils/captureView';
+import { SEMANTIC_OPTIONS, dataRows, excludeRowLabel } from '../../../utils/captureView';
 
 const MAPPING_NOTE = {
   ambiguous: { bg: 'Потвърдете значението', en: 'Confirm the meaning' },
@@ -8,7 +8,7 @@ const MAPPING_NOTE = {
 };
 
 /** DESKTOP: the reconstructed table. Column meanings are editable; every cell shows its own review state. */
-const CaptureTable = ({ table, selected, onSelect, onCommit, onMapColumn, disabled = false, bg = true }) => {
+const CaptureTable = ({ table, selected, onSelect, onCommit, onMapColumn, onToggleExclude, disabled = false, bg = true }) => {
   const rows = dataRows(table);
   return (
     <div className="overflow-auto rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 max-h-[70vh]">
@@ -40,11 +40,17 @@ const CaptureTable = ({ table, selected, onSelect, onCommit, onMapColumn, disabl
                 </th>
               );
             })}
+            <th className="p-2 text-[10px] uppercase tracking-wide text-neutral-400 font-['Manrope']" />
           </tr>
         </thead>
         <tbody>
           {rows.map((row) => (
-            <tr key={row.index} className="align-top border-t border-gray-100 dark:border-zinc-800" data-row-status={row.status}>
+            <tr
+              key={row.index}
+              className={`align-top border-t border-gray-100 dark:border-zinc-800 ${row.excluded ? 'opacity-45' : ''}`}
+              data-row-status={row.status}
+              data-row-excluded={row.excluded ? 'true' : 'false'}
+            >
               <td className="p-2 text-xs tabular-nums text-neutral-400 font-['Manrope']">{row.index + 1}</td>
               {table.columns.map((col) => {
                 const cell = row.cells.find((c) => c.col === col.index);
@@ -55,7 +61,7 @@ const CaptureTable = ({ table, selected, onSelect, onCommit, onMapColumn, disabl
                       cell={cell}
                       row={row}
                       bg={bg}
-                      disabled={disabled}
+                      disabled={disabled || row.excluded}
                       selected={selected && selected.row === row.index && selected.col === col.index}
                       onSelect={onSelect}
                       onCommit={onCommit}
@@ -63,6 +69,19 @@ const CaptureTable = ({ table, selected, onSelect, onCommit, onMapColumn, disabl
                   </td>
                 );
               })}
+              <td className="p-1">
+                {onToggleExclude && (
+                  <button
+                    type="button"
+                    disabled={disabled}
+                    onClick={() => onToggleExclude(row.index, !row.excluded)}
+                    className="px-2 py-1 rounded-lg text-[11px] font-medium font-['Manrope'] bg-white dark:bg-zinc-900 outline outline-1 outline-gray-200 dark:outline-zinc-700 disabled:opacity-40 whitespace-nowrap"
+                    data-testid="capture-row-exclude-toggle"
+                  >
+                    {excludeRowLabel(row.excluded, bg)}
+                  </button>
+                )}
+              </td>
             </tr>
           ))}
         </tbody>

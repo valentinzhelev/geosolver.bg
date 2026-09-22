@@ -26,7 +26,7 @@ jest.mock('../../../shared/SEO', () => () => null);
 jest.mock('../../../../hooks/useTranslation', () => ({ useTranslation: () => ({ language: 'bg' }) }));
 jest.mock('../../../../hooks/useProScan', () => ({ useProScan: () => ({ isProUser: mockPro, proScanMessage: 'Сканирането е функция на Pro плана. Моля, абонирайте се.' }) }));
 jest.mock('../../../../services/captureApi', () => ({
-  captureApi: { patchJob: jest.fn(), getJob: jest.fn(), confirmJob: jest.fn(), createJob: jest.fn(), fetchImageObjectUrl: jest.fn() },
+  captureApi: { patchJob: jest.fn(), getJob: jest.fn(), confirmJob: jest.fn(), createJob: jest.fn(), fetchImageObjectUrl: jest.fn(), listJobs: jest.fn() },
 }));
 
 const job = (over = {}) => ({
@@ -60,6 +60,7 @@ beforeEach(() => {
   mockSearch = 'projectId=proj1';
   mockPro = true;
   captureApi.fetchImageObjectUrl.mockResolvedValue('blob:img');
+  captureApi.listJobs.mockResolvedValue([]);
   global.URL.revokeObjectURL = jest.fn();
 });
 afterEach(async () => {
@@ -165,6 +166,37 @@ describe('reopening and restarting', () => {
     expect(container.querySelector('a[href="/points?projectId=proj1"]')).not.toBeNull();
     await act(async () => { [...container.querySelectorAll('button')].find((b) => b.textContent === 'Ново сканиране').click(); });
     expect(container.querySelector('[data-testid="capture-upload"]')).not.toBeNull();
+  });
+});
+
+describe('V2.2 Capture history on the upload screen', () => {
+  it('shows the project\'s recent captures, and a new upload is reflected once the user returns to the upload screen', async () => {
+    captureApi.listJobs.mockResolvedValueOnce([]).mockResolvedValueOnce([{ id: 'jH', status: 'needs_review', originalName: 'table.png', rows: 1, review: 0, invalid: 0, importedCount: 0, createdAt: '2026-01-01T10:00:00.000Z' }]);
+    captureApi.createJob.mockResolvedValue(job());
+    await mount();
+    await flush();
+    expect(captureApi.listJobs).toHaveBeenCalledWith('proj1');
+    expect(container.querySelector('[data-testid="capture-history-empty"]')).not.toBeNull();
+
+    await pickFile(new File(['png'], 'table.png', { type: 'image/png' }));
+    await flush();
+    expect(container.querySelector('[data-testid="capture-review"]')).not.toBeNull(); // navigated away from the upload screen
+
+    await act(async () => { [...container.querySelectorAll('button')].find((b) => b.textContent === 'Ново сканиране').click(); });
+    await flush();
+    expect(captureApi.listJobs).toHaveBeenCalledTimes(2); // the upload screen's history is current again
+    expect(container.querySelector('[data-testid="capture-history-row"]').textContent).toContain('table.png');
+  });
+
+  it('clicking a history row reopens that job (even while a different one is showing)', async () => {
+    captureApi.listJobs.mockResolvedValue([{ id: 'jOld', status: 'needs_review', originalName: 'old.png', rows: 1, review: 0, invalid: 0, importedCount: 0, createdAt: '2026-01-01T10:00:00.000Z' }]);
+    captureApi.getJob.mockImplementation(async (id) => job({ id }));
+    await mount();
+    await flush();
+    await act(async () => { container.querySelector('[data-testid="capture-history-row"]').click(); });
+    await flush();
+    expect(captureApi.getJob).toHaveBeenCalledWith('jOld');
+    expect(container.querySelector('[data-testid="capture-review"]')).not.toBeNull();
   });
 });
 

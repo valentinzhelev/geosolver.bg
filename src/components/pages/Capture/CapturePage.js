@@ -7,6 +7,7 @@ import { useProScan } from '../../../hooks/useProScan';
 import { captureApi } from '../../../services/captureApi';
 import { ACCEPTED_TYPES, checkFile, describeCaptureError } from '../../../utils/captureView';
 import CaptureReview from './CaptureReview';
+import CaptureHistory from './CaptureHistory';
 
 /**
  * Capture V2.1 (coordinate tables): project -> photo / scan -> reconstructed draft -> review -> explicit confirmation
@@ -24,6 +25,7 @@ const CapturePage = () => {
   const [imageUrl, setImageUrl] = useState('');
   const [phase, setPhase] = useState('idle'); // idle | uploading | loading | ready
   const [error, setError] = useState('');
+  const [historyRefresh, setHistoryRefresh] = useState(0);
   const fileRef = useRef(null);
   const cameraRef = useRef(null);
 
@@ -57,6 +59,7 @@ const CapturePage = () => {
       const data = await captureApi.createJob(file, projectId);
       setParams({ projectId, jobId: data.id }, { replace: true });
       await showJob(data);
+      setHistoryRefresh((n) => n + 1);
     } catch (e) {
       setError(describeCaptureError(e, bg));
       setPhase('idle');
@@ -72,6 +75,13 @@ const CapturePage = () => {
     setPhase('idle');
     setError('');
     setParams({ projectId }, { replace: true });
+  };
+
+  const openHistoryJob = (id) => {
+    setJob(null);
+    setImageUrl('');
+    setError('');
+    setParams({ projectId, jobId: id }, { replace: true });
   };
 
   const primary = "px-4 py-2 rounded-lg text-sm font-semibold font-['Manrope'] bg-black dark:bg-white text-white dark:text-black disabled:opacity-50";
@@ -132,6 +142,7 @@ const CapturePage = () => {
             <p className="text-sm text-neutral-500 font-['Manrope']" role="status">{phase === 'uploading' ? (bg ? 'Разпознаване на таблицата...' : 'Recognising the table...') : (bg ? 'Зареждане...' : 'Loading...')}</p>
           )}
         </div>
+        <CaptureHistory projectId={projectId} refreshKey={historyRefresh} onOpen={openHistoryJob} bg={bg} />
       </div>
     );
   }

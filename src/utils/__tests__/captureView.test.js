@@ -1,6 +1,7 @@
 import {
   SEMANTIC_OPTIONS, semanticLabel, CELL_STATES, cellStateLabel, cellDisplayValue, summaryText, bboxToPercent,
   dataRows, nextAttentionRow, describeCaptureError, canConfirmJob, importCount, checkFile, MAX_UPLOAD_BYTES,
+  candidateAlternatives, hasAlternatives, arbitrationReason, excludeRowLabel,
 } from '../captureView';
 import { captureApi, CaptureApiError } from '../../services/captureApi';
 import { onSurveyPointsChanged } from '../surveyPointsEvents';
@@ -40,6 +41,13 @@ describe('summary and geometry', () => {
     expect(summaryText(null)).toBe('');
   });
 
+  it('summary appends an excluded count only when there is one (never breaks the V2.1 4-part format)', () => {
+    expect(summaryText({ rows: 3, ready: 3, review: 0, invalid: 0 }, true)).toBe('3 реда · 3 готови · 0 за проверка · 0 невалидни');
+    expect(summaryText({ rows: 3, ready: 3, review: 0, invalid: 0, excluded: 0 }, true)).toBe('3 реда · 3 готови · 0 за проверка · 0 невалидни');
+    expect(summaryText({ rows: 2, ready: 2, review: 0, invalid: 0, excluded: 1 }, true)).toBe('2 реда · 2 готови · 0 за проверка · 0 невалидни · 1 изключени');
+    expect(summaryText({ rows: 2, ready: 2, review: 0, invalid: 0, excluded: 1 }, false)).toBe('2 rows · 2 ready · 0 need review · 0 invalid · 1 excluded');
+  });
+
   it('a source box becomes percentages of the review image (exact at any zoom)', () => {
     expect(bboxToPercent({ x: 100, y: 50, w: 200, h: 25 }, { width: 1000, height: 500 })).toEqual({ left: 10, top: 10, width: 20, height: 5 });
     expect(bboxToPercent(null, { width: 1, height: 1 })).toBeNull();
@@ -61,6 +69,31 @@ describe('summary and geometry', () => {
     expect(canConfirmJob({ status: 'confirmed', validationSummary: { canConfirm: true } })).toBe(false);
     expect(canConfirmJob(null)).toBe(false);
     expect(importCount({ validationSummary: { rows: 7 } })).toBe(7);
+  });
+});
+
+describe('V2.2 candidates, arbitration reasons and row exclusion', () => {
+  it('candidateAlternatives lists the server\'s "other readings", never the empty/blank ones', () => {
+    const cell = { arbitration: { outcome: 'REVIEW_SUGGESTED', alternatives: [{ text: '4700030', normalizedValue: 4700030 }, { text: '', normalizedValue: null }, { text: null }] } };
+    expect(candidateAlternatives(cell)).toEqual([{ text: '4700030', normalizedValue: 4700030 }]);
+    expect(hasAlternatives(cell)).toBe(true);
+    expect(hasAlternatives({ arbitration: null })).toBe(false);
+    expect(candidateAlternatives(null)).toEqual([]);
+  });
+
+  it('arbitrationReason gives a fixed, translated explanation for a known reason, and nothing for an unknown/missing one', () => {
+    expect(arbitrationReason({ arbitration: { reason: 'CONTRADICTED_BY_CONSENSUS' } })).toMatch(/повтори/);
+    expect(arbitrationReason({ arbitration: { reason: 'CONTRADICTED_BY_CONSENSUS' } }, false)).toMatch(/repeated/);
+    expect(arbitrationReason({ arbitration: { reason: 'SOMETHING_NEW' } })).toBe('');
+    expect(arbitrationReason({ arbitration: null })).toBe('');
+    expect(arbitrationReason(null)).toBe('');
+  });
+
+  it('excludeRowLabel flips between "do not import" and "re-include"', () => {
+    expect(excludeRowLabel(false)).toBe('Не импортирай този ред');
+    expect(excludeRowLabel(true)).toBe('Включи отново');
+    expect(excludeRowLabel(false, false)).toBe('Do not import this row');
+    expect(excludeRowLabel(true, false)).toBe('Re-include row');
   });
 });
 
@@ -141,6 +174,13 @@ describe('captureApi (the real client with a faked fetch)', () => {
     expect((await captureApi.getJob('j1').catch((x) => x)).code).toBe('PRO_REQUIRED');
     respond(422, { success: false, code: 'VALIDATION_ERRORS', errors: [{ row: 0, col: 2, code: 'VALUE_INVALID' }] });
     expect((await captureApi.confirmJob('j1').catch((x) => x)).errors).toHaveLength(1);
+  });
+
+  it('listJobs (Capture history) requests the project\'s jobs, authenticated', async () => {
+    respond(200, { success: true, data: [{ id: 'j1', status: 'needs_review' }] });
+    expect(await captureApi.listJobs('proj1')).toEqual([{ id: 'j1', status: 'needs_review' }]);
+    expect(calls[0].url).toMatch(/\/capture\/jobs\?projectId=proj1$/);
+    expect(calls[0].options.headers.Authorization).toBe('Bearer test-token');
   });
 
   it('the review image is fetched WITH the token and exposed as an object URL', async () => {

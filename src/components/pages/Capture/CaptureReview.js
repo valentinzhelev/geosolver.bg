@@ -4,6 +4,7 @@ import { captureApi } from '../../../services/captureApi';
 import CaptureImagePane from './CaptureImagePane';
 import CaptureTable from './CaptureTable';
 import CaptureRowStepper from './CaptureRowStepper';
+import CaptureCandidatePanel from './CaptureCandidatePanel';
 import { canConfirmJob, dataRows, describeCaptureError, importCount, summaryText } from '../../../utils/captureView';
 
 /**
@@ -35,6 +36,13 @@ const CaptureReview = ({ initialJob, imageUrl, bg = true }) => {
     return cell ? cell.bbox : null;
   }, [selected, job.table]);
 
+  const selectedCell = useMemo(() => {
+    if (!selected || !job.table) return { cell: null, row: null };
+    const row = job.table.rows.find((r) => r.index === selected.row);
+    const cell = row && row.cells.find((c) => c.col === selected.col);
+    return { cell: cell || null, row: cell ? row : null };
+  }, [selected, job.table]);
+
   const handleSelect = useCallback((row, col) => {
     setSelected({ row, col });
     setRowIndex(row);
@@ -59,6 +67,7 @@ const CaptureReview = ({ initialJob, imageUrl, bg = true }) => {
 
   const handleCommit = useCallback((row, col, value) => send({ edits: [{ row, col, value }] }), [send]);
   const handleMapColumn = useCallback((index, semantic) => send({ columns: [{ index, semantic }] }), [send]);
+  const handleToggleExclude = useCallback((index, excluded) => send({ rows: [{ index, excluded }] }), [send]);
 
   const handleConfirm = async () => {
     setStage('importing');
@@ -143,16 +152,18 @@ const CaptureReview = ({ initialJob, imageUrl, bg = true }) => {
         )}
       </div>
 
-      {/* DESKTOP: image left, table right */}
+      {/* DESKTOP: image left, table right, the selected cell's close-up + alternatives below the image */}
       <div className="hidden md:grid md:grid-cols-2 gap-4 items-start">
         <CaptureImagePane imageUrl={imageUrl} size={reviewSize} selectedBbox={selectedBbox} bg={bg} />
-        <CaptureTable table={job.table} selected={selected} onSelect={handleSelect} onCommit={handleCommit} onMapColumn={handleMapColumn} disabled={locked} bg={bg} />
+        <CaptureTable table={job.table} selected={selected} onSelect={handleSelect} onCommit={handleCommit} onMapColumn={handleMapColumn} onToggleExclude={confirmed ? undefined : handleToggleExclude} disabled={locked} bg={bg} />
+        <CaptureCandidatePanel cell={selectedCell.cell} row={selectedCell.row} imageUrl={imageUrl} onCommit={handleCommit} disabled={locked} bg={bg} />
       </div>
 
-      {/* MOBILE: image, then one row card at a time */}
+      {/* MOBILE: image, then one row card at a time, then the selected cell's close-up + alternatives */}
       <div className="md:hidden flex flex-col gap-3">
         <CaptureImagePane imageUrl={imageUrl} size={reviewSize} selectedBbox={selectedBbox} bg={bg} />
-        <CaptureRowStepper table={job.table} rowIndex={rowIndex} onRowChange={(r) => { setRowIndex(r); setSelected({ row: r, col: 0 }); }} selected={selected} onSelect={handleSelect} onCommit={handleCommit} onMapColumn={handleMapColumn} disabled={locked} bg={bg} />
+        <CaptureRowStepper table={job.table} rowIndex={rowIndex} onRowChange={(r) => { setRowIndex(r); setSelected({ row: r, col: 0 }); }} selected={selected} onSelect={handleSelect} onCommit={handleCommit} onMapColumn={handleMapColumn} onToggleExclude={confirmed ? undefined : handleToggleExclude} disabled={locked} bg={bg} />
+        <CaptureCandidatePanel cell={selectedCell.cell} row={selectedCell.row} imageUrl={imageUrl} onCommit={handleCommit} disabled={locked} bg={bg} />
       </div>
     </div>
   );

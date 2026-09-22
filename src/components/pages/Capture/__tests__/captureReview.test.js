@@ -265,6 +265,86 @@ describe('explicit confirmation (nothing is imported before it)', () => {
   });
 });
 
+describe('V2.2 row exclusion ("Не импортирай този ред")', () => {
+  it('toggling excludes a row via the server (a row edit, not a value edit) and shows it visually excluded', async () => {
+    const updated = makeJob();
+    updated.table.rows[1].excluded = true;
+    updated.table.rows[1].status = 'excluded';
+    updated.validationSummary = { rows: 2, ready: 1, review: 0, invalid: 0, excluded: 1, canConfirm: true };
+    captureApi.patchJob.mockResolvedValue(updated);
+    await mount(makeJob());
+    const toggles = desktop().querySelectorAll('[data-testid="capture-row-exclude-toggle"]');
+    expect(toggles).toHaveLength(3);
+    await click(toggles[1]);
+    expect(captureApi.patchJob).toHaveBeenCalledWith('job1', { rows: [{ index: 1, excluded: true }], baseRevision: 0 });
+    const row = desktop().querySelectorAll('tbody tr')[1];
+    expect(row.getAttribute('data-row-excluded')).toBe('true');
+    expect(container.querySelector('[data-testid="capture-summary"]').textContent).toContain('1 изключени');
+  });
+
+  it('an excluded row can be re-included', async () => {
+    const job = makeJob();
+    job.table.rows[1].excluded = true;
+    const updated = makeJob();
+    captureApi.patchJob.mockResolvedValue(updated);
+    await mount(job);
+    const toggles = desktop().querySelectorAll('[data-testid="capture-row-exclude-toggle"]');
+    expect(toggles[1].textContent).toBe('Включи отново');
+    await click(toggles[1]);
+    expect(captureApi.patchJob).toHaveBeenCalledWith('job1', { rows: [{ index: 1, excluded: false }], baseRevision: 0 });
+  });
+
+  it('a confirmed job has no exclude toggle (read-only)', async () => {
+    await mount({ ...cleanJob(), status: 'confirmed', importedPointIds: ['a', 'b', 'c'] });
+    expect(desktop().querySelector('[data-testid="capture-row-exclude-toggle"]')).toBeNull();
+  });
+
+  it('mobile: the row card has the same exclude toggle', async () => {
+    const updated = makeJob();
+    updated.table.rows[0].excluded = true;
+    captureApi.patchJob.mockResolvedValue(updated);
+    await mount(makeJob());
+    await click(mobile().querySelector('[data-testid="capture-row-exclude-toggle"]'));
+    expect(captureApi.patchJob).toHaveBeenCalledWith('job1', { rows: [{ index: 0, excluded: true }], baseRevision: 0 });
+  });
+});
+
+describe('V2.2 candidate panel: close-up + alternative readings for the selected cell', () => {
+  it('shows a placeholder until a cell is selected', async () => {
+    await mount(makeJob());
+    expect(desktop().querySelector('[data-testid="capture-candidates-empty"]')).not.toBeNull();
+    expect(desktop().querySelector('[data-testid="capture-candidates"]')).toBeNull();
+  });
+
+  it('selecting a cell with alternative readings shows them as buttons; picking one sends it as the correction', async () => {
+    const job = makeJob();
+    job.table.rows[1].cells[2] = cell(2, invalidX.rawText, {
+      reviewState: 'invalid',
+      validation: { status: 'error', issues: [{ code: 'VALUE_INVALID', severity: 'error', message: 'x' }] },
+      arbitration: { outcome: 'REVIEW_SUGGESTED', reason: 'GENERATED_ALTERNATIVE_FROM_LOOKALIKE', alternatives: [{ text: '4 700 100,50', normalizedValue: 4700100.5, passCount: 0, source: 'generated-alternative' }] },
+    });
+    captureApi.patchJob.mockResolvedValue(makeJob({ revision: 1 }));
+    await mount(job);
+    await focus(desktop().querySelectorAll('tbody tr')[1].querySelectorAll('input')[2]);
+    const panel = desktop().querySelector('[data-testid="capture-candidates"]');
+    expect(panel).not.toBeNull();
+    expect(panel.querySelector('[data-testid="capture-candidates-reason"]').textContent).toMatch(/цифра/);
+    const option = panel.querySelector('[data-testid="capture-candidate-option"]');
+    expect(option.textContent).toContain('4 700 100,50');
+    expect(option.textContent).toContain('изведено');
+    await click(option);
+    expect(captureApi.patchJob).toHaveBeenCalledWith('job1', { edits: [{ row: 1, col: 2, value: '4 700 100,50' }], baseRevision: 0 });
+  });
+
+  it('mobile: the candidate panel appears below the row card too', async () => {
+    const job = makeJob();
+    job.table.rows[0].cells[0] = cell(0, 'P1', { arbitration: { outcome: 'REVIEW_SUGGESTED', reason: 'SINGLE_MODERATE_CONFIDENCE', alternatives: [] } });
+    await mount(job);
+    await focus(mobile().querySelector('[data-testid="capture-row-card"] input'));
+    expect(mobile().querySelector('[data-testid="capture-candidates"]')).not.toBeNull();
+  });
+});
+
 describe('mobile: one row card at a time', () => {
   it('shows the current row with previous / next and a row counter', async () => {
     await mount(makeJob());

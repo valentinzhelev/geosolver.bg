@@ -44,6 +44,7 @@ export function summaryText(summary, bg = true) {
     `${summary.review} ${bg ? 'за проверка' : 'need review'}`,
     `${summary.invalid} ${bg ? 'невалидни' : 'invalid'}`,
   ];
+  if (summary.excluded) parts.push(`${summary.excluded} ${bg ? 'изключени' : 'excluded'}`);
   return parts.join(' · ');
 }
 
@@ -74,6 +75,43 @@ export function nextAttentionRow(table, fromIndex) {
 
 /** Only semantic columns are shown as editable fields (unmapped columns are shown, but marked as not imported). */
 export const columnsOf = (table) => (table ? table.columns : []);
+
+/* ---------------------------------------------------------------------------------------------------------------
+ * V2.2: candidates & arbitration (multiple recognition signals -> a trust decision the server made; the UI only
+ * presents the evidence and lets the user pick or correct - it never re-decides trust on its own).
+ * ------------------------------------------------------------------------------------------------------------ */
+
+/** Other readings the server gathered for this cell (never the currently shown one), for "Други разчитания". */
+export function candidateAlternatives(cell) {
+  const alts = (cell && cell.arbitration && cell.arbitration.alternatives) || [];
+  return alts.filter((a) => a && a.text !== undefined && a.text !== null && String(a.text) !== '');
+}
+export const hasAlternatives = (cell) => candidateAlternatives(cell).length > 0;
+
+const ARBITRATION_REASONS = {
+  CONTRADICTED_BY_CONSENSUS: ['Друго разчитане на клетката се повтори при няколко опита.', 'Another reading of this cell repeated across several passes.'],
+  DISAGREEMENT_NO_CONSENSUS: ['Разчитанията на клетката при различните опити не съвпадат.', 'The readings from different passes disagree.'],
+  CONSENSUS_BUT_SUSPICIOUS_SYMBOL: ['Един от знаците е разпознат с ниска сигурност.', 'One character was recognised with low confidence.'],
+  GENERATED_ALTERNATIVE_FROM_LOOKALIKE: ['Възможно е знак да е объркан с цифра (напр. O и 0).', 'A character may be confused with a digit (e.g. O and 0).'],
+  SINGLE_LOW_CONFIDENCE: ['Разпознаването е с много ниска сигурност.', 'The recognition has very low confidence.'],
+  SINGLE_MODERATE_CONFIDENCE: ['Разпознаването е с умерена сигурност.', 'The recognition has moderate confidence.'],
+  PRIMARY_UNPARSEABLE: ['Стойността не прилича на валидно число.', 'The value does not look like a valid number.'],
+  INSUFFICIENT_EVIDENCE: ['Няма достатъчно сигурно разчитане на клетката.', 'There is not enough confident evidence for this cell.'],
+};
+/** A short, fixed explanation of WHY the cell needs a second look (never invented text - a fixed lookup). */
+export function arbitrationReason(cell, bg = true) {
+  const reason = cell && cell.arbitration && cell.arbitration.reason;
+  const entry = reason && ARBITRATION_REASONS[reason];
+  return entry ? entry[bg ? 0 : 1] : '';
+}
+
+/* ---------------------------------------------------------------------------------------------------------------
+ * V2.2: row exclusion ("Не импортирай този ред") - explicit and reversible.
+ * ------------------------------------------------------------------------------------------------------------ */
+export const excludeRowLabel = (excluded, bg = true) => {
+  if (excluded) return bg ? 'Включи отново' : 'Re-include row';
+  return bg ? 'Не импортирай този ред' : 'Do not import this row';
+};
 
 const MESSAGES = {
   PRO_REQUIRED: ['Capture е функция на Pro плана.', 'Capture is a Pro plan feature.'],

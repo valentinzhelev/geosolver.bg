@@ -1,12 +1,12 @@
 import React from 'react';
 import CaptureCellInput from './CaptureCellInput';
-import { dataRows, nextAttentionRow, semanticLabel, SEMANTIC_OPTIONS } from '../../../utils/captureView';
+import { dataRows, nextAttentionRow, semanticLabel, SEMANTIC_OPTIONS, excludeRowLabel } from '../../../utils/captureView';
 
 /**
  * MOBILE: one row at a time as a card (image above, fields below, previous / next). The desktop table is deliberately
  * not squeezed onto a phone.
  */
-const CaptureRowStepper = ({ table, rowIndex, onRowChange, selected, onSelect, onCommit, onMapColumn, disabled = false, bg = true }) => {
+const CaptureRowStepper = ({ table, rowIndex, onRowChange, selected, onSelect, onCommit, onMapColumn, onToggleExclude, disabled = false, bg = true }) => {
   const rows = dataRows(table);
   const position = Math.max(0, rows.findIndex((r) => r.index === rowIndex));
   const row = rows[position];
@@ -32,7 +32,18 @@ const CaptureRowStepper = ({ table, rowIndex, onRowChange, selected, onSelect, o
           {bg ? 'Към следващия ред за проверка' : 'Go to the next row to check'}
         </button>
       )}
-      <div className="flex flex-col gap-2 p-3 rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900">
+      {onToggleExclude && (
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={() => onToggleExclude(row.index, !row.excluded)}
+          className="self-start px-2.5 py-1.5 rounded-lg text-xs font-medium font-['Manrope'] bg-white dark:bg-zinc-900 outline outline-1 outline-gray-200 dark:outline-zinc-700 disabled:opacity-40"
+          data-testid="capture-row-exclude-toggle"
+        >
+          {excludeRowLabel(row.excluded, bg)}
+        </button>
+      )}
+      <div className={`flex flex-col gap-2 p-3 rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 ${row.excluded ? 'opacity-45' : ''}`} data-row-excluded={row.excluded ? 'true' : 'false'}>
         {table.columns.map((col) => {
           const cell = row.cells.find((c) => c.col === col.index);
           if (!cell) return null;
@@ -55,7 +66,7 @@ const CaptureRowStepper = ({ table, rowIndex, onRowChange, selected, onSelect, o
                 row={row}
                 bg={bg}
                 compact
-                disabled={disabled}
+                disabled={disabled || row.excluded}
                 selected={selected && selected.row === row.index && selected.col === col.index}
                 onSelect={onSelect}
                 onCommit={onCommit}
