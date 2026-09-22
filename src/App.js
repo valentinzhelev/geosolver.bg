@@ -68,6 +68,7 @@ import GnssFieldLogPage from './components/pages/Gnss/GnssFieldLogPage';
 import IntegrationsPage from './components/pages/Integrations/IntegrationsPage';
 import WorkspacePage from './components/pages/Workspace/WorkspacePage';
 import ProjectHubPage from './components/pages/Projects/ProjectHubPage';
+import ProjectWorkspacePage from './components/pages/Project/ProjectWorkspacePage';
 import CapturePage from './components/pages/Capture/CapturePage';
 import StakeOutPage from './components/pages/StakeOut/StakeOutPage';
 import CalculationHistoryPage from './components/pages/Calculations/CalculationHistoryPage';
@@ -211,6 +212,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <ProjectHubPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/project"
+                element={
+                  <ProtectedRoute>
+                    <ProjectWorkspacePage />
                   </ProtectedRoute>
                 }
               />

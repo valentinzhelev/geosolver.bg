@@ -281,8 +281,14 @@ const ProjectHubPage = () => {
                   </div>
                   <div className="flex flex-wrap gap-2">
                     <Link
-                      to={`/map?projectId=${p._id}`}
+                      to={`/project?projectId=${p._id}`}
                       className="px-3 py-2 rounded-lg text-sm font-semibold font-['Manrope'] bg-black dark:bg-white text-white dark:text-black"
+                    >
+                      {bg ? 'Отвори проекта' : 'Open project'}
+                    </Link>
+                    <Link
+                      to={`/map?projectId=${p._id}`}
+                      className="px-3 py-2 rounded-lg text-sm font-medium font-['Manrope'] bg-white dark:bg-zinc-900 outline outline-1 outline-gray-200 dark:outline-zinc-700"
                     >
                       {bg ? 'Карта' : 'Map'}
                     </Link>

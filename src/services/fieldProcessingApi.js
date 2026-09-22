@@ -48,6 +48,9 @@ export const fieldProcessingApi = {
   // GET returns every run (polar AND traverse) for this FieldObservationSet, newest first - each UI filters by
   // its own processingType so a run of the other kind never lands in the wrong renderer.
   listRuns: (fieldObservationSetId) => request(`/field-processing?fieldObservationSetId=${encodeURIComponent(fieldObservationSetId)}`).then((r) => r.data),
+  // Project-wide listing (Project Processing workspace): every run (polar AND traverse) across every
+  // FieldObservationSet in the project, newest first - same shape as listRuns.
+  listRunsForProject: (projectId) => request(`/field-processing?projectId=${encodeURIComponent(projectId)}`).then((r) => r.data),
   // creating points changes the project's SurveyPoints: the shared points cache (PointPickers) must refresh
   createPoints: (runId) => request(`/field-processing/${runId}/create-points`, { method: 'POST' }).then((r) => { notifySurveyPointsChanged(); return r; }),
 };
