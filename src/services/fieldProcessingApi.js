@@ -40,7 +40,13 @@ export const fieldProcessingApi = {
   /** @param {string} fieldObservationSetId @param {'zenith'|'vertical'|null} [verticalAngleConvention] */
   createRun: (fieldObservationSetId, verticalAngleConvention = null) =>
     request('/field-processing', { method: 'POST', body: { fieldObservationSetId, verticalAngleConvention } }).then((r) => r.data),
+  /** @param {string} fieldObservationSetId
+   *  @param {{traverseType:'CLOSED_LOOP'|'KNOWN_ENDPOINT'|'OPEN', startIdentifier:string, endIdentifier?:string|null, verticalAngleConvention?:'zenith'|'vertical'|null}} opts */
+  createTraverseRun: (fieldObservationSetId, opts) =>
+    request('/field-processing/traverse', { method: 'POST', body: { fieldObservationSetId, ...opts } }).then((r) => r.data),
   getRun: (id) => request(`/field-processing/${id}`).then((r) => r.data),
+  // GET returns every run (polar AND traverse) for this FieldObservationSet, newest first - each UI filters by
+  // its own processingType so a run of the other kind never lands in the wrong renderer.
   listRuns: (fieldObservationSetId) => request(`/field-processing?fieldObservationSetId=${encodeURIComponent(fieldObservationSetId)}`).then((r) => r.data),
   // creating points changes the project's SurveyPoints: the shared points cache (PointPickers) must refresh
   createPoints: (runId) => request(`/field-processing/${runId}/create-points`, { method: 'POST' }).then((r) => { notifySurveyPointsChanged(); return r; }),

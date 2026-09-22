@@ -31,8 +31,11 @@ const FieldProcessingResults = ({ fieldObservationSetId, projectId, bg = true })
     fieldProcessingApi.listRuns(fieldObservationSetId)
       .then((runs) => {
         if (cancelled) return;
-        if (runs && runs.length) {
-          setRun(runs[0]);
+        // GET /field-processing lists every run for this set (polar AND traverse, V2.4.2) - this workflow only
+        // ever renders a polar one.
+        const polarRuns = (runs || []).filter((r) => (r.processingType || 'polar') === 'polar');
+        if (polarRuns.length) {
+          setRun(polarRuns[0]);
           setPhase('ready');
         } else {
           setPhase('idle');
