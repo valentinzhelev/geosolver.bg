@@ -6,6 +6,7 @@ import CaptureCandidatePanel from '../CaptureCandidatePanel';
 import NotebookStationCard from './NotebookStationCard';
 import NotebookObservationsTable from './NotebookObservationsTable';
 import NotebookRowStepper from './NotebookRowStepper';
+import FieldProcessingResults from './FieldProcessingResults';
 import { canConfirmNotebookJob, notebookObservations, describeCaptureError, notebookImportCount, notebookSummaryText, fieldAddrKey } from '../../../../utils/captureView';
 
 /** Finds the cell (and a row-shaped wrapper for CaptureCandidatePanel/onCommit) for a field address. */
@@ -178,6 +179,12 @@ const NotebookReview = ({ initialJob, imageUrl, bg = true }) => {
         />
         <CaptureCandidatePanel cell={selectedCell} row={selectedRow} imageUrl={imageUrl} onCommit={(r, c, v) => handleCommit(selectedAddr, v)} disabled={locked} bg={bg} />
       </div>
+
+      {/* V2.4.1: once confirmed, the Field Notebook workflow continues straight into processing - never a
+          disconnected calculator screen. */}
+      {confirmed && job.importedFieldObservationSetId && (
+        <FieldProcessingResults fieldObservationSetId={job.importedFieldObservationSetId} projectId={job.project} bg={bg} />
+      )}
     </div>
   );
 };
