@@ -134,6 +134,62 @@ export const importCount = (job) => (job && job.validationSummary ? job.validati
 export const ACCEPTED_TYPES = 'image/jpeg,image/png,image/webp';
 export const MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
 
+/* ===================================================================================================================
+ * V2.3: Field Notebook (mode = 'field-notebook'). The server does all interpretation/validation, exactly like
+ * coordinate tables; these helpers only label, order and position what it returns. Cell-level helpers above
+ * (cellDisplayValue, CELL_STATES, cellStateLabel, candidateAlternatives, arbitrationReason, excludeRowLabel,
+ * bboxToPercent) are already generic and are reused as-is for notebook fields.
+ * =================================================================================================================== */
+
+/** Column/field meanings the user can choose for an observation column. */
+export const NOTEBOOK_FIELD_OPTIONS = [
+  { value: '', bg: 'Не се импортира', en: 'Not imported' },
+  { value: 'target', bg: 'Точка', en: 'Target' },
+  { value: 'hz', bg: 'Hz', en: 'Hz' },
+  { value: 'vz', bg: 'V / Zenith', en: 'V / Zenith' },
+  { value: 'distance', bg: 'Разстояние (S)', en: 'Distance (S)' },
+  { value: 'horizontalDistance', bg: 'Хор. разстояние', en: 'Horiz. distance' },
+  { value: 'prismHeight', bg: 'Височина на призма', en: 'Prism height' },
+  { value: 'code', bg: 'Код', en: 'Code' },
+  { value: 'notes', bg: 'Бележки', en: 'Notes' },
+];
+export const notebookFieldLabel = (field, bg = true) => {
+  const o = NOTEBOOK_FIELD_OPTIONS.find((x) => x.value === (field || ''));
+  return o ? (bg ? o.bg : o.en) : '';
+};
+
+export function notebookSummaryText(summary, bg = true) {
+  if (!summary) return '';
+  const parts = [
+    `${summary.setups} ${bg ? 'станции' : 'setups'}`,
+    `${summary.observations} ${bg ? 'наблюдения' : 'observations'}`,
+    `${summary.ready} ${bg ? 'готови' : 'ready'}`,
+    `${summary.review} ${bg ? 'за проверка' : 'need review'}`,
+    `${summary.invalid} ${bg ? 'невалидни' : 'invalid'}`,
+  ];
+  if (summary.excluded) parts.push(`${summary.excluded} ${bg ? 'изключени' : 'excluded'}`);
+  return parts.join(' · ');
+}
+
+export const canConfirmNotebookJob = (job) => Boolean(job && job.status === 'needs_review' && job.validationSummary && job.validationSummary.canConfirm);
+export const notebookImportCount = (job) => (job && job.validationSummary ? job.validationSummary.observations : 0);
+
+/** The observations a user actually needs to look at (blank rows produced by OCR noise are hidden, like coordinate rows). */
+export const notebookObservations = (setup) => (setup ? setup.observations.filter((r) => !r.skipped) : []);
+
+export function nextAttentionObservation(setup, fromIndex) {
+  const rows = notebookObservations(setup);
+  const start = rows.findIndex((r) => r.index === fromIndex);
+  for (let i = 1; i <= rows.length; i += 1) {
+    const r = rows[(start + i) % rows.length];
+    if (r && (r.status === 'error' || r.status === 'warning')) return r.index;
+  }
+  return null;
+}
+
+/** A stable string key for a field address {setup, section, row?, field}, so "is this field selected" is a simple compare. */
+export const fieldAddrKey = (addr) => (addr ? `${addr.setup}:${addr.section}:${addr.row ?? ''}:${addr.field}` : '');
+
 /** Client-side pre-check for a friendlier message; the server validates the real content again. */
 export function checkFile(file, bg = true) {
   if (!file) return bg ? 'Изберете файл.' : 'Choose a file.';

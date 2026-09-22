@@ -23,7 +23,7 @@ afterEach(async () => {
   jest.clearAllMocks();
 });
 
-const job = (over = {}) => ({ id: 'j1', status: 'needs_review', originalName: 'table.png', rows: 4, review: 1, invalid: 0, importedCount: 0, createdAt: '2026-01-01T10:00:00.000Z', ...over });
+const job = (over = {}) => ({ id: 'j1', mode: 'coordinate-table', status: 'needs_review', originalName: 'table.png', rows: 4, review: 1, invalid: 0, importedCount: 0, createdAt: '2026-01-01T10:00:00.000Z', ...over });
 
 describe('CaptureHistory', () => {
   it('renders nothing without a project (Capture is always project-scoped)', async () => {
@@ -44,6 +44,14 @@ describe('CaptureHistory', () => {
     expect(rows[0].querySelector('[data-testid="capture-history-status"]').textContent).toBe('За преглед');
     expect(rows[0].textContent).toContain('4 реда');
     expect(rows[0].textContent).toContain('1 за проверка');
+  });
+
+  it('V2.3: shows a type badge distinguishing coordinate-table from field-notebook jobs', async () => {
+    captureApi.listJobs.mockResolvedValue([job({ id: 'j1', mode: 'coordinate-table' }), job({ id: 'j2', mode: 'field-notebook', originalName: 'notebook.png' })]);
+    await mount();
+    await act(async () => {});
+    const badges = [...container.querySelectorAll('[data-testid="capture-history-type"]')];
+    expect(badges.map((b) => b.textContent)).toEqual(['Таблица с координати', 'Полева книжка']);
   });
 
   it('a confirmed job shows the imported count instead of a review count', async () => {

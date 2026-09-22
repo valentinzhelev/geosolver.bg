@@ -2,6 +2,8 @@ import {
   SEMANTIC_OPTIONS, semanticLabel, CELL_STATES, cellStateLabel, cellDisplayValue, summaryText, bboxToPercent,
   dataRows, nextAttentionRow, describeCaptureError, canConfirmJob, importCount, checkFile, MAX_UPLOAD_BYTES,
   candidateAlternatives, hasAlternatives, arbitrationReason, excludeRowLabel,
+  NOTEBOOK_FIELD_OPTIONS, notebookFieldLabel, notebookSummaryText, canConfirmNotebookJob, notebookImportCount,
+  notebookObservations, nextAttentionObservation, fieldAddrKey,
 } from '../captureView';
 import { captureApi, CaptureApiError } from '../../services/captureApi';
 import { onSurveyPointsChanged } from '../surveyPointsEvents';
@@ -94,6 +96,45 @@ describe('V2.2 candidates, arbitration reasons and row exclusion', () => {
     expect(excludeRowLabel(true)).toBe('Включи отново');
     expect(excludeRowLabel(false, false)).toBe('Do not import this row');
     expect(excludeRowLabel(true, false)).toBe('Re-include row');
+  });
+});
+
+describe('V2.3 Field Notebook helpers', () => {
+  it('notebookFieldLabel translates a field name, and "not imported" for none/unknown', () => {
+    expect(NOTEBOOK_FIELD_OPTIONS.map((o) => o.value)).toEqual(['', 'target', 'hz', 'vz', 'distance', 'horizontalDistance', 'prismHeight', 'code', 'notes']);
+    expect(notebookFieldLabel('hz')).toBe('Hz');
+    expect(notebookFieldLabel('distance', false)).toBe('Distance (S)');
+    expect(notebookFieldLabel(null)).toBe('Не се импортира');
+    expect(notebookFieldLabel('bogus')).toBe('');
+  });
+
+  it('notebookSummaryText reads like "1 станции · 3 наблюдения · 2 готови · 1 за проверка · 0 невалидни"', () => {
+    expect(notebookSummaryText({ setups: 1, observations: 3, ready: 2, review: 1, invalid: 0 }, true)).toBe('1 станции · 3 наблюдения · 2 готови · 1 за проверка · 0 невалидни');
+    expect(notebookSummaryText({ setups: 1, observations: 1, ready: 1, review: 0, invalid: 0, excluded: 1 }, false)).toBe('1 setups · 1 observations · 1 ready · 0 need review · 0 invalid · 1 excluded');
+    expect(notebookSummaryText(null)).toBe('');
+  });
+
+  it('canConfirmNotebookJob / notebookImportCount mirror the coordinate-table versions', () => {
+    expect(canConfirmNotebookJob({ status: 'needs_review', validationSummary: { canConfirm: true } })).toBe(true);
+    expect(canConfirmNotebookJob({ status: 'confirmed', validationSummary: { canConfirm: true } })).toBe(false);
+    expect(canConfirmNotebookJob(null)).toBe(false);
+    expect(notebookImportCount({ validationSummary: { observations: 5 } })).toBe(5);
+  });
+
+  it('notebookObservations hides blank/skipped rows; nextAttentionObservation finds the next error/warning and wraps', () => {
+    const setup = { observations: [{ index: 0, status: 'ok', skipped: false }, { index: 1, status: 'warning', skipped: false }, { index: 2, status: 'ok', skipped: true }, { index: 3, status: 'error', skipped: false }] };
+    expect(notebookObservations(setup).map((r) => r.index)).toEqual([0, 1, 3]);
+    expect(nextAttentionObservation(setup, 0)).toBe(1);
+    expect(nextAttentionObservation(setup, 1)).toBe(3);
+    expect(nextAttentionObservation(setup, 3)).toBe(1);
+    expect(nextAttentionObservation({ observations: [{ index: 0, status: 'ok', skipped: false }] }, 0)).toBeNull();
+  });
+
+  it('fieldAddrKey gives a stable, distinct key per field address', () => {
+    expect(fieldAddrKey({ setup: 0, section: 'station', field: 'point' })).toBe('0:station::point');
+    expect(fieldAddrKey({ setup: 0, section: 'observation', row: 2, field: 'hz' })).toBe('0:observation:2:hz');
+    expect(fieldAddrKey({ setup: 0, section: 'observation', row: 2, field: 'hz' })).not.toBe(fieldAddrKey({ setup: 0, section: 'observation', row: 3, field: 'hz' }));
+    expect(fieldAddrKey(null)).toBe('');
   });
 });
 

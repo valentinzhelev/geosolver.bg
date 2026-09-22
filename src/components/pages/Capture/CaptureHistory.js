@@ -10,6 +10,12 @@ const STATUS_LABEL = {
   processing: ['Обработва се', 'Processing'],
 };
 
+// V2.3: a clear type badge per job, since Capture history now lists both coordinate-table and field-notebook jobs.
+const MODE_LABEL = {
+  'coordinate-table': ['Таблица с координати', 'Coordinate table'],
+  'field-notebook': ['Полева книжка', 'Field notebook'],
+};
+
 const formatWhen = (iso, bg) => {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return '';
@@ -50,6 +56,7 @@ const CaptureHistory = ({ projectId, refreshKey, onOpen, bg = true }) => {
         <ul className="flex flex-col divide-y divide-gray-100 dark:divide-zinc-800">
           {jobs.map((job) => {
             const label = STATUS_LABEL[job.status] || [job.status, job.status];
+            const modeLabel = MODE_LABEL[job.mode] || [job.mode, job.mode];
             return (
               <li key={job.id}>
                 <button
@@ -59,7 +66,15 @@ const CaptureHistory = ({ projectId, refreshKey, onOpen, bg = true }) => {
                   data-testid="capture-history-row"
                 >
                   <span className="flex flex-col">
-                    <span className="text-sm font-medium font-['Manrope'] text-black dark:text-white">{job.originalName || (bg ? '(без име)' : '(unnamed)')}</span>
+                    <span className="flex items-center gap-1.5">
+                      <span className="text-sm font-medium font-['Manrope'] text-black dark:text-white">{job.originalName || (bg ? '(без име)' : '(unnamed)')}</span>
+                      <span
+                        className={`px-1.5 py-0.5 rounded text-[10px] font-semibold font-['Manrope'] ${job.mode === 'field-notebook' ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300' : 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300'}`}
+                        data-testid="capture-history-type"
+                      >
+                        {bg ? modeLabel[0] : modeLabel[1]}
+                      </span>
+                    </span>
                     <span className="text-[11px] text-neutral-400 font-['Manrope']">{formatWhen(job.createdAt, bg)}</span>
                   </span>
                   <span className="flex items-center gap-3 text-[11px] font-['Manrope'] text-neutral-500 dark:text-zinc-400">

@@ -41,6 +41,35 @@ const job = (over = {}) => ({
   images: { review: '/api/capture/jobs/job9/image/review' }, ...over,
 });
 
+const notebookJob = (over = {}) => ({
+  id: 'nb1', project: 'proj1', status: 'needs_review', revision: 0, mode: 'field-notebook',
+  source: { review: { width: 800, height: 300 }, quality: { warnings: [] } },
+  notebook: {
+    pageIndex: 0, issues: [],
+    setups: [{
+      index: 0,
+      station: {
+        point: { col: 0, rawText: 'T1', normalizedValue: 'T1', reviewState: 'accepted', validation: { status: 'ok', issues: [] }, userValue: null, bbox: { x: 0, y: 0, w: 8, h: 8 }, candidates: [] },
+        instrumentHeight: { col: 0, rawText: '1.450', normalizedValue: 1.45, reviewState: 'accepted', validation: { status: 'ok', issues: [] }, userValue: null, bbox: { x: 0, y: 0, w: 8, h: 8 }, candidates: [] },
+        notes: { col: 0, rawText: '', normalizedValue: null, reviewState: 'accepted', validation: { status: 'ok', issues: [] }, userValue: null, bbox: { x: 0, y: 0, w: 8, h: 8 }, candidates: [] },
+        bbox: { x: 0, y: 0, w: 8, h: 8 },
+      },
+      orientation: null,
+      issues: [],
+      observations: [{
+        index: 0, bbox: { x: 0, y: 10, w: 8, h: 8 }, status: 'ok', skipped: false, excluded: false,
+        cols: [{ index: 0, headerText: 'Точка', field: 'target', mapping: 'ok' }, { index: 1, headerText: 'Hz', field: 'hz', mapping: 'ok' }],
+        cells: [
+          { col: 0, rawText: 'A1', normalizedValue: 'A1', reviewState: 'accepted', validation: { status: 'ok', issues: [] }, userValue: null, bbox: { x: 0, y: 10, w: 8, h: 8 }, candidates: [] },
+          { col: 1, rawText: '94.5000g', normalizedValue: 94.5, reviewState: 'accepted', validation: { status: 'ok', issues: [] }, userValue: null, bbox: { x: 20, y: 10, w: 8, h: 8 }, candidates: [] },
+        ],
+      }],
+    }],
+  },
+  validationSummary: { setups: 1, observations: 1, ready: 1, review: 0, invalid: 0, excluded: 0, canConfirm: true },
+  images: { review: '/api/capture/jobs/nb1/image/review' }, ...over,
+});
+
 let root;
 let container;
 async function mount() {
@@ -55,6 +84,7 @@ const pickFile = (file) => act(async () => {
   input.dispatchEvent(new Event('change', { bubbles: true }));
 });
 const flush = () => act(async () => { await new Promise((r) => setTimeout(r, 0)); });
+const click = (el) => act(async () => { el.click(); });
 
 beforeEach(() => {
   mockSearch = 'projectId=proj1';
@@ -103,7 +133,7 @@ describe('upload -> review', () => {
     const file = new File(['png'], 'table.png', { type: 'image/png' });
     await pickFile(file);
     await flush();
-    expect(captureApi.createJob).toHaveBeenCalledWith(file, 'proj1');
+    expect(captureApi.createJob).toHaveBeenCalledWith(file, 'proj1', 'coordinate-table');
     expect(captureApi.fetchImageObjectUrl).toHaveBeenCalledWith('/api/capture/jobs/job9/image/review');
     expect(container.querySelector('[data-testid="capture-review"]')).not.toBeNull();
     expect(container.querySelector('[data-testid="capture-summary"]').textContent).toBe('1 реда · 1 готови · 0 за проверка · 0 невалидни');
@@ -145,6 +175,38 @@ describe('upload -> review', () => {
     await flush();
     expect(captureApi.confirmJob).not.toHaveBeenCalled();
     expect(captureApi.patchJob).not.toHaveBeenCalled();
+  });
+});
+
+describe('V2.3: choosing between coordinate-table and field-notebook mode', () => {
+  it('defaults to coordinate-table; explains the trust rule for it', async () => {
+    await mount();
+    expect(container.querySelector('[data-testid="capture-mode-coordinate-table"]').getAttribute('aria-selected')).toBe('true');
+    expect(container.querySelector('[data-testid="capture-mode-field-notebook"]').getAttribute('aria-selected')).toBe('false');
+    expect(container.querySelector('[data-testid="capture-upload"]').textContent).toContain('X е север, Y е изток');
+  });
+
+  it('switching to field notebook changes the explanation and the mode sent on upload', async () => {
+    captureApi.createJob.mockResolvedValue(notebookJob());
+    await mount();
+    await click(container.querySelector('[data-testid="capture-mode-field-notebook"]'));
+    expect(container.querySelector('[data-testid="capture-upload"]').textContent).toContain('станция, ориентир, наблюдения');
+    expect(container.querySelector('[data-testid="capture-upload"]').textContent).not.toContain('X е север');
+    await pickFile(new File(['png'], 'notebook.png', { type: 'image/png' }));
+    await flush();
+    expect(captureApi.createJob).toHaveBeenCalledWith(expect.anything(), 'proj1', 'field-notebook');
+  });
+
+  it('a field-notebook job renders the Field Notebook review workspace, not the coordinate-table one', async () => {
+    captureApi.createJob.mockResolvedValue(notebookJob());
+    await mount();
+    await click(container.querySelector('[data-testid="capture-mode-field-notebook"]'));
+    await pickFile(new File(['png'], 'notebook.png', { type: 'image/png' }));
+    await flush();
+    expect(container.querySelector('[data-testid="notebook-review"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="capture-review"]')).toBeNull();
+    // a field-notebook capture never offers "project points" (it creates no SurveyPoints)
+    expect(container.querySelector('a[href="/points?projectId=proj1"]')).toBeNull();
   });
 });
 

@@ -44,10 +44,11 @@ async function request(path, { method = 'GET', body, formData, raw = false } = {
 }
 
 export const captureApi = {
-  createJob: (file, projectId) => {
+  /** @param {'coordinate-table'|'field-notebook'} mode */
+  createJob: (file, projectId, mode = 'coordinate-table') => {
     const form = new FormData();
     form.append('projectId', projectId);
-    form.append('mode', 'coordinate-table');
+    form.append('mode', mode);
     form.append('image', file);
     return request('/capture/jobs', { method: 'POST', formData: form }).then((r) => r.data);
   },
