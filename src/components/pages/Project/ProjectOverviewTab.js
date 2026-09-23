@@ -3,8 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { surveyPointsApi } from '../../../services/surveyPointsApi';
 import { captureApi } from '../../../services/captureApi';
 import { fieldProcessingApi } from '../../../services/fieldProcessingApi';
+import { reportsApi } from '../../../services/reportsApi';
 import { statusLabel, statusTone, captureStatusKey, traverseRunStatusKey, polarRunStatusKey } from '../../../utils/statusLabels';
 import { runCounts } from '../../../utils/fieldProcessingView';
+import { reportTypeLabel } from '../../../utils/reportLabels';
 
 const StatTile = ({ label, value }) => (
   <div className="p-3 bg-white dark:bg-zinc-900 rounded-xl outline outline-1 outline-gray-200 dark:outline-zinc-800">
@@ -24,6 +26,7 @@ const ProjectOverviewTab = ({ projectId, bg = true }) => {
   const [pointCount, setPointCount] = useState(0);
   const [jobs, setJobs] = useState([]);
   const [runs, setRuns] = useState([]);
+  const [reports, setReports] = useState([]);
 
   useEffect(() => {
     if (!projectId) return undefined;
@@ -34,11 +37,13 @@ const ProjectOverviewTab = ({ projectId, bg = true }) => {
       surveyPointsApi.list({ projectId }).catch(() => ({ data: [] })),
       captureApi.listJobs(projectId).catch(() => []),
       fieldProcessingApi.listRunsForProject(projectId).catch(() => []),
-    ]).then(([ptsRes, jobsRes, runsRes]) => {
+      reportsApi.listReports(projectId).catch(() => []),
+    ]).then(([ptsRes, jobsRes, runsRes, reportsRes]) => {
       if (cancelled) return;
       setPointCount((ptsRes.data || []).length);
       setJobs(jobsRes || []);
       setRuns(runsRes || []);
+      setReports(reportsRes || []);
       setLoading(false);
     }).catch((e) => { if (!cancelled) { setError(e.message); setLoading(false); } });
     return () => { cancelled = true; };
@@ -63,6 +68,12 @@ const ProjectOverviewTab = ({ projectId, bg = true }) => {
         to: `/project?projectId=${projectId}&tab=processing`,
       };
     }),
+    ...reports.map((r) => ({
+      kind: 'document', date: r.generatedAt, id: r.id,
+      label: `${bg ? 'Документ' : 'Document'}: ${reportTypeLabel(r.reportType, bg)}`,
+      statusKey: 'PROCESSED',
+      to: `/project?projectId=${projectId}&tab=documents`,
+    })),
   ].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 6);
 
   const primary = "px-4 py-2 rounded-lg text-sm font-semibold font-['Manrope'] bg-black dark:bg-white text-white dark:text-black";

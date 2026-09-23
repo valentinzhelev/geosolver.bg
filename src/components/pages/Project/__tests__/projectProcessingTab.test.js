@@ -2,11 +2,13 @@ import React, { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import ProjectProcessingTab from '../ProjectProcessingTab';
 import { fieldProcessingApi } from '../../../../services/fieldProcessingApi';
+import { reportsApi } from '../../../../services/reportsApi';
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
 jest.mock('react-router-dom', () => ({ Link: ({ to, children, ...rest }) => <a href={to} {...rest}>{children}</a> }), { virtual: true });
 jest.mock('../../../../services/fieldProcessingApi', () => ({ fieldProcessingApi: { listRunsForProject: jest.fn() } }));
+jest.mock('../../../../services/reportsApi', () => ({ reportsApi: { createReport: jest.fn() } }));
 
 const polarRun = () => ({
   id: 'run-polar-1',
@@ -130,5 +132,67 @@ describe('ProjectProcessingTab: project-wide, read-only run listing', () => {
     await flush();
     await click(q('processing-run-toggle'));
     expect(q('processing-run-detail').textContent).toContain('Не е приложимо');
+  });
+});
+
+describe('"Генерирай отчет": a lightweight confirmation before generating, never silent', () => {
+  it('shows a confirm step naming the report type and row count before calling the API', async () => {
+    fieldProcessingApi.listRunsForProject.mockResolvedValue([polarRun()]);
+    await mount();
+    await flush();
+    expect(reportsApi.createReport).not.toHaveBeenCalled();
+    await click(q('processing-run-generate-report'));
+    const dialog = q('processing-run-report-confirm');
+    expect(dialog).toBeTruthy();
+    expect(dialog.textContent).toContain('полярна');
+    expect(dialog.textContent).toContain('2'); // two observations in the polar fixture
+    expect(reportsApi.createReport).not.toHaveBeenCalled();
+  });
+
+  it('confirming calls createReport with the exact run id and reportType, then shows a done state with a Documents link', async () => {
+    fieldProcessingApi.listRunsForProject.mockResolvedValue([polarRun()]);
+    reportsApi.createReport.mockResolvedValue({ id: 'report1', title: 'Отчет за полярна обработка' });
+    await mount();
+    await flush();
+    await click(q('processing-run-generate-report'));
+    await click(q('processing-run-report-go'));
+    await flush();
+    expect(reportsApi.createReport).toHaveBeenCalledWith({ reportType: 'POLAR_PROCESSING_REPORT', projectId: 'proj1', sourceId: 'run-polar-1' });
+    const done = q('processing-run-report-done');
+    expect(done).toBeTruthy();
+    expect(done.querySelector('a').getAttribute('href')).toBe('/project?projectId=proj1&tab=documents');
+  });
+
+  it('a traverse run generates a TRAVERSE_PROCESSING_REPORT', async () => {
+    fieldProcessingApi.listRunsForProject.mockResolvedValue([traverseRun()]);
+    reportsApi.createReport.mockResolvedValue({ id: 'report2', title: 'Отчет за обработка на полигонов ход' });
+    await mount();
+    await flush();
+    await click(q('processing-run-generate-report'));
+    await click(q('processing-run-report-go'));
+    await flush();
+    expect(reportsApi.createReport).toHaveBeenCalledWith(expect.objectContaining({ reportType: 'TRAVERSE_PROCESSING_REPORT', sourceId: 'run-traverse-1' }));
+  });
+
+  it('cancelling the confirmation never calls the API', async () => {
+    fieldProcessingApi.listRunsForProject.mockResolvedValue([polarRun()]);
+    await mount();
+    await flush();
+    await click(q('processing-run-generate-report'));
+    await click(container.querySelector('[data-testid="processing-run-report-confirm"] button:not([data-testid])'));
+    expect(q('processing-run-report-confirm')).toBeFalsy();
+    expect(reportsApi.createReport).not.toHaveBeenCalled();
+  });
+
+  it('a failed generation shows the error and returns to the idle state, offering a retry', async () => {
+    fieldProcessingApi.listRunsForProject.mockResolvedValue([polarRun()]);
+    reportsApi.createReport.mockRejectedValue({ message: 'Грешка при заявката.' });
+    await mount();
+    await flush();
+    await click(q('processing-run-generate-report'));
+    await click(q('processing-run-report-go'));
+    await flush();
+    expect(container.querySelector('[role="alert"]').textContent).toBe('Грешка при заявката.');
+    expect(q('processing-run-generate-report')).toBeTruthy(); // back to idle, can retry
   });
 });

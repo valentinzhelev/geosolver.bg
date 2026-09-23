@@ -4,6 +4,7 @@ import ProjectOverviewTab from '../ProjectOverviewTab';
 import { surveyPointsApi } from '../../../../services/surveyPointsApi';
 import { captureApi } from '../../../../services/captureApi';
 import { fieldProcessingApi } from '../../../../services/fieldProcessingApi';
+import { reportsApi } from '../../../../services/reportsApi';
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -15,6 +16,7 @@ jest.mock('react-router-dom', () => ({
 jest.mock('../../../../services/surveyPointsApi', () => ({ surveyPointsApi: { list: jest.fn() } }));
 jest.mock('../../../../services/captureApi', () => ({ captureApi: { listJobs: jest.fn() } }));
 jest.mock('../../../../services/fieldProcessingApi', () => ({ fieldProcessingApi: { listRunsForProject: jest.fn() } }));
+jest.mock('../../../../services/reportsApi', () => ({ reportsApi: { listReports: jest.fn() } }));
 
 const job = (over = {}) => ({ id: 'job1', originalName: 'x.jpg', mode: 'field-notebook', status: 'needs_review', rows: 2, review: 1, importedCount: 0, createdAt: '2026-09-20T10:00:00Z', ...over });
 const polarRun = () => ({ id: 'run1', processingType: 'polar', createdAt: '2026-09-21T10:00:00Z', setups: [{ index: 0, observations: [{ status: 'READY' }] }] });
@@ -42,6 +44,7 @@ describe('ProjectOverviewTab: a lean project dashboard', () => {
     surveyPointsApi.list.mockResolvedValue({ data: [{ _id: 'p1' }, { _id: 'p2' }] });
     captureApi.listJobs.mockResolvedValue([job(), job({ id: 'job2', status: 'confirmed' })]);
     fieldProcessingApi.listRunsForProject.mockResolvedValue([polarRun()]);
+    reportsApi.listReports.mockResolvedValue([]);
     await mount();
     await flush();
     expect(container.textContent).toContain('2'); // points
@@ -53,6 +56,7 @@ describe('ProjectOverviewTab: a lean project dashboard', () => {
     surveyPointsApi.list.mockResolvedValue({ data: [] });
     captureApi.listJobs.mockResolvedValue([]);
     fieldProcessingApi.listRunsForProject.mockResolvedValue([]);
+    reportsApi.listReports.mockResolvedValue([]);
     await mount();
     await flush();
     expect(q('overview-action-points').getAttribute('href')).toBe('/points?projectId=proj1');
@@ -65,6 +69,7 @@ describe('ProjectOverviewTab: a lean project dashboard', () => {
     surveyPointsApi.list.mockResolvedValue({ data: [] });
     captureApi.listJobs.mockResolvedValue([]);
     fieldProcessingApi.listRunsForProject.mockResolvedValue([]);
+    reportsApi.listReports.mockResolvedValue([]);
     await mount();
     await flush();
     await act(async () => { q('overview-action-process').click(); });
@@ -75,9 +80,23 @@ describe('ProjectOverviewTab: a lean project dashboard', () => {
     surveyPointsApi.list.mockResolvedValue({ data: [] });
     captureApi.listJobs.mockResolvedValue([job({ status: 'needs_review' }), job({ id: 'job2', status: 'confirmed' })]);
     fieldProcessingApi.listRunsForProject.mockResolvedValue([]);
+    reportsApi.listReports.mockResolvedValue([]);
     await mount();
     await flush();
     const tab = q('project-overview-tab');
     expect(tab).toBeTruthy();
+  });
+
+  it('a generated report appears in the latest-activity feed, linking to the Documents tab', async () => {
+    surveyPointsApi.list.mockResolvedValue({ data: [] });
+    captureApi.listJobs.mockResolvedValue([]);
+    fieldProcessingApi.listRunsForProject.mockResolvedValue([]);
+    reportsApi.listReports.mockResolvedValue([{ id: 'report1', reportType: 'PROJECT_COORDINATE_LIST', generatedAt: '2026-09-23T09:00:00Z' }]);
+    await mount();
+    await flush();
+    const rows = qa('overview-activity-row');
+    expect(rows).toHaveLength(1);
+    expect(rows[0].textContent).toContain('Координатен регистър');
+    expect(rows[0].getAttribute('href')).toBe('/project?projectId=proj1&tab=documents');
   });
 });

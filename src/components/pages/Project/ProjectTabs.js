@@ -5,6 +5,7 @@ export const PROJECT_TABS = [
   { id: 'points', bg: 'Точки', en: 'Points' },
   { id: 'field-data', bg: 'Теренни данни', en: 'Field data' },
   { id: 'processing', bg: 'Обработки', en: 'Processing' },
+  { id: 'documents', bg: 'Документи', en: 'Documents' },
   { id: 'map', bg: 'Карта', en: 'Map' },
 ];
 

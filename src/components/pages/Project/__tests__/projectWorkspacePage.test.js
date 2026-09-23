@@ -28,6 +28,7 @@ jest.mock('../ProjectOverviewTab', () => () => <div data-testid="tab-content-ove
 jest.mock('../ProjectPointsTab', () => () => <div data-testid="tab-content-points" />);
 jest.mock('../ProjectFieldDataTab', () => () => <div data-testid="tab-content-field-data" />);
 jest.mock('../ProjectProcessingTab', () => () => <div data-testid="tab-content-processing" />);
+jest.mock('../ProjectDocumentsTab', () => () => <div data-testid="tab-content-documents" />);
 jest.mock('../ProjectMapTab', () => () => <div data-testid="tab-content-map" />);
 
 const project = { _id: 'proj1', name: 'Обект Витоша' };
@@ -90,6 +91,8 @@ describe('ProjectWorkspacePage: the coherent project shell', () => {
     expect(q('tab-content-field-data')).toBeTruthy();
     await click(q('project-tab-points'));
     expect(q('tab-content-points')).toBeTruthy();
+    await click(q('project-tab-documents'));
+    expect(q('tab-content-documents')).toBeTruthy();
     await click(q('project-tab-map'));
     expect(q('tab-content-map')).toBeTruthy();
   });

@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { fieldProcessingApi } from '../../../services/fieldProcessingApi';
+import { reportsApi } from '../../../services/reportsApi';
 import { statusLabel, statusTone, fmtCoord, runCounts } from '../../../utils/fieldProcessingView';
 import { traverseTypeLabel, closureUnavailableMessage, fmtRelativeClosure, hasAdjustment } from '../../../utils/traverseView';
 import { statusLabel as sharedStatusLabel, statusTone as sharedStatusTone, polarRunStatusKey, traverseRunStatusKey } from '../../../utils/statusLabels';
+import { reportTypeLabel } from '../../../utils/reportLabels';
 
 const formatWhen = (iso, bg) => {
   const d = new Date(iso);
@@ -95,13 +97,19 @@ const TraverseRunDetail = ({ run, bg }) => {
 const RunCard = ({ run, projectId, bg, expanded, onToggle }) => {
   const isTraverse = run.processingType === 'traverse';
   const badge = isTraverse ? (bg ? 'Полигонов ход' : 'Traverse') : (bg ? 'Полярна обработка' : 'Polar');
+  const reportType = isTraverse ? 'TRAVERSE_PROCESSING_REPORT' : 'POLAR_PROCESSING_REPORT';
+  const [genStage, setGenStage] = useState('idle'); // idle | confirm | generating | done
+  const [genError, setGenError] = useState('');
+  const [genReport, setGenReport] = useState(null);
 
   let title;
   let sharedStatus;
+  let rowCount;
   if (isTraverse) {
     const t = run.traverse;
     title = `${traverseTypeLabel(t.traverseType, bg)} · ${t.startIdentifier}${t.endIdentifier ? ` → ${t.endIdentifier}` : ''}`;
     sharedStatus = traverseRunStatusKey(t.status);
+    rowCount = t.legs.length;
   } else {
     const targetCount = run.setups.reduce((s, setup) => s + setup.observations.length, 0);
     const counts = run.setups.reduce((acc, setup) => {
@@ -112,7 +120,21 @@ const RunCard = ({ run, projectId, bg, expanded, onToggle }) => {
     const stations = run.setups.map((s) => s.station.identifier).join(', ');
     title = `${bg ? 'Станция' : 'Station'} ${stations} · ${targetCount} ${bg ? 'цели' : 'targets'}`;
     sharedStatus = polarRunStatusKey(counts);
+    rowCount = targetCount;
   }
+
+  const generateReport = async () => {
+    setGenStage('generating');
+    setGenError('');
+    try {
+      const created = await reportsApi.createReport({ reportType, projectId, sourceId: run.id });
+      setGenReport(created);
+      setGenStage('done');
+    } catch (e) {
+      setGenError(e.message);
+      setGenStage('idle');
+    }
+  };
 
   return (
     <div className="flex flex-col gap-2 p-3 rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900" data-testid="processing-run-card">
@@ -137,8 +159,42 @@ const RunCard = ({ run, projectId, bg, expanded, onToggle }) => {
           <button type="button" onClick={onToggle} className="text-xs font-['Manrope'] underline text-black dark:text-white" data-testid="processing-run-toggle">
             {expanded ? (bg ? 'Скрий детайли' : 'Hide details') : (bg ? 'Детайли' : 'Details')}
           </button>
+          {genStage === 'idle' && (
+            <button type="button" onClick={() => setGenStage('confirm')} className="text-xs font-['Manrope'] underline text-orange-700 dark:text-orange-400" data-testid="processing-run-generate-report">
+              {bg ? 'Генерирай отчет' : 'Generate report'}
+            </button>
+          )}
         </div>
       </div>
+
+      {genStage === 'confirm' && (
+        <div className="p-2.5 rounded-lg bg-orange-50 dark:bg-orange-950/20 outline outline-1 outline-orange-200 dark:outline-orange-900/50 flex flex-col gap-2" role="alertdialog" aria-label={bg ? 'Потвърждение' : 'Confirmation'} data-testid="processing-run-report-confirm">
+          <p className="text-xs font-['Manrope'] text-black dark:text-white">
+            {bg
+              ? `Ще бъде генериран ${reportTypeLabel(reportType, bg)} с ${rowCount} реда.`
+              : `A ${reportTypeLabel(reportType, bg)} with ${rowCount} rows will be generated.`}
+          </p>
+          <div className="flex gap-2">
+            <button type="button" onClick={generateReport} className="px-3 py-1.5 rounded-lg text-xs font-semibold font-['Manrope'] bg-black dark:bg-white text-white dark:text-black" data-testid="processing-run-report-go">
+              {bg ? 'Генерирай' : 'Generate'}
+            </button>
+            <button type="button" onClick={() => setGenStage('idle')} className="px-3 py-1.5 rounded-lg text-xs font-medium font-['Manrope'] bg-white dark:bg-zinc-900 outline outline-1 outline-gray-200 dark:outline-zinc-700">
+              {bg ? 'Отказ' : 'Cancel'}
+            </button>
+          </div>
+        </div>
+      )}
+      {genStage === 'generating' && <p className="text-xs text-neutral-500 font-['Manrope']">{bg ? 'Генериране...' : 'Generating...'}</p>}
+      {genStage === 'done' && genReport && (
+        <div className="p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 outline outline-1 outline-emerald-200 dark:outline-emerald-900/50 flex flex-wrap items-center gap-2" role="status" data-testid="processing-run-report-done">
+          <span className="text-xs font-semibold font-['Manrope'] text-emerald-800 dark:text-emerald-300">✓ {bg ? 'Отчетът е генериран.' : 'Report generated.'}</span>
+          <Link to={`/project?projectId=${projectId}&tab=documents`} className="text-xs font-['Manrope'] underline text-black dark:text-white">
+            {bg ? 'Отвори в Документи' : 'Open in Documents'}
+          </Link>
+        </div>
+      )}
+      {genError && <p className="text-xs text-red-600 font-['Manrope']" role="alert">{genError}</p>}
+
       {expanded && (
         <div className="pt-2 border-t border-gray-100 dark:border-zinc-800" data-testid="processing-run-detail">
           {isTraverse ? <TraverseRunDetail run={run} bg={bg} /> : <PolarRunDetail run={run} bg={bg} />}
