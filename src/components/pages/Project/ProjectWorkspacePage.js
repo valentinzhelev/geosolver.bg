@@ -11,6 +11,7 @@ import ProjectFieldDataTab from './ProjectFieldDataTab';
 import ProjectProcessingTab from './ProjectProcessingTab';
 import ProjectDocumentsTab from './ProjectDocumentsTab';
 import ProjectMapTab from './ProjectMapTab';
+import ProjectGaiTab from './ProjectGaiTab';
 
 const VALID_TABS = new Set(PROJECT_TABS.map((t) => t.id));
 
@@ -98,6 +99,7 @@ const ProjectWorkspacePage = () => {
                 {tab === 'processing' && <ProjectProcessingTab projectId={projectId} bg={bg} />}
                 {tab === 'documents' && <ProjectDocumentsTab projectId={projectId} bg={bg} />}
                 {tab === 'map' && <ProjectMapTab projectId={projectId} bg={bg} />}
+                {tab === 'gai' && <ProjectGaiTab projectId={projectId} bg={bg} />}
               </div>
             )}
           </div>

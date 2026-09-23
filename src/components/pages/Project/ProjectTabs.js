@@ -7,6 +7,7 @@ export const PROJECT_TABS = [
   { id: 'processing', bg: 'Обработки', en: 'Processing' },
   { id: 'documents', bg: 'Документи', en: 'Documents' },
   { id: 'map', bg: 'Карта', en: 'Map' },
+  { id: 'gai', bg: 'GAI', en: 'GAI' },
 ];
 
 /** The Project workspace's persistent in-project navigation (V2.4.3 section 2). */
