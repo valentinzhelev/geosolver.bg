@@ -25,7 +25,13 @@ async function request(path, { method = 'GET', body } = {}) {
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...(body ? { 'Content-Type': 'application/json' } : {}),
   });
-  const response = await fetch(`${API_BASE_URL}${path}`, { method, headers, body: body ? JSON.stringify(body) : undefined });
+  let response;
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, { method, headers, body: body ? JSON.stringify(body) : undefined });
+  } catch {
+    // the browser's own network error text ("Failed to fetch") is English and meaningless to users
+    throw new GaiApiError(0, { code: 'NETWORK_ERROR' });
+  }
   let data = {};
   try {
     data = await response.json();
@@ -42,4 +48,6 @@ export const gaiApi = {
   getConversation: (id) => request(`/gai/conversations/${id}`).then((r) => r.data),
   /** @returns {Promise<{message:object, evidence:Array}>} */
   sendMessage: (conversationId, text) => request(`/gai/conversations/${conversationId}/messages`, { method: 'POST', body: { text } }).then((r) => r.data),
+  /** Context-aware starter questions (Bulgarian), built server-side from the project's real data. */
+  getStarters: (projectId) => request(`/gai/starters?projectId=${encodeURIComponent(projectId)}`).then((r) => r.data),
 };
