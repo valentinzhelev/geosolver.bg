@@ -262,6 +262,16 @@ describe('V1.0.2: safe errors, retry, starters, chips, accessibility', () => {
     expect(q('gai-send').getAttribute('aria-busy')).toBe('false');
   });
 
+  it('switching the UI to English never leaves Bulgarian server starters on screen', async () => {
+    gaiApi.listConversations.mockResolvedValue([]);
+    await mount();
+    await flush();
+    expect(qa('gai-starter-question').map((b) => b.textContent)).toEqual(STARTERS);
+    await act(async () => root.render(<ProjectGaiTab projectId="proj1" bg={false} />));
+    await flush();
+    expect(qa('gai-starter-question').map((b) => b.textContent)).toEqual(['Summarize the project', 'Which data is awaiting review?']);
+  });
+
   it('an untitled conversation is listed as "Нов разговор"', async () => {
     gaiApi.listConversations.mockResolvedValue([conversation({ title: null })]);
     await mount();

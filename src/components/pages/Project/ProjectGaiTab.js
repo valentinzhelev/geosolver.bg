@@ -52,7 +52,8 @@ const ProjectGaiTab = ({ projectId, bg = true }) => {
   }, [projectId, bg]);
 
   useEffect(() => {
-    if (!projectId || !bg) return undefined;
+    if (!bg) { setStarters(FALLBACK_STARTERS.en); return undefined; } // server starters are Bulgarian questions
+    if (!projectId) return undefined;
     let cancelled = false;
     gaiApi.getStarters(projectId)
       .then((data) => { if (!cancelled) setStarters(Array.isArray(data) && data.length ? data : FALLBACK_STARTERS.bg); })
