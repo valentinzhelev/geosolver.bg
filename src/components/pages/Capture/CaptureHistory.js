@@ -26,8 +26,11 @@ const formatWhen = (iso, bg) => {
  * V2.2 Capture history for a project: recent jobs, newest first. Reopens a needs_review job for further review, or
  * a confirmed job in the same (now read-only) review screen for audit. `refreshKey` re-fetches when it changes
  * (e.g. right after a new upload), so the list stays current without the caller managing fetch timing.
+ *
+ * Field Sessions reuse it for the captures that belong to NO session (`excludeIds`), with their own `title`,
+ * `emptyText` and an optional `rowAction(job)` rendered beside - never inside - the row's open button.
  */
-const CaptureHistory = ({ projectId, refreshKey, onOpen, bg = true }) => {
+const CaptureHistory = ({ projectId, refreshKey, onOpen, bg = true, excludeIds = null, title = null, emptyText = null, rowAction = null }) => {
   const [jobs, setJobs] = useState(null); // null = loading
   const [error, setError] = useState('');
 
@@ -44,25 +47,27 @@ const CaptureHistory = ({ projectId, refreshKey, onOpen, bg = true }) => {
 
   if (!projectId) return null;
 
+  const visible = jobs && excludeIds ? jobs.filter((j) => !excludeIds.includes(j.id)) : jobs;
+
   return (
     <div className="flex flex-col gap-2 p-4 rounded-xl bg-white dark:bg-zinc-900 outline outline-1 outline-gray-200 dark:outline-zinc-800" data-testid="capture-history">
-      <h2 className="text-sm font-bold font-['Manrope'] text-black dark:text-white">{bg ? 'Скорошни сканирания' : 'Recent captures'}</h2>
+      <h2 className="text-sm font-bold font-['Manrope'] text-black dark:text-white">{title || (bg ? 'Скорошни сканирания' : 'Recent captures')}</h2>
       {jobs === null && <p className="text-xs text-neutral-400 font-['Manrope']" role="status">{bg ? 'Зареждане...' : 'Loading...'}</p>}
       {error && <p className="text-xs text-red-600 font-['Manrope']" role="alert">{error}</p>}
-      {jobs && jobs.length === 0 && !error && (
-        <p className="text-xs text-neutral-400 font-['Manrope']" data-testid="capture-history-empty">{bg ? 'Все още няма сканирания за този проект.' : 'No captures for this project yet.'}</p>
+      {visible && visible.length === 0 && !error && (
+        <p className="text-xs text-neutral-400 font-['Manrope']" data-testid="capture-history-empty">{emptyText || (bg ? 'Все още няма сканирания за този проект.' : 'No captures for this project yet.')}</p>
       )}
-      {jobs && jobs.length > 0 && (
+      {visible && visible.length > 0 && (
         <ul className="flex flex-col divide-y divide-gray-100 dark:divide-zinc-800">
-          {jobs.map((job) => {
+          {visible.map((job) => {
             const label = STATUS_LABEL[job.status] || [job.status, job.status];
             const modeLabel = MODE_LABEL[job.mode] || [job.mode, job.mode];
             return (
-              <li key={job.id}>
+              <li key={job.id} className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => onOpen(job.id)}
-                  className="w-full flex flex-wrap items-center justify-between gap-2 py-2 text-left hover:bg-stone-50 dark:hover:bg-zinc-800 rounded-lg px-1"
+                  className="flex-1 min-w-0 flex flex-wrap items-center justify-between gap-2 py-2 text-left hover:bg-stone-50 dark:hover:bg-zinc-800 rounded-lg px-1"
                   data-testid="capture-history-row"
                 >
                   <span className="flex flex-col">
@@ -84,6 +89,7 @@ const CaptureHistory = ({ projectId, refreshKey, onOpen, bg = true }) => {
                     {job.status === 'confirmed' && <span className="text-emerald-700 dark:text-emerald-400">{job.importedCount} {bg ? 'импортирани' : 'imported'}</span>}
                   </span>
                 </button>
+                {rowAction && rowAction(job)}
               </li>
             );
           })}

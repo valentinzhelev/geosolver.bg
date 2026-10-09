@@ -99,6 +99,23 @@ describe('ProjectProcessingTab: project-wide, read-only run listing', () => {
     expect(q('processing-run-source-link').getAttribute('href')).toBe('/capture?projectId=proj1&jobId=job-1');
   });
 
+  it('a run made from a Field Session links to that SESSION - never to a capture URL with no job', async () => {
+    fieldProcessingApi.listRunsForProject.mockResolvedValue([{ ...polarRun(), source: { fieldObservationSetId: 'fos-9', captureJobId: null, fieldSessionId: 'sess-1' } }]);
+    await mount();
+    await flush();
+    const link = q('processing-run-source-link');
+    expect(link.getAttribute('href')).toBe('/project?projectId=proj1&tab=field-data&session=sess-1');
+    expect(link.textContent).toBe('Теренна сесия');
+    expect(link.getAttribute('href')).not.toMatch(/capture|null|undefined/);
+  });
+
+  it('a run with neither source link (should not happen) shows no link at all rather than a dead one', async () => {
+    fieldProcessingApi.listRunsForProject.mockResolvedValue([{ ...polarRun(), source: { fieldObservationSetId: 'fos-9' } }]);
+    await mount();
+    await flush();
+    expect(q('processing-run-source-link')).toBeNull();
+  });
+
   it('clicking Details expands a read-only detail block; clicking again collapses it (never mutates the run)', async () => {
     fieldProcessingApi.listRunsForProject.mockResolvedValue([traverseRun()]);
     await mount();

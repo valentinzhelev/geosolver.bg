@@ -32,6 +32,8 @@ describe('evidence chips', () => {
     expect(evidenceChipLabel({ kind: 'surveyPoint', label: '201' })).toBe('Точка 201');
     expect(evidenceChipLabel({ kind: 'surveyPoint', label: 'Точка 201' })).toBe('Точка 201');
     expect(evidenceChipLabel({ kind: 'captureJob' })).toBe('Заснемане');
+    expect(evidenceChipLabel({ kind: 'fieldSession', label: 'Теренна сесия · 09.10.2026' })).toBe('Теренна сесия · 09.10.2026');
+    expect(evidenceChipLabel({ kind: 'fieldSession' })).toBe('Теренна сесия');
     expect(evidenceChipLabel({ kind: 'report', label: '6a24728aa23b7d85a3236d01' })).toBe('Отчет');
     expect(evidenceChipLabel({ kind: 'somethingNew' })).toBe('Източник');
   });
@@ -41,6 +43,8 @@ describe('evidence chips', () => {
     expect(evidenceHref({ kind: 'captureJob' }, 'p1')).toBe('/project?projectId=p1&tab=field-data');
     expect(evidenceHref({ kind: 'report' }, 'p1')).toBe('/project?projectId=p1&tab=documents');
     expect(evidenceHref({ kind: 'calculation' }, 'p1')).toBe('/calculations/history?projectId=p1');
+    expect(evidenceHref({ kind: 'fieldSession', id: 's1' }, 'p1')).toBe('/project?projectId=p1&tab=field-data&session=s1');
+    expect(evidenceHref({ kind: 'fieldSession' }, 'p1')).toBeNull();
     expect(evidenceHref({ kind: 'project' }, 'p1')).toBeNull();
     expect(evidenceHref({ kind: 'manual' }, 'p1')).toBeNull();
     expect(evidenceHref({ kind: 'surveyPoint' }, '')).toBeNull();

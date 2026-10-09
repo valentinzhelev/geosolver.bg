@@ -22,12 +22,15 @@ const CONVENTIONS = [
  * confirmed/never-auto-save/server-authoritative contract as FieldProcessingResults (V2.4.1 polar), offered as a
  * sibling choice from the same confirmed Field Notebook rather than a disconnected calculator screen.
  */
-const TraverseProcessingResults = ({ fieldObservationSetId, projectId, bg = true }) => {
+const TraverseProcessingResults = ({ fieldObservationSetId, projectId, bg = true, suggestions = null }) => {
   const [phase, setPhase] = useState('loading'); // loading | idle | running | ready
   const [run, setRun] = useState(null);
-  const [traverseType, setTraverseType] = useState('CLOSED_LOOP');
-  const [startIdentifier, setStartIdentifier] = useState('');
-  const [endIdentifier, setEndIdentifier] = useState('');
+  // Field Sessions infer a likely setup from the confirmed data (editable, never auto-run); otherwise exactly as before
+  const endCandidates = (suggestions && suggestions.endCandidates) || [];
+  const suggestedType = !suggestions ? 'CLOSED_LOOP' : suggestions.closesOnStart ? 'CLOSED_LOOP' : endCandidates.length ? 'KNOWN_ENDPOINT' : 'OPEN';
+  const [traverseType, setTraverseType] = useState(suggestedType);
+  const [startIdentifier, setStartIdentifier] = useState((suggestions && suggestions.suggestedStart) || '');
+  const [endIdentifier, setEndIdentifier] = useState(suggestedType === 'KNOWN_ENDPOINT' ? endCandidates[0] : '');
   const [convention, setConvention] = useState('');
   const [error, setError] = useState('');
   const [selected, setSelected] = useState(null); // index of the leg shown in detail
@@ -112,7 +115,10 @@ const TraverseProcessingResults = ({ fieldObservationSetId, projectId, bg = true
           </label>
           <label className="flex flex-col gap-1 text-xs font-['Manrope'] text-neutral-600 dark:text-zinc-300">
             {bg ? 'Начална станция (име от полевата книжка)' : 'Start station (name from the field notebook)'}
-            <input value={startIdentifier} onChange={(e) => setStartIdentifier(e.target.value)} disabled={phase === 'running'} className={input} placeholder="101" data-testid="traverse-start-identifier" />
+            <input value={startIdentifier} onChange={(e) => setStartIdentifier(e.target.value)} disabled={phase === 'running'} className={input} placeholder="101" list={suggestions && suggestions.chain ? 'traverse-chain-stations' : undefined} data-testid="traverse-start-identifier" />
+            {suggestions && suggestions.chain && (
+              <datalist id="traverse-chain-stations">{suggestions.chain.map((c) => <option key={c} value={c} />)}</datalist>
+            )}
           </label>
           {traverseType !== 'OPEN' && (
             <label className="flex flex-col gap-1 text-xs font-['Manrope'] text-neutral-600 dark:text-zinc-300">
@@ -122,8 +128,11 @@ const TraverseProcessingResults = ({ fieldObservationSetId, projectId, bg = true
               )}
               <input
                 value={endIdentifier} onChange={(e) => setEndIdentifier(e.target.value)} disabled={phase === 'running'} className={input}
-                placeholder={traverseType === 'CLOSED_LOOP' ? startIdentifier || '101' : ''} data-testid="traverse-end-identifier"
+                placeholder={traverseType === 'CLOSED_LOOP' ? startIdentifier || '101' : ''} list={endCandidates.length ? 'traverse-end-candidates' : undefined} data-testid="traverse-end-identifier"
               />
+              {endCandidates.length > 0 && (
+                <datalist id="traverse-end-candidates">{endCandidates.map((c) => <option key={c} value={c} />)}</datalist>
+              )}
             </label>
           )}
         </div>

@@ -153,9 +153,16 @@ const RunCard = ({ run, projectId, bg, expanded, onToggle }) => {
               {run.generatedPointIds.length} {bg ? 'генерирани точки' : 'generated points'}
             </Link>
           )}
-          <Link to={`/capture?projectId=${projectId}&jobId=${run.source.captureJobId}`} className="text-xs font-['Manrope'] underline text-neutral-500 dark:text-zinc-400" data-testid="processing-run-source-link">
-            {bg ? 'Изходен карнет' : 'Source notebook'}
-          </Link>
+          {run.source.fieldSessionId ? (
+            // a run made from a Field Session links to that session; only a capture-origin run links to its capture
+            <Link to={`/project?projectId=${projectId}&tab=field-data&session=${run.source.fieldSessionId}`} className="text-xs font-['Manrope'] underline text-neutral-500 dark:text-zinc-400" data-testid="processing-run-source-link">
+              {bg ? 'Теренна сесия' : 'Field session'}
+            </Link>
+          ) : run.source.captureJobId ? (
+            <Link to={`/capture?projectId=${projectId}&jobId=${run.source.captureJobId}`} className="text-xs font-['Manrope'] underline text-neutral-500 dark:text-zinc-400" data-testid="processing-run-source-link">
+              {bg ? 'Изходен карнет' : 'Source notebook'}
+            </Link>
+          ) : null}
           <button type="button" onClick={onToggle} className="text-xs font-['Manrope'] underline text-black dark:text-white" data-testid="processing-run-toggle">
             {expanded ? (bg ? 'Скрий детайли' : 'Hide details') : (bg ? 'Детайли' : 'Details')}
           </button>
@@ -231,7 +238,7 @@ const ProjectProcessingTab = ({ projectId, bg = true }) => {
         <h2 className="text-sm font-bold font-['Manrope'] text-black dark:text-white">{bg ? 'Обработки' : 'Processing'}</h2>
         <p className="text-xs text-neutral-500 dark:text-zinc-400 font-['Manrope']">
           {bg
-            ? 'Всички полярни обработки и полигонови ходове в проекта. Нова обработка се стартира от потвърден полеви карнет в „Теренни данни“.'
+            ? 'Всички полярни обработки и полигонови ходове в проекта. Нова обработка се стартира от потвърдена теренна сесия в „Теренни данни“.'
             : 'Every polar and traverse processing run in this project. Start a new one from a confirmed field notebook under "Field Data".'}
         </p>
       </div>

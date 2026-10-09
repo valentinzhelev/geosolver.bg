@@ -30,6 +30,7 @@ const KIND_LABEL = {
   surveyPoint: { bg: 'Точка', en: 'Point' },
   captureJob: { bg: 'Заснемане', en: 'Capture' },
   fieldObservationSet: { bg: 'Потвърдени теренни наблюдения', en: 'Confirmed field observations' },
+  fieldSession: { bg: 'Теренна сесия', en: 'Field session' },
   processingRun: { bg: 'Обработка', en: 'Processing' },
   report: { bg: 'Отчет', en: 'Report' },
   calculation: { bg: 'Изчисление', en: 'Calculation' },
@@ -51,6 +52,7 @@ const KIND_TAB = { surveyPoint: 'points', captureJob: 'field-data', fieldObserva
 export function evidenceHref(e, projectId) {
   if (!e || !projectId) return null;
   const pid = encodeURIComponent(projectId);
+  if (e.kind === 'fieldSession' && e.id) return `/project?projectId=${pid}&tab=field-data&session=${encodeURIComponent(e.id)}`;
   if (KIND_TAB[e.kind]) return `/project?projectId=${pid}&tab=${KIND_TAB[e.kind]}`;
   if (e.kind === 'calculation') return `/calculations/history?projectId=${pid}`;
   return null;

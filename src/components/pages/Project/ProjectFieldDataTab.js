@@ -1,40 +1,30 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import CaptureHistory from '../Capture/CaptureHistory';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import FieldSessionsPanel from './FieldSession/FieldSessionsPanel';
+import FieldSessionDetail from './FieldSession/FieldSessionDetail';
 
 /**
- * V2.4.3 "Теренни данни": the project's unified Capture history (coordinate-table AND Field Notebook captures -
- * CaptureHistory already lists both, V2.2/V2.3), given a proper home in the Project workspace instead of only
- * being reachable by first navigating to the standalone Capture page. Opening or continuing a capture still
- * happens on the Capture page itself (its review UI - OCR correction, candidate panel, confirm flow - is
- * substantial and already fully tested; this tab does not duplicate it, only makes it discoverable and deep-links
- * into it via the existing ?projectId=&jobId= mechanism).
+ * "Теренни данни": the project's Field Sessions (Теренна сесия) - one real working session in the field, from
+ * entry (manual or from a notebook photo) through review and confirmation to processing, points and a report.
+ * `?session=<id>[&section=...]` opens one session inside the tab (so a link, a reload and the browser's back button
+ * all work); without it the tab lists the sessions plus, for compatibility, the captures that belong to no session
+ * and the legacy carnets. The OCR capture/review workspace itself is unchanged and still lives on the Capture page.
  */
 const ProjectFieldDataTab = ({ projectId, bg = true }) => {
   const navigate = useNavigate();
-  const openJob = (jobId) => navigate(`/capture?projectId=${projectId}&jobId=${jobId}`);
+  const [params, setParams] = useSearchParams();
+  const sessionId = params.get('session') || '';
+  const section = params.get('section') || '';
+
+  const openSession = (id, sec = '') => setParams({ projectId, tab: 'field-data', session: id, ...(sec ? { section: sec } : {}) });
+  const backToList = () => setParams({ projectId, tab: 'field-data' });
+  const openCapture = (jobId) => navigate(`/capture?projectId=${projectId}&jobId=${jobId}`);
 
   return (
     <div className="flex flex-col gap-3" data-testid="project-field-data-tab">
-      <div className="flex flex-wrap items-start justify-between gap-2">
-        <div className="flex flex-col gap-1">
-          <h2 className="text-sm font-bold font-['Manrope'] text-black dark:text-white">{bg ? 'Теренни данни' : 'Field data'}</h2>
-          <p className="text-xs text-neutral-500 dark:text-zinc-400 font-['Manrope']">
-            {bg
-              ? 'Всички заснемания за проекта - таблици с координати и полеви карнети. Отвори за преглед, продължи проверка на данни „За проверка“, или обработи потвърден карнет.'
-              : 'Every capture for this project - coordinate tables and field notebooks. Open to review, continue a "needs review" item, or process a confirmed notebook.'}
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={() => navigate(`/capture?projectId=${projectId}`)}
-          className="px-3 py-2 rounded-lg text-sm font-semibold font-['Manrope'] bg-black dark:bg-white text-white dark:text-black"
-          data-testid="project-field-data-new"
-        >
-          {bg ? 'Ново заснемане' : 'New capture'}
-        </button>
-      </div>
-      <CaptureHistory projectId={projectId} onOpen={openJob} bg={bg} />
+      {sessionId
+        ? <FieldSessionDetail key={sessionId} projectId={projectId} sessionId={sessionId} initialSection={section} bg={bg} onBack={backToList} onOpenSession={openSession} />
+        : <FieldSessionsPanel projectId={projectId} bg={bg} onOpenSession={openSession} onOpenCapture={openCapture} />}
     </div>
   );
 };

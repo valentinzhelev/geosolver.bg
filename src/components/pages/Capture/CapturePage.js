@@ -5,6 +5,8 @@ import SEO from '../../shared/SEO';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { useProScan } from '../../../hooks/useProScan';
 import { captureApi } from '../../../services/captureApi';
+import { fieldSessionsApi } from '../../../services/fieldSessionsApi';
+import { sessionErrorMessage } from '../../../utils/fieldSessionView';
 import { ACCEPTED_TYPES, checkFile, describeCaptureError } from '../../../utils/captureView';
 import CaptureReview from './CaptureReview';
 import NotebookReview from './Notebook/NotebookReview';
@@ -14,6 +16,10 @@ import CaptureHistory from './CaptureHistory';
  * Capture: project -> photo / scan -> reconstructed draft -> review -> explicit confirmation. Two modes since V2.3:
  * coordinate-table (-> SurveyPoints) and field-notebook (-> a FieldObservationSet, never SurveyPoints/a calculation).
  * A first-class workspace page reached from a project.
+ *
+ * Field Sessions: with `?sessionId=` the page is the "Добави от снимка" step of that session - notebook mode only, the
+ * uploaded job is attached to the session right after it is created, and a link leads back to the session. The
+ * whole OCR/review/confirm pipeline below is the unchanged one; without `sessionId` nothing here differs.
  */
 const CapturePage = () => {
   const { language } = useTranslation();
@@ -22,13 +28,14 @@ const CapturePage = () => {
   const [params, setParams] = useSearchParams();
   const projectId = params.get('projectId') || '';
   const jobId = params.get('jobId') || '';
+  const sessionId = params.get('sessionId') || '';
 
   const [job, setJob] = useState(null);
   const [imageUrl, setImageUrl] = useState('');
   const [phase, setPhase] = useState('idle'); // idle | uploading | loading | ready
   const [error, setError] = useState('');
   const [historyRefresh, setHistoryRefresh] = useState(0);
-  const [mode, setMode] = useState('coordinate-table'); // the mode chosen on the upload screen, before a job exists
+  const [mode, setMode] = useState(sessionId || params.get('mode') === 'field-notebook' ? 'field-notebook' : 'coordinate-table'); // chosen on the upload screen, before a job exists
   const fileRef = useRef(null);
   const cameraRef = useRef(null);
 
@@ -59,10 +66,18 @@ const CapturePage = () => {
     setError('');
     setPhase('uploading');
     try {
-      const data = await captureApi.createJob(file, projectId, mode);
-      setParams({ projectId, jobId: data.id }, { replace: true });
+      const data = await captureApi.createJob(file, projectId, sessionId ? 'field-notebook' : mode);
+      setParams({ projectId, jobId: data.id, ...(sessionId ? { sessionId } : {}) }, { replace: true });
       await showJob(data);
       setHistoryRefresh((n) => n + 1);
+      if (sessionId) {
+        try {
+          await fieldSessionsApi.attachCapture(sessionId, data.id);
+        } catch (e) {
+          // the capture itself is fine and stays reviewable; only the link to the session failed
+          setError(sessionErrorMessage(e, bg));
+        }
+      }
     } catch (e) {
       setError(describeCaptureError(e, bg));
       setPhase('idle');
@@ -77,15 +92,19 @@ const CapturePage = () => {
     setImageUrl('');
     setPhase('idle');
     setError('');
-    setParams({ projectId }, { replace: true });
+    setParams({ projectId, ...(sessionId ? { sessionId } : {}) }, { replace: true });
   };
 
   const openHistoryJob = (id) => {
     setJob(null);
     setImageUrl('');
     setError('');
-    setParams({ projectId, jobId: id }, { replace: true });
+    setParams({ projectId, jobId: id, ...(sessionId ? { sessionId } : {}) }, { replace: true });
   };
+
+  const backToSession = sessionId && projectId
+    ? <Link to={`/project?projectId=${encodeURIComponent(projectId)}&tab=field-data&session=${encodeURIComponent(sessionId)}`} className="self-start text-sm font-semibold font-['Manrope'] underline text-neutral-700 dark:text-zinc-200" data-testid="capture-back-to-session">{bg ? '← Към теренната сесия' : '← Back to the field session'}</Link>
+    : null;
 
   const primary = "px-4 py-2 rounded-lg text-sm font-semibold font-['Manrope'] bg-black dark:bg-white text-white dark:text-black disabled:opacity-50";
   const ghost = "px-4 py-2 rounded-lg text-sm font-medium font-['Manrope'] bg-white dark:bg-zinc-900 outline outline-1 outline-gray-200 dark:outline-zinc-700";
@@ -137,10 +156,12 @@ const CapturePage = () => {
     body = (
       <div className="flex flex-col gap-4">
         <div className="p-5 md:p-6 rounded-xl bg-white dark:bg-zinc-900 outline outline-1 outline-gray-200 dark:outline-zinc-800 flex flex-col gap-4" data-testid="capture-upload">
-          <div className="flex gap-1.5" role="tablist" aria-label={bg ? 'Вид сканиране' : 'Capture type'}>
-            {modeBtn('coordinate-table', 'Таблица с координати', 'Coordinate table')}
-            {modeBtn('field-notebook', 'Полева книжка', 'Field notebook')}
-          </div>
+          {!sessionId && (
+            <div className="flex gap-1.5" role="tablist" aria-label={bg ? 'Вид сканиране' : 'Capture type'}>
+              {modeBtn('coordinate-table', 'Таблица с координати', 'Coordinate table')}
+              {modeBtn('field-notebook', 'Полева книжка', 'Field notebook')}
+            </div>
+          )}
           {mode === 'field-notebook' ? (
             <div>
               <h2 className="text-lg font-bold font-['Manrope'] text-black dark:text-white">{bg ? 'Полева книжка' : 'Field notebook'}</h2>
@@ -192,6 +213,7 @@ const CapturePage = () => {
               {bg ? 'Снимка → разпознаване → проверка → потвърждение' : 'Photo → recognition → review → confirmation'}
             </p>
           </div>
+          {backToSession}
           {error && <div role="alert" className="p-3 rounded-lg bg-red-50 text-red-700 text-sm font-['Manrope']">{error}</div>}
           {body}
         </div>

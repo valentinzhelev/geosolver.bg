@@ -94,4 +94,46 @@ describe('CaptureHistory', () => {
     await act(async () => root.render(<CaptureHistory projectId="proj1" bg refreshKey={1} />));
     expect(captureApi.listJobs).toHaveBeenCalledTimes(2);
   });
+
+  describe('options used by Field Sessions (all optional - the default list is unchanged)', () => {
+    const qa = (id) => [...container.querySelectorAll(`[data-testid="${id}"]`)];
+
+    it('excludeIds hides the captures that already belong to a session', async () => {
+      captureApi.listJobs.mockResolvedValue([job({ id: 'in-session' }), job({ id: 'free', originalName: 'free.png' })]);
+      await mount({ excludeIds: ['in-session'], onOpen: jest.fn() });
+      await act(async () => {});
+      expect(qa('capture-history-row')).toHaveLength(1);
+      expect(qa('capture-history-row')[0].textContent).toContain('free.png');
+    });
+
+    it('a custom title and empty text apply when everything is excluded', async () => {
+      captureApi.listJobs.mockResolvedValue([job({ id: 'a' })]);
+      await mount({ excludeIds: ['a'], title: 'Заснемания извън сесия', emptyText: 'Няма заснемания извън сесиите.', onOpen: jest.fn() });
+      await act(async () => {});
+      expect(container.querySelector('h2').textContent).toBe('Заснемания извън сесия');
+      expect(container.querySelector('[data-testid="capture-history-empty"]').textContent).toBe('Няма заснемания извън сесиите.');
+    });
+
+    it('rowAction renders beside the open button, never inside it, and does not trigger onOpen', async () => {
+      captureApi.listJobs.mockResolvedValue([job({ id: 'j1' })]);
+      const onOpen = jest.fn();
+      const onAction = jest.fn();
+      await mount({ onOpen, rowAction: (j) => <button type="button" data-testid="row-action" onClick={() => onAction(j.id)}>+</button> });
+      await act(async () => {});
+      const row = qa('capture-history-row')[0];
+      expect(row.querySelector('button')).toBeNull(); // no nested interactive element
+      await act(async () => { container.querySelector('[data-testid="row-action"]').click(); });
+      expect(onAction).toHaveBeenCalledWith('j1');
+      expect(onOpen).not.toHaveBeenCalled();
+    });
+
+    it('without the options the list is exactly as before', async () => {
+      captureApi.listJobs.mockResolvedValue([job({ id: 'j1' })]);
+      await mount({ onOpen: jest.fn() });
+      await act(async () => {});
+      expect(container.querySelector('h2').textContent).toBe('Скорошни сканирания');
+      expect(qa('capture-history-row')).toHaveLength(1);
+      expect(container.querySelector('[data-testid="row-action"]')).toBeNull();
+    });
+  });
 });
