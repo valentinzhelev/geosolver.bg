@@ -12,7 +12,7 @@ jest.mock('../../../../../services/fieldSessionsApi', () => ({
 }));
 jest.mock('../../../../../services/reportsApi', () => ({ reportsApi: { createReport: jest.fn() } }));
 jest.mock('../../../Capture/Notebook/FieldProcessingWorkflow', () => (props) => (
-  <div data-testid="mock-workflow" data-modes={props.availableModes.join(',')} data-set={props.fieldObservationSetId} data-suggest={JSON.stringify(props.traverseSuggestions)} />
+  <div data-testid="mock-workflow" data-modes={props.availableModes.join(',')} data-set={props.fieldObservationSetId} data-suggest={JSON.stringify(props.traverseSuggestions)} onClick={props.onChanged} />
 ));
 
 const rawSetup = (over = {}) => ({
@@ -459,6 +459,17 @@ describe('processing: only what the confirmed data supports', () => {
     expect(q('session-run-link').getAttribute('href')).toBe('/project?projectId=proj1&tab=processing');
     expect(q('session-status').textContent).toBe('✓✓ Обработена');
   });
+
+  it('when the workflow saves points the session reloads by itself (no manual refresh needed)', async () => {
+    fieldSessionsApi.get.mockResolvedValue(confirmedView());
+    await mount({ initialSection: 'processing' });
+    expect(q('session-runs-empty')).toBeTruthy();
+    fieldSessionsApi.get.mockResolvedValue(confirmedView({ status: 'processed', processing: { runCount: 1, pointCount: 3, reportCount: 0 }, runs: [{ id: 'r1', processingType: 'polar', createdAt: '2026-10-09T10:00:00Z', pointCount: 3 }] }));
+    await click(q('mock-workflow'));
+    await flush();
+    expect(q('session-run').textContent).toContain('3 точки');
+    expect(q('session-status').textContent).toBe('✓✓ Обработена');
+  });
 });
 
 describe('documents', () => {
@@ -478,6 +489,7 @@ describe('documents', () => {
     fieldSessionsApi.get.mockResolvedValue(processed());
     await mount({ initialSection: 'documents' });
     expect(q('session-report').textContent).toContain('Отчет за полярна обработка');
+    expect(q('session-report').textContent).not.toMatch(/Отчет за полярна обработка.*Отчет за полярна обработка/);
     expect(q('session-documents-link').getAttribute('href')).toBe('/project?projectId=proj1&tab=documents');
 
     reportsApi.createReport.mockResolvedValue({ id: 'rep2' });

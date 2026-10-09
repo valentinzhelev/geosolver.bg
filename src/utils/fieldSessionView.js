@@ -108,7 +108,7 @@ const FIELD_LABELS = {
   target: ['Цел', 'Target'],
   direction: ['Посока към ориентира', 'Backsight direction'],
   hz: ['Hz', 'Hz'],
-  vz: ['V (зенитно разстояние)', 'V (zenith)'],
+  vz: ['V (зенитно)', 'V (zenith)'],
   distance: ['Наклонено разстояние', 'Slope distance'],
   horizontalDistance: ['Хоризонтално разстояние', 'Horizontal distance'],
   prismHeight: ['Височина на призмата', 'Prism height'],

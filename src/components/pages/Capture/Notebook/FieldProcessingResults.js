@@ -17,7 +17,7 @@ const CONVENTIONS = [
  * explicitly save the calculated targets as project SurveyPoints ("Създай точки"). Reused from the Field Notebook
  * workflow (NotebookReview), never a disconnected calculator screen.
  */
-const FieldProcessingResults = ({ fieldObservationSetId, projectId, bg = true }) => {
+const FieldProcessingResults = ({ fieldObservationSetId, projectId, bg = true, onChanged = null }) => {
   const [phase, setPhase] = useState('loading'); // loading | idle | running | ready | error
   const [run, setRun] = useState(null);
   const [convention, setConvention] = useState('');
@@ -68,6 +68,7 @@ const FieldProcessingResults = ({ fieldObservationSetId, projectId, bg = true })
       setRun(res.data);
       setSaveResult({ created: res.created, skipped: res.skipped });
       setSaveStage('done');
+      if (onChanged) onChanged();
     } catch (e) {
       setSaveStage('idle');
       setError(e.message);

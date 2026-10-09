@@ -55,7 +55,7 @@ const SessionDocuments = ({ session, projectId, onChanged, bg = true }) => {
         <ul className="flex flex-col divide-y divide-gray-100 dark:divide-zinc-800">
           {session.reports.map((rep) => (
             <li key={rep.id} className="py-2 text-sm font-['Manrope'] text-black dark:text-white" data-testid="session-report">
-              {rep.title} <span className="text-xs text-neutral-500">· {reportTypeLabel(rep.reportType, bg)} · {fmtGeneratedAt(rep.generatedAt, bg)}</span>
+              {rep.title} <span className="text-xs text-neutral-500">· {rep.title === reportTypeLabel(rep.reportType, bg) ? null : <>{reportTypeLabel(rep.reportType, bg)} · </>}{fmtGeneratedAt(rep.generatedAt, bg)}</span>
             </li>
           ))}
         </ul>

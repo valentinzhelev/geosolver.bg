@@ -14,7 +14,7 @@ const ALL_MODES = ['polar', 'traverse'];
  * at all) and `traverseSuggestions` (start station / end candidates inferred from the data, editable). Without
  * them it behaves exactly as before: both kinds, nothing pre-filled.
  */
-const FieldProcessingWorkflow = ({ fieldObservationSetId, projectId, bg = true, availableModes = ALL_MODES, traverseSuggestions = null }) => {
+const FieldProcessingWorkflow = ({ fieldObservationSetId, projectId, bg = true, availableModes = ALL_MODES, traverseSuggestions = null, onChanged = null }) => {
   const modes = ALL_MODES.filter((m) => availableModes.includes(m));
   const [chosen, setChosen] = useState(modes[0] || 'polar');
   const mode = modes.includes(chosen) ? chosen : modes[0];
@@ -36,8 +36,8 @@ const FieldProcessingWorkflow = ({ fieldObservationSetId, projectId, bg = true, 
         )}
       </div>
       {mode === 'polar'
-        ? <FieldProcessingResults fieldObservationSetId={fieldObservationSetId} projectId={projectId} bg={bg} />
-        : <TraverseProcessingResults fieldObservationSetId={fieldObservationSetId} projectId={projectId} bg={bg} suggestions={traverseSuggestions} />}
+        ? <FieldProcessingResults fieldObservationSetId={fieldObservationSetId} projectId={projectId} bg={bg} onChanged={onChanged} />
+        : <TraverseProcessingResults fieldObservationSetId={fieldObservationSetId} projectId={projectId} bg={bg} suggestions={traverseSuggestions} onChanged={onChanged} />}
     </div>
   );
 };

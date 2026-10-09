@@ -37,7 +37,7 @@ const SessionProcessing = ({ session, projectId, onRefresh, refreshing, bg = tru
     <div className="flex flex-col gap-4" data-testid="session-processing">
       <h3 className="text-sm font-bold font-['Manrope'] text-black dark:text-white">{bg ? 'Обработи измерванията' : 'Process the measurements'}</h3>
       {modes.length > 0 && session.observationSetId ? (
-        <FieldProcessingWorkflow fieldObservationSetId={session.observationSetId} projectId={projectId} bg={bg} availableModes={modes} traverseSuggestions={traverse} />
+        <FieldProcessingWorkflow fieldObservationSetId={session.observationSetId} projectId={projectId} bg={bg} availableModes={modes} traverseSuggestions={traverse} onChanged={onRefresh} />
       ) : (
         <p className="text-sm text-neutral-600 dark:text-zinc-300 font-['Manrope']" data-testid="session-processing-none">{noProcessingReason(options, bg)}</p>
       )}

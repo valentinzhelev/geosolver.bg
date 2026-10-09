@@ -22,7 +22,7 @@ const CONVENTIONS = [
  * confirmed/never-auto-save/server-authoritative contract as FieldProcessingResults (V2.4.1 polar), offered as a
  * sibling choice from the same confirmed Field Notebook rather than a disconnected calculator screen.
  */
-const TraverseProcessingResults = ({ fieldObservationSetId, projectId, bg = true, suggestions = null }) => {
+const TraverseProcessingResults = ({ fieldObservationSetId, projectId, bg = true, suggestions = null, onChanged = null }) => {
   const [phase, setPhase] = useState('loading'); // loading | idle | running | ready
   const [run, setRun] = useState(null);
   // Field Sessions infer a likely setup from the confirmed data (editable, never auto-run); otherwise exactly as before
@@ -79,6 +79,7 @@ const TraverseProcessingResults = ({ fieldObservationSetId, projectId, bg = true
       setRun(res.data);
       setSaveResult({ created: res.created, skipped: res.skipped });
       setSaveStage('done');
+      if (onChanged) onChanged();
     } catch (e) {
       setSaveStage('idle');
       setError(e.message);

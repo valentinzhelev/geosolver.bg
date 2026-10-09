@@ -179,7 +179,7 @@ const SessionEntry = ({ setups, editSetups, evaluation, angleUnit = 'gon', bg = 
         <h3 className="text-sm font-bold font-['Manrope'] text-black dark:text-white">
           {editingRow !== null ? (bg ? 'Редакция на наблюдение' : 'Edit observation') : (bg ? 'Ново наблюдение' : 'New observation')}
         </h3>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 items-end gap-3">
           <div className="col-span-2">
             <Field id="obs-target" testId="obs-field-target" inputRef={targetRef} label={fieldLabel('target', bg)} value={form.target} onChange={(v) => set({ target: v })}
               issue={editingRow !== null ? issueOf({ setup: active.index, section: 'observation', row: editingRow, field: 'target' }) : null} placeholder="201" />
@@ -198,7 +198,7 @@ const SessionEntry = ({ setups, editSetups, evaluation, angleUnit = 'gon', bg = 
           {showMore ? (bg ? 'По-малко' : 'Less') : (bg ? 'Още полета' : 'More fields')}
         </button>
         {showMore && (
-          <div className="grid grid-cols-2 gap-3" data-testid="obs-more">
+          <div className="grid grid-cols-2 items-end gap-3" data-testid="obs-more">
             <Field id="obs-hdist" testId="obs-field-horizontalDistance" label={`${fieldLabel('horizontalDistance', bg)} (m)`} value={form.horizontalDistance} inputMode="decimal" onChange={(v) => set({ horizontalDistance: v })}
               issue={editingRow !== null ? issueOf({ setup: active.index, section: 'observation', row: editingRow, field: 'horizontalDistance' }) : null} />
             <Field id="obs-code" testId="obs-field-code" label={fieldLabel('code', bg)} value={form.code} onChange={(v) => set({ code: v })} />
