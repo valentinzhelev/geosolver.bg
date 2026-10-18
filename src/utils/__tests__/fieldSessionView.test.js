@@ -20,6 +20,8 @@ describe('sessionErrorMessage: only safe text', () => {
     expect(sessionErrorMessage({ code: 'REVISION_CONFLICT' })).toMatch(/друго устройство/);
     expect(sessionErrorMessage({ code: 'NOT_SAVED' })).toMatch(/не са запазени/);
     expect(sessionErrorMessage({ code: 'SESSION_CONFIRMED', message: 'Сесията е потвърдена и не може да се променя.' })).toBe('Сесията е потвърдена и не може да се променя.');
+    const unavailable = 'Потвърждаването временно не е налично – системата се обновява. Сесията е запазена, опитайте отново след малко.';
+    expect(sessionErrorMessage({ code: 'CONFIRM_UNAVAILABLE', status: 503, message: unavailable })).toBe(unavailable);
   });
   it('never shows an unknown error\'s own text', () => {
     const generic = 'Възникна проблем. Опитайте отново.';
