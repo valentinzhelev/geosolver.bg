@@ -141,7 +141,7 @@ const SessionPages = ({ session, projectId, selectedId, onOpen, onChanged, onRef
       <h3 className="text-sm font-bold font-['Manrope'] text-black dark:text-white">{bg ? 'Страници' : 'Pages'} ({pages.length})</h3>
       {pages.length === 0 && <p className="text-sm text-neutral-600 dark:text-zinc-300 font-['Manrope']" data-testid="session-pages-empty">{bg ? 'Още няма страници. Добавете първата страница от полевия карнет.' : 'There are no pages yet. Add the first page of the field notebook.'}</p>}
       {pages.length > 0 && (
-        <ol className="flex flex-col gap-2" data-testid="session-pages">
+        <ol className="flex flex-col gap-2 lg:grid lg:grid-cols-2 xl:grid-cols-3" data-testid="session-pages">
           {pages.map((p, i) => {
             const badge = pageStateBadge(p.state, bg);
             const selected = p.id === selectedId;

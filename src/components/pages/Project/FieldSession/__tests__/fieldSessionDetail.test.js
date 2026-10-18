@@ -565,9 +565,12 @@ describe('a session fed by field notebook pages (the full multi-page review is i
     expect(q('mock-workflow')).toBeTruthy();
   });
 
-  it('an empty manual session also offers "add from a photo" through the capture page, tied to this session', async () => {
-    fieldSessionsApi.get.mockResolvedValue(view({ setups: [], setupCount: 0, observationCount: 0 }));
+  it('an empty session offers to start with PAGES from photos right on the entry screen (upload, camera, existing capture)', async () => {
+    fieldSessionsApi.get.mockResolvedValue(view({ setups: [], setupCount: 0, observationCount: 0, pages: [], pageCount: 0 }));
     await mount();
-    expect(q('session-add-photo').getAttribute('href')).toBe('/capture?projectId=proj1&mode=field-notebook&sessionId=s1');
+    expect(q('session-add-pages')).toBeTruthy();
+    expect(q('session-page-upload')).toBeTruthy();
+    expect(q('session-page-camera')).toBeTruthy();
+    expect(q('session-page-existing')).toBeTruthy();
   });
 });

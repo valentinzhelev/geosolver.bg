@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { fieldSessionsApi } from '../../../../services/fieldSessionsApi';
 import { sessionErrorMessage, statusBadge } from '../../../../utils/fieldSessionView';
 import { useSessionDraft } from './useSessionDraft';
@@ -9,6 +8,7 @@ import SessionEvidence from './SessionEvidence';
 import SessionReview from './SessionReview';
 import SessionProcessing from './SessionProcessing';
 import SessionDocuments from './SessionDocuments';
+import SessionPages from './SessionPages';
 
 const SECTIONS = [
   { id: 'overview', bg: 'Преглед', en: 'Overview' },
@@ -122,7 +122,6 @@ const FieldSessionDetail = ({ projectId, sessionId, bg = true, initialSection = 
     await fieldSessionsApi.remove(session.id);
     onBack();
   });
-  const addPhoto = () => `/capture?projectId=${encodeURIComponent(projectId)}&mode=field-notebook&sessionId=${encodeURIComponent(session.id)}`;
 
   let body;
   if (section === 'overview') {
@@ -136,7 +135,10 @@ const FieldSessionDetail = ({ projectId, sessionId, bg = true, initialSection = 
         <div className="flex flex-col gap-3">
           <SessionEntry setups={setups} editSetups={editSetups} evaluation={session.evaluation} angleUnit={meta.angleUnit || 'gon'} bg={bg} selectRequest={selectRequest} />
           {!setups.length && (
-            <Link to={addPhoto()} className={`${BTN_GHOST} self-start inline-flex items-center`} data-testid="session-add-photo">{bg ? 'Или добави от снимка' : 'Or add from a photo'}</Link>
+            <div className="flex flex-col gap-2 p-3 rounded-xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900" data-testid="session-add-pages">
+              <h3 className="text-sm font-bold font-['Manrope'] text-black dark:text-white">{bg ? 'Или добави страници на полеви карнет от снимка' : 'Or add field notebook pages from photos'}</h3>
+              <SessionPages session={session} projectId={projectId} onChanged={(view) => { setSession(view); setSection('review'); }} onRefresh={refresh} onOpen={() => {}} disabled={busy} bg={bg} />
+            </div>
           )}
         </div>
       );
