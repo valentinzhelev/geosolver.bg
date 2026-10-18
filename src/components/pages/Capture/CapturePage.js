@@ -17,9 +17,11 @@ import CaptureHistory from './CaptureHistory';
  * coordinate-table (-> SurveyPoints) and field-notebook (-> a FieldObservationSet, never SurveyPoints/a calculation).
  * A first-class workspace page reached from a project.
  *
- * Field Sessions: with `?sessionId=` the page is the "Добави от снимка" step of that session - notebook mode only, the
- * uploaded job is attached to the session right after it is created, and a link leads back to the session. The
- * whole OCR/review/confirm pipeline below is the unchanged one; without `sessionId` nothing here differs.
+ * Field Sessions: with `?sessionId=` the page is the "Добави страница" step of that session - notebook mode only, the
+ * uploaded job is added to the session as its next PAGE right after it is created (a photo that could not be read is
+ * added too, as a failed page the session shows as replaceable), and a link leads back to the session. The OCR
+ * pipeline and the page review below are the unchanged ones, but a session page has no confirm of its own: it is
+ * confirmed only as part of its session. Without `sessionId` nothing here differs.
  */
 const CapturePage = () => {
   const { language } = useTranslation();
@@ -72,7 +74,7 @@ const CapturePage = () => {
       setHistoryRefresh((n) => n + 1);
       if (sessionId) {
         try {
-          await fieldSessionsApi.attachCapture(sessionId, data.id);
+          await fieldSessionsApi.attachPage(sessionId, data.id);
         } catch (e) {
           // the capture itself is fine and stays reviewable; only the link to the session failed
           setError(sessionErrorMessage(e, bg));
@@ -81,6 +83,8 @@ const CapturePage = () => {
     } catch (e) {
       setError(describeCaptureError(e, bg));
       setPhase('idle');
+      // the photo was stored but not readable: still a page of the session (failed, replaceable), so nothing is lost
+      if (sessionId && e && e.jobId) await fieldSessionsApi.attachPage(sessionId, e.jobId).catch(() => {});
     } finally {
       if (fileRef.current) fileRef.current.value = '';
       if (cameraRef.current) cameraRef.current.value = '';
@@ -138,7 +142,7 @@ const CapturePage = () => {
           {points}
         </div>
         {job.mode === 'field-notebook'
-          ? <NotebookReview key={job.id} initialJob={job} imageUrl={imageUrl} bg={bg} />
+          ? <NotebookReview key={job.id} initialJob={job} imageUrl={imageUrl} bg={bg} embedded={!!sessionId} />
           : <CaptureReview key={job.id} initialJob={job} imageUrl={imageUrl} bg={bg} />}
       </div>
     );

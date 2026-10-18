@@ -25,8 +25,8 @@ jest.mock('../../../../hooks/useProScan', () => ({ useProScan: () => ({ isProUse
 jest.mock('../../../../services/captureApi', () => ({
   captureApi: { patchJob: jest.fn(), getJob: jest.fn(), confirmJob: jest.fn(), createJob: jest.fn(), fetchImageObjectUrl: jest.fn(), listJobs: jest.fn() },
 }));
-jest.mock('../../../../services/fieldSessionsApi', () => ({ fieldSessionsApi: { attachCapture: jest.fn() } }));
-jest.mock('../Notebook/NotebookReview', () => (props) => <div data-testid="notebook-review" data-job={props.initialJob.id} />);
+jest.mock('../../../../services/fieldSessionsApi', () => ({ fieldSessionsApi: { attachPage: jest.fn() } }));
+jest.mock('../Notebook/NotebookReview', () => (props) => <div data-testid="notebook-review" data-job={props.initialJob.id} data-embedded={String(!!props.embedded)} />);
 
 const nbJob = (over = {}) => ({ id: 'nb1', project: 'proj1', status: 'needs_review', revision: 0, mode: 'field-notebook', images: { review: '/img' }, ...over });
 
@@ -59,7 +59,7 @@ afterEach(async () => {
   mockSetParamsSpy.mockClear();
 });
 
-describe('Capture page inside a Field Session ("Добави от снимка")', () => {
+describe('Capture page inside a Field Session ("Добави страница")', () => {
   it('is always a field notebook: no coordinate-table choice, and a way back to the session', async () => {
     await mount();
     expect(q('capture-mode-coordinate-table')).toBeNull();
@@ -70,13 +70,13 @@ describe('Capture page inside a Field Session ("Добави от снимка")
 
   it('uploads as a notebook, attaches the new job to the session, and keeps the session in the URL', async () => {
     captureApi.createJob.mockResolvedValue(nbJob());
-    fieldSessionsApi.attachCapture.mockResolvedValue({ id: 's1' });
+    fieldSessionsApi.attachPage.mockResolvedValue({ id: 's1' });
     await mount();
     const file = new File(['png'], 'page.png', { type: 'image/png' });
     await pickFile(file);
     await flush();
     expect(captureApi.createJob).toHaveBeenCalledWith(file, 'proj1', 'field-notebook');
-    expect(fieldSessionsApi.attachCapture).toHaveBeenCalledWith('s1', 'nb1');
+    expect(fieldSessionsApi.attachPage).toHaveBeenCalledWith('s1', 'nb1');
     expect(mockSetParamsSpy).toHaveBeenCalledWith({ projectId: 'proj1', jobId: 'nb1', sessionId: 's1' });
     expect(q('notebook-review').dataset.job).toBe('nb1');
     expect(q('capture-back-to-session')).toBeTruthy(); // still there while reviewing
@@ -84,7 +84,7 @@ describe('Capture page inside a Field Session ("Добави от снимка")
 
   it('if attaching fails the capture is still there to review, with a safe message', async () => {
     captureApi.createJob.mockResolvedValue(nbJob());
-    fieldSessionsApi.attachCapture.mockRejectedValue({ status: 409, code: 'CAPTURE_ALREADY_ATTACHED', message: 'Това заснемане вече е добавено към друга сесия.' });
+    fieldSessionsApi.attachPage.mockRejectedValue({ status: 409, code: 'CAPTURE_ALREADY_ATTACHED', message: 'Това заснемане вече е добавено към друга сесия.' });
     await mount();
     await pickFile(new File(['png'], 'page.png', { type: 'image/png' }));
     await flush();
@@ -92,12 +92,30 @@ describe('Capture page inside a Field Session ("Добави от снимка")
     expect(container.querySelector('[role="alert"]').textContent).toBe('Това заснемане вече е добавено към друга сесия.');
   });
 
-  it('an upload failure never attaches anything', async () => {
+  it('inside a session the page review is EMBEDDED: a page has no confirm of its own (it is confirmed with its session)', async () => {
+    captureApi.createJob.mockResolvedValue(nbJob());
+    fieldSessionsApi.attachPage.mockResolvedValue({ id: 's1' });
+    await mount();
+    await pickFile(new File(['png'], 'page.png', { type: 'image/png' }));
+    await flush();
+    expect(q('notebook-review').dataset.embedded).toBe('true');
+  });
+
+  it('a photo that was stored but could not be read is still added to the session - as a failed page the session can replace', async () => {
+    captureApi.createJob.mockRejectedValue(Object.assign(new Error('x'), { name: 'CaptureApiError', status: 422, code: 'NO_NOTEBOOK_DETECTED', jobId: 'failed9' }));
+    fieldSessionsApi.attachPage.mockResolvedValue({ id: 's1' });
+    await mount();
+    await pickFile(new File(['png'], 'page.png', { type: 'image/png' }));
+    await flush();
+    expect(fieldSessionsApi.attachPage).toHaveBeenCalledWith('s1', 'failed9');
+  });
+
+  it('an upload failure with no stored capture never attaches anything', async () => {
     captureApi.createJob.mockRejectedValue({ status: 500, code: 'INTERNAL', message: 'x' });
     await mount();
     await pickFile(new File(['png'], 'page.png', { type: 'image/png' }));
     await flush();
-    expect(fieldSessionsApi.attachCapture).not.toHaveBeenCalled();
+    expect(fieldSessionsApi.attachPage).not.toHaveBeenCalled();
   });
 
   it('reopening the capture of a session (from "Продължи проверката") keeps the way back', async () => {
@@ -123,7 +141,7 @@ describe('without a session the Capture page is exactly what it was', () => {
     await pickFile(file);
     await flush();
     expect(captureApi.createJob).toHaveBeenCalledWith(file, 'proj1', 'coordinate-table');
-    expect(fieldSessionsApi.attachCapture).not.toHaveBeenCalled();
+    expect(fieldSessionsApi.attachPage).not.toHaveBeenCalled();
     expect(mockSetParamsSpy).toHaveBeenCalledWith({ projectId: 'proj1', jobId: 'job9' });
   });
 

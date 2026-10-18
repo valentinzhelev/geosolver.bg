@@ -26,14 +26,20 @@ function cellAtAddr(job, addr) {
  * The Field Notebook review workspace (V2.3): a dedicated workspace, not the coordinate-table UI overloaded - a
  * notebook page may have several stations/setups, each with its own station/orientation card and observation
  * table, which the coordinate-table's single-grid UI has no room for.
+ *
+ * Multi-page Field Sessions embed it as the editor of ONE page (`embedded`): the cell corrections, column mapping and row
+ * exclusion are exactly these, but there is no confirm/import and no processing here - a page is confirmed only as part of
+ * its session. `focus` (a page-local cell address) opens it on the cell an issue points at; `onChange(job)` tells the
+ * session to re-merge after every successful edit.
  */
-const NotebookReview = ({ initialJob, imageUrl, bg = true }) => {
+const NotebookReview = ({ initialJob, imageUrl, bg = true, embedded = false, focus = null, onChange = null }) => {
   const [job, setJob] = useState(initialJob);
   const setups = job.notebook ? job.notebook.setups : [];
-  const [setupIndex, setSetupIndex] = useState(0);
+  const [setupIndex, setSetupIndex] = useState(focus && Number.isInteger(focus.setup) ? focus.setup : 0);
   const setup = setups.find((s) => s.index === setupIndex) || setups[0];
-  const [selectedAddr, setSelectedAddr] = useState(null);
+  const [selectedAddr, setSelectedAddr] = useState(focus || null);
   const [rowIndex, setRowIndex] = useState(() => {
+    if (focus && focus.section === 'observation' && Number.isInteger(focus.row)) return focus.row;
     const first = setup ? notebookObservations(setup)[0] : null;
     return first ? first.index : 0;
   });
@@ -61,6 +67,7 @@ const NotebookReview = ({ initialJob, imageUrl, bg = true }) => {
     try {
       const updated = await captureApi.patchJob(job.id, { ...body, baseRevision: job.revision });
       setJob(updated);
+      if (onChange) onChange(updated);
     } catch (e) {
       if (e.code === 'REVISION_CONFLICT') {
         try { setJob(await captureApi.getJob(job.id)); } catch { /* keep the old view */ }
@@ -69,7 +76,7 @@ const NotebookReview = ({ initialJob, imageUrl, bg = true }) => {
     } finally {
       setBusy(false);
     }
-  }, [job.id, job.revision, bg]);
+  }, [job.id, job.revision, bg, onChange]);
 
   const handleCommit = useCallback((addr, value) => send({ edits: [{ ...addr, value }] }), [send]);
   const handleMapColumn = useCallback((setupIdx, index, field) => send({ columns: [{ setup: setupIdx, index, field }] }), [send]);
@@ -105,13 +112,13 @@ const NotebookReview = ({ initialJob, imageUrl, bg = true }) => {
           <p className="text-sm font-semibold font-['Manrope'] text-black dark:text-white" data-testid="notebook-summary" role="status">
             {confirmed ? (bg ? 'Импортирано · ' : 'Imported · ') : ''}{notebookSummaryText(job.validationSummary, bg)}
           </p>
-          {!confirmed && stage !== 'ask' && (
+          {!embedded && !confirmed && stage !== 'ask' && (
             <button type="button" className={primary} disabled={!canConfirmNotebookJob(job) || locked} onClick={() => setStage('ask')} data-testid="notebook-confirm-start">
               {bg ? 'Потвърди и импортирай' : 'Confirm and import'}
             </button>
           )}
         </div>
-        {!confirmed && stage === 'ask' && (
+        {!embedded && !confirmed && stage === 'ask' && (
           <div className="flex flex-col gap-2 p-3 rounded-lg bg-orange-50 dark:bg-orange-950/20 outline outline-1 outline-orange-200 dark:outline-orange-900/50" role="alertdialog" aria-label={bg ? 'Потвърждение на импорта' : 'Import confirmation'}>
             <p className="text-sm font-['Manrope'] text-black dark:text-white">
               {bg
@@ -124,8 +131,8 @@ const NotebookReview = ({ initialJob, imageUrl, bg = true }) => {
             </div>
           </div>
         )}
-        {stage === 'importing' && <p className="text-sm text-neutral-500 font-['Manrope']">{bg ? 'Запис...' : 'Saving...'}</p>}
-        {confirmed && (
+        {!embedded && stage === 'importing' && <p className="text-sm text-neutral-500 font-['Manrope']">{bg ? 'Запис...' : 'Saving...'}</p>}
+        {!embedded && confirmed && (
           <div className="flex flex-wrap items-center gap-3 p-3 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 outline outline-1 outline-emerald-200 dark:outline-emerald-900/50" role="status" data-testid="notebook-done">
             <span className="text-sm font-semibold font-['Manrope'] text-emerald-800 dark:text-emerald-300">
               ✓ {bg
@@ -182,7 +189,7 @@ const NotebookReview = ({ initialJob, imageUrl, bg = true }) => {
 
       {/* V2.4.1/V2.4.2: once confirmed, the Field Notebook workflow continues straight into processing - never a
           disconnected calculator screen. The workflow itself offers the polar vs traverse choice (section 26). */}
-      {confirmed && job.importedFieldObservationSetId && (
+      {!embedded && confirmed && job.importedFieldObservationSetId && (
         <FieldProcessingWorkflow fieldObservationSetId={job.importedFieldObservationSetId} projectId={job.project} bg={bg} />
       )}
     </div>

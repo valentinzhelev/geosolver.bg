@@ -2,6 +2,7 @@ import {
   statusBadge, sessionErrorMessage, addSetup, addNextStation, addObservation, updateObservation, removeObservation, removeSetup,
   updateStation, updateOrientation, isBlankObservation, countObservations, indexIssues, issueKey, issueLocation, splitIssues,
   fieldLabel, evidenceLine, availableModes, noProcessingReason, sessionSummaryLine, capturesOutsideSessions,
+  pageStateBadge, pageCountsLine, movePageIds, pageIssueLocation, groupIssuesByPage, pageIssueAddr,
 } from '../fieldSessionView';
 
 describe('statusBadge: Чернова -> За проверка -> Потвърдена -> Обработена, never colour alone', () => {
@@ -137,5 +138,64 @@ describe('list helpers', () => {
   it('captures outside sessions = all captures minus the attached ones', () => {
     expect(capturesOutsideSessions([{ id: 'a' }, { id: 'b' }], ['a']).map((j) => j.id)).toEqual(['b']);
     expect(capturesOutsideSessions(null, null)).toEqual([]);
+  });
+});
+
+describe('notebook pages: state, counts, order, issue placement', () => {
+  it('a page state is a symbol AND a word, in both languages', () => {
+    expect(pageStateBadge('ready').text).toBe('✓ Готова за проверка');
+    expect(pageStateBadge('failed').text).toBe('✕ Не е разпозната');
+    expect(pageStateBadge('processing').text).toBe('… Обработва се');
+    expect(pageStateBadge('confirmed').text).toBe('✓✓ Потвърдена');
+    expect(pageStateBadge('missing', false).text).toBe('✕ Capture missing');
+    expect(pageStateBadge('???').text).toBe('… Обработва се'); // an unknown state is never shown as ready
+  });
+
+  it('counts line: observations always, errors and warnings only when there are some', () => {
+    expect(pageCountsLine({ observationCount: 1, errors: 0, warnings: 0 })).toBe('1 наблюдение');
+    expect(pageCountsLine({ observationCount: 4, errors: 1, warnings: 2 })).toBe('4 наблюдения · ✕ 1 грешка · ! 2 предупреждения');
+    expect(pageCountsLine({ observationCount: 2, errors: 3, warnings: 0 }, false)).toBe('2 observations · ✕ 3 errors');
+  });
+
+  it('movePageIds swaps with the neighbour, and is a no-op at the ends (never mutates)', () => {
+    const ids = ['a', 'b', 'c'];
+    expect(movePageIds(ids, 1, -1)).toEqual(['b', 'a', 'c']);
+    expect(movePageIds(ids, 1, 1)).toEqual(['a', 'c', 'b']);
+    expect(movePageIds(ids, 0, -1)).toBe(ids);
+    expect(movePageIds(ids, 2, 1)).toBe(ids);
+    expect(movePageIds(ids, 9, 1)).toBe(ids);
+    expect(ids).toEqual(['a', 'b', 'c']);
+  });
+
+  const logical = [{ index: 0, station: { point: '101' }, observations: [{ row: 2, target: '203' }] }];
+  it('an issue is located by PAGE first, then station / observation / field', () => {
+    expect(pageIssueLocation({ page: 2, setup: 0, section: 'observation', row: 2, field: 'hz' }, logical)).toBe('Страница 2 · Станция 101 · наблюдение към 203 · Hz');
+    expect(pageIssueLocation({ page: 2, setup: null, section: 'page' }, logical)).toBe('Страница 2');
+    expect(pageIssueLocation({ page: null, setup: null, section: 'page' }, logical)).toBe('Цялата сесия');
+    expect(pageIssueLocation({ page: 3, setup: 0, section: 'observation', row: 2, field: 'hz' }, logical, false)).toBe('Page 3 · Station 101 · observation to 203 · Hz');
+  });
+
+  it('groups issues by page, session-wide first', () => {
+    const groups = groupIssuesByPage([{ page: 3, code: 'a' }, { page: null, code: 'b' }, { page: 2, code: 'c' }, { page: 3, code: 'd' }]);
+    expect(groups.map((g) => [g.page, g.issues.map((i) => i.code)])).toEqual([[null, ['b']], [2, ['c']], [3, ['a', 'd']]]);
+    expect(groupIssuesByPage(null)).toEqual([]);
+  });
+
+  it('maps an issue to the page-local cell address the page editor understands', () => {
+    expect(pageIssueAddr({ section: 'station', field: 'instrumentHeight', pageSetup: 1, pageRow: null })).toEqual({ setup: 1, section: 'station', field: 'instrumentHeight' });
+    expect(pageIssueAddr({ section: 'station', field: 'orientationTarget', pageSetup: 0 })).toEqual({ setup: 0, section: 'orientation', field: 'target' });
+    expect(pageIssueAddr({ section: 'station', field: 'orientationDirection', pageSetup: 0 })).toEqual({ setup: 0, section: 'orientation', field: 'direction' });
+    expect(pageIssueAddr({ section: 'orientation', field: 'direction', pageSetup: 0 })).toEqual({ setup: 0, section: 'orientation', field: 'direction' });
+    expect(pageIssueAddr({ section: 'observation', field: 'hz', pageSetup: 0, pageRow: 4 })).toEqual({ setup: 0, section: 'observation', row: 4, field: 'hz' });
+    expect(pageIssueAddr({ section: 'setup', field: 'distance', pageSetup: 0, pageRow: null })).toBeNull();
+    expect(pageIssueAddr({ section: 'page', field: null, pageSetup: null })).toBeNull();
+    expect(pageIssueAddr({ section: 'observation', field: null, pageSetup: 0, pageRow: 1 })).toBeNull();
+  });
+
+  it('the new page and capture error codes are shown as the server worded them (never a raw message)', () => {
+    for (const code of ['PAGE_LIMIT_REACHED', 'PAGE_DUPLICATE', 'PAGE_NOT_FOUND', 'CAPTURE_CONFIRMED', 'BELONGS_TO_SESSION']) {
+      expect(sessionErrorMessage({ code, message: 'Фиксирано съобщение.' })).toBe('Фиксирано съобщение.');
+    }
+    expect(sessionErrorMessage({ code: 'PAGE_LIMIT_REACHED', message: 'x' }, false)).toBe('Something went wrong. Please try again.');
   });
 });

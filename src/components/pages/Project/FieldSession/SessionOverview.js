@@ -51,7 +51,7 @@ const SessionOverview = ({ session, meta, editable, editMeta, onGoto, onOpenSess
       </div>
 
       <div className="flex flex-col gap-1 text-sm font-['Manrope'] text-neutral-700 dark:text-zinc-200" data-testid="session-provenance">
-        <span>{bg ? 'Източник на данните' : 'Data source'}: <strong>{src[bg ? 0 : 1]}</strong></span>
+        <span>{bg ? 'Източник на данните' : 'Data source'}: <strong>{bg && session.pageCount > 1 && session.sourceLabel ? session.sourceLabel : src[bg ? 0 : 1]}</strong></span>
         {session.revisionOf && (
           <span>{bg ? 'Това е ревизия на ' : 'This is a revision of '}<button type="button" className="underline font-semibold" onClick={() => onOpenSession(session.revisionOf)} data-testid="session-open-original">{bg ? 'предишна сесия' : 'an earlier session'}</button>.</span>
         )}
@@ -64,7 +64,12 @@ const SessionOverview = ({ session, meta, editable, editMeta, onGoto, onOpenSess
           <button type="button" className={BTN_PRIMARY} onClick={() => onGoto('processing')} data-testid="overview-process">{bg ? 'Обработи измерванията' : 'Process the measurements'}</button>
         </div>
       )}
-      {!session.confirmed && session.source === 'capture' && session.capture && session.capture.available && (
+      {!session.confirmed && session.source === 'capture' && (
+        <p className="text-sm text-neutral-700 dark:text-zinc-200 font-['Manrope']" data-testid="overview-pages">
+          {bg ? `Страници: ${session.pageCount || 0}` : `Pages: ${session.pageCount || 0}`}
+        </p>
+      )}
+      {!session.confirmed && session.source === 'capture' && (
         <button type="button" className={`${BTN_GHOST} self-start`} onClick={() => onGoto('review')} data-testid="overview-continue-review">{bg ? 'Продължи проверката' : 'Continue the review'}</button>
       )}
 

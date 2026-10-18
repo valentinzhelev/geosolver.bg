@@ -57,6 +57,18 @@ export const fieldSessionsApi = {
   submit: (id) => request(`/field-sessions/${id}/submit`, { method: 'POST', body: {} }).then((r) => r.data),
   /** @returns {Promise<{data: object, alreadyConfirmed: boolean}>} */
   confirm: (id) => request(`/field-sessions/${id}/confirm`, { method: 'POST', body: {} }).then((r) => ({ data: r.data, alreadyConfirmed: !!r.alreadyConfirmed })),
+  /** Multi-page notebooks: add a page (a Field Notebook capture) at the end, or at `position` (0-based). */
+  attachPage: (id, captureJobId, { position, baseRevision } = {}) => request(`/field-sessions/${id}/pages`, {
+    method: 'POST',
+    body: { captureJobId, ...(position !== undefined ? { position } : {}), ...(baseRevision !== undefined ? { baseRevision } : {}) },
+  }).then((r) => r.data),
+  /** Detach a page (the capture itself is never deleted). */
+  detachPage: (id, pageId, baseRevision) => request(`/field-sessions/${id}/pages/${encodeURIComponent(pageId)}${baseRevision !== undefined ? `?baseRevision=${baseRevision}` : ''}`, { method: 'DELETE' }).then((r) => r.data),
+  /** Set the page order: exactly the current page ids, in the new order. Never re-runs OCR. */
+  reorderPages: (id, pageIds, baseRevision) => request(`/field-sessions/${id}/pages/reorder`, {
+    method: 'PATCH',
+    body: { pageIds, ...(baseRevision !== undefined ? { baseRevision } : {}) },
+  }).then((r) => r.data),
   attachCapture: (id, captureJobId) => request(`/field-sessions/${id}/attach-capture`, { method: 'POST', body: { captureJobId } }).then((r) => r.data),
   revise: (id) => request(`/field-sessions/${id}/revise`, { method: 'POST', body: {} }).then((r) => r.data),
   remove: (id) => request(`/field-sessions/${id}`, { method: 'DELETE' }).then(() => true),

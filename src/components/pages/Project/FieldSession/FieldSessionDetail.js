@@ -102,9 +102,6 @@ const FieldSessionDetail = ({ projectId, sessionId, bg = true, initialSection = 
   if (!session || !section) return <p className="text-xs text-neutral-400 font-['Manrope']" role="status">{bg ? 'Зареждане...' : 'Loading...'}</p>;
 
   const badge = statusBadge(session.status, bg);
-  const captureLink = session.capture && session.capture.available
-    ? `/capture?projectId=${encodeURIComponent(projectId)}&jobId=${encodeURIComponent(session.capture.jobId)}&sessionId=${encodeURIComponent(session.id)}`
-    : null;
 
   const submit = () => run(async () => {
     if (!(await ensureSaved())) throw Object.assign(new Error('x'), { code: 'NOT_SAVED' });
@@ -133,7 +130,7 @@ const FieldSessionDetail = ({ projectId, sessionId, bg = true, initialSection = 
   } else if (section === 'entry') {
     if (session.confirmed) body = <SessionEvidence evidence={session.evidence} bg={bg} />;
     else if (session.source === 'capture') {
-      body = <p className="text-sm text-neutral-600 dark:text-zinc-300 font-['Manrope']" data-testid="session-entry-capture">{bg ? 'Наблюденията на тази сесия идват от снимка на полеви карнет и се проверяват в прегледа на заснемането (раздел „Проверка“).' : 'This session\'s observations come from a field notebook photo and are checked in the capture review ("Review" section).'}</p>;
+      body = <p className="text-sm text-neutral-600 dark:text-zinc-300 font-['Manrope']" data-testid="session-entry-capture">{bg ? 'Наблюденията на тази сесия идват от снимки на страници от полеви карнет. Страниците се добавят, подреждат и проверяват в раздел „Проверка“.' : 'This session\'s observations come from photos of field notebook pages. Pages are added, ordered and checked in the "Review" section.'}</p>;
     } else {
       body = (
         <div className="flex flex-col gap-3">
@@ -147,7 +144,8 @@ const FieldSessionDetail = ({ projectId, sessionId, bg = true, initialSection = 
   } else if (section === 'review') {
     body = (
       <SessionReview
-        session={session} setups={setups} saveState={saveState} busy={busy} error={actionError} captureLink={captureLink} bg={bg}
+        session={session} projectId={projectId} setups={setups} saveState={saveState} busy={busy} error={actionError} bg={bg}
+        onSessionChange={setSession} onRefresh={refresh}
         onJump={(issue) => { setSelectRequest({ setup: issue.setup, row: issue.row, nonce: Date.now() }); setSection('entry'); }}
         onSubmit={submit} onConfirm={confirm} onRevise={revise} onDelete={remove}
       />

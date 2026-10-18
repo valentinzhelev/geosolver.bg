@@ -521,18 +521,21 @@ describe('documents', () => {
   });
 });
 
-describe('a session fed by a field notebook photo', () => {
+describe('a session fed by field notebook pages (the full multi-page review is in sessionPagesReview.test.js)', () => {
+  const page = (n, over = {}) => ({ id: 'job' + n, page: n, state: 'ready', mine: true, hasImage: false, setupCount: 1, observationCount: 4, errors: 0, warnings: 0, continuesStation: null, repeatsStation: null, ...over });
   const capture = (over = {}) => ({ attached: true, available: true, status: 'needs_review', mine: true, jobId: 'job1', rows: 8, review: 1, invalid: 2, ...over });
-  const photoSession = (over = {}) => view({ source: 'capture', sourceLabel: 'От снимка на полеви карнет', setups: [], setupCount: 2, observationCount: 8, evaluation: null, capture: capture(), ...over });
+  const photoSession = (over = {}) => view({
+    source: 'capture', sourceLabel: 'От снимка на полеви карнет', setups: [], setupCount: 1, observationCount: 4, evaluation: { summary: { pages: 1, setups: 1, observations: 4, errors: 0, warnings: 0, canConfirm: true }, issues: [] },
+    capture: capture(), pageCount: 1, pages: [page(1)], logical: { setups: [] }, ...over,
+  });
 
-  it('the review mirrors the capture and sends the user to the existing capture review, coming back to this session', async () => {
+  it('the review shows the pages, the session-wide counts and the page actions - never a second typing editor', async () => {
     fieldSessionsApi.get.mockResolvedValue(photoSession());
     await mount();
-    expect(q('session-capture-card').textContent).toContain('2 станции · 8 наблюдения');
-    expect(q('session-capture-card').textContent).toContain('✕ 2 невалидни');
-    expect(q('session-capture-card').textContent).toContain('! 1 за проверка');
-    expect(q('session-continue-capture').getAttribute('href')).toBe('/capture?projectId=proj1&jobId=job1&sessionId=s1');
-    expect(q('session-confirm-start')).toBeNull(); // confirmation happens in the capture review
+    expect(q('session-pages')).toBeTruthy();
+    expect(qa('session-page')).toHaveLength(1);
+    expect(q('review-summary').textContent).toContain('Страници');
+    expect(q('session-page-upload')).toBeTruthy();
     expect(container.querySelectorAll('input[type="text"]')).toHaveLength(0);
   });
 
@@ -540,29 +543,22 @@ describe('a session fed by a field notebook photo', () => {
     fieldSessionsApi.get.mockResolvedValue(photoSession());
     await mount();
     await section('entry');
-    expect(q('session-entry-capture').textContent).toContain('снимка на полеви карнет');
+    expect(q('session-entry-capture').textContent).toContain('снимки на страници от полеви карнет');
     expect(q('session-entry')).toBeNull();
   });
 
-  it('another project member sees the state but gets no link into the uploader\'s private review', async () => {
-    fieldSessionsApi.get.mockResolvedValue(photoSession({ capture: capture({ mine: false }) }));
+  it('an overview of a capture-backed session names its page count', async () => {
+    fieldSessionsApi.get.mockResolvedValue(photoSession({ pageCount: 3, sourceLabel: 'От снимки на полеви карнет (3 страници)', pages: [page(1), page(2), page(3)] }));
     await mount();
-    expect(q('session-continue-capture')).toBeNull();
-    expect(q('session-capture-not-mine')).toBeTruthy();
+    await section('overview');
+    expect(q('overview-pages').textContent).toBe('Страници: 3');
+    expect(q('session-provenance').textContent).toContain('От снимки на полеви карнет (3 страници)');
   });
 
-  it('a capture that is gone is reported plainly, with the way out', async () => {
-    fieldSessionsApi.get.mockResolvedValue(photoSession({ capture: capture({ available: false, status: null }) }));
-    await mount();
-    expect(q('session-capture-unavailable')).toBeTruthy();
-    expect(q('session-continue-capture')).toBeNull();
-    expect(q('session-delete')).toBeTruthy();
-  });
-
-  it('after the capture review confirms, switching sections picks the confirmed state up', async () => {
+  it('after the session is confirmed, switching sections picks the confirmed state up', async () => {
     fieldSessionsApi.get.mockResolvedValue(photoSession());
     await mount();
-    fieldSessionsApi.get.mockResolvedValue(confirmedView({ source: 'capture', capture: capture({ status: 'confirmed' }) }));
+    fieldSessionsApi.get.mockResolvedValue(confirmedView({ source: 'capture', capture: capture({ status: 'confirmed' }), pages: [page(1, { state: 'confirmed' })], pageCount: 1 }));
     await section('processing');
     await flush();
     expect(q('session-status').textContent).toBe('✓ Потвърдена');
